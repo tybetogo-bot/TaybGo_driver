@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(tree:*)",
+      "Bash(dir /s \"c:\\\\Users\\\\abdul\\\\teybatdriver\\\\lib\")",
+      "Bash(flutter pub get:*)",
+      "Bash(flutter gen-l10n:*)",
+      "Bash(flutter analyze:*)",
+      "Bash(find:*)",
+      "Bash(dir /s /b \"c:\\\\Users\\\\abdul\\\\teybatdriver\")",
+      "Bash(git init:*)",
+      "Bash(git add:*)"
+    ]
+  }
+}

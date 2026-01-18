@@ -1,0 +1,940 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
+import '../../../core/constants/route_constants.dart';
+import '../../../core/l10n/app_localizations.dart';
+import '../../../core/providers/order_provider.dart';
+import '../../../core/theme/app_colors.dart';
+import '../models/order_model.dart';
+
+class OrderDetailScreen extends StatefulWidget {
+  final String orderId;
+
+  const OrderDetailScreen({super.key, required this.orderId});
+
+  @override
+  State<OrderDetailScreen> createState() => _OrderDetailScreenState();
+}
+
+class _OrderDetailScreenState extends State<OrderDetailScreen> {
+  OrderModel? _order;
+  bool _isLoading = true;
+  bool _isUpdating = false;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrder();
+  }
+
+  void _loadOrder() {
+    final orderProvider = context.read<OrderProvider>();
+
+    // Check active order first
+    if (orderProvider.activeOrder?.id == widget.orderId) {
+      setState(() {
+        _order = orderProvider.activeOrder;
+        _isLoading = false;
+      });
+      return;
+    }
+
+    // Check pending order
+    if (orderProvider.pendingOrder?.id == widget.orderId) {
+      setState(() {
+        _order = orderProvider.pendingOrder;
+        _isLoading = false;
+      });
+      return;
+    }
+
+    // Check order history
+    final historyOrder = orderProvider.orderHistory
+        .where((o) => o.id == widget.orderId)
+        .firstOrNull;
+    if (historyOrder != null) {
+      setState(() {
+        _order = historyOrder;
+        _isLoading = false;
+      });
+      return;
+    }
+
+    // Order not found locally
+    setState(() {
+      _isLoading = false;
+      _error = 'Order not found';
+    });
+  }
+
+  Future<void> _openInGoogleMaps({required double lat, required double lng}) async {
+    final url = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng'
+    );
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url, mode: LaunchMode.externalApplication);
+    }
+  }
+
+  Future<void> _updateOrderStatus(OrderStatus newStatus) async {
+    if (_isUpdating || _order == null) return;
+
+    setState(() => _isUpdating = true);
+
+    final orderProvider = context.read<OrderProvider>();
+    bool success = false;
+
+    switch (newStatus) {
+      case OrderStatus.onTheWay:
+        success = await orderProvider.startDelivery();
+        break;
+      case OrderStatus.delivered:
+        success = await orderProvider.markDelivered();
+        break;
+      case OrderStatus.completed:
+        success = await orderProvider.completeOrder();
+        break;
+      default:
+        break;
+    }
+
+    if (mounted) {
+      setState(() {
+        _isUpdating = false;
+        if (success) {
+          // For completed orders, activeOrder becomes null
+          if (newStatus == OrderStatus.completed) {
+            _order = _order!.copyWith(status: OrderStatus.completed);
+          } else {
+            _order = orderProvider.activeOrder ?? _order!.copyWith(status: newStatus);
+          }
+        }
+      });
+
+      if (success) {
+        if (newStatus == OrderStatus.completed) {
+          context.pop();
+        }
+      } else {
+        // Show error message
+        final error = orderProvider.error ?? 'Failed to update status';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error), backgroundColor: AppColors.error),
+        );
+      }
+    }
+  }
+
+  Future<void> _acceptOrder() async {
+    if (_isUpdating || _order == null) return;
+
+    setState(() => _isUpdating = true);
+
+    final orderProvider = context.read<OrderProvider>();
+    final success = await orderProvider.acceptOrder();
+
+    if (mounted) {
+      setState(() {
+        _isUpdating = false;
+        if (success) {
+          _order = orderProvider.activeOrder ?? _order!.copyWith(status: OrderStatus.accepted);
+        }
+      });
+
+      if (!success) {
+        // Show error message
+        final error = orderProvider.error ?? 'Failed to accept order';
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error), backgroundColor: AppColors.error),
+        );
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? AppColors.darkText : AppColors.lightText;
+    final secondaryColor =
+        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final bgColor = isDark ? AppColors.darkBg : AppColors.lightBg;
+    final l10n = AppLocalizations.of(context)!;
+
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: bgColor,
+        appBar: _buildAppBar(context, l10n, textColor),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_error != null || _order == null) {
+      return Scaffold(
+        backgroundColor: bgColor,
+        appBar: _buildAppBar(context, l10n, textColor),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.receipt_long_outlined,
+                  size: 48, color: secondaryColor.withValues(alpha: 0.5)),
+              const SizedBox(height: 12),
+              Text(_error ?? 'Order not found',
+                  style: TextStyle(color: secondaryColor)),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final order = _order!;
+    final isPending = order.status == OrderStatus.pending ||
+        order.status == OrderStatus.searchingForDriver ||
+        order.status == OrderStatus.driverNotificationSent;
+    final isActive = order.status == OrderStatus.accepted ||
+        order.status == OrderStatus.onTheWay ||
+        order.status == OrderStatus.delivered;
+    final showBottomBar = isPending || isActive;
+
+    return Stack(
+      children: [
+        Scaffold(
+          backgroundColor: bgColor,
+          appBar: _buildAppBar(context, l10n, textColor),
+          body: SingleChildScrollView(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Status Badge
+                _buildStatusBadge(order, l10n),
+                const SizedBox(height: 20),
+
+                // Route Card
+                _buildRouteCard(order, l10n, textColor, secondaryColor, surfaceColor),
+                const SizedBox(height: 16),
+
+                // Customer Info
+                _buildCustomerCard(
+                    order, l10n, textColor, secondaryColor, surfaceColor),
+                const SizedBox(height: 16),
+
+                // Earnings Card
+                _buildEarningsCard(
+                    order, l10n, textColor, secondaryColor, surfaceColor),
+                const SizedBox(height: 16),
+
+                // Order Meta
+                _buildMetaCard(order, l10n, textColor, secondaryColor, surfaceColor),
+
+                const SizedBox(height: 100),
+              ],
+            ),
+          ),
+          bottomNavigationBar: showBottomBar
+              ? _buildBottomBar(context, order, l10n, surfaceColor, isPending)
+              : null,
+        ),
+        // Loading overlay
+        if (_isUpdating)
+          Container(
+            color: Colors.black.withValues(alpha: 0.5),
+            child: Center(
+              child: Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: surfaceColor,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const CircularProgressIndicator(
+                      color: AppColors.primary,
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      l10n.updatingStatus,
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  PreferredSizeWidget _buildAppBar(
+      BuildContext context, AppLocalizations l10n, Color textColor) {
+    return AppBar(
+      backgroundColor: Colors.transparent,
+      elevation: 0,
+      leading: IconButton(
+        icon: Icon(Icons.arrow_back, color: textColor),
+        onPressed: () => context.pop(),
+      ),
+      title: Text(
+        '${l10n.orderDetails} #${widget.orderId}',
+        style: TextStyle(
+          color: textColor,
+          fontSize: 16,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      centerTitle: true,
+    );
+  }
+
+  Widget _buildStatusBadge(OrderModel order, AppLocalizations l10n) {
+    Color statusColor;
+    IconData statusIcon;
+    String statusText;
+
+    switch (order.status) {
+      case OrderStatus.pending:
+      case OrderStatus.searchingForDriver:
+      case OrderStatus.driverNotificationSent:
+        statusColor = AppColors.warning;
+        statusIcon = Icons.access_time;
+        statusText = l10n.newOrder;
+        break;
+      case OrderStatus.completed:
+        statusColor = AppColors.success;
+        statusIcon = Icons.check_circle;
+        statusText = l10n.orderCompleted;
+        break;
+      case OrderStatus.cancelled:
+      case OrderStatus.rejected:
+        statusColor = AppColors.error;
+        statusIcon = Icons.cancel;
+        statusText = l10n.orderCancelled;
+        break;
+      case OrderStatus.onTheWay:
+        statusColor = AppColors.primary;
+        statusIcon = Icons.local_shipping;
+        statusText = l10n.onTheWay;
+        break;
+      case OrderStatus.accepted:
+        statusColor = AppColors.info;
+        statusIcon = Icons.check_circle_outline;
+        statusText = l10n.orderAccepted;
+        break;
+      case OrderStatus.delivered:
+        statusColor = AppColors.success;
+        statusIcon = Icons.location_on;
+        statusText = l10n.atDelivery;
+        break;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: statusColor.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(statusIcon, size: 16, color: statusColor),
+          const SizedBox(width: 6),
+          Text(
+            statusText,
+            style: TextStyle(
+              color: statusColor,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRouteCard(OrderModel order, AppLocalizations l10n,
+      Color textColor, Color secondaryColor, Color surfaceColor) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          // Pickup
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Column(
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  Container(
+                    width: 2,
+                    height: 55,
+                    color: AppColors.primary.withValues(alpha: 0.3),
+                  ),
+                ],
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.pickup,
+                      style: TextStyle(fontSize: 11, color: secondaryColor),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      order.pickupName,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
+                      ),
+                    ),
+                    if (order.pickupStreet != null)
+                      Text(
+                        order.pickupStreet!,
+                        style: TextStyle(fontSize: 12, color: textColor),
+                      ),
+                    Text(
+                      order.pickupCity ?? order.pickupAddress,
+                      style: TextStyle(fontSize: 12, color: secondaryColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 8),
+
+          // Dropoff
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 10,
+                height: 10,
+                decoration: BoxDecoration(
+                  color: AppColors.error.withValues(alpha: 0.2),
+                  border: Border.all(color: AppColors.error, width: 2),
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.dropoff,
+                      style: TextStyle(fontSize: 11, color: secondaryColor),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      order.customerName,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
+                      ),
+                    ),
+                    if (order.dropoffStreet != null)
+                      Text(
+                        order.dropoffStreet!,
+                        style: TextStyle(fontSize: 12, color: textColor),
+                      ),
+                    Text(
+                      order.dropoffCity ?? order.dropoffAddress,
+                      style: TextStyle(fontSize: 12, color: secondaryColor),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 12),
+          // Distance & Time row
+          Row(
+            children: [
+              _buildInfoChip(
+                  Icons.route, order.formattedDistance, AppColors.info),
+              const SizedBox(width: 8),
+              _buildInfoChip(Icons.schedule, '~${order.estimatedMinutes} ${l10n.min}',
+                  AppColors.warning),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCustomerCard(OrderModel order, AppLocalizations l10n,
+      Color textColor, Color secondaryColor, Color surfaceColor) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: const Icon(Icons.person, color: AppColors.primary, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  order.customerName,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
+                ),
+                if (order.customerPhone != null &&
+                    order.customerPhone!.isNotEmpty)
+                  Text(
+                    order.customerPhone!,
+                    style: TextStyle(fontSize: 12, color: secondaryColor),
+                  ),
+              ],
+            ),
+          ),
+          if (order.customerPhone != null && order.customerPhone!.isNotEmpty)
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: AppColors.success.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child:
+                  const Icon(Icons.phone, color: AppColors.success, size: 18),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEarningsCard(OrderModel order, AppLocalizations l10n,
+      Color textColor, Color secondaryColor, Color surfaceColor) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          _buildEarningRow(l10n.deliveryFee, order.formattedDeliveryFee,
+              secondaryColor, textColor),
+          const SizedBox(height: 10),
+          _buildEarningRow(
+              l10n.tip, order.formattedTip, secondaryColor, textColor),
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: Divider(height: 1),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.total,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                ),
+              ),
+              Text(
+                order.formattedTotal,
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.success,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEarningRow(
+      String label, String value, Color secondaryColor, Color textColor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(label, style: TextStyle(fontSize: 13, color: secondaryColor)),
+        Text(
+          value,
+          style: TextStyle(
+              fontSize: 13, fontWeight: FontWeight.w500, color: textColor),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMetaCard(OrderModel order, AppLocalizations l10n,
+      Color textColor, Color secondaryColor, Color surfaceColor) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          _buildMetaRow(
+            Icons.tag,
+            l10n.orderId,
+            '#${order.id}',
+            secondaryColor,
+            textColor,
+            onTap: () {
+              Clipboard.setData(ClipboardData(text: order.id));
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${l10n.orderId} copied'),
+                  duration: const Duration(seconds: 1),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 10),
+          _buildMetaRow(
+            Icons.category,
+            'Type',
+            order.orderType.name.toUpperCase(),
+            secondaryColor,
+            textColor,
+          ),
+          const SizedBox(height: 10),
+          _buildMetaRow(
+            Icons.access_time,
+            'Created',
+            _formatDateTime(order.createdAt),
+            secondaryColor,
+            textColor,
+          ),
+          if (order.items.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            _buildMetaRow(
+              Icons.shopping_bag_outlined,
+              l10n.itemsOrdered,
+              '${order.items.length} ${l10n.items}',
+              secondaryColor,
+              textColor,
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMetaRow(IconData icon, String label, String value,
+      Color secondaryColor, Color textColor,
+      {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Row(
+        children: [
+          Icon(icon, size: 16, color: secondaryColor),
+          const SizedBox(width: 10),
+          Text(label, style: TextStyle(fontSize: 13, color: secondaryColor)),
+          const Spacer(),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: textColor,
+            ),
+          ),
+          if (onTap != null) ...[
+            const SizedBox(width: 4),
+            Icon(Icons.copy, size: 14, color: secondaryColor),
+          ],
+        ],
+      ),
+    );
+  }
+
+  String _formatDateTime(DateTime dt) {
+    final day = dt.day.toString().padLeft(2, '0');
+    final month = dt.month.toString().padLeft(2, '0');
+    final hour = dt.hour.toString().padLeft(2, '0');
+    final minute = dt.minute.toString().padLeft(2, '0');
+    return '$day/$month/${dt.year} $hour:$minute';
+  }
+
+  Future<void> _showStatusConfirmation({
+    required String title,
+    required String message,
+    required VoidCallback onConfirm,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(title),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l10n.confirm),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      onConfirm();
+    }
+  }
+
+  Widget _buildBottomBar(BuildContext context, OrderModel order,
+      AppLocalizations l10n, Color surfaceColor, bool isPending) {
+    // Determine which action button to show based on status
+    String actionText;
+    String confirmTitle;
+    String confirmMessage;
+    IconData actionIcon;
+    OrderStatus? nextStatus;
+    Color actionColor = AppColors.primary;
+    bool isAcceptAction = false;
+
+    if (isPending) {
+      actionText = l10n.orderAccepted;
+      confirmTitle = l10n.acceptOrder;
+      confirmMessage = l10n.acceptOrderConfirmation;
+      actionIcon = Icons.check;
+      nextStatus = OrderStatus.accepted;
+      actionColor = AppColors.success;
+      isAcceptAction = true;
+    } else {
+      switch (order.status) {
+        case OrderStatus.accepted:
+          actionText = l10n.onTheWay;
+          confirmTitle = l10n.startDelivery;
+          confirmMessage = l10n.startDeliveryConfirmation;
+          actionIcon = Icons.directions_car;
+          nextStatus = OrderStatus.onTheWay;
+          break;
+        case OrderStatus.onTheWay:
+          actionText = l10n.markAsDelivered;
+          confirmTitle = l10n.arrivedAtDropoff;
+          confirmMessage = l10n.arrivedAtDropoffConfirmation;
+          actionIcon = Icons.location_on;
+          nextStatus = OrderStatus.delivered;
+          break;
+        case OrderStatus.delivered:
+          actionText = l10n.orderCompleted;
+          confirmTitle = l10n.completeOrder;
+          confirmMessage = l10n.completeOrderConfirmation;
+          actionIcon = Icons.check_circle;
+          nextStatus = OrderStatus.completed;
+          actionColor = AppColors.success;
+          break;
+        default:
+          actionText = l10n.navigate;
+          confirmTitle = '';
+          confirmMessage = '';
+          actionIcon = Icons.navigation;
+          nextStatus = null;
+      }
+    }
+
+    // Get target coordinates for navigation
+    double? targetLat;
+    double? targetLng;
+    if (order.status == OrderStatus.accepted) {
+      targetLat = order.pickupLat;
+      targetLng = order.pickupLng;
+    } else {
+      targetLat = order.dropoffLat;
+      targetLng = order.dropoffLng;
+    }
+
+    return Container(
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
+      ),
+      child: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Navigation buttons row
+              if (targetLat != null && targetLng != null)
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 10),
+                  child: Row(
+                    children: [
+                      // Navigate button
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: OutlinedButton.icon(
+                            onPressed: () => context.push(RouteConstants.navigationPath(order.id)),
+                            icon: const Icon(Icons.navigation_outlined, size: 18),
+                            label: Text(l10n.navigate,
+                                style: const TextStyle(fontWeight: FontWeight.w600)),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.primary,
+                              side: const BorderSide(color: AppColors.primary),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      // Google Maps button
+                      Expanded(
+                        child: SizedBox(
+                          height: 46,
+                          child: OutlinedButton.icon(
+                            onPressed: () => _openInGoogleMaps(lat: targetLat!, lng: targetLng!),
+                            icon: const Icon(Icons.map_outlined, size: 18),
+                            label: const Text('Google Maps',
+                                style: TextStyle(fontWeight: FontWeight.w600)),
+                            style: OutlinedButton.styleFrom(
+                              foregroundColor: AppColors.info,
+                              side: const BorderSide(color: AppColors.info),
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10)),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+              // Action button (status update or accept)
+              SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton.icon(
+                  onPressed: _isUpdating
+                      ? null
+                      : () {
+                          _showStatusConfirmation(
+                            title: confirmTitle,
+                            message: confirmMessage,
+                            onConfirm: () {
+                              if (isAcceptAction) {
+                                _acceptOrder();
+                              } else if (nextStatus != null) {
+                                _updateOrderStatus(nextStatus);
+                              }
+                            },
+                          );
+                        },
+                  icon: _isUpdating
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Icon(actionIcon, size: 20),
+                  label: Text(actionText,
+                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: actionColor,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

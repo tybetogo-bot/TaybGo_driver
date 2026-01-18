@@ -1,0 +1,722 @@
+// ignore: unused_import
+import 'package:intl/intl.dart' as intl;
+import 'app_localizations.dart';
+
+// ignore_for_file: type=lint
+
+/// The translations for German (`de`).
+class AppLocalizationsDe extends AppLocalizations {
+  AppLocalizationsDe([String locale = 'de']) : super(locale);
+
+  @override
+  String get appName => 'TybeToGo Fahrer';
+
+  @override
+  String get welcome => 'Willkommen';
+
+  @override
+  String get getStarted => 'Loslegen';
+
+  @override
+  String get next => 'Weiter';
+
+  @override
+  String get skip => 'Überspringen';
+
+  @override
+  String get done => 'Fertig';
+
+  @override
+  String get cancel => 'Abbrechen';
+
+  @override
+  String get confirm => 'Bestätigen';
+
+  @override
+  String get save => 'Speichern';
+
+  @override
+  String get edit => 'Bearbeiten';
+
+  @override
+  String get delete => 'Löschen';
+
+  @override
+  String get retry => 'Wiederholen';
+
+  @override
+  String get loading => 'Laden...';
+
+  @override
+  String get error => 'Fehler';
+
+  @override
+  String get success => 'Erfolg';
+
+  @override
+  String get seeAll => 'Alle anzeigen';
+
+  @override
+  String get or => 'ODER';
+
+  @override
+  String get onboardingTitle1 => 'Verdienen Sie noch heute';
+
+  @override
+  String get onboardingDesc1 =>
+      'Schließen Sie sich Tausenden von Fahrern an, die nach eigenem Zeitplan verdienen';
+
+  @override
+  String get onboardingTitle2 => 'Aufträge einfach annehmen';
+
+  @override
+  String get onboardingDesc2 =>
+      'Werden Sie über neue Aufträge benachrichtigt und nehmen Sie mit einem Tippen an';
+
+  @override
+  String get onboardingTitle3 => 'Navigieren & Liefern';
+
+  @override
+  String get onboardingDesc3 =>
+      'Die integrierte Navigation hilft Ihnen, Ziele schneller zu erreichen';
+
+  @override
+  String get phoneNumber => 'Telefonnummer';
+
+  @override
+  String get enterPhoneNumber => 'Geben Sie Ihre Telefonnummer ein';
+
+  @override
+  String get phoneHint => '+49 123 456 7890';
+
+  @override
+  String get sendOtp => 'Code senden';
+
+  @override
+  String get verifyOtp => 'Code bestätigen';
+
+  @override
+  String get enterOtp => 'Geben Sie den Code ein, den wir gesendet haben an';
+
+  @override
+  String get resendOtp => 'Code erneut senden';
+
+  @override
+  String resendOtpIn(int seconds) {
+    return 'Code erneut senden in ${seconds}s';
+  }
+
+  @override
+  String get invalidOtp => 'Ungültiger Bestätigungscode';
+
+  @override
+  String get otpSent => 'Bestätigungscode gesendet';
+
+  @override
+  String get email => 'E-Mail';
+
+  @override
+  String get enterEmail => 'Geben Sie Ihre E-Mail ein';
+
+  @override
+  String get signUpWithApple => 'Mit Apple anmelden';
+
+  @override
+  String get signUpWithGoogle => 'Mit Google anmelden';
+
+  @override
+  String get forgotPassword => 'Passwort vergessen';
+
+  @override
+  String get driverApplication => 'Fahrerantrag';
+
+  @override
+  String get personalInfo => 'Persönliche Informationen';
+
+  @override
+  String get vehicleInfo => 'Fahrzeuginformationen';
+
+  @override
+  String get documents => 'Dokumente';
+
+  @override
+  String get reviewSubmit => 'Überprüfen & Absenden';
+
+  @override
+  String get fullName => 'Vollständiger Name';
+
+  @override
+  String get age => 'Alter';
+
+  @override
+  String get dateOfBirth => 'Geburtsdatum';
+
+  @override
+  String get address => 'Adresse';
+
+  @override
+  String get city => 'Stadt';
+
+  @override
+  String get vehicleType => 'Fahrzeugtyp';
+
+  @override
+  String get selectVehicleType => 'Fahrzeugtyp auswählen';
+
+  @override
+  String get car => 'Auto';
+
+  @override
+  String get motorcycle => 'Motorrad';
+
+  @override
+  String get bicycle => 'Fahrrad';
+
+  @override
+  String get scooter => 'Roller';
+
+  @override
+  String get licensePlate => 'Kennzeichen';
+
+  @override
+  String get vehicleModel => 'Fahrzeugmodell';
+
+  @override
+  String get vehicleYear => 'Baujahr';
+
+  @override
+  String get vehicleColor => 'Fahrzeugfarbe';
+
+  @override
+  String get serviceType => 'Serviceart';
+
+  @override
+  String get selectServiceType => 'Welche Dienste werden Sie anbieten?';
+
+  @override
+  String get foodDelivery => 'Essenslieferung';
+
+  @override
+  String get shipping => 'Versand';
+
+  @override
+  String get taxi => 'Taxi';
+
+  @override
+  String get uploadDocuments => 'Dokumente hochladen';
+
+  @override
+  String get driversLicense => 'Führerschein';
+
+  @override
+  String get nationalId => 'Personalausweis';
+
+  @override
+  String get vehicleRegistration => 'Fahrzeugschein';
+
+  @override
+  String get insurance => 'Versicherung';
+
+  @override
+  String get profilePhoto => 'Profilfoto';
+
+  @override
+  String get uploadPhoto => 'Foto hochladen';
+
+  @override
+  String get takePhoto => 'Foto aufnehmen';
+
+  @override
+  String get chooseFromGallery => 'Aus Galerie wählen';
+
+  @override
+  String get submitApplication => 'Antrag absenden';
+
+  @override
+  String get applicationSubmitted => 'Antrag eingereicht';
+
+  @override
+  String get applicationPending => 'Ihr Antrag wird geprüft';
+
+  @override
+  String get applicationApproved => 'Antrag genehmigt';
+
+  @override
+  String get applicationRejected => 'Antrag abgelehnt';
+
+  @override
+  String get pendingApprovalMessage =>
+      'Wir prüfen Ihre Dokumente. Dies dauert normalerweise 24-48 Stunden.';
+
+  @override
+  String get home => 'Startseite';
+
+  @override
+  String get orders => 'Aufträge';
+
+  @override
+  String get recentOrders => 'Letzte Aufträge';
+
+  @override
+  String get earnings => 'Einnahmen';
+
+  @override
+  String get profile => 'Profil';
+
+  @override
+  String get search => 'Suche';
+
+  @override
+  String get online => 'Online';
+
+  @override
+  String get offline => 'Offline';
+
+  @override
+  String get goOnline => 'Online gehen';
+
+  @override
+  String get goOffline => 'Offline gehen';
+
+  @override
+  String get youAreOnline => 'Sie sind online und bereit, Aufträge zu erhalten';
+
+  @override
+  String get youAreOffline =>
+      'Sie sind offline. Gehen Sie online, um Aufträge zu erhalten';
+
+  @override
+  String get newOrder => 'Neuer Auftrag';
+
+  @override
+  String get newOrderTitle => 'Neuer Auftrag!';
+
+  @override
+  String get newOrderSubtitle => 'Annehmen bevor die Zeit abläuft';
+
+  @override
+  String get orderDetails => 'Auftragsdetails';
+
+  @override
+  String get navigate => 'Navigieren';
+
+  @override
+  String get details => 'Details';
+
+  @override
+  String get acceptOrder => 'Auftrag annehmen';
+
+  @override
+  String get rejectOrder => 'Auftrag ablehnen';
+
+  @override
+  String get accept => 'Annehmen';
+
+  @override
+  String get reject => 'Ablehnen';
+
+  @override
+  String acceptIn(int seconds) {
+    return 'Annehmen in ${seconds}s';
+  }
+
+  @override
+  String get orderAccepted => 'Auftrag angenommen';
+
+  @override
+  String get items => 'Artikel';
+
+  @override
+  String get time => 'Zeit';
+
+  @override
+  String get orderRejected => 'Auftrag abgelehnt';
+
+  @override
+  String get orderCompleted => 'Auftrag abgeschlossen';
+
+  @override
+  String get orderCancelled => 'Auftrag storniert';
+
+  @override
+  String get pickup => 'Abholung';
+
+  @override
+  String get dropoff => 'Lieferung';
+
+  @override
+  String get pickupLocation => 'Abholort';
+
+  @override
+  String get dropoffLocation => 'Lieferort';
+
+  @override
+  String get route => 'Route';
+
+  @override
+  String get inProgress => 'In Bearbeitung';
+
+  @override
+  String get headingToPickup => 'Auf dem Weg zum Abholort';
+
+  @override
+  String get headingToDropoff => 'Auf dem Weg zum Lieferort';
+
+  @override
+  String get atPickupLocation => 'Am Abholort';
+
+  @override
+  String get atDropoffLocation => 'Am Lieferort';
+
+  @override
+  String get orderId => 'Auftrags-ID';
+
+  @override
+  String get customer => 'Kunde';
+
+  @override
+  String get itemsOrdered => 'Artikel';
+
+  @override
+  String get callCustomer => 'Kunden anrufen';
+
+  @override
+  String get distance => 'Entfernung';
+
+  @override
+  String get estimatedTime => 'Geschätzte Zeit';
+
+  @override
+  String get km => 'km';
+
+  @override
+  String get min => 'Min';
+
+  @override
+  String get startNavigation => 'Navigation starten';
+
+  @override
+  String get arrivedAtPickup => 'Am Abholort angekommen';
+
+  @override
+  String get startDelivery => 'Lieferung starten';
+
+  @override
+  String get arrivedAtDropoff => 'Am Lieferort angekommen';
+
+  @override
+  String get completeOrder => 'Auftrag abschließen';
+
+  @override
+  String get markAsDelivered => 'Als geliefert markieren';
+
+  @override
+  String get acceptOrderConfirmation =>
+      'Sind Sie sicher, dass Sie diesen Auftrag annehmen möchten?';
+
+  @override
+  String get startDeliveryConfirmation =>
+      'Bestätigen Sie, dass Sie den Auftrag abgeholt haben und die Lieferung beginnen?';
+
+  @override
+  String get arrivedAtDropoffConfirmation =>
+      'Bestätigen Sie, dass Sie am Lieferort angekommen sind?';
+
+  @override
+  String get completeOrderConfirmation =>
+      'Bestätigen Sie, dass Sie diese Lieferung abgeschlossen haben?';
+
+  @override
+  String get updatingStatus => 'Status wird aktualisiert...';
+
+  @override
+  String get tip => 'Trinkgeld';
+
+  @override
+  String get earnings_label => 'Einnahmen';
+
+  @override
+  String get deliveryFee => 'Liefergebühr';
+
+  @override
+  String get total => 'Gesamt';
+
+  @override
+  String get currentOrders => 'Aktuelle Aufträge';
+
+  @override
+  String get orderHistory => 'Auftragsverlauf';
+
+  @override
+  String get noOrdersYet => 'Noch keine Aufträge';
+
+  @override
+  String get noActiveOrders => 'Keine aktiven Aufträge';
+
+  @override
+  String get waitingForOrders => 'Warten auf neue Aufträge...';
+
+  @override
+  String get totalOrders => 'Gesamte Aufträge';
+
+  @override
+  String get totalEarnings => 'Gesamteinnahmen';
+
+  @override
+  String get avgTripTime => 'Durchschn. Fahrzeit';
+
+  @override
+  String get completionRate => 'Abschlussrate';
+
+  @override
+  String get rating => 'Bewertung';
+
+  @override
+  String get todayEarnings => 'Einnahmen heute';
+
+  @override
+  String get weeklyEarnings => 'Wöchentliche Einnahmen';
+
+  @override
+  String get monthlyEarnings => 'Monatliche Einnahmen';
+
+  @override
+  String get lastMonthEarnings => 'Einnahmen letzten Monat';
+
+  @override
+  String get viewPayslips => 'Gehaltsabrechnungen anzeigen';
+
+  @override
+  String get payslipsSentEmail =>
+      'Gehaltsabrechnungen werden per E-Mail gesendet';
+
+  @override
+  String get settings => 'Einstellungen';
+
+  @override
+  String get language => 'Sprache';
+
+  @override
+  String get english => 'Englisch';
+
+  @override
+  String get german => 'Deutsch';
+
+  @override
+  String get french => 'Französisch';
+
+  @override
+  String get theme => 'Design';
+
+  @override
+  String get lightMode => 'Heller Modus';
+
+  @override
+  String get darkMode => 'Dunkler Modus';
+
+  @override
+  String get systemDefault => 'Systemstandard';
+
+  @override
+  String get notifications => 'Benachrichtigungen';
+
+  @override
+  String get orderNotifications => 'Auftragsbenachrichtigungen';
+
+  @override
+  String get promotionalNotifications => 'Werbebenachrichtigungen';
+
+  @override
+  String get soundEnabled => 'Ton aktiviert';
+
+  @override
+  String get vibrationEnabled => 'Vibration aktiviert';
+
+  @override
+  String get noNotifications => 'Noch keine Benachrichtigungen';
+
+  @override
+  String get noNotificationsDesc =>
+      'Ihre Benachrichtigungen werden hier angezeigt';
+
+  @override
+  String get today => 'Heute';
+
+  @override
+  String get yesterday => 'Gestern';
+
+  @override
+  String get earlier => 'Früher';
+
+  @override
+  String get markAllRead => 'Alle als gelesen markieren';
+
+  @override
+  String get clearAll => 'Alle löschen';
+
+  @override
+  String get newOrderReceived => 'Neuer Auftrag erhalten';
+
+  @override
+  String get orderAcceptedNotif => 'Auftrag erfolgreich angenommen';
+
+  @override
+  String get orderDeliveredNotif => 'Auftrag erfolgreich geliefert';
+
+  @override
+  String get earningsReceived => 'Einnahmen erhalten';
+
+  @override
+  String get weeklyReportReady => 'Wochenbericht ist bereit';
+
+  @override
+  String get accountUpdated => 'Konto aktualisiert';
+
+  @override
+  String get account => 'Konto';
+
+  @override
+  String get editProfile => 'Profil bearbeiten';
+
+  @override
+  String get changePassword => 'Passwort ändern';
+
+  @override
+  String get privacyPolicy => 'Datenschutzrichtlinie';
+
+  @override
+  String get termsOfService => 'Nutzungsbedingungen';
+
+  @override
+  String get helpSupport => 'Hilfe & Support';
+
+  @override
+  String get contactUs => 'Kontaktieren Sie uns';
+
+  @override
+  String get logout => 'Abmelden';
+
+  @override
+  String get logoutConfirm =>
+      'Sind Sie sicher, dass Sie sich abmelden möchten?';
+
+  @override
+  String get deleteAccount => 'Konto löschen';
+
+  @override
+  String get deleteAccountConfirm =>
+      'Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.';
+
+  @override
+  String get networkError =>
+      'Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.';
+
+  @override
+  String get somethingWentWrong =>
+      'Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.';
+
+  @override
+  String get sessionExpired =>
+      'Sitzung abgelaufen. Bitte melden Sie sich erneut an.';
+
+  @override
+  String get locationPermissionDenied => 'Standortberechtigung verweigert';
+
+  @override
+  String get enableLocationServices =>
+      'Bitte aktivieren Sie die Standortdienste, um fortzufahren';
+
+  @override
+  String version(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get goodMorning => 'Guten Morgen';
+
+  @override
+  String get goodAfternoon => 'Guten Tag';
+
+  @override
+  String get goodEvening => 'Guten Abend';
+
+  @override
+  String get locationRequired => 'Standort erforderlich';
+
+  @override
+  String get enableLocationAccess =>
+      'Aktivieren Sie den Standortzugriff, um Bestellungen zu erhalten.';
+
+  @override
+  String get enable => 'Aktivieren';
+
+  @override
+  String get pleaseEnableLocationInSettings =>
+      'Bitte aktivieren Sie den Standort in den Einstellungen.';
+
+  @override
+  String get gpsDisabled => 'GPS deaktiviert';
+
+  @override
+  String get pleaseEnableGps =>
+      'Bitte aktivieren Sie GPS, um Bestellungen zu erhalten.';
+
+  @override
+  String get failedToUpdateStatus => 'Status konnte nicht aktualisiert werden';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get accountUnderReview => 'Konto wird überprüft';
+
+  @override
+  String get accountBeingVerified =>
+      'Ihr Konto wird überprüft. Sie werden benachrichtigt, wenn es genehmigt ist.';
+
+  @override
+  String get receivingOrders => 'Bestellungen empfangen';
+
+  @override
+  String get goOnlineToStart => 'Online gehen, um zu starten';
+
+  @override
+  String get noRecentOrders => 'Keine aktuellen Bestellungen';
+
+  @override
+  String get headToPickup => 'Zur Abholung fahren';
+
+  @override
+  String get onTheWay => 'Unterwegs';
+
+  @override
+  String get atDelivery => 'Bei der Lieferung';
+
+  @override
+  String get continueText => 'Fortfahren';
+
+  @override
+  String get week => 'Woche';
+
+  @override
+  String get month => 'Monat';
+
+  @override
+  String get avgPerOrder => 'Durchschn./Bestellung';
+
+  @override
+  String get allTime => 'Gesamt';
+
+  @override
+  String get noEarningsData => 'Keine Einnahmedaten';
+
+  @override
+  String get completeOrdersToSeeEarnings =>
+      'Schließen Sie Bestellungen ab, um Ihre Einnahmen zu sehen';
+
+  @override
+  String get verified => 'Verifiziert';
+
+  @override
+  String get driver => 'Fahrer';
+}
