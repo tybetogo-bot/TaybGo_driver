@@ -56,7 +56,9 @@ class _PhoneScreenState extends State<PhoneScreen> {
 
     debugPrint('[PhoneScreen] Calling requestOtp for: $fullNumber');
     final success = await authProvider.requestOtp(fullNumber);
-    debugPrint('[PhoneScreen] requestOtp returned: $success, error: ${authProvider.error}');
+    debugPrint(
+      '[PhoneScreen] requestOtp returned: $success, error: ${authProvider.error}',
+    );
 
     if (mounted && success) {
       debugPrint('[PhoneScreen] Navigating to OTP screen');
@@ -78,8 +80,12 @@ class _PhoneScreenState extends State<PhoneScreen> {
   void _showCountryPicker() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final secondaryColor = isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final secondaryColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
 
     showModalBottomSheet(
       context: context,
@@ -110,12 +116,20 @@ class _PhoneScreenState extends State<PhoneScreen> {
                       color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                     ),
-                    child: const Icon(Icons.language, color: AppColors.primary, size: 20),
+                    child: const Icon(
+                      Icons.language,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
                   ),
                   const SizedBox(width: 12),
                   Text(
                     'Select Country',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: textColor),
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
                   ),
                 ],
               ),
@@ -127,26 +141,48 @@ class _PhoneScreenState extends State<PhoneScreen> {
                   final country = _countries[index];
                   final isSelected = country.code == _selectedCountry.code;
                   return ListTile(
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 4,
+                    ),
                     leading: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
                         color: surfaceColor,
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: Text(country.flag, style: const TextStyle(fontSize: 20)),
+                      child: Text(
+                        country.flag,
+                        style: const TextStyle(fontSize: 20),
+                      ),
                     ),
-                    title: Text(country.name, style: TextStyle(color: textColor, fontWeight: FontWeight.w500)),
+                    title: Text(
+                      country.name,
+                      style: TextStyle(
+                        color: textColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(country.dialCode, style: TextStyle(color: secondaryColor)),
+                        Text(
+                          country.dialCode,
+                          style: TextStyle(color: secondaryColor),
+                        ),
                         if (isSelected) ...[
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.all(4),
-                            decoration: const BoxDecoration(color: AppColors.primary, shape: BoxShape.circle),
-                            child: const Icon(Icons.check, color: Colors.white, size: 12),
+                            decoration: const BoxDecoration(
+                              color: AppColors.primary,
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(
+                              Icons.check,
+                              color: Colors.white,
+                              size: 12,
+                            ),
                           ),
                         ],
                       ],
@@ -169,8 +205,12 @@ class _PhoneScreenState extends State<PhoneScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final secondaryColor = isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final secondaryColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final l10n = AppLocalizations.of(context)!;
 
@@ -190,7 +230,11 @@ class _PhoneScreenState extends State<PhoneScreen> {
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(14),
                 ),
-                child: const Icon(Icons.local_shipping, color: AppColors.primary, size: 32),
+                child: const Icon(
+                  Icons.local_shipping,
+                  color: AppColors.primary,
+                  size: 32,
+                ),
               ),
 
               const SizedBox(height: 32),
@@ -209,7 +253,10 @@ class _PhoneScreenState extends State<PhoneScreen> {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.info.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
@@ -217,11 +264,19 @@ class _PhoneScreenState extends State<PhoneScreen> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.verified_user, size: 14, color: AppColors.info),
+                        const Icon(
+                          Icons.verified_user,
+                          size: 14,
+                          color: AppColors.info,
+                        ),
                         const SizedBox(width: 4),
                         Text(
                           'Secure',
-                          style: TextStyle(fontSize: 12, color: AppColors.info, fontWeight: FontWeight.w500),
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.info,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
@@ -243,7 +298,9 @@ class _PhoneScreenState extends State<PhoneScreen> {
                   color: surfaceColor,
                   borderRadius: BorderRadius.circular(16),
                   border: Border.all(
-                    color: _controller.text.isNotEmpty ? AppColors.primary : borderColor,
+                    color: _controller.text.isNotEmpty
+                        ? AppColors.primary
+                        : borderColor,
                     width: _controller.text.isNotEmpty ? 2 : 1,
                   ),
                 ),
@@ -253,14 +310,20 @@ class _PhoneScreenState extends State<PhoneScreen> {
                     GestureDetector(
                       onTap: _showCountryPicker,
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 16,
+                        ),
                         decoration: BoxDecoration(
                           color: isDark ? AppColors.darkBg : AppColors.lightBg,
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Row(
                           children: [
-                            Text(_selectedCountry.flag, style: const TextStyle(fontSize: 20)),
+                            Text(
+                              _selectedCountry.flag,
+                              style: const TextStyle(fontSize: 20),
+                            ),
                             const SizedBox(width: 8),
                             Text(
                               _selectedCountry.dialCode,
@@ -271,7 +334,11 @@ class _PhoneScreenState extends State<PhoneScreen> {
                               ),
                             ),
                             const SizedBox(width: 4),
-                            Icon(Icons.keyboard_arrow_down, color: secondaryColor, size: 20),
+                            Icon(
+                              Icons.keyboard_arrow_down,
+                              color: secondaryColor,
+                              size: 20,
+                            ),
                           ],
                         ),
                       ),
@@ -292,10 +359,15 @@ class _PhoneScreenState extends State<PhoneScreen> {
                           hintStyle: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w400,
-                            color: isDark ? AppColors.darkTextHint : AppColors.lightTextHint,
+                            color: isDark
+                                ? AppColors.darkTextHint
+                                : AppColors.lightTextHint,
                           ),
                           border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 16,
+                          ),
                         ),
                         inputFormatters: [
                           FilteringTextInputFormatter.digitsOnly,
@@ -318,21 +390,31 @@ class _PhoneScreenState extends State<PhoneScreen> {
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton.icon(
-                      onPressed: _controller.text.length >= 6 && !isLoading ? _continue : null,
+                      onPressed: _controller.text.length >= 6 && !isLoading
+                          ? _continue
+                          : null,
                       icon: isLoading
                           ? const SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
                             )
                           : const Icon(Icons.arrow_forward, size: 20),
-                      label: const Text('Continue', style: TextStyle(fontWeight: FontWeight.w600)),
+                      label: const Text(
+                        'Continue',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,
                         disabledBackgroundColor: borderColor,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(14),
+                        ),
                       ),
                     ),
                   );
@@ -342,25 +424,31 @@ class _PhoneScreenState extends State<PhoneScreen> {
               const SizedBox(height: 16),
 
               // New user link
-              Center(
-                child: TextButton.icon(
-                  onPressed: () => context.push(RouteConstants.application),
-                  icon: const Icon(Icons.person_add_alt_1, size: 18, color: AppColors.primary),
-                  label: Text.rich(
-                    TextSpan(
-                      text: 'New driver? ',
-                      style: TextStyle(color: secondaryColor),
-                      children: const [
-                        TextSpan(
-                          text: 'Apply here',
-                          style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
+              // Center(
+              //   child: TextButton.icon(
+              //     onPressed: () => context.push(RouteConstants.application),
+              //     icon: const Icon(
+              //       Icons.person_add_alt_1,
+              //       size: 18,
+              //       color: AppColors.primary,
+              //     ),
+              //     label: Text.rich(
+              //       TextSpan(
+              //         text: 'New driver? ',
+              //         style: TextStyle(color: secondaryColor),
+              //         children: const [
+              //           TextSpan(
+              //             text: 'Apply here',
+              //             style: TextStyle(
+              //               color: AppColors.primary,
+              //               fontWeight: FontWeight.w600,
+              //             ),
+              //           ),
+              //         ],
+              //       ),
+              //     ),
+              //   ),
+              // ),
               const SizedBox(height: 8),
 
               // Terms
@@ -368,7 +456,11 @@ class _PhoneScreenState extends State<PhoneScreen> {
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(Icons.shield_outlined, size: 14, color: secondaryColor),
+                    Icon(
+                      Icons.shield_outlined,
+                      size: 14,
+                      color: secondaryColor,
+                    ),
                     const SizedBox(width: 6),
                     Text(
                       'By continuing, you agree to our Terms & Privacy',

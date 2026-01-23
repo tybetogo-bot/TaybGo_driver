@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = 'https://taybat-backend.onrender.com/api';
+  static const String baseUrl = 'https://taybat-backend-dev.onrender.com/api';
 
   // Auth endpoints
   static const String otpRequest = '/auth/otp/request/';
