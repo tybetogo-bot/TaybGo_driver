@@ -10,10 +10,9 @@ class DriverRegistrationService {
       : _apiClient = apiClient ?? ApiClient();
 
   /// Register a new driver
-  /// POST /api/drivers/
+  /// POST /api/driver/profile/
   Future<DriverRegistrationResult> registerDriver({
     required String name,
-    required String email,
     required String phone,
     required int age,
     required String vehicleType,
@@ -27,7 +26,6 @@ class DriverRegistrationService {
     try {
       final data = {
         'name': name,
-        'email': email,
         'phone': phone,
         'age': age,
         'vehicle_type': vehicleType,
@@ -64,6 +62,7 @@ class DriverRegistrationService {
         success: true,
         message: response.data['message'] ?? 'Registration successful',
         driverId: response.data['id']?.toString(),
+        isVerified: response.data['is_verified'] ?? response.data['verified'] ?? false,
       );
     } on DioException catch (e) {
       debugPrint('[DriverRegistrationService] Register Driver Error: ${e.message}');
@@ -102,10 +101,12 @@ class DriverRegistrationResult {
   final bool success;
   final String message;
   final String? driverId;
+  final bool isVerified;
 
   DriverRegistrationResult({
     required this.success,
     required this.message,
     this.driverId,
+    this.isVerified = false,
   });
 }

@@ -62,7 +62,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
 
     if (mounted && success) {
       debugPrint('[PhoneScreen] Navigating to OTP screen');
-      context.go(RouteConstants.otp, extra: fullNumber);
+      context.push(RouteConstants.otp, extra: fullNumber);
     } else if (mounted && authProvider.error != null) {
       debugPrint('[PhoneScreen] Showing error snackbar: ${authProvider.error}');
       ScaffoldMessenger.of(context).showSnackBar(

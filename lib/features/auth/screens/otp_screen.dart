@@ -54,7 +54,12 @@ class _OtpScreenState extends State<OtpScreen> {
     final success = await authProvider.verifyOtp(_controller.text);
 
     if (mounted && success) {
-      context.go(RouteConstants.home);
+      // Check if user needs to complete profile
+      if (authProvider.isNewUser) {
+        context.go(RouteConstants.application);
+      } else {
+        context.go(RouteConstants.home);
+      }
     } else if (mounted && authProvider.error != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

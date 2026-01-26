@@ -25,6 +25,7 @@ class DriverProvider extends ChangeNotifier {
   String? _error;
   LocationPermissionStatus? _locationStatus;
   String? _currentPlaceName;
+  bool? _profileExists; // null = unknown, true = has profile, false = no profile (needs registration)
 
   DriverProvider({DriverService? driverService, ApiClient? apiClient})
       : _driverService = driverService ??
@@ -40,6 +41,8 @@ class DriverProvider extends ChangeNotifier {
   LocationPermissionStatus? get locationStatus => _locationStatus;
   LocationService get locationService => _locationService;
   String? get currentPlaceName => _currentPlaceName;
+  /// Returns true if profile exists, false if no profile (403), null if unknown
+  bool? get profileExists => _profileExists;
 
   Future<void> fetchProfile() async {
     _isLoading = true;
@@ -48,6 +51,17 @@ class DriverProvider extends ChangeNotifier {
 
     try {
       _profile = await _driverService.getProfile();
+      _profileExists = true;
+      _isLoading = false;
+      notifyListeners();
+    } on ApiException catch (e) {
+      // 403 means user doesn't have a driver profile yet
+      if (e.statusCode == 403 || e.statusCode == 404) {
+        _profileExists = false;
+        _error = null; // Clear error since this is expected for new users
+      } else {
+        _error = e.message;
+      }
       _isLoading = false;
       notifyListeners();
     } catch (e) {
@@ -225,6 +239,7 @@ class DriverProvider extends ChangeNotifier {
 
   void clearProfile() {
     _profile = null;
+    _profileExists = null;
     _error = null;
     notifyListeners();
   }

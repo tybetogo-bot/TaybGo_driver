@@ -35,13 +35,7 @@ class LocationService {
 
   /// Check if location services are enabled and we have permission
   Future<LocationPermissionStatus> checkPermission() async {
-    // Check if location services are enabled
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return LocationPermissionStatus.serviceDisabled;
-    }
-
-    // Check permission status
+    // Check permission status first
     LocationPermission permission = await Geolocator.checkPermission();
 
     switch (permission) {
@@ -51,6 +45,11 @@ class LocationService {
         return LocationPermissionStatus.deniedForever;
       case LocationPermission.whileInUse:
       case LocationPermission.always:
+        // Permission granted, now check if location services are enabled
+        bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          return LocationPermissionStatus.serviceDisabled;
+        }
         return LocationPermissionStatus.granted;
       case LocationPermission.unableToDetermine:
         return LocationPermissionStatus.denied;
@@ -59,14 +58,17 @@ class LocationService {
 
   /// Request location permission
   Future<LocationPermissionStatus> requestPermission() async {
-    // First check if location services are enabled
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return LocationPermissionStatus.serviceDisabled;
-    }
-
-    // Request permission
+    // Request permission first (so iOS shows Location in Settings)
     LocationPermission permission = await Geolocator.requestPermission();
+
+    // If permission granted, check if location services are enabled
+    if (permission == LocationPermission.whileInUse ||
+        permission == LocationPermission.always) {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        return LocationPermissionStatus.serviceDisabled;
+      }
+    }
 
     switch (permission) {
       case LocationPermission.denied:

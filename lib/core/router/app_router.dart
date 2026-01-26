@@ -33,11 +33,16 @@ class AppRouter {
 
         debugPrint('[Router] Redirect check - path: $currentPath, isAuth: $isAuthenticated, onboardingComplete: $onboardingComplete');
 
-        // If authenticated, redirect to home from auth routes
+        // If authenticated, redirect from auth routes
         if (isAuthenticated) {
           if (currentPath == RouteConstants.onboarding ||
               currentPath == RouteConstants.phone ||
               currentPath == RouteConstants.otp) {
+            // New users need to complete their profile first
+            if (authProvider.isNewUser) {
+              debugPrint('[Router] Redirecting to application (new user needs profile)');
+              return RouteConstants.application;
+            }
             debugPrint('[Router] Redirecting to home (authenticated on auth route)');
             return RouteConstants.home;
           }

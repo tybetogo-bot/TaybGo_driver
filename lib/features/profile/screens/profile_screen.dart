@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/driver_provider.dart';
@@ -19,7 +21,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<DriverProvider>().fetchProfile();
+      final driverProvider = context.read<DriverProvider>();
+      driverProvider.fetchProfile().then((_) {
+        if (!mounted) return;
+        // If no profile exists, redirect to application form
+        if (driverProvider.profileExists == false) {
+          context.go(RouteConstants.application);
+        }
+      });
     });
   }
 

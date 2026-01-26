@@ -9,7 +9,7 @@ class ApiConstants {
 
   // Driver endpoints
   static const String driverProfile = '/driver/profile/';
-  static const String driverCreate = '/drivers/';
+  static const String driverCreate = '/driver/profile/'; // POST to same endpoint as GET
   static const String driverToggleOnline = '/drivers/toggle-online/';
   static const String driverLocation = '/drivers/location/';
   static const String suggestedOrders = '/drivers/suggested-orders/';

@@ -146,4 +146,10 @@ class AuthProvider extends ChangeNotifier {
     _error = null;
     notifyListeners();
   }
+
+  /// Mark user as no longer new (profile has been created)
+  void clearNewUserFlag() {
+    _isNewUser = false;
+    notifyListeners();
+  }
 }

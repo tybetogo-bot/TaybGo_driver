@@ -49,6 +49,14 @@ class _HomeScreenState extends State<HomeScreen>
 
       // Fetch profile and sync stats to order provider
       driverProvider.fetchProfile().then((_) {
+        if (!mounted) return;
+
+        // If no profile exists (403), redirect to application form
+        if (driverProvider.profileExists == false) {
+          context.go(RouteConstants.application);
+          return;
+        }
+
         final profile = driverProvider.profile;
         if (profile != null) {
           _orderProvider?.setStats(profile.totalOrders, profile.totalEarnings);
@@ -316,6 +324,60 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
 
                     const SizedBox(height: 24),
+
+                    // Verification Pending Banner
+                    if (profile != null && !profile.isVerified)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.warning.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.warning.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.warning.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.hourglass_top,
+                                color: AppColors.warning,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.accountUnderReview,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: textColor,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    l10n.accountBeingVerified,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: secondaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
 
                     // Status Card
                     Container(

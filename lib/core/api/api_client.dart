@@ -76,7 +76,6 @@ class _AuthInterceptor extends Interceptor {
     final publicEndpoints = [
       ApiConstants.otpRequest,
       ApiConstants.otpVerify,
-      ApiConstants.driverCreate,
     ];
 
     // Use exact match or endsWith to avoid false positives

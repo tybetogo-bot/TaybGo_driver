@@ -45,6 +45,13 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<!-- Background modes for location tracking and push notifications -->
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>remote-notification</string>
+		<string>fetch</string>
+	</array>
 	<!-- Location permissions for geolocator -->
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>TypeToGo Driver needs your location to show you nearby orders and help customers track deliveries.</string>
