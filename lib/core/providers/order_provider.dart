@@ -3,14 +3,23 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../api/api_client.dart';
 import '../services/order_service.dart';
+import '../mock/tour_mock_data.dart';
 import '../../features/orders/models/order_model.dart';
 
 class OrderProvider extends ChangeNotifier {
   final OrderService _orderService;
 
+  // Tour mode reference (will be set after initialization)
+  bool Function()? _isTourActive;
+
   OrderProvider({OrderService? orderService, ApiClient? apiClient})
       : _orderService = orderService ??
             OrderService(apiClient: apiClient ?? ApiClient());
+
+  /// Set tour mode checker (called from tour integration)
+  void setTourModeChecker(bool Function() checker) {
+    _isTourActive = checker;
+  }
 
   // Pending order (waiting for driver to accept/reject)
   OrderModel? _pendingOrder;
@@ -134,6 +143,24 @@ class OrderProvider extends ChangeNotifier {
   Future<bool> acceptOrder() async {
     if (_pendingOrder == null) return false;
 
+    // Tour mode: Simulate acceptance without API call
+    if (_isTourActive?.call() == true && TourMockData.isMockOrder(_pendingOrder!.id)) {
+      _acceptTimer?.cancel();
+
+      _activeOrder = _pendingOrder!.copyWith(
+        status: OrderStatus.accepted,
+        acceptedAt: DateTime.now(),
+      );
+
+      _totalOrders++;
+      _totalEarnings += _pendingOrder!.deliveryFee;
+
+      _pendingOrder = null;
+      _acceptCountdown = 0;
+      notifyListeners();
+      return true;
+    }
+
     _acceptTimer?.cancel();
     _isLoading = true;
     _error = null;
@@ -193,6 +220,13 @@ class OrderProvider extends ChangeNotifier {
   Future<bool> startDelivery() async {
     if (_activeOrder == null) return false;
 
+    // Tour mode: Simulate status update without API call
+    if (_isTourActive?.call() == true && TourMockData.isMockOrder(_activeOrder!.id)) {
+      _activeOrder = _activeOrder!.copyWith(status: OrderStatus.onTheWay);
+      notifyListeners();
+      return true;
+    }
+
     _isLoading = true;
     notifyListeners();
 
@@ -217,6 +251,13 @@ class OrderProvider extends ChangeNotifier {
   Future<bool> markDelivered() async {
     if (_activeOrder == null) return false;
 
+    // Tour mode: Simulate status update without API call
+    if (_isTourActive?.call() == true && TourMockData.isMockOrder(_activeOrder!.id)) {
+      _activeOrder = _activeOrder!.copyWith(status: OrderStatus.delivered);
+      notifyListeners();
+      return true;
+    }
+
     _isLoading = true;
     notifyListeners();
 
@@ -240,6 +281,20 @@ class OrderProvider extends ChangeNotifier {
   /// Update order status: DELIVERED -> COMPLETED
   Future<bool> completeOrder() async {
     if (_activeOrder == null) return false;
+
+    // Tour mode: Simulate status update without API call
+    if (_isTourActive?.call() == true && TourMockData.isMockOrder(_activeOrder!.id)) {
+      _activeOrder = _activeOrder!.copyWith(
+        status: OrderStatus.completed,
+        completedAt: DateTime.now(),
+      );
+
+      // Move to history
+      _orderHistory.insert(0, _activeOrder!);
+      _activeOrder = null;
+      notifyListeners();
+      return true;
+    }
 
     _isLoading = true;
     notifyListeners();
@@ -387,6 +442,30 @@ class OrderProvider extends ChangeNotifier {
       orders.insert(0, _activeOrder!);
     }
     return orders;
+  }
+
+  // ========== Tour Mode Methods ==========
+
+  /// Inject mock order for tour demonstration
+  void injectMockOrder(OrderModel mockOrder) {
+    _pendingOrder = mockOrder;
+    _startAcceptCountdown();
+    onNewOrderReceived?.call();
+    notifyListeners();
+  }
+
+  /// Clear mock order from tour
+  void clearMockOrder() {
+    if (_pendingOrder != null && TourMockData.isMockOrder(_pendingOrder!.id)) {
+      _pendingOrder = null;
+      _acceptCountdown = 0;
+      _acceptTimer?.cancel();
+      notifyListeners();
+    }
+    if (_activeOrder != null && TourMockData.isMockOrder(_activeOrder!.id)) {
+      _activeOrder = null;
+      notifyListeners();
+    }
   }
 
   @override

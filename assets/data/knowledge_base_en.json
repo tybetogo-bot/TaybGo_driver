@@ -1,0 +1,362 @@
+{
+  "categories": [
+    {
+      "id": "getting_started",
+      "title": "Getting Started",
+      "description": "Learn the basics of using TeybatDriver",
+      "icon": "school",
+      "color": "#4CAF50",
+      "articles": [
+        {
+          "id": "account_verification",
+          "title": "Account Verification",
+          "description": "Understanding the verification process",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Your account needs to be verified before you can start accepting orders. This ensures the safety and quality of our driver network."
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Complete your driver registration with accurate information",
+                "Upload required documents (ID, driver's license, vehicle registration)",
+                "Wait 24-48 hours for our team to review your application",
+                "Receive a notification when your account is approved"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "While waiting for verification, you can take the interactive tour to learn how the app works!"
+            }
+          ],
+          "tags": ["verification", "account", "registration"],
+          "relatedIds": ["going_online", "first_delivery"]
+        },
+        {
+          "id": "going_online",
+          "title": "Going Online",
+          "description": "How to start receiving orders",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Once your account is verified, you can go online to start receiving delivery requests."
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Ensure your account is verified (green checkmark on profile)",
+                "Enable location services on your device",
+                "Tap the 'Go Online' toggle on the home screen",
+                "You'll start receiving order notifications"
+              ]
+            },
+            {
+              "type": "warning",
+              "content": "You must keep location services enabled while online so customers can track their deliveries."
+            }
+          ],
+          "tags": ["online", "location", "orders"],
+          "relatedIds": ["accepting_orders", "location_issues"]
+        },
+        {
+          "id": "first_delivery",
+          "title": "Your First Delivery",
+          "description": "Step-by-step guide for your first order",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Congratulations on your first delivery! Here's what to expect:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Go online and wait for an order notification",
+                "Review the order details (pickup, dropoff, payment)",
+                "Accept the order within 30 seconds",
+                "Navigate to the pickup location",
+                "Collect the items and verify the order",
+                "Navigate to the customer's location",
+                "Complete the delivery and mark as delivered",
+                "Receive your earnings!"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Take your time with your first few deliveries. Customer ratings improve with experience!"
+            }
+          ],
+          "tags": ["first delivery", "tutorial", "beginner"],
+          "relatedIds": ["accepting_orders", "navigation"]
+        }
+      ]
+    },
+    {
+      "id": "managing_orders",
+      "title": "Managing Orders",
+      "description": "Everything about accepting and completing orders",
+      "icon": "local_shipping",
+      "color": "#2196F3",
+      "articles": [
+        {
+          "id": "accepting_orders",
+          "title": "Accepting Orders",
+          "description": "How to accept delivery requests",
+          "sections": [
+            {
+              "type": "text",
+              "content": "When you're online, you'll receive notifications for new orders that match your location and vehicle type."
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Review the order card showing pickup, dropoff, distance, and earnings",
+                "Check if the route fits your current location",
+                "Tap 'Accept' within 30 seconds",
+                "Start navigating to the pickup location"
+              ]
+            },
+            {
+              "type": "warning",
+              "content": "Orders that aren't accepted within 30 seconds will be offered to other drivers. Your acceptance rate affects your priority for future orders."
+            }
+          ],
+          "tags": ["accepting", "orders", "notifications"],
+          "relatedIds": ["order_statuses", "navigation"]
+        },
+        {
+          "id": "navigation",
+          "title": "Using Navigation",
+          "description": "Navigate to pickup and delivery locations",
+          "sections": [
+            {
+              "type": "text",
+              "content": "TeybatDriver includes built-in turn-by-turn navigation to help you reach your destinations quickly."
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Tap the 'Navigate' button on the order details screen",
+                "Choose between in-app navigation or Google Maps",
+                "Follow the directions to reach the pickup location",
+                "After pickup, navigate to the customer's dropoff location",
+                "Update the order status at each step"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "The in-app navigation works offline with downloaded maps. Use Google Maps for real-time traffic updates."
+            }
+          ],
+          "tags": ["navigation", "maps", "directions"],
+          "relatedIds": ["order_statuses", "completing_delivery"]
+        },
+        {
+          "id": "order_statuses",
+          "title": "Order Status Flow",
+          "description": "Understanding different order states",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Each order progresses through several statuses as you complete the delivery:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "PENDING - Order is waiting for you to accept",
+                "ACCEPTED - You've accepted and are heading to pickup",
+                "ON_THE_WAY - You've collected items and are delivering",
+                "DELIVERED - You've arrived and handed over the delivery",
+                "COMPLETED - Delivery is confirmed complete"
+              ]
+            },
+            {
+              "type": "text",
+              "content": "You must update the status manually at each step by tapping the status button on the order details screen."
+            }
+          ],
+          "tags": ["status", "workflow", "delivery"],
+          "relatedIds": ["accepting_orders", "completing_delivery"]
+        },
+        {
+          "id": "completing_delivery",
+          "title": "Completing Deliveries",
+          "description": "Final steps to complete an order",
+          "sections": [
+            {
+              "type": "text",
+              "content": "When you arrive at the customer's location, follow these steps:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Mark status as 'Arrived' when you reach the location",
+                "Contact the customer if needed using the call button",
+                "Hand over the delivery and verify any special instructions",
+                "Tap 'Mark as Delivered' to confirm",
+                "Your earnings will be credited to your account"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Always be courteous and professional. Good customer service leads to better ratings and tips!"
+            }
+          ],
+          "tags": ["completing", "delivery", "earnings"],
+          "relatedIds": ["order_statuses", "earnings_explained"]
+        }
+      ]
+    },
+    {
+      "id": "earnings",
+      "title": "Earnings & Payments",
+      "description": "How you get paid",
+      "icon": "attach_money",
+      "color": "#FFB300",
+      "articles": [
+        {
+          "id": "earnings_explained",
+          "title": "How Earnings Work",
+          "description": "Understanding your payment structure",
+          "sections": [
+            {
+              "type": "text",
+              "content": "You earn money for each completed delivery. Your earnings consist of:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Base delivery fee (varies by distance and demand)",
+                "Customer tips (100% goes to you)",
+                "Bonuses during peak hours and special promotions"
+              ]
+            },
+            {
+              "type": "text",
+              "content": "You can track your daily, weekly, and monthly earnings in the Earnings tab."
+            }
+          ],
+          "tags": ["earnings", "payment", "money"],
+          "relatedIds": ["payment_schedule", "tips"]
+        },
+        {
+          "id": "payment_schedule",
+          "title": "Payment Schedule",
+          "description": "When you receive your earnings",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Payments are processed automatically on a regular schedule:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Earnings are calculated at the end of each week",
+                "Payments are processed every Monday",
+                "Funds are deposited to your registered bank account within 2-3 business days",
+                "You'll receive a notification when payment is processed"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Make sure your bank details are up to date in your profile to avoid payment delays."
+            }
+          ],
+          "tags": ["payment", "schedule", "bank"],
+          "relatedIds": ["earnings_explained"]
+        },
+        {
+          "id": "tips",
+          "title": "Tips & Bonuses",
+          "description": "Maximizing your earnings",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Tips are a significant part of your earnings. Here's how to maximize them:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Provide excellent customer service",
+                "Communicate with customers if there are delays",
+                "Handle food items carefully to maintain quality",
+                "Be professional and courteous",
+                "Deliver within the estimated time"
+              ]
+            },
+            {
+              "type": "text",
+              "content": "Bonuses are available during peak hours (lunch, dinner) and in high-demand areas. Check the app for current promotions."
+            }
+          ],
+          "tags": ["tips", "bonuses", "maximize earnings"],
+          "relatedIds": ["earnings_explained"]
+        }
+      ]
+    },
+    {
+      "id": "troubleshooting",
+      "title": "Troubleshooting",
+      "description": "Solutions to common issues",
+      "icon": "build",
+      "color": "#F44336",
+      "articles": [
+        {
+          "id": "location_issues",
+          "title": "Location Issues",
+          "description": "Fixing GPS and location problems",
+          "sections": [
+            {
+              "type": "text",
+              "content": "If you're having trouble with location services:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Ensure location services are enabled in your device settings",
+                "Grant TeybatDriver permission to access location 'Always' or 'While Using App'",
+                "Check that you have a clear view of the sky (GPS works best outdoors)",
+                "Restart the app if location isn't updating",
+                "Toggle airplane mode on and off to reset GPS"
+              ]
+            },
+            {
+              "type": "warning",
+              "content": "You must have location enabled to go online and receive orders."
+            }
+          ],
+          "tags": ["location", "gps", "troubleshooting"],
+          "relatedIds": ["going_online"]
+        },
+        {
+          "id": "app_issues",
+          "title": "App Not Working",
+          "description": "General troubleshooting steps",
+          "sections": [
+            {
+              "type": "text",
+              "content": "If the app is not functioning properly:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Check your internet connection (WiFi or mobile data)",
+                "Force close the app and reopen it",
+                "Clear the app cache in device settings",
+                "Update to the latest version from the app store",
+                "Restart your device",
+                "Uninstall and reinstall the app as a last resort"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Your order history and earnings data are stored on our servers, so reinstalling won't cause data loss."
+            }
+          ],
+          "tags": ["app issues", "troubleshooting", "fix"],
+          "relatedIds": []
+        }
+      ]
+    }
+  ]
+}

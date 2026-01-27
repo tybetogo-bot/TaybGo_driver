@@ -27,11 +27,19 @@ class DriverProvider extends ChangeNotifier {
   String? _currentPlaceName;
   bool? _profileExists; // null = unknown, true = has profile, false = no profile (needs registration)
 
+  // Tour mode reference (will be set after initialization)
+  bool Function()? _isTourActive;
+
   DriverProvider({DriverService? driverService, ApiClient? apiClient})
       : _driverService = driverService ??
             DriverService(apiClient: apiClient ?? ApiClient()),
         _locationService = LocationService(),
         _geocodingService = GeocodingService();
+
+  /// Set tour mode checker (called from tour integration)
+  void setTourModeChecker(bool Function() checker) {
+    _isTourActive = checker;
+  }
 
   DriverProfile? get profile => _profile;
   bool get isLoading => _isLoading;
@@ -108,6 +116,13 @@ class DriverProvider extends ChangeNotifier {
     if (_isLoading) return ToggleOnlineResult.apiError;
 
     final newStatus = !_profile!.isOnline;
+
+    // Tour mode: Simulate toggle without API call or location checks
+    if (_isTourActive?.call() == true) {
+      _profile = _profile!.copyWith(isOnline: newStatus);
+      notifyListeners();
+      return ToggleOnlineResult.success;
+    }
 
     _isLoading = true;
     notifyListeners();

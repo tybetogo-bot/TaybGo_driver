@@ -10,6 +10,7 @@ import 'core/providers/order_provider.dart';
 import 'core/providers/auth_provider.dart';
 import 'core/providers/driver_provider.dart';
 import 'core/providers/notification_provider.dart';
+import 'core/providers/tour_provider.dart';
 import 'core/router/app_router.dart';
 
 late final GoRouter _router;
@@ -21,16 +22,28 @@ void main() async {
   final authProvider = AuthProvider();
   await authProvider.initialize();
 
+  // Initialize tour provider
+  final tourProvider = TourProvider();
+  await tourProvider.init();
+
   // Create router once with the auth provider
   _router = AppRouter.createRouter(authProvider);
 
-  runApp(TybeToGoDriverApp(authProvider: authProvider));
+  runApp(TybeToGoDriverApp(
+    authProvider: authProvider,
+    tourProvider: tourProvider,
+  ));
 }
 
 class TybeToGoDriverApp extends StatelessWidget {
   final AuthProvider authProvider;
+  final TourProvider tourProvider;
 
-  const TybeToGoDriverApp({super.key, required this.authProvider});
+  const TybeToGoDriverApp({
+    super.key,
+    required this.authProvider,
+    required this.tourProvider,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -42,6 +55,7 @@ class TybeToGoDriverApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider(create: (_) => DriverProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider.value(value: tourProvider),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, _) {

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/order_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../tour/tour_keys.dart';
 import '../../orders/models/order_model.dart';
 
 class EarningsScreen extends StatefulWidget {
@@ -14,6 +15,9 @@ class EarningsScreen extends StatefulWidget {
 
 class _EarningsScreenState extends State<EarningsScreen> {
   bool _isRefreshing = false;
+
+  // Tour keys from singleton
+  final _tourKeys = TourKeys.instance;
 
   @override
   void initState() {
@@ -92,6 +96,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
               children: [
                 // Total earnings card
                 Container(
+                  key: _tourKeys.totalEarningsKey,
                   width: double.infinity,
                   padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
@@ -130,6 +135,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 // Stats grid
                 if (stats.orders > 0) ...[
                   Row(
+                    key: _tourKeys.statsGridKey,
                     children: [
                       Expanded(
                         child: _buildStatCard(

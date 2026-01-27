@@ -13,6 +13,9 @@ import '../../features/earnings/screens/earnings_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
+import '../../features/knowledge_base/screens/knowledge_base_screen.dart';
+import '../../features/knowledge_base/screens/kb_article_screen.dart';
+import '../../features/knowledge_base/models/kb_models.dart';
 import '../constants/route_constants.dart';
 import '../providers/auth_provider.dart';
 import 'shell_scaffold.dart';
@@ -159,6 +162,25 @@ class AppRouter {
       GoRoute(
         path: RouteConstants.notifications,
         builder: (context, state) => const NotificationsScreen(),
+      ),
+
+      // Knowledge Base
+      GoRoute(
+        path: RouteConstants.knowledgeBase,
+        builder: (context, state) => const KnowledgeBaseScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.kbArticle,
+        builder: (context, state) {
+          final categoryId = state.pathParameters['categoryId'] ?? '';
+          final articleId = state.pathParameters['articleId'] ?? '';
+          final article = state.extra as KBArticle?;
+          return KBArticleScreen(
+            categoryId: categoryId,
+            articleId: articleId,
+            article: article,
+          );
+        },
       ),
     ],
     );

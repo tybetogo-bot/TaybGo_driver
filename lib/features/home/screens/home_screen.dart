@@ -6,8 +6,12 @@ import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/providers/order_provider.dart';
+import '../../../core/providers/tour_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/mock/tour_mock_data.dart';
 import '../../orders/models/order_model.dart';
+import '../../tour/widgets/tour_welcome_card.dart';
+import '../../tour/tour_keys.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,6 +28,9 @@ class _HomeScreenState extends State<HomeScreen>
   bool _isRefreshing = false;
   OrderProvider? _orderProvider;
 
+  // Tour keys from singleton
+  final _tourKeys = TourKeys.instance;
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +45,11 @@ class _HomeScreenState extends State<HomeScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _orderProvider = context.read<OrderProvider>();
       final driverProvider = context.read<DriverProvider>();
+      final tourProvider = context.read<TourProvider>();
+
+      // Set up tour mode checkers in providers
+      _orderProvider!.setTourModeChecker(() => tourProvider.isTourActive);
+      driverProvider.setTourModeChecker(() => tourProvider.isTourActive);
 
       _orderProvider!.onNewOrderReceived = _onNewOrder;
 
@@ -226,6 +238,20 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  void _startTour(TourProvider tourProvider) async {
+    // Start the tour
+    await tourProvider.startTour();
+
+    // The tour coordinator will handle the rest
+    // For now, we'll inject a mock order after a short delay
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted && tourProvider.isTourActive) {
+        final mockOrder = TourMockData.createMockOrder();
+        _orderProvider?.injectMockOrder(mockOrder);
+      }
+    });
+  }
+
   @override
   void dispose() {
     _orderProvider?.onNewOrderReceived = null;
@@ -328,6 +354,7 @@ class _HomeScreenState extends State<HomeScreen>
                     // Verification Pending Banner
                     if (profile != null && !profile.isVerified)
                       Container(
+                        key: _tourKeys.verificationBannerKey,
                         margin: const EdgeInsets.only(bottom: 16),
                         padding: const EdgeInsets.all(14),
                         decoration: BoxDecoration(
@@ -379,8 +406,24 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
 
+                    // Tour Welcome Card
+                    Consumer<TourProvider>(
+                      builder: (context, tourProvider, _) {
+                        if (profile != null &&
+                            !profile.isVerified &&
+                            tourProvider.shouldShowPrompt(profile.isVerified)) {
+                          return TourWelcomeCard(
+                            onStartTour: () => _startTour(tourProvider),
+                            onSkip: () => tourProvider.skipTour(),
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
+
                     // Status Card
                     Container(
+                      key: _tourKeys.onlineToggleKey,
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         color: isOnline ? AppColors.primary.withValues(alpha: 0.08) : surfaceColor,
@@ -487,6 +530,7 @@ class _HomeScreenState extends State<HomeScreen>
 
                     // Stats Card
                     Container(
+                      key: _tourKeys.statsCardKey,
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: surfaceColor,
@@ -643,6 +687,7 @@ class _HomeScreenState extends State<HomeScreen>
     return GestureDetector(
       onTap: () => context.push(RouteConstants.orderDetailPath(order.id)),
       child: Container(
+        key: _tourKeys.newOrderCardKey,
         margin: const EdgeInsets.only(bottom: 20),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(

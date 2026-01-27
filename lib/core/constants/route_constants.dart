@@ -24,7 +24,13 @@ class RouteConstants {
   static const String settings = '/settings';
   static const String notifications = '/notifications';
 
+  // Knowledge Base
+  static const String knowledgeBase = '/knowledge-base';
+  static const String kbArticle = '/knowledge-base/:categoryId/:articleId';
+
   // Helper methods
   static String orderDetailPath(String id) => '/order/$id';
   static String navigationPath(String id) => '/navigation/$id';
+  static String kbArticlePath(String categoryId, String articleId) =>
+      '/knowledge-base/$categoryId/$articleId';
 }

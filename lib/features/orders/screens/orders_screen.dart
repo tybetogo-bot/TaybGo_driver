@@ -6,6 +6,7 @@ import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/providers/order_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../tour/tour_keys.dart';
 import '../models/order_model.dart';
 
 class OrdersScreen extends StatefulWidget {
@@ -19,6 +20,9 @@ class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isRefreshing = false;
+
+  // Tour keys from singleton
+  final _tourKeys = TourKeys.instance;
 
   @override
   void initState() {
@@ -87,6 +91,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                 ),
         ],
         bottom: TabBar(
+          key: _tourKeys.tabBarKey,
           controller: _tabController,
           labelColor: AppColors.primary,
           unselectedLabelColor: secondaryColor,
