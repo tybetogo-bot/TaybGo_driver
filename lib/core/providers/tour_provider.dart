@@ -14,6 +14,12 @@ class TourProvider extends ChangeNotifier {
   int _currentStepInStage = 0;
   OrderModel? _mockOrder;
 
+  /// Callback to navigate to a specific tab during tour
+  void Function(int tabIndex)? _tabNavigationCallback;
+
+  /// Callback to trigger showing the tour for current stage
+  void Function()? _showStageCallback;
+
   // Getters
   bool get isTourActive => _isTourActive;
   bool get isTourCompleted => _isTourCompleted;
@@ -21,6 +27,42 @@ class TourProvider extends ChangeNotifier {
   TourStage get currentStage => _currentStage;
   int get currentStepInStage => _currentStepInStage;
   OrderModel? get mockOrder => _mockOrder;
+
+  /// Register a callback for tab navigation (called by ShellScaffold)
+  void setTabNavigationCallback(void Function(int tabIndex)? callback) {
+    _tabNavigationCallback = callback;
+  }
+
+  /// Register a callback to show the tour stage (called by each screen)
+  void setShowStageCallback(void Function()? callback) {
+    _showStageCallback = callback;
+  }
+
+  /// Navigate to a specific tab during tour
+  void navigateToTab(int tabIndex) {
+    _tabNavigationCallback?.call(tabIndex);
+  }
+
+  /// Trigger showing the current tour stage
+  void triggerShowStage() {
+    _showStageCallback?.call();
+  }
+
+  /// Get the tab index for a tour stage
+  int getTabIndexForStage(TourStage stage) {
+    switch (stage) {
+      case TourStage.home:
+      case TourStage.orderAcceptance:
+      case TourStage.activeOrder:
+        return 0; // Home tab
+      case TourStage.orders:
+        return 1; // Orders tab
+      case TourStage.earnings:
+        return 2; // Earnings tab
+      case TourStage.profile:
+        return 3; // Profile tab
+    }
+  }
 
   /// Initialize tour state from storage
   Future<void> init() async {
