@@ -3,27 +3,37 @@ import 'package:go_router/go_router.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import '../../core/constants/route_constants.dart';
 import '../../core/providers/tour_provider.dart';
+import '../../core/providers/order_provider.dart';
 import '../../core/models/tour_models.dart';
+import '../../core/mock/tour_mock_data.dart';
 import 'tour_keys.dart';
 import 'widgets/tour_content_widget.dart';
 import 'widgets/tour_completion_dialog.dart';
 
 /// Coordinates the entire tour flow across different screens
 class TourCoordinator {
-  final BuildContext context;
+  BuildContext context;
   final TourProvider tourProvider;
+  final OrderProvider? orderProvider;
   final VoidCallback? onComplete;
   final VoidCallback? onSkip;
 
   TutorialCoachMark? _tutorialCoachMark;
   List<TargetFocus> _targets = [];
+  bool _isShowingTour = false;
 
   TourCoordinator({
     required this.context,
     required this.tourProvider,
+    this.orderProvider,
     this.onComplete,
     this.onSkip,
   });
+
+  /// Update the context (needed when navigating to different screens)
+  void updateContext(BuildContext newContext) {
+    context = newContext;
+  }
 
   /// Start the tour from a specific stage
   Future<void> startTour({TourStage stage = TourStage.home}) async {
@@ -31,8 +41,16 @@ class TourCoordinator {
     await _showTourStage(stage);
   }
 
+  /// Show tour for the current stage (called by screens when they're ready)
+  Future<void> showCurrentStage() async {
+    if (!tourProvider.isTourActive || _isShowingTour) return;
+    await _showTourStage(tourProvider.currentStage);
+  }
+
   /// Show tour for a specific stage
   Future<void> _showTourStage(TourStage stage) async {
+    if (_isShowingTour) return;
+
     switch (stage) {
       case TourStage.home:
         await _showHomeStage();
@@ -41,7 +59,8 @@ class TourCoordinator {
         await _showOrderAcceptanceStage();
         break;
       case TourStage.activeOrder:
-        await _showActiveOrderStage();
+        // Skip active order stage as it requires actual order interaction
+        _completeStage(TourStage.activeOrder);
         break;
       case TourStage.orders:
         await _showOrdersStage();
@@ -57,95 +76,154 @@ class TourCoordinator {
 
   /// Home screen tour stage
   Future<void> _showHomeStage() async {
-    _targets = _createHomeTargets();
-    if (_targets.isEmpty) return;
+    // Small delay to ensure UI is ready
+    await Future.delayed(const Duration(milliseconds: 300));
 
+    _targets = _createHomeTargets();
+    if (_targets.isEmpty) {
+      // If no targets found, skip to next stage
+      _completeStage(TourStage.home);
+      return;
+    }
+
+    _isShowingTour = true;
     _createTutorial(
       targets: _targets,
       stage: TourStage.home,
-      onFinish: () => _completeStage(TourStage.home),
-      onSkip: _handleSkip,
+      onFinish: () {
+        _isShowingTour = false;
+        _completeStage(TourStage.home);
+      },
+      onSkip: () {
+        _isShowingTour = false;
+        _handleSkip();
+      },
     );
 
-    _tutorialCoachMark?.show(context: context);
+    if (context.mounted) {
+      _tutorialCoachMark?.show(context: context);
+    }
   }
 
   /// Order acceptance stage (when mock order appears)
   Future<void> _showOrderAcceptanceStage() async {
-    // Wait a bit for UI to update with mock order
-    await Future.delayed(const Duration(milliseconds: 500));
+    // Wait for mock order UI to be rendered
+    await Future.delayed(const Duration(milliseconds: 600));
 
     _targets = _createOrderAcceptanceTargets();
-    if (_targets.isEmpty) return;
+    if (_targets.isEmpty) {
+      // If no targets (order card not visible), skip to next stage
+      _completeStage(TourStage.orderAcceptance);
+      return;
+    }
 
+    _isShowingTour = true;
     _createTutorial(
       targets: _targets,
       stage: TourStage.orderAcceptance,
-      onFinish: () => _completeStage(TourStage.orderAcceptance),
-      onSkip: _handleSkip,
+      onFinish: () {
+        _isShowingTour = false;
+        _completeStage(TourStage.orderAcceptance);
+      },
+      onSkip: () {
+        _isShowingTour = false;
+        _handleSkip();
+      },
     );
 
-    _tutorialCoachMark?.show(context: context);
-  }
-
-  /// Active order management stage
-  Future<void> _showActiveOrderStage() async {
-    _targets = _createActiveOrderTargets();
-    if (_targets.isEmpty) return;
-
-    _createTutorial(
-      targets: _targets,
-      stage: TourStage.activeOrder,
-      onFinish: () => _completeStage(TourStage.activeOrder),
-      onSkip: _handleSkip,
-    );
-
-    _tutorialCoachMark?.show(context: context);
+    if (context.mounted) {
+      _tutorialCoachMark?.show(context: context);
+    }
   }
 
   /// Orders tab stage
   Future<void> _showOrdersStage() async {
-    _targets = _createOrdersTargets();
-    if (_targets.isEmpty) return;
+    // Wait for screen to build
+    await Future.delayed(const Duration(milliseconds: 400));
 
+    _targets = _createOrdersTargets();
+    if (_targets.isEmpty) {
+      _completeStage(TourStage.orders);
+      return;
+    }
+
+    _isShowingTour = true;
     _createTutorial(
       targets: _targets,
       stage: TourStage.orders,
-      onFinish: () => _completeStage(TourStage.orders),
-      onSkip: _handleSkip,
+      onFinish: () {
+        _isShowingTour = false;
+        _completeStage(TourStage.orders);
+      },
+      onSkip: () {
+        _isShowingTour = false;
+        _handleSkip();
+      },
     );
 
-    _tutorialCoachMark?.show(context: context);
+    if (context.mounted) {
+      _tutorialCoachMark?.show(context: context);
+    }
   }
 
   /// Earnings tab stage
   Future<void> _showEarningsStage() async {
-    _targets = _createEarningsTargets();
-    if (_targets.isEmpty) return;
+    // Wait for screen to build
+    await Future.delayed(const Duration(milliseconds: 400));
 
+    _targets = _createEarningsTargets();
+    if (_targets.isEmpty) {
+      _completeStage(TourStage.earnings);
+      return;
+    }
+
+    _isShowingTour = true;
     _createTutorial(
       targets: _targets,
       stage: TourStage.earnings,
-      onFinish: () => _completeStage(TourStage.earnings),
-      onSkip: _handleSkip,
+      onFinish: () {
+        _isShowingTour = false;
+        _completeStage(TourStage.earnings);
+      },
+      onSkip: () {
+        _isShowingTour = false;
+        _handleSkip();
+      },
     );
 
-    _tutorialCoachMark?.show(context: context);
+    if (context.mounted) {
+      _tutorialCoachMark?.show(context: context);
+    }
   }
 
   /// Profile tab stage
   Future<void> _showProfileStage() async {
-    _targets = _createProfileTargets();
-    if (_targets.isEmpty) return;
+    // Wait for screen to build
+    await Future.delayed(const Duration(milliseconds: 400));
 
+    _targets = _createProfileTargets();
+    if (_targets.isEmpty) {
+      _completeTour();
+      return;
+    }
+
+    _isShowingTour = true;
     _createTutorial(
       targets: _targets,
       stage: TourStage.profile,
-      onFinish: () => _completeTour(),
-      onSkip: _handleSkip,
+      onFinish: () {
+        _isShowingTour = false;
+        _completeTour();
+      },
+      onSkip: () {
+        _isShowingTour = false;
+        _handleSkip();
+      },
     );
 
-    _tutorialCoachMark?.show(context: context);
+    if (context.mounted) {
+      _tutorialCoachMark?.show(context: context);
+    }
   }
 
   /// Create tutorial coach mark instance
@@ -160,13 +238,14 @@ class TourCoordinator {
       colorShadow: Colors.black,
       paddingFocus: 10,
       opacityShadow: 0.85,
+      hideSkip: false,
       onFinish: onFinish,
       onSkip: () {
         onSkip();
         return true;
       },
       onClickTarget: (target) {
-        // Handle target click if needed
+        // Move to next on target click
       },
       onClickOverlay: (target) {
         // Move to next step on overlay click
@@ -177,59 +256,93 @@ class TourCoordinator {
 
   /// Complete a stage and move to next
   void _completeStage(TourStage completedStage) {
-    tourProvider.nextStage();
-
-    // Move to next stage
     final stages = TourStage.values;
     final currentIndex = stages.indexOf(completedStage);
 
     if (currentIndex < stages.length - 1) {
       final nextStage = stages[currentIndex + 1];
+      tourProvider.setStage(nextStage);
 
-      // Special handling for stage transitions
+      // Check if we need to navigate to a different tab
+      final currentTab = tourProvider.getTabIndexForStage(completedStage);
+      final nextTab = tourProvider.getTabIndexForStage(nextStage);
+
       if (nextStage == TourStage.orderAcceptance) {
-        // Inject mock order before showing acceptance stage
-        tourProvider.injectMockOrder();
+        // Special handling: inject mock order before showing acceptance stage
+        final mockOrder = TourMockData.createMockOrder();
+        tourProvider.setMockOrder(mockOrder);
+        orderProvider?.injectMockOrder(mockOrder);
         Future.delayed(const Duration(milliseconds: 800), () {
           if (context.mounted) {
             _showTourStage(nextStage);
           }
         });
+      } else if (currentTab != nextTab) {
+        // Navigate to the new tab first, then show the tour
+        tourProvider.navigateToTab(nextTab);
+        // Wait for navigation and screen build
+        Future.delayed(const Duration(milliseconds: 600), () {
+          if (context.mounted && tourProvider.isTourActive) {
+            _showTourStage(nextStage);
+          }
+        });
       } else {
-        // Show next stage immediately
-        _showTourStage(nextStage);
+        // Same tab, show next stage immediately
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (context.mounted) {
+            _showTourStage(nextStage);
+          }
+        });
       }
+    } else {
+      // Last stage completed
+      _completeTour();
     }
   }
 
   /// Complete the entire tour
   void _completeTour() {
     tourProvider.completeTour();
+    tourProvider.clearMockOrder();
+    orderProvider?.clearMockOrder();
 
-    // Show completion dialog
-    TourCompletionDialog.show(
-      context,
-      onClose: () {
-        onComplete?.call();
-      },
-      onViewKnowledgeBase: () {
-        // Navigate to knowledge base
-        if (context.mounted) {
-          context.push(RouteConstants.knowledgeBase);
-        }
-      },
-    );
+    // Navigate back to home
+    tourProvider.navigateToTab(0);
+
+    // Show completion dialog after navigation
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (context.mounted) {
+        TourCompletionDialog.show(
+          context,
+          onClose: () {
+            onComplete?.call();
+          },
+          onViewKnowledgeBase: () {
+            if (context.mounted) {
+              context.push(RouteConstants.knowledgeBase);
+            }
+          },
+        );
+      }
+    });
   }
 
   /// Handle tour skip
   void _handleSkip() {
+    _tutorialCoachMark?.finish();
     tourProvider.skipTour();
     tourProvider.clearMockOrder();
+    orderProvider?.clearMockOrder();
+
+    // Navigate back to home
+    tourProvider.navigateToTab(0);
+
     onSkip?.call();
   }
 
   /// Dispose resources
   void dispose() {
+    _tutorialCoachMark?.finish();
     _tutorialCoachMark = null;
   }
 

@@ -8,10 +8,10 @@ import '../../../core/providers/driver_provider.dart';
 import '../../../core/providers/order_provider.dart';
 import '../../../core/providers/tour_provider.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/mock/tour_mock_data.dart';
 import '../../orders/models/order_model.dart';
 import '../../tour/widgets/tour_welcome_card.dart';
 import '../../tour/tour_keys.dart';
+import '../../tour/tour_coordinator.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,6 +30,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   // Tour keys from singleton
   final _tourKeys = TourKeys.instance;
+
+  // Tour coordinator for managing the app tour
+  TourCoordinator? _tourCoordinator;
 
   @override
   void initState() {
@@ -239,23 +242,35 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _startTour(TourProvider tourProvider) async {
-    // Start the tour
+    // Start the tour in the provider
     await tourProvider.startTour();
 
-    // The tour coordinator will handle the rest
-    // For now, we'll inject a mock order after a short delay
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted && tourProvider.isTourActive) {
-        final mockOrder = TourMockData.createMockOrder();
-        _orderProvider?.injectMockOrder(mockOrder);
-      }
-    });
+    // Create the tour coordinator
+    _tourCoordinator = TourCoordinator(
+      context: context,
+      tourProvider: tourProvider,
+      orderProvider: _orderProvider,
+      onComplete: () {
+        if (mounted) {
+          setState(() {});
+        }
+      },
+      onSkip: () {
+        if (mounted) {
+          setState(() {});
+        }
+      },
+    );
+
+    // Start the visual tour
+    await _tourCoordinator!.startTour();
   }
 
   @override
   void dispose() {
     _orderProvider?.onNewOrderReceived = null;
     _pulseController.dispose();
+    _tourCoordinator?.dispose();
     super.dispose();
   }
 
