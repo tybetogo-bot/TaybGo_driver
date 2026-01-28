@@ -716,4 +716,211 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get driver => 'Chauffeur';
+
+  @override
+  String get knowledgeBase => 'Base de connaissances';
+
+  @override
+  String get searchForHelp => 'Rechercher de l\'aide...';
+
+  @override
+  String get noArticlesFound => 'Aucun article trouvé';
+
+  @override
+  String get tryDifferentSearch => 'Essayez un autre terme de recherche';
+
+  @override
+  String get noCategoriesAvailable => 'Aucune catégorie disponible';
+
+  @override
+  String articlesCount(int count) {
+    return '$count articles';
+  }
+
+  @override
+  String get articleNotFound => 'Article non trouvé';
+
+  @override
+  String get wasArticleHelpful => 'Cet article vous a-t-il été utile ?';
+
+  @override
+  String get thankYouFeedback => 'Merci pour votre retour !';
+
+  @override
+  String get willImproveArticle =>
+      'Nous travaillerons à améliorer cet article.';
+
+  @override
+  String get relatedArticles => 'Articles connexes';
+
+  @override
+  String get kbTip => 'Conseil';
+
+  @override
+  String get kbWarning => 'Avertissement';
+
+  @override
+  String get yes => 'Oui';
+
+  @override
+  String get no => 'Non';
+
+  @override
+  String get article => 'Article';
+
+  @override
+  String get browseKnowledgeBase => 'Parcourir la base de connaissances';
+
+  @override
+  String sectionsCount(int count) {
+    return '$count sections';
+  }
+
+  @override
+  String minRead(int count) {
+    return '$count min de lecture';
+  }
+
+  @override
+  String get tourAccountUnderReviewTitle => 'Compte en cours de vérification';
+
+  @override
+  String get tourAccountUnderReviewDesc =>
+      'Votre compte est en cours de vérification. Vous pouvez explorer l\'application en attendant l\'approbation.';
+
+  @override
+  String get tourGoOnlineTitle => 'Passez en ligne pour recevoir des commandes';
+
+  @override
+  String get tourGoOnlineDesc =>
+      'Activez ce bouton lorsque vous êtes prêt à accepter des livraisons. Vous pouvez passer hors ligne à tout moment.';
+
+  @override
+  String get tourDailyStatsTitle => 'Vos statistiques quotidiennes';
+
+  @override
+  String get tourDailyStatsDesc =>
+      'Suivez vos commandes, revenus et notes ici. Les statistiques se mettent à jour en temps réel.';
+
+  @override
+  String get tourNewOrderTitle => 'Nouvelle commande reçue !';
+
+  @override
+  String get tourNewOrderDesc =>
+      'Voici comment apparaissent les nouvelles commandes. Consultez le ramassage, la livraison, la distance et le paiement.';
+
+  @override
+  String get tourOrdersTabTitle => 'Onglet Commandes';
+
+  @override
+  String get tourOrdersTabDesc =>
+      'Basculez entre les commandes en cours et l\'historique des commandes.';
+
+  @override
+  String get tourTotalEarningsTitle => 'Vos revenus totaux';
+
+  @override
+  String get tourTotalEarningsDesc =>
+      'Suivez tous vos revenus ici — salaire de base, pourboires et bonus.';
+
+  @override
+  String get tourEarningsBreakdownTitle => 'Détail des revenus';
+
+  @override
+  String get tourEarningsBreakdownDesc =>
+      'Consultez le total de vos commandes et les revenus moyens par commande.';
+
+  @override
+  String get tourRouteDetailsTitle => 'Détails de l\'itinéraire';
+
+  @override
+  String get tourRouteDetailsDesc =>
+      'Consultez l\'itinéraire complet de ramassage et de livraison avec adresses, distance et temps estimé.';
+
+  @override
+  String get tourYourEarningsTitle => 'Vos revenus';
+
+  @override
+  String get tourYourEarningsDesc =>
+      'Consultez le détail complet — frais de livraison, pourboire et montant total.';
+
+  @override
+  String get tourNavActionsTitle => 'Navigation et actions';
+
+  @override
+  String get tourNavActionsDesc =>
+      'Naviguez vers le ramassage/livraison ou mettez à jour le statut de la commande au fur et à mesure.';
+
+  @override
+  String get tourTurnByTurnTitle => 'Navigation pas à pas';
+
+  @override
+  String get tourTurnByTurnDesc =>
+      'Suivez les indications en temps réel vers votre lieu de ramassage ou de livraison.';
+
+  @override
+  String get tourTripControlsTitle => 'Contrôles du trajet';
+
+  @override
+  String get tourTripControlsDesc =>
+      'Basculez entre les itinéraires de ramassage et de livraison, consultez les détails de destination et les revenus.';
+
+  @override
+  String get tourUpdateStatusTitle => 'Mettre à jour le statut';
+
+  @override
+  String get tourUpdateStatusDesc =>
+      'Appuyez pour marquer les étapes clés — En route, Livré ou Terminé.';
+
+  @override
+  String get tourAppSettingsTitle => 'Paramètres de l\'application';
+
+  @override
+  String get tourAppSettingsDesc =>
+      'Changez votre langue, thème et accédez à la base de connaissances pour obtenir de l\'aide.';
+
+  @override
+  String get tourKnowledgeBaseTitle => 'Base de connaissances';
+
+  @override
+  String get tourKnowledgeBaseDesc =>
+      'Parcourez les guides étape par étape, les conseils et les réponses aux questions fréquentes.';
+
+  @override
+  String get tourSkipBtn => 'Passer';
+
+  @override
+  String get tourBackBtn => 'Retour';
+
+  @override
+  String get tourNextBtn => 'Suivant';
+
+  @override
+  String get tourDoneBtn => 'Terminé';
+
+  @override
+  String get tourWelcomeTitle => 'Bienvenue sur TypeToGo !';
+
+  @override
+  String get tourWelcomeDesc =>
+      'Faites une visite rapide pour apprendre à utiliser l\'application';
+
+  @override
+  String get tourSkipForNow => 'Passer pour l\'instant';
+
+  @override
+  String get tourStartBtn => 'Commencer la visite';
+
+  @override
+  String get tourCompleteTitle => 'Visite terminée !';
+
+  @override
+  String get tourCompleteDesc =>
+      'Vous êtes prêt à accepter des commandes et gagner avec TypeToGo !';
+
+  @override
+  String get tourBrowseKb => 'Parcourir la base de connaissances';
+
+  @override
+  String get tourGetStarted => 'Commencer';
 }

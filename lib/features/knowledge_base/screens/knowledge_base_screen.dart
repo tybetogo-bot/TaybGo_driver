@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/route_constants.dart';
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/locale_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../models/kb_models.dart';
@@ -69,12 +70,14 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     final secondaryColor =
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final surfaceColor =
+        isDark ? AppColors.darkSurface : AppColors.lightSurface;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Knowledge Base'),
+        title: Text(l10n.knowledgeBase),
         backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
         elevation: 0,
       ),
@@ -84,17 +87,19 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
               children: [
                 // Search bar
                 Padding(
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
                   child: TextField(
                     controller: _searchController,
                     onChanged: _onSearchChanged,
                     decoration: InputDecoration(
-                      hintText: 'Search for help...',
+                      hintText: l10n.searchForHelp,
                       hintStyle: TextStyle(color: secondaryColor),
-                      prefixIcon: Icon(Icons.search, color: secondaryColor),
+                      prefixIcon:
+                          Icon(Icons.search, color: secondaryColor),
                       suffixIcon: _searchController.text.isNotEmpty
                           ? IconButton(
-                              icon: Icon(Icons.clear, color: secondaryColor),
+                              icon:
+                                  Icon(Icons.clear, color: secondaryColor),
                               onPressed: () {
                                 _searchController.clear();
                                 _onSearchChanged('');
@@ -113,8 +118,8 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide:
-                            const BorderSide(color: AppColors.primary, width: 2),
+                        borderSide: const BorderSide(
+                            color: AppColors.primary, width: 2),
                       ),
                     ),
                   ),
@@ -123,16 +128,250 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
                 // Content
                 Expanded(
                   child: _isSearching
-                      ? _buildSearchResults(textColor, secondaryColor, surfaceColor)
-                      : _buildCategories(textColor, secondaryColor, surfaceColor),
+                      ? _buildSearchResults(
+                          textColor, secondaryColor, surfaceColor,
+                          borderColor, l10n)
+                      : _buildMainContent(
+                          textColor, secondaryColor, surfaceColor,
+                          borderColor, l10n),
                 ),
               ],
             ),
     );
   }
 
+  // ── Main content: category grid + articles by category ──
+
+  Widget _buildMainContent(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    Color borderColor,
+    AppLocalizations l10n,
+  ) {
+    if (_knowledgeBase == null || _knowledgeBase!.categories.isEmpty) {
+      return Center(
+        child: Text(
+          l10n.noCategoriesAvailable,
+          style: TextStyle(color: secondaryColor),
+        ),
+      );
+    }
+
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      children: [
+        const SizedBox(height: 4),
+        // Category grid
+        _buildCategoryGrid(
+            textColor, secondaryColor, surfaceColor, borderColor, l10n),
+        const SizedBox(height: 28),
+        // Articles grouped by category
+        _buildArticlesByCategory(
+            textColor, secondaryColor, surfaceColor, borderColor, l10n),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  // ── Category Grid (2-column) ──
+
+  Widget _buildCategoryGrid(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    Color borderColor,
+    AppLocalizations l10n,
+  ) {
+    final categories = _knowledgeBase!.categories;
+
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 12,
+        mainAxisSpacing: 12,
+        childAspectRatio: 1.3,
+      ),
+      itemCount: categories.length,
+      itemBuilder: (context, index) {
+        final category = categories[index];
+        return _buildCategoryGridCard(
+            category, textColor, secondaryColor, surfaceColor, l10n);
+      },
+    );
+  }
+
+  Widget _buildCategoryGridCard(
+    KBCategory category,
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    AppLocalizations l10n,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: category.color.withValues(alpha: 0.15),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: category.color.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              _getIconData(category.icon),
+              color: category.color,
+              size: 22,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            category.title,
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w600,
+              color: textColor,
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            l10n.articlesCount(category.articles.length),
+            style: TextStyle(fontSize: 12, color: secondaryColor),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Articles grouped by category ──
+
+  Widget _buildArticlesByCategory(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    Color borderColor,
+    AppLocalizations l10n,
+  ) {
+    final categories = _knowledgeBase!.categories;
+
+    return Column(
+      children: categories.map((category) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Section header
+            Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: Row(
+                children: [
+                  Icon(
+                    _getIconData(category.icon),
+                    size: 16,
+                    color: category.color,
+                  ),
+                  const SizedBox(width: 6),
+                  Text(
+                    category.title,
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: secondaryColor,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            // Grouped container
+            Container(
+              decoration: BoxDecoration(
+                color: surfaceColor,
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Column(
+                children:
+                    category.articles.asMap().entries.map((entry) {
+                  final isLast =
+                      entry.key == category.articles.length - 1;
+                  final article = entry.value;
+                  return Column(
+                    children: [
+                      ListTile(
+                        onTap: () => context.push(
+                          RouteConstants.kbArticlePath(
+                              category.id, article.id),
+                          extra: article,
+                        ),
+                        contentPadding:
+                            const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 4),
+                        leading: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: category.color
+                                .withValues(alpha: 0.1),
+                            borderRadius:
+                                BorderRadius.circular(10),
+                          ),
+                          child: Icon(Icons.article_outlined,
+                              size: 20, color: category.color),
+                        ),
+                        title: Text(
+                          article.title,
+                          style: TextStyle(
+                              fontSize: 15, color: textColor),
+                        ),
+                        subtitle: article.description != null
+                            ? Text(
+                                article.description!,
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: secondaryColor),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              )
+                            : null,
+                        trailing: Icon(Icons.chevron_right,
+                            size: 20, color: secondaryColor),
+                      ),
+                      if (!isLast)
+                        Divider(
+                            height: 1,
+                            indent: 56,
+                            color: borderColor),
+                    ],
+                  );
+                }).toList(),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  // ── Search Results ──
+
   Widget _buildSearchResults(
-      Color textColor, Color secondaryColor, Color surfaceColor) {
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    Color borderColor,
+    AppLocalizations l10n,
+  ) {
     if (_searchResults.isEmpty) {
       return Center(
         child: Column(
@@ -141,7 +380,7 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
             Icon(Icons.search_off, size: 64, color: secondaryColor),
             const SizedBox(height: 16),
             Text(
-              'No articles found',
+              l10n.noArticlesFound,
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
@@ -150,252 +389,98 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Try a different search term',
-              style: TextStyle(fontSize: 14, color: secondaryColor),
+              l10n.tryDifferentSearch,
+              style:
+                  TextStyle(fontSize: 14, color: secondaryColor),
             ),
           ],
         ),
       );
     }
 
-    return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      itemCount: _searchResults.length,
-      itemBuilder: (context, index) {
-        final article = _searchResults[index];
-        // Find category for this article
-        String categoryId = '';
-        for (final category in _knowledgeBase!.categories) {
-          if (category.articles.any((a) => a.id == article.id)) {
-            categoryId = category.id;
-            break;
-          }
-        }
-
-        return _buildArticleCard(
-          article,
-          categoryId,
-          textColor,
-          secondaryColor,
-          surfaceColor,
-        );
-      },
-    );
-  }
-
-  Widget _buildCategories(
-      Color textColor, Color secondaryColor, Color surfaceColor) {
-    if (_knowledgeBase == null || _knowledgeBase!.categories.isEmpty) {
-      return Center(
-        child: Text(
-          'No categories available',
-          style: TextStyle(color: secondaryColor),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: const EdgeInsets.all(16),
-      itemCount: _knowledgeBase!.categories.length,
-      itemBuilder: (context, index) {
-        final category = _knowledgeBase!.categories[index];
-        return _buildCategoryCard(category, textColor, secondaryColor, surfaceColor);
-      },
-    );
-  }
-
-  Widget _buildCategoryCard(
-      KBCategory category, Color textColor, Color secondaryColor, Color surfaceColor) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: category.color.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Category header
-          Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: category.color.withValues(alpha: 0.1),
-              borderRadius: const BorderRadius.only(
-                topLeft: Radius.circular(16),
-                topRight: Radius.circular(16),
-              ),
-            ),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: category.color.withValues(alpha: 0.2),
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  child: Icon(
-                    _getIconData(category.icon),
-                    color: category.color,
-                    size: 24,
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        category.title,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: textColor,
-                        ),
-                      ),
-                      if (category.description.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          category.description,
-                          style: TextStyle(fontSize: 12, color: secondaryColor),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                Text(
-                  '${category.articles.length} articles',
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                    color: category.color,
-                  ),
-                ),
-              ],
-            ),
+    return ListView(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: surfaceColor,
+            borderRadius: BorderRadius.circular(14),
           ),
+          child: Column(
+            children:
+                _searchResults.asMap().entries.map((entry) {
+              final isLast =
+                  entry.key == _searchResults.length - 1;
+              final article = entry.value;
 
-          // Articles list
-          ...category.articles.map((article) => _buildArticleListItem(
-                article,
-                category.id,
-                textColor,
-                secondaryColor,
-              )),
-        ],
-      ),
-    );
-  }
+              // Find category for this article
+              String categoryId = '';
+              Color categoryColor = AppColors.primary;
+              for (final category
+                  in _knowledgeBase!.categories) {
+                if (category.articles
+                    .any((a) => a.id == article.id)) {
+                  categoryId = category.id;
+                  categoryColor = category.color;
+                  break;
+                }
+              }
 
-  Widget _buildArticleListItem(
-      KBArticle article, String categoryId, Color textColor, Color secondaryColor) {
-    return InkWell(
-      onTap: () => context.push(
-        RouteConstants.kbArticlePath(categoryId, article.id),
-        extra: article,
-      ),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(
-              color: secondaryColor.withValues(alpha: 0.1),
-            ),
-          ),
-        ),
-        child: Row(
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              return Column(
                 children: [
-                  Text(
-                    article.title,
-                    style: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: textColor,
+                  ListTile(
+                    onTap: () => context.push(
+                      RouteConstants.kbArticlePath(
+                          categoryId, article.id),
+                      extra: article,
                     ),
-                  ),
-                  if (article.description != null) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      article.description!,
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: secondaryColor,
+                    contentPadding:
+                        const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 4),
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: categoryColor
+                            .withValues(alpha: 0.1),
+                        borderRadius:
+                            BorderRadius.circular(10),
                       ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      child: Icon(Icons.article_outlined,
+                          size: 20, color: categoryColor),
                     ),
-                  ],
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right, color: secondaryColor),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildArticleCard(
-    KBArticle article,
-    String categoryId,
-    Color textColor,
-    Color secondaryColor,
-    Color surfaceColor,
-  ) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: secondaryColor.withValues(alpha: 0.2)),
-      ),
-      child: InkWell(
-        onTap: () => context.push(
-          RouteConstants.kbArticlePath(categoryId, article.id),
-          extra: article,
-        ),
-        borderRadius: BorderRadius.circular(12),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+                    title: Text(
                       article.title,
                       style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: textColor,
-                      ),
+                          fontSize: 15, color: textColor),
                     ),
-                    if (article.description != null) ...[
-                      const SizedBox(height: 6),
-                      Text(
-                        article.description!,
-                        style: TextStyle(fontSize: 13, color: secondaryColor),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ],
-                ),
-              ),
-              Icon(Icons.chevron_right, color: secondaryColor),
-            ],
+                    subtitle: article.description != null
+                        ? Text(
+                            article.description!,
+                            style: TextStyle(
+                                fontSize: 12,
+                                color: secondaryColor),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          )
+                        : null,
+                    trailing: Icon(Icons.chevron_right,
+                        size: 20, color: secondaryColor),
+                  ),
+                  if (!isLast)
+                    Divider(
+                        height: 1,
+                        indent: 56,
+                        color: borderColor),
+                ],
+              );
+            }).toList(),
           ),
         ),
-      ),
+      ],
     );
   }
+
+  // ── Helpers ──
 
   IconData _getIconData(String iconName) {
     switch (iconName) {

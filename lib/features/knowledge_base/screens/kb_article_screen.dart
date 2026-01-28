@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/route_constants.dart';
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/locale_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_text_styles.dart';
 import '../models/kb_models.dart';
 import '../services/kb_service.dart';
 
@@ -25,39 +27,51 @@ class KBArticleScreen extends StatefulWidget {
 
 class _KBArticleScreenState extends State<KBArticleScreen> {
   final KBService _kbService = KBService();
+  final ScrollController _scrollController = ScrollController();
   KBArticle? _article;
   KnowledgeBase? _knowledgeBase;
   bool _isLoading = true;
   bool _wasHelpful = false;
   bool _feedbackGiven = false;
+  double _readingProgress = 0.0;
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     _loadArticle();
+  }
+
+  void _onScroll() {
+    if (_scrollController.hasClients) {
+      final maxScroll = _scrollController.position.maxScrollExtent;
+      final currentScroll = _scrollController.position.pixels;
+      if (mounted) {
+        setState(() {
+          _readingProgress =
+              maxScroll > 0 ? (currentScroll / maxScroll).clamp(0.0, 1.0) : 0.0;
+        });
+      }
+    }
   }
 
   Future<void> _loadArticle() async {
     setState(() => _isLoading = true);
 
-    // Use article from constructor if provided
     if (widget.article != null) {
       setState(() {
         _article = widget.article;
         _isLoading = false;
       });
-      // Still load KB for related articles
       _loadKnowledgeBase();
       return;
     }
 
-    // Otherwise load from service
     final locale = context.read<LocaleProvider>().locale.languageCode;
     final kb = await _kbService.loadKnowledgeBase(locale);
 
     if (mounted) {
       final article = kb.findArticle(widget.articleId);
-
       setState(() {
         _knowledgeBase = kb;
         _article = article;
@@ -83,19 +97,38 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
       _feedbackGiven = true;
     });
 
-    // Show thank you message
+    final l10n = AppLocalizations.of(context)!;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(
-          helpful
-              ? 'Thank you for your feedback!'
-              : 'We\'ll work on improving this article.',
+          helpful ? l10n.thankYouFeedback : l10n.willImproveArticle,
         ),
         duration: const Duration(seconds: 2),
       ),
     );
+  }
 
-    // TODO: Send feedback to analytics/backend
+  int _estimateReadTime() {
+    if (_article == null) return 1;
+    int wordCount = 0;
+    for (final section in _article!.sections) {
+      if (section.content != null) {
+        wordCount += section.content!.split(' ').length;
+      }
+      if (section.items != null) {
+        for (final item in section.items!) {
+          wordCount += item.split(' ').length;
+        }
+      }
+    }
+    return (wordCount / 200).ceil().clamp(1, 30);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.removeListener(_onScroll);
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -104,14 +137,26 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
     final secondaryColor =
         isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final surfaceColor =
+        isDark ? AppColors.darkSurface : AppColors.lightSurface;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(_article?.title ?? 'Article'),
+        title: Text(l10n.knowledgeBase),
         backgroundColor: isDark ? AppColors.darkBg : AppColors.lightBg,
         elevation: 0,
+        bottom: PreferredSize(
+          preferredSize: const Size.fromHeight(2),
+          child: LinearProgressIndicator(
+            value: _readingProgress,
+            backgroundColor: borderColor,
+            valueColor:
+                const AlwaysStoppedAnimation<Color>(AppColors.primary),
+            minHeight: 2,
+          ),
+        ),
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -120,10 +165,11 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error_outline, size: 64, color: secondaryColor),
+                      Icon(Icons.error_outline,
+                          size: 64, color: secondaryColor),
                       const SizedBox(height: 16),
                       Text(
-                        'Article not found',
+                        l10n.articleNotFound,
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.w600,
@@ -134,49 +180,25 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
                   ),
                 )
               : SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
+                  controller: _scrollController,
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Article header
-                      if (_article!.description != null) ...[
-                        Container(
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: AppColors.primary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.info_outline,
-                                color: AppColors.primary,
-                                size: 24,
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  _article!.description!,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: textColor,
-                                    height: 1.5,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                      ],
+                      // ── Article header ──
+                      _buildArticleHeader(
+                          textColor, secondaryColor, borderColor, l10n),
 
-                      // Article sections
+                      // ── Article sections ──
                       ..._article!.sections.asMap().entries.map((entry) {
                         final index = entry.key;
                         final section = entry.value;
                         return Padding(
                           padding: EdgeInsets.only(
-                            bottom: index < _article!.sections.length - 1 ? 24 : 0,
+                            bottom: index < _article!.sections.length - 1
+                                ? 24
+                                : 0,
                           ),
                           child: _buildSection(
                             section,
@@ -184,21 +206,23 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
                             secondaryColor,
                             surfaceColor,
                             borderColor,
+                            l10n,
                           ),
                         );
                       }),
 
                       const SizedBox(height: 32),
 
-                      // Feedback section
+                      // ── Feedback section ──
                       _buildFeedbackSection(
                         textColor,
                         secondaryColor,
                         surfaceColor,
                         borderColor,
+                        l10n,
                       ),
 
-                      // Related articles
+                      // ── Related articles ──
                       if (_article!.relatedIds.isNotEmpty &&
                           _knowledgeBase != null) ...[
                         const SizedBox(height: 32),
@@ -207,13 +231,94 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
                           secondaryColor,
                           surfaceColor,
                           borderColor,
+                          l10n,
                         ),
                       ],
+
+                      const SizedBox(height: 20),
                     ],
                   ),
                 ),
     );
   }
+
+  // ── Article Header ──
+
+  Widget _buildArticleHeader(
+    Color textColor,
+    Color secondaryColor,
+    Color borderColor,
+    AppLocalizations l10n,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Title
+        Text(
+          _article!.title,
+          style: AppTextStyles.h2.copyWith(color: textColor),
+        ),
+        const SizedBox(height: 12),
+        // Meta badges
+        Row(
+          children: [
+            _buildMetaBadge(
+              Icons.menu_book_outlined,
+              l10n.sectionsCount(_article!.sections.length),
+              AppColors.primary,
+            ),
+            const SizedBox(width: 8),
+            _buildMetaBadge(
+              Icons.schedule,
+              l10n.minRead(_estimateReadTime()),
+              AppColors.info,
+            ),
+          ],
+        ),
+        if (_article!.description != null) ...[
+          const SizedBox(height: 16),
+          Text(
+            _article!.description!,
+            style: TextStyle(
+              fontSize: 15,
+              color: secondaryColor,
+              height: 1.6,
+            ),
+          ),
+        ],
+        const SizedBox(height: 20),
+        Divider(color: borderColor),
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  Widget _buildMetaBadge(IconData icon, String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 4),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ── Section Dispatcher ──
 
   Widget _buildSection(
     KBSection section,
@@ -221,19 +326,21 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
     Color secondaryColor,
     Color surfaceColor,
     Color borderColor,
+    AppLocalizations l10n,
   ) {
     switch (section.type) {
       case KBSectionType.text:
         return _buildTextSection(section, textColor);
       case KBSectionType.steps:
-        return _buildStepsSection(section, textColor, secondaryColor);
+        return _buildStepsSection(
+            section, textColor, secondaryColor, surfaceColor);
       case KBSectionType.tip:
         return _buildInfoBox(
           section,
           textColor,
           AppColors.success,
           Icons.lightbulb_outline,
-          'Tip',
+          l10n.kbTip,
         );
       case KBSectionType.warning:
         return _buildInfoBox(
@@ -241,67 +348,95 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
           textColor,
           AppColors.error,
           Icons.warning_amber_rounded,
-          'Warning',
+          l10n.kbWarning,
         );
       case KBSectionType.screenshot:
         return _buildScreenshotSection(section, borderColor);
     }
   }
 
+  // ── Text Section ──
+
   Widget _buildTextSection(KBSection section, Color textColor) {
     return Text(
       section.content ?? '',
-      style: TextStyle(
-        fontSize: 15,
-        color: textColor,
-        height: 1.6,
-      ),
+      style: AppTextStyles.body.copyWith(color: textColor),
     );
   }
+
+  // ── Steps Section (stepper with connecting line) ──
 
   Widget _buildStepsSection(
     KBSection section,
     Color textColor,
     Color secondaryColor,
+    Color surfaceColor,
   ) {
     if (section.items == null || section.items!.isEmpty) {
       return const SizedBox.shrink();
     }
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: section.items!.asMap().entries.map((entry) {
-        final index = entry.key;
-        final step = entry.value;
-        return Padding(
-          padding: EdgeInsets.only(
-            bottom: index < section.items!.length - 1 ? 16 : 0,
-          ),
-          child: Row(
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: section.items!.asMap().entries.map((entry) {
+          final index = entry.key;
+          final step = entry.value;
+          final isLast = index == section.items!.length - 1;
+
+          return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: AppColors.primary,
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Center(
-                  child: Text(
-                    '${index + 1}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w600,
+              // Step indicator column with connecting line
+              SizedBox(
+                width: 32,
+                child: Column(
+                  children: [
+                    // Number badge (rounded square)
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Center(
+                        child: Text(
+                          '${index + 1}',
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
                     ),
-                  ),
+                    // Connecting line
+                    if (!isLast)
+                      Container(
+                        width: 2,
+                        height: 24,
+                        margin: const EdgeInsets.symmetric(vertical: 4),
+                        decoration: BoxDecoration(
+                          color:
+                              AppColors.primary.withValues(alpha: 0.15),
+                          borderRadius: BorderRadius.circular(1),
+                        ),
+                      ),
+                  ],
                 ),
               ),
               const SizedBox(width: 12),
+              // Step text
               Expanded(
                 child: Padding(
-                  padding: const EdgeInsets.only(top: 4),
+                  padding:
+                      EdgeInsets.only(top: 6, bottom: isLast ? 0 : 12),
                   child: Text(
                     step,
                     style: TextStyle(
@@ -313,11 +448,13 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
                 ),
               ),
             ],
-          ),
-        );
-      }).toList(),
+          );
+        }).toList(),
+      ),
     );
   }
+
+  // ── Tip / Warning Info Box (with left accent bar) ──
 
   Widget _buildInfoBox(
     KBSection section,
@@ -326,60 +463,91 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
     IconData icon,
     String label,
   ) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: accentColor.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: accentColor.withValues(alpha: 0.3),
-          width: 1,
-        ),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: accentColor, size: 24),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: accentColor,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  section.content ?? '',
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: textColor,
-                    height: 1.5,
-                  ),
-                ),
-              ],
-            ),
+    return IntrinsicHeight(
+      child: Container(
+        decoration: BoxDecoration(
+          color: accentColor.withValues(alpha: 0.05),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: accentColor.withValues(alpha: 0.15),
           ),
-        ],
+        ),
+        child: Row(
+          children: [
+            // Left accent bar
+            Container(
+              width: 4,
+              decoration: BoxDecoration(
+                color: accentColor,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(14),
+                  bottomLeft: Radius.circular(14),
+                ),
+              ),
+            ),
+            // Content
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: accentColor.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Icon(icon, color: accentColor, size: 18),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            label,
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                              color: accentColor,
+                              letterSpacing: 0.3,
+                            ),
+                          ),
+                          const SizedBox(height: 6),
+                          Text(
+                            section.content ?? '',
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: textColor,
+                              height: 1.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
+
+  // ── Screenshot Section ──
 
   Widget _buildScreenshotSection(KBSection section, Color borderColor) {
     if (section.imageUrl == null) return const SizedBox.shrink();
 
     return Container(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         border: Border.all(color: borderColor),
       ),
       child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(14),
         child: Image.asset(
           section.imageUrl!,
           fit: BoxFit.cover,
@@ -396,23 +564,36 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
     );
   }
 
+  // ── Feedback Section ──
+
   Widget _buildFeedbackSection(
     Color textColor,
     Color secondaryColor,
     Color surfaceColor,
     Color borderColor,
+    AppLocalizations l10n,
   ) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: surfaceColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(14),
       ),
       child: Column(
         children: [
+          // Icon
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.rate_review_outlined,
+                color: AppColors.primary, size: 24),
+          ),
+          const SizedBox(height: 12),
           Text(
-            'Was this article helpful?',
+            l10n.wasArticleHelpful,
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w600,
@@ -422,7 +603,8 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
           const SizedBox(height: 16),
           if (_feedbackGiven) ...[
             Container(
-              padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              padding: const EdgeInsets.symmetric(
+                  vertical: 12, horizontal: 16),
               decoration: BoxDecoration(
                 color: AppColors.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
@@ -431,13 +613,15 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    _wasHelpful ? Icons.check_circle : Icons.info_outline,
+                    _wasHelpful
+                        ? Icons.check_circle
+                        : Icons.info_outline,
                     color: AppColors.success,
                     size: 20,
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'Thank you for your feedback!',
+                    l10n.thankYouFeedback,
                     style: TextStyle(
                       color: textColor,
                       fontSize: 14,
@@ -453,12 +637,14 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
                 Expanded(
                   child: OutlinedButton.icon(
                     onPressed: () => _handleFeedback(false),
-                    icon: const Icon(Icons.thumb_down_outlined, size: 18),
-                    label: const Text('No'),
+                    icon:
+                        const Icon(Icons.thumb_down_outlined, size: 18),
+                    label: Text(l10n.no),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: secondaryColor,
                       side: BorderSide(color: borderColor),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
@@ -466,12 +652,14 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
                 Expanded(
                   child: ElevatedButton.icon(
                     onPressed: () => _handleFeedback(true),
-                    icon: const Icon(Icons.thumb_up_outlined, size: 18),
-                    label: const Text('Yes'),
+                    icon:
+                        const Icon(Icons.thumb_up_outlined, size: 18),
+                    label: Text(l10n.yes),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: AppColors.primary,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      padding:
+                          const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
                 ),
@@ -483,11 +671,14 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
     );
   }
 
+  // ── Related Articles ──
+
   Widget _buildRelatedArticles(
     Color textColor,
     Color secondaryColor,
     Color surfaceColor,
     Color borderColor,
+    AppLocalizations l10n,
   ) {
     final relatedArticles = _article!.relatedIds
         .map((id) => _knowledgeBase!.findArticle(id))
@@ -500,78 +691,86 @@ class _KBArticleScreenState extends State<KBArticleScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          'Related Articles',
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: textColor,
-          ),
-        ),
-        const SizedBox(height: 16),
-        ...relatedArticles.map((article) {
-          // Find category for this article
-          String categoryId = '';
-          for (final category in _knowledgeBase!.categories) {
-            if (category.articles.any((a) => a.id == article.id)) {
-              categoryId = category.id;
-              break;
-            }
-          }
-
-          return Container(
-            margin: const EdgeInsets.only(bottom: 12),
-            decoration: BoxDecoration(
-              color: surfaceColor,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: borderColor),
-            ),
-            child: InkWell(
-              onTap: () {
-                context.push(
-                  RouteConstants.kbArticlePath(categoryId, article.id),
-                  extra: article,
-                );
-              },
-              borderRadius: BorderRadius.circular(12),
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            article.title,
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              color: textColor,
-                            ),
-                          ),
-                          if (article.description != null) ...[
-                            const SizedBox(height: 4),
-                            Text(
-                              article.description!,
-                              style: TextStyle(
-                                fontSize: 13,
-                                color: secondaryColor,
-                              ),
-                              maxLines: 2,
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    Icon(Icons.arrow_forward_ios, size: 16, color: secondaryColor),
-                  ],
-                ),
+        // Section header
+        Row(
+          children: [
+            Icon(Icons.link, size: 16, color: secondaryColor),
+            const SizedBox(width: 6),
+            Text(
+              l10n.relatedArticles,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+                color: secondaryColor,
               ),
             ),
-          );
-        }),
+          ],
+        ),
+        const SizedBox(height: 12),
+        // Grouped container
+        Container(
+          decoration: BoxDecoration(
+            color: surfaceColor,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Column(
+            children: relatedArticles.asMap().entries.map((entry) {
+              final isLast =
+                  entry.key == relatedArticles.length - 1;
+              final article = entry.value;
+
+              // Find category for this article
+              String categoryId = '';
+              for (final category in _knowledgeBase!.categories) {
+                if (category.articles
+                    .any((a) => a.id == article.id)) {
+                  categoryId = category.id;
+                  break;
+                }
+              }
+
+              return Column(
+                children: [
+                  ListTile(
+                    onTap: () {
+                      context.push(
+                        RouteConstants.kbArticlePath(
+                            categoryId, article.id),
+                        extra: article,
+                      );
+                    },
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 4),
+                    leading: Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary
+                            .withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(
+                          Icons.article_outlined,
+                          size: 20,
+                          color: AppColors.primary),
+                    ),
+                    title: Text(
+                      article.title,
+                      style: TextStyle(
+                          fontSize: 15, color: textColor),
+                    ),
+                    trailing: Icon(Icons.chevron_right,
+                        size: 20, color: secondaryColor),
+                  ),
+                  if (!isLast)
+                    Divider(
+                        height: 1,
+                        indent: 56,
+                        color: borderColor),
+                ],
+              );
+            }).toList(),
+          ),
+        ),
       ],
     );
   }

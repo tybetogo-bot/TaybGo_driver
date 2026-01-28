@@ -1,0 +1,362 @@
+{
+  "categories": [
+    {
+      "id": "getting_started",
+      "title": "Erste Schritte",
+      "description": "Lernen Sie die Grundlagen von TeybatDriver",
+      "icon": "school",
+      "color": "#4CAF50",
+      "articles": [
+        {
+          "id": "account_verification",
+          "title": "Kontoverifizierung",
+          "description": "Den Verifizierungsprozess verstehen",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Ihr Konto muss verifiziert werden, bevor Sie Aufträge annehmen können. Dies gewährleistet die Sicherheit und Qualität unseres Fahrernetzwerks."
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Vervollständigen Sie Ihre Fahrerregistrierung mit korrekten Informationen",
+                "Laden Sie die erforderlichen Dokumente hoch (Ausweis, Führerschein, Fahrzeugschein)",
+                "Warten Sie 24-48 Stunden, bis unser Team Ihren Antrag geprüft hat",
+                "Sie erhalten eine Benachrichtigung, wenn Ihr Konto genehmigt wurde"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Während Sie auf die Verifizierung warten, können Sie die interaktive Tour machen, um die App kennenzulernen!"
+            }
+          ],
+          "tags": ["verifizierung", "konto", "registrierung"],
+          "relatedIds": ["going_online", "first_delivery"]
+        },
+        {
+          "id": "going_online",
+          "title": "Online gehen",
+          "description": "So beginnen Sie, Aufträge zu erhalten",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Sobald Ihr Konto verifiziert ist, können Sie online gehen, um Lieferanfragen zu erhalten."
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Stellen Sie sicher, dass Ihr Konto verifiziert ist (grünes Häkchen im Profil)",
+                "Aktivieren Sie die Standortdienste auf Ihrem Gerät",
+                "Tippen Sie auf den Schalter 'Online gehen' auf dem Startbildschirm",
+                "Sie erhalten dann Auftragsbenachrichtigungen"
+              ]
+            },
+            {
+              "type": "warning",
+              "content": "Sie müssen die Standortdienste aktiviert lassen, solange Sie online sind, damit Kunden ihre Lieferungen verfolgen können."
+            }
+          ],
+          "tags": ["online", "standort", "aufträge"],
+          "relatedIds": ["accepting_orders", "location_issues"]
+        },
+        {
+          "id": "first_delivery",
+          "title": "Ihre erste Lieferung",
+          "description": "Schritt-für-Schritt-Anleitung für Ihren ersten Auftrag",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Herzlichen Glückwunsch zu Ihrer ersten Lieferung! Das erwartet Sie:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Gehen Sie online und warten Sie auf eine Auftragsbenachrichtigung",
+                "Prüfen Sie die Auftragsdetails (Abholung, Lieferung, Zahlung)",
+                "Nehmen Sie den Auftrag innerhalb von 30 Sekunden an",
+                "Navigieren Sie zum Abholort",
+                "Holen Sie die Artikel ab und überprüfen Sie den Auftrag",
+                "Navigieren Sie zum Standort des Kunden",
+                "Schließen Sie die Lieferung ab und markieren Sie sie als geliefert",
+                "Erhalten Sie Ihre Einnahmen!"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Nehmen Sie sich bei Ihren ersten Lieferungen Zeit. Kundenbewertungen verbessern sich mit der Erfahrung!"
+            }
+          ],
+          "tags": ["erste lieferung", "anleitung", "anfänger"],
+          "relatedIds": ["accepting_orders", "navigation"]
+        }
+      ]
+    },
+    {
+      "id": "managing_orders",
+      "title": "Aufträge verwalten",
+      "description": "Alles über das Annehmen und Abschließen von Aufträgen",
+      "icon": "local_shipping",
+      "color": "#2196F3",
+      "articles": [
+        {
+          "id": "accepting_orders",
+          "title": "Aufträge annehmen",
+          "description": "So nehmen Sie Lieferanfragen an",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Wenn Sie online sind, erhalten Sie Benachrichtigungen für neue Aufträge, die zu Ihrem Standort und Fahrzeugtyp passen."
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Prüfen Sie die Auftragskarte mit Abholung, Lieferung, Entfernung und Einnahmen",
+                "Überprüfen Sie, ob die Route zu Ihrem aktuellen Standort passt",
+                "Tippen Sie innerhalb von 30 Sekunden auf 'Annehmen'",
+                "Beginnen Sie die Navigation zum Abholort"
+              ]
+            },
+            {
+              "type": "warning",
+              "content": "Aufträge, die nicht innerhalb von 30 Sekunden angenommen werden, werden anderen Fahrern angeboten. Ihre Annahmequote beeinflusst Ihre Priorität für zukünftige Aufträge."
+            }
+          ],
+          "tags": ["annehmen", "aufträge", "benachrichtigungen"],
+          "relatedIds": ["order_statuses", "navigation"]
+        },
+        {
+          "id": "navigation",
+          "title": "Navigation verwenden",
+          "description": "Zum Abhol- und Lieferort navigieren",
+          "sections": [
+            {
+              "type": "text",
+              "content": "TeybatDriver enthält eine integrierte Turn-by-Turn-Navigation, um Ihre Ziele schnell zu erreichen."
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Tippen Sie auf die Schaltfläche 'Navigieren' im Auftragsdetail-Bildschirm",
+                "Wählen Sie zwischen In-App-Navigation oder Google Maps",
+                "Folgen Sie den Anweisungen zum Abholort",
+                "Navigieren Sie nach der Abholung zum Lieferort des Kunden",
+                "Aktualisieren Sie den Auftragsstatus bei jedem Schritt"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Die In-App-Navigation funktioniert offline mit heruntergeladenen Karten. Verwenden Sie Google Maps für Echtzeit-Verkehrsinformationen."
+            }
+          ],
+          "tags": ["navigation", "karten", "wegbeschreibung"],
+          "relatedIds": ["order_statuses", "completing_delivery"]
+        },
+        {
+          "id": "order_statuses",
+          "title": "Auftragsstatus-Ablauf",
+          "description": "Die verschiedenen Auftragszustände verstehen",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Jeder Auftrag durchläuft mehrere Status, während Sie die Lieferung abschließen:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "AUSSTEHEND - Der Auftrag wartet auf Ihre Annahme",
+                "ANGENOMMEN - Sie haben angenommen und fahren zur Abholung",
+                "UNTERWEGS - Sie haben die Artikel abgeholt und liefern",
+                "GELIEFERT - Sie sind angekommen und haben die Lieferung übergeben",
+                "ABGESCHLOSSEN - Die Lieferung ist bestätigt abgeschlossen"
+              ]
+            },
+            {
+              "type": "text",
+              "content": "Sie müssen den Status bei jedem Schritt manuell aktualisieren, indem Sie auf die Statusschaltfläche im Auftragsdetail-Bildschirm tippen."
+            }
+          ],
+          "tags": ["status", "ablauf", "lieferung"],
+          "relatedIds": ["accepting_orders", "completing_delivery"]
+        },
+        {
+          "id": "completing_delivery",
+          "title": "Lieferungen abschließen",
+          "description": "Letzte Schritte zum Abschluss eines Auftrags",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Wenn Sie am Standort des Kunden ankommen, folgen Sie diesen Schritten:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Markieren Sie den Status als 'Angekommen', wenn Sie den Standort erreichen",
+                "Kontaktieren Sie den Kunden bei Bedarf über die Anrufschaltfläche",
+                "Übergeben Sie die Lieferung und beachten Sie besondere Anweisungen",
+                "Tippen Sie auf 'Als geliefert markieren' zur Bestätigung",
+                "Ihre Einnahmen werden Ihrem Konto gutgeschrieben"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Seien Sie immer höflich und professionell. Guter Kundenservice führt zu besseren Bewertungen und Trinkgeldern!"
+            }
+          ],
+          "tags": ["abschließen", "lieferung", "einnahmen"],
+          "relatedIds": ["order_statuses", "earnings_explained"]
+        }
+      ]
+    },
+    {
+      "id": "earnings",
+      "title": "Einnahmen & Zahlungen",
+      "description": "So werden Sie bezahlt",
+      "icon": "attach_money",
+      "color": "#FFB300",
+      "articles": [
+        {
+          "id": "earnings_explained",
+          "title": "So funktionieren die Einnahmen",
+          "description": "Ihre Zahlungsstruktur verstehen",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Sie verdienen Geld für jede abgeschlossene Lieferung. Ihre Einnahmen bestehen aus:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Grundliefergebühr (variiert je nach Entfernung und Nachfrage)",
+                "Kundentrinkgelder (100% gehen an Sie)",
+                "Boni während Stoßzeiten und bei Sonderaktionen"
+              ]
+            },
+            {
+              "type": "text",
+              "content": "Sie können Ihre täglichen, wöchentlichen und monatlichen Einnahmen im Einnahmen-Tab verfolgen."
+            }
+          ],
+          "tags": ["einnahmen", "zahlung", "geld"],
+          "relatedIds": ["payment_schedule", "tips"]
+        },
+        {
+          "id": "payment_schedule",
+          "title": "Zahlungsplan",
+          "description": "Wann Sie Ihre Einnahmen erhalten",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Zahlungen werden automatisch nach einem festen Zeitplan verarbeitet:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Die Einnahmen werden am Ende jeder Woche berechnet",
+                "Zahlungen werden jeden Montag verarbeitet",
+                "Das Geld wird innerhalb von 2-3 Werktagen auf Ihr registriertes Bankkonto überwiesen",
+                "Sie erhalten eine Benachrichtigung, wenn die Zahlung verarbeitet wurde"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Stellen Sie sicher, dass Ihre Bankdaten in Ihrem Profil aktuell sind, um Zahlungsverzögerungen zu vermeiden."
+            }
+          ],
+          "tags": ["zahlung", "zeitplan", "bank"],
+          "relatedIds": ["earnings_explained"]
+        },
+        {
+          "id": "tips",
+          "title": "Trinkgelder & Boni",
+          "description": "Ihre Einnahmen maximieren",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Trinkgelder sind ein wichtiger Teil Ihrer Einnahmen. So maximieren Sie sie:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Bieten Sie exzellenten Kundenservice",
+                "Kommunizieren Sie mit Kunden bei Verzögerungen",
+                "Behandeln Sie Lebensmittel sorgfältig, um die Qualität zu erhalten",
+                "Seien Sie professionell und höflich",
+                "Liefern Sie innerhalb der geschätzten Zeit"
+              ]
+            },
+            {
+              "type": "text",
+              "content": "Boni sind während Stoßzeiten (Mittag, Abendessen) und in stark nachgefragten Gebieten verfügbar. Prüfen Sie die App auf aktuelle Aktionen."
+            }
+          ],
+          "tags": ["trinkgelder", "boni", "einnahmen maximieren"],
+          "relatedIds": ["earnings_explained"]
+        }
+      ]
+    },
+    {
+      "id": "troubleshooting",
+      "title": "Fehlerbehebung",
+      "description": "Lösungen für häufige Probleme",
+      "icon": "build",
+      "color": "#F44336",
+      "articles": [
+        {
+          "id": "location_issues",
+          "title": "Standortprobleme",
+          "description": "GPS- und Standortprobleme beheben",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Wenn Sie Probleme mit den Standortdiensten haben:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Stellen Sie sicher, dass die Standortdienste in Ihren Geräteeinstellungen aktiviert sind",
+                "Erteilen Sie TeybatDriver die Berechtigung für den Standortzugriff 'Immer' oder 'Während der Nutzung'",
+                "Stellen Sie sicher, dass Sie freie Sicht zum Himmel haben (GPS funktioniert am besten im Freien)",
+                "Starten Sie die App neu, wenn der Standort nicht aktualisiert wird",
+                "Schalten Sie den Flugmodus ein und wieder aus, um das GPS zurückzusetzen"
+              ]
+            },
+            {
+              "type": "warning",
+              "content": "Sie müssen den Standort aktiviert haben, um online zu gehen und Aufträge zu erhalten."
+            }
+          ],
+          "tags": ["standort", "gps", "fehlerbehebung"],
+          "relatedIds": ["going_online"]
+        },
+        {
+          "id": "app_issues",
+          "title": "App funktioniert nicht",
+          "description": "Allgemeine Fehlerbehebungsschritte",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Wenn die App nicht richtig funktioniert:"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Überprüfen Sie Ihre Internetverbindung (WLAN oder mobile Daten)",
+                "Erzwingen Sie das Schließen der App und öffnen Sie sie erneut",
+                "Leeren Sie den App-Cache in den Geräteeinstellungen",
+                "Aktualisieren Sie auf die neueste Version im App Store",
+                "Starten Sie Ihr Gerät neu",
+                "Deinstallieren und installieren Sie die App als letzten Ausweg neu"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Ihre Auftragsverlauf und Einnahmedaten sind auf unseren Servern gespeichert, sodass eine Neuinstallation keinen Datenverlust verursacht."
+            }
+          ],
+          "tags": ["app-probleme", "fehlerbehebung", "reparieren"],
+          "relatedIds": []
+        }
+      ]
+    }
+  ]
+}

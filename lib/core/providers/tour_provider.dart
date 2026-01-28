@@ -20,6 +20,9 @@ class TourProvider extends ChangeNotifier {
   /// Callback to trigger showing the tour for current stage
   void Function()? _showStageCallback;
 
+  /// Callback invoked when the tour is started (used by ShellScaffold)
+  void Function()? _tourStartCallback;
+
   // Getters
   bool get isTourActive => _isTourActive;
   bool get isTourCompleted => _isTourCompleted;
@@ -36,6 +39,11 @@ class TourProvider extends ChangeNotifier {
   /// Register a callback to show the tour stage (called by each screen)
   void setShowStageCallback(void Function()? callback) {
     _showStageCallback = callback;
+  }
+
+  /// Register a callback for when the tour starts (called by ShellScaffold)
+  void setTourStartCallback(void Function()? callback) {
+    _tourStartCallback = callback;
   }
 
   /// Navigate to a specific tab during tour
@@ -55,6 +63,9 @@ class TourProvider extends ChangeNotifier {
       case TourStage.orderAcceptance:
       case TourStage.activeOrder:
         return 0; // Home tab
+      case TourStage.orderDetail:
+      case TourStage.ongoingTrip:
+        return -1; // Pushed routes, not tabs
       case TourStage.orders:
         return 1; // Orders tab
       case TourStage.earnings:
@@ -67,15 +78,18 @@ class TourProvider extends ChangeNotifier {
   /// Initialize tour state from storage
   Future<void> init() async {
     _isTourCompleted = await _storageService.isTourCompleted();
-    final skipCount = await _storageService.getTourSkipCount();
-    _hasSkippedTour = skipCount > 0;
+    // Skip is session-only: unverified users should always see the tour
+    // card on each app launch until they complete the tour.
+    _hasSkippedTour = false;
     notifyListeners();
   }
 
-  /// Check if the tour welcome prompt should be shown
-  /// Returns true if user is unverified and hasn't completed or skipped the tour
+  /// Check if the tour welcome prompt should be shown.
+  /// Returns true if user is unverified and hasn't skipped the tour this session.
+  /// The card stays available even after completing the tour — as long as the
+  /// account is still under review the driver can retake it.
   bool shouldShowPrompt(bool isVerified) {
-    return !isVerified && !_isTourCompleted && !_hasSkippedTour;
+    return !isVerified && !_hasSkippedTour;
   }
 
   /// Start the tour
@@ -85,6 +99,8 @@ class TourProvider extends ChangeNotifier {
     _currentStepInStage = 0;
     await _storageService.setLastTourStage(TourStage.home.name);
     notifyListeners();
+    // Notify ShellScaffold to create the coordinator and run the tour
+    _tourStartCallback?.call();
   }
 
   /// Pause the tour (e.g., when user navigates away)

@@ -4,6 +4,8 @@ enum TourStage {
   home,
   orderAcceptance,
   activeOrder,
+  orderDetail,
+  ongoingTrip,
   orders,
   earnings,
   profile,

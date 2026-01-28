@@ -22,6 +22,16 @@ class TourKeys {
   final GlobalKey totalEarningsKey = GlobalKey();
   final GlobalKey statsGridKey = GlobalKey();
 
+  // Order Detail Screen Keys
+  final GlobalKey orderDetailRouteCardKey = GlobalKey();
+  final GlobalKey orderDetailEarningsCardKey = GlobalKey();
+  final GlobalKey orderDetailBottomBarKey = GlobalKey();
+
+  // Navigation Screen Keys
+  final GlobalKey navigationInstructionCardKey = GlobalKey();
+  final GlobalKey navigationBottomPanelKey = GlobalKey();
+  final GlobalKey navigationActionButtonKey = GlobalKey();
+
   // Profile Screen Keys
   final GlobalKey settingsMenuKey = GlobalKey();
   final GlobalKey kbMenuKey = GlobalKey();

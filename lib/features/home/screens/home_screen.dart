@@ -11,7 +11,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../orders/models/order_model.dart';
 import '../../tour/widgets/tour_welcome_card.dart';
 import '../../tour/tour_keys.dart';
-import '../../tour/tour_coordinator.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,9 +29,6 @@ class _HomeScreenState extends State<HomeScreen>
 
   // Tour keys from singleton
   final _tourKeys = TourKeys.instance;
-
-  // Tour coordinator for managing the app tour
-  TourCoordinator? _tourCoordinator;
 
   @override
   void initState() {
@@ -242,35 +238,15 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _startTour(TourProvider tourProvider) async {
-    // Start the tour in the provider
+    // Start the tour in the provider — ShellScaffold's listener
+    // will create the TourCoordinator and run the visual tour.
     await tourProvider.startTour();
-
-    // Create the tour coordinator
-    _tourCoordinator = TourCoordinator(
-      context: context,
-      tourProvider: tourProvider,
-      orderProvider: _orderProvider,
-      onComplete: () {
-        if (mounted) {
-          setState(() {});
-        }
-      },
-      onSkip: () {
-        if (mounted) {
-          setState(() {});
-        }
-      },
-    );
-
-    // Start the visual tour
-    await _tourCoordinator!.startTour();
   }
 
   @override
   void dispose() {
     _orderProvider?.onNewOrderReceived = null;
     _pulseController.dispose();
-    _tourCoordinator?.dispose();
     super.dispose();
   }
 

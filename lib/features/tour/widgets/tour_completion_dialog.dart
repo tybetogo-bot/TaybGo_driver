@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 
 /// Dialog shown when tour is completed
@@ -30,6 +31,7 @@ class TourCompletionDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context)!;
 
     return Dialog(
       shape: RoundedRectangleBorder(
@@ -61,7 +63,7 @@ class TourCompletionDialog extends StatelessWidget {
             const SizedBox(height: 24),
             // Title
             Text(
-              'Tour Complete!',
+              l10n.tourCompleteTitle,
               style: TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
@@ -72,7 +74,7 @@ class TourCompletionDialog extends StatelessWidget {
             const SizedBox(height: 12),
             // Description
             Text(
-              'You\'re all set to start accepting orders and earning with TeybatDriver!',
+              l10n.tourCompleteDesc,
               style: TextStyle(
                 fontSize: 15,
                 height: 1.5,
@@ -107,9 +109,9 @@ class TourCompletionDialog extends StatelessWidget {
                   color: AppColors.primary,
                   size: 20,
                 ),
-                label: const Text(
-                  'Browse Knowledge Base',
-                  style: TextStyle(
+                label: Text(
+                  l10n.tourBrowseKb,
+                  style: const TextStyle(
                     color: AppColors.primary,
                     fontWeight: FontWeight.w600,
                     fontSize: 15,
@@ -134,9 +136,9 @@ class TourCompletionDialog extends StatelessWidget {
                   ),
                   elevation: 0,
                 ),
-                child: const Text(
-                  'Get Started',
-                  style: TextStyle(
+                child: Text(
+                  l10n.tourGetStarted,
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),

@@ -274,5 +274,84 @@
   "completeOrdersToSeeEarnings": "Complete orders to see your earnings",
 
   "verified": "Verified",
-  "driver": "Driver"
+  "driver": "Driver",
+
+  "knowledgeBase": "Knowledge Base",
+  "searchForHelp": "Search for help...",
+  "noArticlesFound": "No articles found",
+  "tryDifferentSearch": "Try a different search term",
+  "noCategoriesAvailable": "No categories available",
+  "articlesCount": "{count} articles",
+  "@articlesCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "articleNotFound": "Article not found",
+  "wasArticleHelpful": "Was this article helpful?",
+  "thankYouFeedback": "Thank you for your feedback!",
+  "willImproveArticle": "We'll work on improving this article.",
+  "relatedArticles": "Related Articles",
+  "kbTip": "Tip",
+  "kbWarning": "Warning",
+  "yes": "Yes",
+  "no": "No",
+  "article": "Article",
+  "browseKnowledgeBase": "Browse Knowledge Base",
+  "sectionsCount": "{count} sections",
+  "@sectionsCount": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "minRead": "{count} min read",
+  "@minRead": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+
+  "tourAccountUnderReviewTitle": "Account Under Review",
+  "tourAccountUnderReviewDesc": "Your account is being verified. You can explore the app while waiting for approval.",
+  "tourGoOnlineTitle": "Go Online to Receive Orders",
+  "tourGoOnlineDesc": "Toggle this switch when you're ready to accept deliveries. You can go offline anytime.",
+  "tourDailyStatsTitle": "Your Daily Stats",
+  "tourDailyStatsDesc": "Track your orders, earnings, and rating here. Stats update in real-time.",
+  "tourNewOrderTitle": "New Order Received!",
+  "tourNewOrderDesc": "This is how new orders appear. Review the pickup, dropoff, distance, and payment.",
+  "tourOrdersTabTitle": "Orders Tab",
+  "tourOrdersTabDesc": "Switch between Current Orders and Order History.",
+  "tourTotalEarningsTitle": "Your Total Earnings",
+  "tourTotalEarningsDesc": "Track all your earnings here — base pay, tips, and bonuses.",
+  "tourEarningsBreakdownTitle": "Earnings Breakdown",
+  "tourEarningsBreakdownDesc": "See your total orders and average earnings per order.",
+  "tourRouteDetailsTitle": "Route Details",
+  "tourRouteDetailsDesc": "See the full pickup and dropoff route with addresses, distance, and estimated time.",
+  "tourYourEarningsTitle": "Your Earnings",
+  "tourYourEarningsDesc": "View the full payment breakdown — delivery fee, tip, and total payout.",
+  "tourNavActionsTitle": "Navigation & Actions",
+  "tourNavActionsDesc": "Navigate to pickup/dropoff or update the order status as you progress.",
+  "tourTurnByTurnTitle": "Turn-by-Turn Navigation",
+  "tourTurnByTurnDesc": "Follow real-time directions to your pickup or dropoff location.",
+  "tourTripControlsTitle": "Trip Controls",
+  "tourTripControlsDesc": "Switch between pickup and dropoff routes, view destination details and earnings.",
+  "tourUpdateStatusTitle": "Update Status",
+  "tourUpdateStatusDesc": "Tap to mark key milestones — On The Way, Delivered, or Complete.",
+  "tourAppSettingsTitle": "App Settings",
+  "tourAppSettingsDesc": "Change your language, theme, and access the Knowledge Base for help.",
+  "tourKnowledgeBaseTitle": "Knowledge Base",
+  "tourKnowledgeBaseDesc": "Browse step-by-step guides, tips, and answers to common questions.",
+
+  "tourSkipBtn": "Skip",
+  "tourBackBtn": "Back",
+  "tourNextBtn": "Next",
+  "tourDoneBtn": "Done",
+  "tourWelcomeTitle": "Welcome to TypeToGo!",
+  "tourWelcomeDesc": "Take a quick tour to learn how to use the app",
+  "tourSkipForNow": "Skip for now",
+  "tourStartBtn": "Take Tour",
+  "tourCompleteTitle": "Tour Complete!",
+  "tourCompleteDesc": "You're all set to start accepting orders and earning with TypeToGo!",
+  "tourBrowseKb": "Browse Knowledge Base",
+  "tourGetStarted": "Get Started"
 }

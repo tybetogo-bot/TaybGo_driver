@@ -1,0 +1,362 @@
+{
+  "categories": [
+    {
+      "id": "getting_started",
+      "title": "Pour commencer",
+      "description": "Apprenez les bases de TeybatDriver",
+      "icon": "school",
+      "color": "#4CAF50",
+      "articles": [
+        {
+          "id": "account_verification",
+          "title": "Vérification du compte",
+          "description": "Comprendre le processus de vérification",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Votre compte doit être vérifié avant de pouvoir accepter des commandes. Cela garantit la sécurité et la qualité de notre réseau de chauffeurs."
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Complétez votre inscription de chauffeur avec des informations exactes",
+                "Téléchargez les documents requis (pièce d'identité, permis de conduire, carte grise)",
+                "Attendez 24 à 48 heures que notre équipe examine votre candidature",
+                "Recevez une notification lorsque votre compte est approuvé"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "En attendant la vérification, vous pouvez suivre la visite interactive pour découvrir comment fonctionne l'application !"
+            }
+          ],
+          "tags": ["vérification", "compte", "inscription"],
+          "relatedIds": ["going_online", "first_delivery"]
+        },
+        {
+          "id": "going_online",
+          "title": "Passer en ligne",
+          "description": "Comment commencer à recevoir des commandes",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Une fois votre compte vérifié, vous pouvez passer en ligne pour recevoir des demandes de livraison."
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Assurez-vous que votre compte est vérifié (coche verte sur le profil)",
+                "Activez les services de localisation sur votre appareil",
+                "Appuyez sur le bouton 'Passer en ligne' sur l'écran d'accueil",
+                "Vous commencerez à recevoir des notifications de commandes"
+              ]
+            },
+            {
+              "type": "warning",
+              "content": "Vous devez garder les services de localisation activés pendant que vous êtes en ligne pour que les clients puissent suivre leurs livraisons."
+            }
+          ],
+          "tags": ["en ligne", "localisation", "commandes"],
+          "relatedIds": ["accepting_orders", "location_issues"]
+        },
+        {
+          "id": "first_delivery",
+          "title": "Votre première livraison",
+          "description": "Guide étape par étape pour votre première commande",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Félicitations pour votre première livraison ! Voici ce qui vous attend :"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Passez en ligne et attendez une notification de commande",
+                "Examinez les détails de la commande (retrait, livraison, paiement)",
+                "Acceptez la commande dans les 30 secondes",
+                "Naviguez vers le lieu de retrait",
+                "Récupérez les articles et vérifiez la commande",
+                "Naviguez vers le lieu du client",
+                "Complétez la livraison et marquez-la comme livrée",
+                "Recevez vos gains !"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Prenez votre temps pour vos premières livraisons. Les évaluations des clients s'améliorent avec l'expérience !"
+            }
+          ],
+          "tags": ["première livraison", "tutoriel", "débutant"],
+          "relatedIds": ["accepting_orders", "navigation"]
+        }
+      ]
+    },
+    {
+      "id": "managing_orders",
+      "title": "Gérer les commandes",
+      "description": "Tout sur l'acceptation et la complétion des commandes",
+      "icon": "local_shipping",
+      "color": "#2196F3",
+      "articles": [
+        {
+          "id": "accepting_orders",
+          "title": "Accepter les commandes",
+          "description": "Comment accepter les demandes de livraison",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Lorsque vous êtes en ligne, vous recevrez des notifications pour les nouvelles commandes correspondant à votre localisation et type de véhicule."
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Examinez la carte de commande montrant le retrait, la livraison, la distance et les gains",
+                "Vérifiez si l'itinéraire correspond à votre position actuelle",
+                "Appuyez sur 'Accepter' dans les 30 secondes",
+                "Commencez la navigation vers le lieu de retrait"
+              ]
+            },
+            {
+              "type": "warning",
+              "content": "Les commandes non acceptées dans les 30 secondes seront proposées à d'autres chauffeurs. Votre taux d'acceptation affecte votre priorité pour les futures commandes."
+            }
+          ],
+          "tags": ["accepter", "commandes", "notifications"],
+          "relatedIds": ["order_statuses", "navigation"]
+        },
+        {
+          "id": "navigation",
+          "title": "Utiliser la navigation",
+          "description": "Naviguer vers les lieux de retrait et de livraison",
+          "sections": [
+            {
+              "type": "text",
+              "content": "TeybatDriver inclut une navigation guidée intégrée pour vous aider à atteindre vos destinations rapidement."
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Appuyez sur le bouton 'Naviguer' sur l'écran des détails de la commande",
+                "Choisissez entre la navigation intégrée ou Google Maps",
+                "Suivez les indications pour atteindre le lieu de retrait",
+                "Après le retrait, naviguez vers le lieu de livraison du client",
+                "Mettez à jour le statut de la commande à chaque étape"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "La navigation intégrée fonctionne hors ligne avec les cartes téléchargées. Utilisez Google Maps pour les informations de trafic en temps réel."
+            }
+          ],
+          "tags": ["navigation", "cartes", "directions"],
+          "relatedIds": ["order_statuses", "completing_delivery"]
+        },
+        {
+          "id": "order_statuses",
+          "title": "Flux des statuts de commande",
+          "description": "Comprendre les différents états de commande",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Chaque commande passe par plusieurs statuts au fur et à mesure que vous complétez la livraison :"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "EN ATTENTE - La commande attend votre acceptation",
+                "ACCEPTÉE - Vous avez accepté et vous dirigez vers le retrait",
+                "EN ROUTE - Vous avez récupéré les articles et êtes en livraison",
+                "LIVRÉE - Vous êtes arrivé et avez remis la livraison",
+                "TERMINÉE - La livraison est confirmée comme terminée"
+              ]
+            },
+            {
+              "type": "text",
+              "content": "Vous devez mettre à jour le statut manuellement à chaque étape en appuyant sur le bouton de statut sur l'écran des détails de la commande."
+            }
+          ],
+          "tags": ["statut", "flux", "livraison"],
+          "relatedIds": ["accepting_orders", "completing_delivery"]
+        },
+        {
+          "id": "completing_delivery",
+          "title": "Compléter les livraisons",
+          "description": "Dernières étapes pour terminer une commande",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Lorsque vous arrivez chez le client, suivez ces étapes :"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Marquez le statut comme 'Arrivé' lorsque vous atteignez le lieu",
+                "Contactez le client si nécessaire en utilisant le bouton d'appel",
+                "Remettez la livraison et vérifiez les instructions spéciales",
+                "Appuyez sur 'Marquer comme livré' pour confirmer",
+                "Vos gains seront crédités sur votre compte"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Soyez toujours courtois et professionnel. Un bon service client mène à de meilleures évaluations et pourboires !"
+            }
+          ],
+          "tags": ["compléter", "livraison", "gains"],
+          "relatedIds": ["order_statuses", "earnings_explained"]
+        }
+      ]
+    },
+    {
+      "id": "earnings",
+      "title": "Gains et paiements",
+      "description": "Comment vous êtes payé",
+      "icon": "attach_money",
+      "color": "#FFB300",
+      "articles": [
+        {
+          "id": "earnings_explained",
+          "title": "Comment fonctionnent les gains",
+          "description": "Comprendre votre structure de paiement",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Vous gagnez de l'argent pour chaque livraison complétée. Vos gains se composent de :"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Frais de livraison de base (varie selon la distance et la demande)",
+                "Pourboires des clients (100% pour vous)",
+                "Bonus pendant les heures de pointe et les promotions spéciales"
+              ]
+            },
+            {
+              "type": "text",
+              "content": "Vous pouvez suivre vos gains quotidiens, hebdomadaires et mensuels dans l'onglet Gains."
+            }
+          ],
+          "tags": ["gains", "paiement", "argent"],
+          "relatedIds": ["payment_schedule", "tips"]
+        },
+        {
+          "id": "payment_schedule",
+          "title": "Calendrier de paiement",
+          "description": "Quand vous recevez vos gains",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Les paiements sont traités automatiquement selon un calendrier régulier :"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Les gains sont calculés à la fin de chaque semaine",
+                "Les paiements sont traités chaque lundi",
+                "Les fonds sont déposés sur votre compte bancaire enregistré sous 2 à 3 jours ouvrables",
+                "Vous recevrez une notification lorsque le paiement est traité"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Assurez-vous que vos coordonnées bancaires sont à jour dans votre profil pour éviter les retards de paiement."
+            }
+          ],
+          "tags": ["paiement", "calendrier", "banque"],
+          "relatedIds": ["earnings_explained"]
+        },
+        {
+          "id": "tips",
+          "title": "Pourboires et bonus",
+          "description": "Maximiser vos gains",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Les pourboires représentent une part importante de vos gains. Voici comment les maximiser :"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Offrez un excellent service client",
+                "Communiquez avec les clients en cas de retard",
+                "Manipulez les articles alimentaires avec soin pour maintenir la qualité",
+                "Soyez professionnel et courtois",
+                "Livrez dans le délai estimé"
+              ]
+            },
+            {
+              "type": "text",
+              "content": "Des bonus sont disponibles pendant les heures de pointe (déjeuner, dîner) et dans les zones à forte demande. Consultez l'application pour les promotions en cours."
+            }
+          ],
+          "tags": ["pourboires", "bonus", "maximiser les gains"],
+          "relatedIds": ["earnings_explained"]
+        }
+      ]
+    },
+    {
+      "id": "troubleshooting",
+      "title": "Dépannage",
+      "description": "Solutions aux problèmes courants",
+      "icon": "build",
+      "color": "#F44336",
+      "articles": [
+        {
+          "id": "location_issues",
+          "title": "Problèmes de localisation",
+          "description": "Résoudre les problèmes GPS et de localisation",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Si vous avez des problèmes avec les services de localisation :"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Assurez-vous que les services de localisation sont activés dans les paramètres de votre appareil",
+                "Accordez à TeybatDriver la permission d'accéder à la localisation 'Toujours' ou 'Pendant l'utilisation'",
+                "Vérifiez que vous avez une vue dégagée du ciel (le GPS fonctionne mieux en extérieur)",
+                "Redémarrez l'application si la localisation ne se met pas à jour",
+                "Activez puis désactivez le mode avion pour réinitialiser le GPS"
+              ]
+            },
+            {
+              "type": "warning",
+              "content": "Vous devez avoir la localisation activée pour passer en ligne et recevoir des commandes."
+            }
+          ],
+          "tags": ["localisation", "gps", "dépannage"],
+          "relatedIds": ["going_online"]
+        },
+        {
+          "id": "app_issues",
+          "title": "L'application ne fonctionne pas",
+          "description": "Étapes de dépannage générales",
+          "sections": [
+            {
+              "type": "text",
+              "content": "Si l'application ne fonctionne pas correctement :"
+            },
+            {
+              "type": "steps",
+              "items": [
+                "Vérifiez votre connexion internet (WiFi ou données mobiles)",
+                "Forcez la fermeture de l'application et rouvrez-la",
+                "Videz le cache de l'application dans les paramètres de l'appareil",
+                "Mettez à jour vers la dernière version depuis l'App Store",
+                "Redémarrez votre appareil",
+                "Désinstallez et réinstallez l'application en dernier recours"
+              ]
+            },
+            {
+              "type": "tip",
+              "content": "Votre historique de commandes et vos données de gains sont stockés sur nos serveurs, la réinstallation ne causera donc aucune perte de données."
+            }
+          ],
+          "tags": ["problèmes d'application", "dépannage", "réparer"],
+          "relatedIds": []
+        }
+      ]
+    }
+  ]
+}

@@ -1467,6 +1467,372 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Driver'**
   String get driver;
+
+  /// No description provided for @knowledgeBase.
+  ///
+  /// In en, this message translates to:
+  /// **'Knowledge Base'**
+  String get knowledgeBase;
+
+  /// No description provided for @searchForHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for help...'**
+  String get searchForHelp;
+
+  /// No description provided for @noArticlesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No articles found'**
+  String get noArticlesFound;
+
+  /// No description provided for @tryDifferentSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Try a different search term'**
+  String get tryDifferentSearch;
+
+  /// No description provided for @noCategoriesAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No categories available'**
+  String get noCategoriesAvailable;
+
+  /// No description provided for @articlesCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} articles'**
+  String articlesCount(int count);
+
+  /// No description provided for @articleNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Article not found'**
+  String get articleNotFound;
+
+  /// No description provided for @wasArticleHelpful.
+  ///
+  /// In en, this message translates to:
+  /// **'Was this article helpful?'**
+  String get wasArticleHelpful;
+
+  /// No description provided for @thankYouFeedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Thank you for your feedback!'**
+  String get thankYouFeedback;
+
+  /// No description provided for @willImproveArticle.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll work on improving this article.'**
+  String get willImproveArticle;
+
+  /// No description provided for @relatedArticles.
+  ///
+  /// In en, this message translates to:
+  /// **'Related Articles'**
+  String get relatedArticles;
+
+  /// No description provided for @kbTip.
+  ///
+  /// In en, this message translates to:
+  /// **'Tip'**
+  String get kbTip;
+
+  /// No description provided for @kbWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get kbWarning;
+
+  /// No description provided for @yes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get yes;
+
+  /// No description provided for @no.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get no;
+
+  /// No description provided for @article.
+  ///
+  /// In en, this message translates to:
+  /// **'Article'**
+  String get article;
+
+  /// No description provided for @browseKnowledgeBase.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse Knowledge Base'**
+  String get browseKnowledgeBase;
+
+  /// No description provided for @sectionsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} sections'**
+  String sectionsCount(int count);
+
+  /// No description provided for @minRead.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min read'**
+  String minRead(int count);
+
+  /// No description provided for @tourAccountUnderReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Under Review'**
+  String get tourAccountUnderReviewTitle;
+
+  /// No description provided for @tourAccountUnderReviewDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is being verified. You can explore the app while waiting for approval.'**
+  String get tourAccountUnderReviewDesc;
+
+  /// No description provided for @tourGoOnlineTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Online to Receive Orders'**
+  String get tourGoOnlineTitle;
+
+  /// No description provided for @tourGoOnlineDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Toggle this switch when you\'re ready to accept deliveries. You can go offline anytime.'**
+  String get tourGoOnlineDesc;
+
+  /// No description provided for @tourDailyStatsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Daily Stats'**
+  String get tourDailyStatsTitle;
+
+  /// No description provided for @tourDailyStatsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Track your orders, earnings, and rating here. Stats update in real-time.'**
+  String get tourDailyStatsDesc;
+
+  /// No description provided for @tourNewOrderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New Order Received!'**
+  String get tourNewOrderTitle;
+
+  /// No description provided for @tourNewOrderDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This is how new orders appear. Review the pickup, dropoff, distance, and payment.'**
+  String get tourNewOrderDesc;
+
+  /// No description provided for @tourOrdersTabTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Orders Tab'**
+  String get tourOrdersTabTitle;
+
+  /// No description provided for @tourOrdersTabDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch between Current Orders and Order History.'**
+  String get tourOrdersTabDesc;
+
+  /// No description provided for @tourTotalEarningsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Total Earnings'**
+  String get tourTotalEarningsTitle;
+
+  /// No description provided for @tourTotalEarningsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Track all your earnings here — base pay, tips, and bonuses.'**
+  String get tourTotalEarningsDesc;
+
+  /// No description provided for @tourEarningsBreakdownTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Earnings Breakdown'**
+  String get tourEarningsBreakdownTitle;
+
+  /// No description provided for @tourEarningsBreakdownDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'See your total orders and average earnings per order.'**
+  String get tourEarningsBreakdownDesc;
+
+  /// No description provided for @tourRouteDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Route Details'**
+  String get tourRouteDetailsTitle;
+
+  /// No description provided for @tourRouteDetailsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'See the full pickup and dropoff route with addresses, distance, and estimated time.'**
+  String get tourRouteDetailsDesc;
+
+  /// No description provided for @tourYourEarningsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your Earnings'**
+  String get tourYourEarningsTitle;
+
+  /// No description provided for @tourYourEarningsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'View the full payment breakdown — delivery fee, tip, and total payout.'**
+  String get tourYourEarningsDesc;
+
+  /// No description provided for @tourNavActionsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigation & Actions'**
+  String get tourNavActionsTitle;
+
+  /// No description provided for @tourNavActionsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigate to pickup/dropoff or update the order status as you progress.'**
+  String get tourNavActionsDesc;
+
+  /// No description provided for @tourTurnByTurnTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Turn-by-Turn Navigation'**
+  String get tourTurnByTurnTitle;
+
+  /// No description provided for @tourTurnByTurnDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Follow real-time directions to your pickup or dropoff location.'**
+  String get tourTurnByTurnDesc;
+
+  /// No description provided for @tourTripControlsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Trip Controls'**
+  String get tourTripControlsTitle;
+
+  /// No description provided for @tourTripControlsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch between pickup and dropoff routes, view destination details and earnings.'**
+  String get tourTripControlsDesc;
+
+  /// No description provided for @tourUpdateStatusTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update Status'**
+  String get tourUpdateStatusTitle;
+
+  /// No description provided for @tourUpdateStatusDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to mark key milestones — On The Way, Delivered, or Complete.'**
+  String get tourUpdateStatusDesc;
+
+  /// No description provided for @tourAppSettingsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App Settings'**
+  String get tourAppSettingsTitle;
+
+  /// No description provided for @tourAppSettingsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Change your language, theme, and access the Knowledge Base for help.'**
+  String get tourAppSettingsDesc;
+
+  /// No description provided for @tourKnowledgeBaseTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Knowledge Base'**
+  String get tourKnowledgeBaseTitle;
+
+  /// No description provided for @tourKnowledgeBaseDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse step-by-step guides, tips, and answers to common questions.'**
+  String get tourKnowledgeBaseDesc;
+
+  /// No description provided for @tourSkipBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get tourSkipBtn;
+
+  /// No description provided for @tourBackBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get tourBackBtn;
+
+  /// No description provided for @tourNextBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get tourNextBtn;
+
+  /// No description provided for @tourDoneBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get tourDoneBtn;
+
+  /// No description provided for @tourWelcomeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome to TypeToGo!'**
+  String get tourWelcomeTitle;
+
+  /// No description provided for @tourWelcomeDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Take a quick tour to learn how to use the app'**
+  String get tourWelcomeDesc;
+
+  /// No description provided for @tourSkipForNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Skip for now'**
+  String get tourSkipForNow;
+
+  /// No description provided for @tourStartBtn.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Tour'**
+  String get tourStartBtn;
+
+  /// No description provided for @tourCompleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tour Complete!'**
+  String get tourCompleteTitle;
+
+  /// No description provided for @tourCompleteDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'You\'re all set to start accepting orders and earning with TypeToGo!'**
+  String get tourCompleteDesc;
+
+  /// No description provided for @tourBrowseKb.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse Knowledge Base'**
+  String get tourBrowseKb;
+
+  /// No description provided for @tourGetStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'Get Started'**
+  String get tourGetStarted;
 }
 
 class _AppLocalizationsDelegate

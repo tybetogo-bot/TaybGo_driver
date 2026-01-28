@@ -58,7 +58,7 @@ class TourStorageService {
     await prefs.remove(_keyTourCompleted);
     await prefs.remove(_keyTourLastStage);
     await prefs.remove(_keyTourCompletedDate);
-    // Note: We don't reset skip count as it's useful for analytics
+    await prefs.remove(_keyTourSkipCount);
   }
 
   Future<void> clearAllTourData() async {

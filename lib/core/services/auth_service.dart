@@ -131,6 +131,27 @@ class AuthService {
     }
   }
 
+  Future<void> deleteAccount() async {
+    try {
+      debugPrint('[AuthService] === DELETE ACCOUNT REQUEST ===');
+      debugPrint('[AuthService] Endpoint: ${ApiConstants.userMe}');
+
+      final response = await _apiClient.delete(ApiConstants.userMe);
+
+      debugPrint('[AuthService] === DELETE ACCOUNT RESPONSE ===');
+      debugPrint('[AuthService] Status: ${response.statusCode}');
+      debugPrint('[AuthService] Account deleted successfully');
+    } on DioException catch (e) {
+      debugPrint('[AuthService] Delete Account Error: ${e.message}');
+      debugPrint('[AuthService] Error Response: ${e.response?.data}');
+      throw ApiException.fromDioException(e);
+    } finally {
+      // Always clear tokens after account deletion attempt
+      await _apiClient.tokenStorage.clearTokens();
+      debugPrint('[AuthService] Tokens cleared after account deletion');
+    }
+  }
+
   Future<bool> isAuthenticated() async {
     return _apiClient.tokenStorage.hasTokens();
   }

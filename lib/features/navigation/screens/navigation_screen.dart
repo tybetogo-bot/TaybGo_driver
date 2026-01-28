@@ -9,9 +9,11 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/order_provider.dart';
+import '../../../core/providers/tour_provider.dart';
 import '../../../core/services/location_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../orders/models/order_model.dart';
+import '../../tour/tour_keys.dart';
 
 enum RouteTarget { pickup, dropoff }
 
@@ -27,6 +29,7 @@ class NavigationScreen extends StatefulWidget {
 class _NavigationScreenState extends State<NavigationScreen> {
   final MapController _mapController = MapController();
   final LocationService _locationService = LocationService();
+  final _tourKeys = TourKeys.instance;
 
   OrderModel? _order;
   LatLng? _currentLocation;
@@ -39,6 +42,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   bool _isUpdating = false;
   bool _locationError = false;
   String? _locationErrorMessage;
+  bool _isTourMode = false;
 
   @override
   void initState() {
@@ -54,6 +58,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   void _loadOrder() {
     final orderProvider = context.read<OrderProvider>();
+    final tourProvider = context.read<TourProvider>();
+    _isTourMode = tourProvider.isTourActive;
 
     // Check active order first
     if (orderProvider.activeOrder?.id == widget.orderId) {
@@ -80,8 +86,24 @@ class _NavigationScreenState extends State<NavigationScreen> {
         _routeTarget = RouteTarget.dropoff;
       }
 
-      // Get real GPS location
-      _initLocation();
+      if (_isTourMode) {
+        // During tour, skip real GPS and route fetching — use mock static data
+        _currentLocation = LatLng(
+          (_order!.pickupLat ?? 37.7749) + 0.002,
+          (_order!.pickupLng ?? -122.4194) + 0.001,
+        );
+        _currentInstruction = 'Turn right onto Main Street';
+        _distanceRemaining = _order!.formattedDistance;
+        _timeRemaining = '${_order!.estimatedMinutes} min';
+        _routePoints = [
+          _currentLocation!,
+          if (_pickupLocation != null) _pickupLocation!,
+        ];
+        setState(() => _isLoading = false);
+      } else {
+        // Get real GPS location
+        _initLocation();
+      }
     } else {
       setState(() => _isLoading = false);
     }
@@ -474,6 +496,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
           // Instruction card (below top buttons)
           Positioned(
+            key: _isTourMode ? _tourKeys.navigationInstructionCardKey : null,
             top: MediaQuery.of(context).padding.top + (_locationError ? 115 : 65),
             left: 16,
             right: 16,
@@ -482,6 +505,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
           // Bottom panel
           Positioned(
+            key: _isTourMode ? _tourKeys.navigationBottomPanelKey : null,
             bottom: 0,
             left: 0,
             right: 0,
@@ -800,6 +824,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
   Widget _buildActionButtons(AppLocalizations l10n, bool isPickupPhase) {
     return Row(
+      key: _isTourMode ? _tourKeys.navigationActionButtonKey : null,
       children: [
         // Google Maps button
         Expanded(

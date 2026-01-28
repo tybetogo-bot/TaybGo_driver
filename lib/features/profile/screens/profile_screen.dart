@@ -235,7 +235,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         key: _tourKeys.kbMenuKey,
                         child: _buildMenuItem(
                           Icons.help_center_outlined,
-                          'Knowledge Base',
+                          l10n.knowledgeBase,
                           null,
                           AppColors.success,
                           textColor,

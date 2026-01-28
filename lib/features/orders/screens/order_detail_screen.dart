@@ -6,7 +6,9 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/order_provider.dart';
+import '../../../core/providers/tour_provider.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../tour/tour_keys.dart';
 import '../models/order_model.dart';
 
 class OrderDetailScreen extends StatefulWidget {
@@ -23,6 +25,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   bool _isLoading = true;
   bool _isUpdating = false;
   String? _error;
+
+  // Tour keys
+  final _tourKeys = TourKeys.instance;
 
   @override
   void initState() {
@@ -192,6 +197,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
 
     final order = _order!;
+    final isTourActive = context.watch<TourProvider>().isTourActive;
     final isPending = order.status == OrderStatus.pending ||
         order.status == OrderStatus.searchingForDriver ||
         order.status == OrderStatus.driverNotificationSent;
@@ -215,7 +221,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 const SizedBox(height: 20),
 
                 // Route Card
-                _buildRouteCard(order, l10n, textColor, secondaryColor, surfaceColor),
+                Container(
+                  key: isTourActive ? _tourKeys.orderDetailRouteCardKey : null,
+                  child: _buildRouteCard(order, l10n, textColor, secondaryColor, surfaceColor),
+                ),
                 const SizedBox(height: 16),
 
                 // Customer Info
@@ -224,8 +233,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 const SizedBox(height: 16),
 
                 // Earnings Card
-                _buildEarningsCard(
-                    order, l10n, textColor, secondaryColor, surfaceColor),
+                Container(
+                  key: isTourActive ? _tourKeys.orderDetailEarningsCardKey : null,
+                  child: _buildEarningsCard(
+                      order, l10n, textColor, secondaryColor, surfaceColor),
+                ),
                 const SizedBox(height: 16),
 
                 // Order Meta
@@ -236,7 +248,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ),
           ),
           bottomNavigationBar: showBottomBar
-              ? _buildBottomBar(context, order, l10n, surfaceColor, isPending)
+              ? Container(
+                  key: isTourActive ? _tourKeys.orderDetailBottomBarKey : null,
+                  child: _buildBottomBar(context, order, l10n, surfaceColor, isPending),
+                )
               : null,
         ),
         // Loading overlay

@@ -711,4 +711,209 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get driver => 'Driver';
+
+  @override
+  String get knowledgeBase => 'Knowledge Base';
+
+  @override
+  String get searchForHelp => 'Search for help...';
+
+  @override
+  String get noArticlesFound => 'No articles found';
+
+  @override
+  String get tryDifferentSearch => 'Try a different search term';
+
+  @override
+  String get noCategoriesAvailable => 'No categories available';
+
+  @override
+  String articlesCount(int count) {
+    return '$count articles';
+  }
+
+  @override
+  String get articleNotFound => 'Article not found';
+
+  @override
+  String get wasArticleHelpful => 'Was this article helpful?';
+
+  @override
+  String get thankYouFeedback => 'Thank you for your feedback!';
+
+  @override
+  String get willImproveArticle => 'We\'ll work on improving this article.';
+
+  @override
+  String get relatedArticles => 'Related Articles';
+
+  @override
+  String get kbTip => 'Tip';
+
+  @override
+  String get kbWarning => 'Warning';
+
+  @override
+  String get yes => 'Yes';
+
+  @override
+  String get no => 'No';
+
+  @override
+  String get article => 'Article';
+
+  @override
+  String get browseKnowledgeBase => 'Browse Knowledge Base';
+
+  @override
+  String sectionsCount(int count) {
+    return '$count sections';
+  }
+
+  @override
+  String minRead(int count) {
+    return '$count min read';
+  }
+
+  @override
+  String get tourAccountUnderReviewTitle => 'Account Under Review';
+
+  @override
+  String get tourAccountUnderReviewDesc =>
+      'Your account is being verified. You can explore the app while waiting for approval.';
+
+  @override
+  String get tourGoOnlineTitle => 'Go Online to Receive Orders';
+
+  @override
+  String get tourGoOnlineDesc =>
+      'Toggle this switch when you\'re ready to accept deliveries. You can go offline anytime.';
+
+  @override
+  String get tourDailyStatsTitle => 'Your Daily Stats';
+
+  @override
+  String get tourDailyStatsDesc =>
+      'Track your orders, earnings, and rating here. Stats update in real-time.';
+
+  @override
+  String get tourNewOrderTitle => 'New Order Received!';
+
+  @override
+  String get tourNewOrderDesc =>
+      'This is how new orders appear. Review the pickup, dropoff, distance, and payment.';
+
+  @override
+  String get tourOrdersTabTitle => 'Orders Tab';
+
+  @override
+  String get tourOrdersTabDesc =>
+      'Switch between Current Orders and Order History.';
+
+  @override
+  String get tourTotalEarningsTitle => 'Your Total Earnings';
+
+  @override
+  String get tourTotalEarningsDesc =>
+      'Track all your earnings here — base pay, tips, and bonuses.';
+
+  @override
+  String get tourEarningsBreakdownTitle => 'Earnings Breakdown';
+
+  @override
+  String get tourEarningsBreakdownDesc =>
+      'See your total orders and average earnings per order.';
+
+  @override
+  String get tourRouteDetailsTitle => 'Route Details';
+
+  @override
+  String get tourRouteDetailsDesc =>
+      'See the full pickup and dropoff route with addresses, distance, and estimated time.';
+
+  @override
+  String get tourYourEarningsTitle => 'Your Earnings';
+
+  @override
+  String get tourYourEarningsDesc =>
+      'View the full payment breakdown — delivery fee, tip, and total payout.';
+
+  @override
+  String get tourNavActionsTitle => 'Navigation & Actions';
+
+  @override
+  String get tourNavActionsDesc =>
+      'Navigate to pickup/dropoff or update the order status as you progress.';
+
+  @override
+  String get tourTurnByTurnTitle => 'Turn-by-Turn Navigation';
+
+  @override
+  String get tourTurnByTurnDesc =>
+      'Follow real-time directions to your pickup or dropoff location.';
+
+  @override
+  String get tourTripControlsTitle => 'Trip Controls';
+
+  @override
+  String get tourTripControlsDesc =>
+      'Switch between pickup and dropoff routes, view destination details and earnings.';
+
+  @override
+  String get tourUpdateStatusTitle => 'Update Status';
+
+  @override
+  String get tourUpdateStatusDesc =>
+      'Tap to mark key milestones — On The Way, Delivered, or Complete.';
+
+  @override
+  String get tourAppSettingsTitle => 'App Settings';
+
+  @override
+  String get tourAppSettingsDesc =>
+      'Change your language, theme, and access the Knowledge Base for help.';
+
+  @override
+  String get tourKnowledgeBaseTitle => 'Knowledge Base';
+
+  @override
+  String get tourKnowledgeBaseDesc =>
+      'Browse step-by-step guides, tips, and answers to common questions.';
+
+  @override
+  String get tourSkipBtn => 'Skip';
+
+  @override
+  String get tourBackBtn => 'Back';
+
+  @override
+  String get tourNextBtn => 'Next';
+
+  @override
+  String get tourDoneBtn => 'Done';
+
+  @override
+  String get tourWelcomeTitle => 'Welcome to TypeToGo!';
+
+  @override
+  String get tourWelcomeDesc => 'Take a quick tour to learn how to use the app';
+
+  @override
+  String get tourSkipForNow => 'Skip for now';
+
+  @override
+  String get tourStartBtn => 'Take Tour';
+
+  @override
+  String get tourCompleteTitle => 'Tour Complete!';
+
+  @override
+  String get tourCompleteDesc =>
+      'You\'re all set to start accepting orders and earning with TypeToGo!';
+
+  @override
+  String get tourBrowseKb => 'Browse Knowledge Base';
+
+  @override
+  String get tourGetStarted => 'Get Started';
 }

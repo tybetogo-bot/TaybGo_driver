@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/order_provider.dart';
+import '../../../core/providers/tour_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../tour/tour_keys.dart';
 import '../../orders/models/order_model.dart';
@@ -83,7 +84,11 @@ class _EarningsScreenState extends State<EarningsScreen> {
       ),
       body: Consumer<OrderProvider>(
         builder: (context, orderProvider, _) {
-          if (orderProvider.isLoading) {
+          final isTourActive = context.watch<TourProvider>().isTourActive;
+
+          // Don't show loading spinner during tour — the keyed containers
+          // must stay in the widget tree so the tour overlay can find them.
+          if (orderProvider.isLoading && !isTourActive) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -132,8 +137,9 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 ),
                 const SizedBox(height: 20),
 
-                // Stats grid
-                if (stats.orders > 0) ...[
+                // Stats grid — always show during tour so the tour overlay
+                // can highlight it, even when there are 0 real orders.
+                if (stats.orders > 0 || isTourActive) ...[
                   Row(
                     key: _tourKeys.statsGridKey,
                     children: [

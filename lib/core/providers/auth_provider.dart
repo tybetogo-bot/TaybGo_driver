@@ -142,6 +142,45 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deleteAccount() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      debugPrint('[AuthProvider] Deleting account');
+      await _authService.deleteAccount();
+
+      // Clear all user state
+      _status = AuthStatus.unauthenticated;
+      _phoneNumber = null;
+      _isNewUser = false;
+      _onboardingComplete = false;
+
+      // Clear onboarding preference
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove(_onboardingCompleteKey);
+
+      debugPrint('[AuthProvider] Account deleted successfully');
+      _isLoading = false;
+      notifyListeners();
+    } on ApiException catch (e) {
+      debugPrint('[AuthProvider] Delete account error: ${e.message}');
+      _error = e.message;
+      _isLoading = false;
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+      rethrow;
+    } catch (e) {
+      debugPrint('[AuthProvider] Unknown error during account deletion: $e');
+      _error = 'Failed to delete account. Please try again.';
+      _isLoading = false;
+      _status = AuthStatus.unauthenticated;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
   void clearError() {
     _error = null;
     notifyListeners();

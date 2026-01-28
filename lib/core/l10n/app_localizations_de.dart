@@ -719,4 +719,210 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get driver => 'Fahrer';
+
+  @override
+  String get knowledgeBase => 'Wissensdatenbank';
+
+  @override
+  String get searchForHelp => 'Nach Hilfe suchen...';
+
+  @override
+  String get noArticlesFound => 'Keine Artikel gefunden';
+
+  @override
+  String get tryDifferentSearch => 'Versuchen Sie einen anderen Suchbegriff';
+
+  @override
+  String get noCategoriesAvailable => 'Keine Kategorien verfügbar';
+
+  @override
+  String articlesCount(int count) {
+    return '$count Artikel';
+  }
+
+  @override
+  String get articleNotFound => 'Artikel nicht gefunden';
+
+  @override
+  String get wasArticleHelpful => 'War dieser Artikel hilfreich?';
+
+  @override
+  String get thankYouFeedback => 'Vielen Dank für Ihr Feedback!';
+
+  @override
+  String get willImproveArticle => 'Wir werden diesen Artikel verbessern.';
+
+  @override
+  String get relatedArticles => 'Verwandte Artikel';
+
+  @override
+  String get kbTip => 'Tipp';
+
+  @override
+  String get kbWarning => 'Warnung';
+
+  @override
+  String get yes => 'Ja';
+
+  @override
+  String get no => 'Nein';
+
+  @override
+  String get article => 'Artikel';
+
+  @override
+  String get browseKnowledgeBase => 'Wissensdatenbank durchsuchen';
+
+  @override
+  String sectionsCount(int count) {
+    return '$count Abschnitte';
+  }
+
+  @override
+  String minRead(int count) {
+    return '$count Min. Lesezeit';
+  }
+
+  @override
+  String get tourAccountUnderReviewTitle => 'Konto wird überprüft';
+
+  @override
+  String get tourAccountUnderReviewDesc =>
+      'Ihr Konto wird verifiziert. Sie können die App erkunden, während Sie auf die Genehmigung warten.';
+
+  @override
+  String get tourGoOnlineTitle => 'Online gehen, um Bestellungen zu erhalten';
+
+  @override
+  String get tourGoOnlineDesc =>
+      'Schalten Sie diesen Schalter um, wenn Sie bereit sind, Lieferungen anzunehmen. Sie können jederzeit offline gehen.';
+
+  @override
+  String get tourDailyStatsTitle => 'Ihre Tagesstatistiken';
+
+  @override
+  String get tourDailyStatsDesc =>
+      'Verfolgen Sie hier Ihre Bestellungen, Einnahmen und Bewertungen. Die Statistiken werden in Echtzeit aktualisiert.';
+
+  @override
+  String get tourNewOrderTitle => 'Neue Bestellung eingegangen!';
+
+  @override
+  String get tourNewOrderDesc =>
+      'So erscheinen neue Bestellungen. Überprüfen Sie Abholung, Zustellung, Entfernung und Bezahlung.';
+
+  @override
+  String get tourOrdersTabTitle => 'Bestellungen-Tab';
+
+  @override
+  String get tourOrdersTabDesc =>
+      'Wechseln Sie zwischen aktuellen Bestellungen und dem Bestellverlauf.';
+
+  @override
+  String get tourTotalEarningsTitle => 'Ihre Gesamteinnahmen';
+
+  @override
+  String get tourTotalEarningsDesc =>
+      'Verfolgen Sie hier alle Ihre Einnahmen – Grundlohn, Trinkgeld und Boni.';
+
+  @override
+  String get tourEarningsBreakdownTitle => 'Einnahmenübersicht';
+
+  @override
+  String get tourEarningsBreakdownDesc =>
+      'Sehen Sie Ihre Gesamtbestellungen und die durchschnittlichen Einnahmen pro Bestellung.';
+
+  @override
+  String get tourRouteDetailsTitle => 'Routendetails';
+
+  @override
+  String get tourRouteDetailsDesc =>
+      'Sehen Sie die vollständige Abhol- und Zustellroute mit Adressen, Entfernung und geschätzter Zeit.';
+
+  @override
+  String get tourYourEarningsTitle => 'Ihre Einnahmen';
+
+  @override
+  String get tourYourEarningsDesc =>
+      'Sehen Sie die vollständige Aufschlüsselung – Liefergebühr, Trinkgeld und Gesamtauszahlung.';
+
+  @override
+  String get tourNavActionsTitle => 'Navigation & Aktionen';
+
+  @override
+  String get tourNavActionsDesc =>
+      'Navigieren Sie zur Abholung/Zustellung oder aktualisieren Sie den Bestellstatus während der Fahrt.';
+
+  @override
+  String get tourTurnByTurnTitle => 'Schritt-für-Schritt-Navigation';
+
+  @override
+  String get tourTurnByTurnDesc =>
+      'Folgen Sie den Echtzeitanweisungen zu Ihrem Abhol- oder Zustellort.';
+
+  @override
+  String get tourTripControlsTitle => 'Fahrtsteuerung';
+
+  @override
+  String get tourTripControlsDesc =>
+      'Wechseln Sie zwischen Abhol- und Zustellrouten, sehen Sie Zieldetails und Einnahmen.';
+
+  @override
+  String get tourUpdateStatusTitle => 'Status aktualisieren';
+
+  @override
+  String get tourUpdateStatusDesc =>
+      'Tippen Sie, um wichtige Meilensteine zu markieren – Unterwegs, Zugestellt oder Abgeschlossen.';
+
+  @override
+  String get tourAppSettingsTitle => 'App-Einstellungen';
+
+  @override
+  String get tourAppSettingsDesc =>
+      'Ändern Sie Ihre Sprache, Ihr Design und greifen Sie auf die Wissensdatenbank zu.';
+
+  @override
+  String get tourKnowledgeBaseTitle => 'Wissensdatenbank';
+
+  @override
+  String get tourKnowledgeBaseDesc =>
+      'Durchsuchen Sie Schritt-für-Schritt-Anleitungen, Tipps und Antworten auf häufige Fragen.';
+
+  @override
+  String get tourSkipBtn => 'Überspringen';
+
+  @override
+  String get tourBackBtn => 'Zurück';
+
+  @override
+  String get tourNextBtn => 'Weiter';
+
+  @override
+  String get tourDoneBtn => 'Fertig';
+
+  @override
+  String get tourWelcomeTitle => 'Willkommen bei TypeToGo!';
+
+  @override
+  String get tourWelcomeDesc =>
+      'Machen Sie eine kurze Tour, um die App kennenzulernen';
+
+  @override
+  String get tourSkipForNow => 'Erstmal überspringen';
+
+  @override
+  String get tourStartBtn => 'Tour starten';
+
+  @override
+  String get tourCompleteTitle => 'Tour abgeschlossen!';
+
+  @override
+  String get tourCompleteDesc =>
+      'Sie sind bereit, Bestellungen anzunehmen und mit TypeToGo zu verdienen!';
+
+  @override
+  String get tourBrowseKb => 'Wissensdatenbank durchsuchen';
+
+  @override
+  String get tourGetStarted => 'Loslegen';
 }

@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 
-/// Custom tooltip content widget for tour steps
+/// Tour step tooltip rendered inside TutorialCoachMark's unconstrained overlay.
+///
+/// Rules for unconstrained overlay:
+/// - SizedBox with explicit width at root (from MediaQuery)
+/// - No Expanded, Spacer, Flexible, or CrossAxisAlignment.stretch
+/// - All Rows use mainAxisSize: MainAxisSize.min
 class TourContentWidget extends StatelessWidget {
   final String title;
   final String description;
@@ -29,174 +35,160 @@ class TourContentWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = isDark ? Colors.white : Colors.white;
+    final secondaryColor = Colors.white70;
+    final screenWidth = MediaQuery.of(context).size.width;
 
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: isDark ? AppColors.darkSurface : AppColors.lightBg,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Title
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: isDark ? AppColors.darkText : AppColors.lightText,
+    return SizedBox(
+      width: screenWidth - 32,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: const Color(0xFF1E1E2C),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title + step
+            Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Flexible(
+                  child: Text(
+                    title,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
                   ),
                 ),
-              ),
-              // Step counter badge
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
+                const SizedBox(width: 8),
+                Text(
                   '$currentStep/$totalSteps',
                   style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
                     color: AppColors.primary,
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-          // Description
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: 14,
-              height: 1.5,
-              color: isDark
-                  ? AppColors.darkTextSecondary
-                  : AppColors.lightTextSecondary,
+              ],
             ),
-          ),
-          const SizedBox(height: 20),
-          // Progress dots
-          _buildProgressDots(isDark),
-          const SizedBox(height: 20),
-          // Action buttons
-          Row(
-            children: [
-              // Skip button
-              TextButton(
-                onPressed: onSkip,
-                style: TextButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                ),
-                child: Text(
-                  'Skip Tour',
-                  style: TextStyle(
-                    color: isDark
-                        ? AppColors.darkTextSecondary
-                        : AppColors.lightTextSecondary,
-                    fontWeight: FontWeight.w600,
-                  ),
+            const SizedBox(height: 6),
+            // Description
+            Text(
+              description,
+              style: TextStyle(
+                fontSize: 13,
+                height: 1.4,
+                color: secondaryColor,
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Progress bar
+            ClipRRect(
+              borderRadius: BorderRadius.circular(1.5),
+              child: SizedBox(
+                height: 3,
+                child: LinearProgressIndicator(
+                  value: totalSteps > 0 ? currentStep / totalSteps : 0.0,
+                  backgroundColor: Colors.white12,
+                  valueColor:
+                      const AlwaysStoppedAnimation<Color>(AppColors.primary),
+                  minHeight: 3,
                 ),
               ),
-              const Spacer(),
-              // Previous button
-              if (showPrevious && onPrevious != null)
-                OutlinedButton(
-                  onPressed: onPrevious,
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    side: BorderSide(color: AppColors.primary.withValues(alpha: 0.5)),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.arrow_back, size: 16, color: AppColors.primary),
-                      SizedBox(width: 6),
-                      Text(
-                        'Back',
-                        style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              if (showPrevious && onPrevious != null) const SizedBox(width: 8),
-              // Next/Done button
-              ElevatedButton(
-                onPressed: onNext,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                  elevation: 0,
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      isLastStep ? 'Done' : 'Next',
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
-                    ),
-                    const SizedBox(width: 6),
-                    Icon(
-                      isLastStep ? Icons.check : Icons.arrow_forward,
-                      size: 16,
-                    ),
+            ),
+            const SizedBox(height: 14),
+            // Buttons
+            Builder(builder: (ctx) {
+              final l10n = AppLocalizations.of(ctx)!;
+              return Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  _buildTextBtn(l10n.tourSkipBtn, onSkip, Colors.white54),
+                  const SizedBox(width: 10),
+                  if (showPrevious && onPrevious != null) ...[
+                    _buildBtn(l10n.tourBackBtn, Icons.arrow_back_ios, onPrevious!,
+                        filled: false),
+                    const SizedBox(width: 8),
                   ],
-                ),
-              ),
-            ],
-          ),
-        ],
+                  _buildBtn(
+                    isLastStep ? l10n.tourDoneBtn : l10n.tourNextBtn,
+                    isLastStep ? Icons.check : Icons.arrow_forward_ios,
+                    onNext,
+                    filled: true,
+                    iconAfter: true,
+                  ),
+                ],
+              );
+            }),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildProgressDots(bool isDark) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(totalSteps, (index) {
-        final isActive = index < currentStep;
-        final isCurrent = index == currentStep - 1;
-
-        return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 3),
-          width: isCurrent ? 24 : 8,
-          height: 8,
-          decoration: BoxDecoration(
-            color: isActive || isCurrent
-                ? AppColors.primary
-                : (isDark ? AppColors.darkBorder : AppColors.lightBorder),
-            borderRadius: BorderRadius.circular(4),
+  Widget _buildTextBtn(String label, VoidCallback onTap, Color color) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 2),
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: color,
           ),
-        );
-      }),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildBtn(
+    String label,
+    IconData icon,
+    VoidCallback onTap, {
+    bool filled = true,
+    bool iconAfter = false,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+          color: filled ? AppColors.primary : Colors.white10,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (!iconAfter)
+              Padding(
+                padding: const EdgeInsets.only(right: 4),
+                child:
+                    Icon(icon, size: 11, color: filled ? Colors.white : Colors.white60),
+              ),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: filled ? Colors.white : Colors.white60,
+              ),
+            ),
+            if (iconAfter)
+              Padding(
+                padding: const EdgeInsets.only(left: 4),
+                child:
+                    Icon(icon, size: 11, color: filled ? Colors.white : Colors.white60),
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

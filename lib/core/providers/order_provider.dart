@@ -446,11 +446,24 @@ class OrderProvider extends ChangeNotifier {
 
   // ========== Tour Mode Methods ==========
 
-  /// Inject mock order for tour demonstration
+  /// Inject mock order for tour demonstration.
+  /// Does NOT start the accept countdown — mock orders persist until
+  /// the tour coordinator explicitly clears or accepts them.
   void injectMockOrder(OrderModel mockOrder) {
     _pendingOrder = mockOrder;
-    _startAcceptCountdown();
+    _acceptTimer?.cancel();
+    _acceptCountdown = 0;
     onNewOrderReceived?.call();
+    notifyListeners();
+  }
+
+  /// Inject a mock order directly as an active order (skips pending/countdown).
+  /// Used by the tour coordinator so the Orders screen shows an active order.
+  void injectMockActiveOrder(OrderModel mockOrder) {
+    _activeOrder = mockOrder.copyWith(
+      status: OrderStatus.accepted,
+      acceptedAt: DateTime.now(),
+    );
     notifyListeners();
   }
 

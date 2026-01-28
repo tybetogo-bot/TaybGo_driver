@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
 
 class TourWelcomeCard extends StatelessWidget {
@@ -13,14 +14,13 @@ class TourWelcomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    // Temporary strings until localization is added
-    const tourWelcomeTitle = 'Welcome to TeybatDriver!';
-    const tourWelcomeDesc = 'Take a quick tour to learn how to use the app';
-    const tourSkipButton = 'Skip for now';
-    const tourStartButton = 'Take Tour';
+    final tourWelcomeTitle = l10n.tourWelcomeTitle;
+    final tourWelcomeDesc = l10n.tourWelcomeDesc;
+    final tourSkipButton = l10n.tourSkipForNow;
+    final tourStartButton = l10n.tourStartBtn;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
