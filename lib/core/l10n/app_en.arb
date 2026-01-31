@@ -193,6 +193,7 @@
   "english": "English",
   "german": "German",
   "french": "French",
+  "arabic": "Arabic",
   "theme": "Theme",
   "lightMode": "Light Mode",
   "darkMode": "Dark Mode",
@@ -353,5 +354,83 @@
   "tourCompleteTitle": "Tour Complete!",
   "tourCompleteDesc": "You're all set to start accepting orders and earning with TypeToGo!",
   "tourBrowseKb": "Browse Knowledge Base",
-  "tourGetStarted": "Get Started"
+  "tourGetStarted": "Get Started",
+
+  "selectCountry": "Select Country",
+  "secure": "Secure",
+  "wellSendVerificationCode": "We'll send you a verification code",
+  "byConsentTerms": "By continuing, you agree to our Terms & Privacy",
+  "otpSentSuccessfully": "OTP sent successfully",
+  "resendIn": "Resend in {seconds}s",
+  "@resendIn": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "resendCode": "Resend code",
+  "verify": "Verify",
+  "tellUsAboutYourself": "Tell us about yourself",
+  "basicInfoSubtitle": "We need some basic information to set up your driver account",
+  "enterYourFullName": "Enter your full name",
+  "notAvailable": "Not available",
+  "verifiedViaOtp": "Verified via OTP",
+  "selectYourVehicle": "Select your vehicle",
+  "vehicleStepSubtitle": "Choose the type of vehicle you'll use for deliveries",
+  "chooseYourServices": "Choose your services",
+  "servicesStepSubtitle": "Select the types of deliveries you want to accept",
+  "deliverFoodDesc": "Deliver food from restaurants",
+  "deliverPackagesDesc": "Deliver packages and parcels",
+  "transportPassengersDesc": "Transport passengers",
+  "changeServiceLater": "You can change your service preferences later in settings",
+  "back": "Back",
+  "completeRegistration": "Complete Registration",
+  "pleaseEnterYourName": "Please enter your name",
+  "pleaseSelectService": "Please select at least one service type",
+  "registrationFailed": "Registration failed. Please try again.",
+  "stepPersonal": "Personal",
+  "stepVehicle": "Vehicle",
+  "stepServices": "Services",
+  "ecoFriendlyOption": "Eco-friendly option",
+  "fastAndAgile": "Fast and agile",
+  "mostVersatile": "Most versatile",
+  "largeDeliveries": "Large deliveries",
+  "van": "Van",
+  "deleteDataWarning": "This will permanently delete all your data including profile, ratings, and order history.",
+  "finalConfirmation": "Final Confirmation",
+  "finalDeleteWarning": "Are you absolutely sure? This action is irreversible and you will lose all your data.",
+  "deleteMyAccount": "Delete My Account",
+  "deletingAccount": "Deleting account...",
+  "accountDeletedSuccessfully": "Account deleted successfully",
+  "failedToDeleteAccount": "Failed to delete account: {error}",
+  "@failedToDeleteAccount": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "justNow": "Just now",
+  "minutesAgo": "{minutes}m ago",
+  "@minutesAgo": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "hoursAgo": "{hours}h ago",
+  "@hoursAgo": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "daysAgo": "{days}d ago",
+  "@daysAgo": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "clearAllNotificationsConfirm": "Are you sure you want to clear all notifications?",
+  "failedToLoadNotifications": "Failed to load notifications",
+  "calculatingRoute": "Calculating route...",
+  "orderNotFound": "Order not found",
+  "goBack": "Go Back",
+  "gpsUnavailableTapRetry": "GPS unavailable. Tap to retry.",
+  "googleMaps": "Google Maps"
 }

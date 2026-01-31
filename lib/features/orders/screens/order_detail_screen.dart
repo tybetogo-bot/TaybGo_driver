@@ -188,7 +188,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               Icon(Icons.receipt_long_outlined,
                   size: 48, color: secondaryColor.withValues(alpha: 0.5)),
               const SizedBox(height: 12),
-              Text(_error ?? 'Order not found',
+              Text(_error ?? l10n.orderNotFound,
                   style: TextStyle(color: secondaryColor)),
             ],
           ),
@@ -890,8 +890,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           child: OutlinedButton.icon(
                             onPressed: () => _openInGoogleMaps(lat: targetLat!, lng: targetLng!),
                             icon: const Icon(Icons.map_outlined, size: 18),
-                            label: const Text('Google Maps',
-                                style: TextStyle(fontWeight: FontWeight.w600)),
+                            label: Text(l10n.googleMaps,
+                                style: const TextStyle(fontWeight: FontWeight.w600)),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.info,
                               side: const BorderSide(color: AppColors.info),

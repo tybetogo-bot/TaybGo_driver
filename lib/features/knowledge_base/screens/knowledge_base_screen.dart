@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/locale_provider.dart';
+import '../../../core/providers/tour_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../models/kb_models.dart';
 import '../services/kb_service.dart';
@@ -162,6 +163,9 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       children: [
         const SizedBox(height: 4),
+        // Start Tour button (always visible)
+        _buildStartTourCard(secondaryColor, surfaceColor, borderColor, l10n),
+        const SizedBox(height: 16),
         // Category grid
         _buildCategoryGrid(
             textColor, secondaryColor, surfaceColor, borderColor, l10n),
@@ -171,6 +175,63 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
             textColor, secondaryColor, surfaceColor, borderColor, l10n),
         const SizedBox(height: 20),
       ],
+    );
+  }
+
+  // ── Start Tour Card (always visible) ──
+
+  Widget _buildStartTourCard(
+    Color secondaryColor,
+    Color surfaceColor,
+    Color borderColor,
+    AppLocalizations l10n,
+  ) {
+    final tourProvider = Provider.of<TourProvider>(context, listen: false);
+    return Container(
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+      ),
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.tourWelcomeTitle,
+                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.tourWelcomeDesc,
+                  style: TextStyle(fontSize: 12, color: secondaryColor),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          ElevatedButton.icon(
+            onPressed: () async {
+              context.go(RouteConstants.home);
+              await Future.delayed(const Duration(milliseconds: 350));
+              await tourProvider.startTour();
+            },
+            icon: const Icon(Icons.play_arrow, size: 18),
+            label: Text(l10n.tourStartBtn),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

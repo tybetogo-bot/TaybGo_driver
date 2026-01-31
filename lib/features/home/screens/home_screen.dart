@@ -398,11 +398,11 @@ class _HomeScreenState extends State<HomeScreen>
                       ),
 
                     // Tour Welcome Card
-                    Consumer<TourProvider>(
-                      builder: (context, tourProvider, _) {
+                    Consumer2<TourProvider, OrderProvider>(
+                      builder: (context, tourProvider, orderProvider, _) {
+                        final hasOrders = orderProvider.totalOrders > 0;
                         if (profile != null &&
-                            !profile.isVerified &&
-                            tourProvider.shouldShowPrompt(profile.isVerified)) {
+                            tourProvider.shouldShowPrompt(hasOrders)) {
                           return TourWelcomeCard(
                             onStartTour: () => _startTour(tourProvider),
                             onSkip: () => tourProvider.skipTour(),

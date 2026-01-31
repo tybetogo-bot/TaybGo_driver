@@ -85,11 +85,11 @@ class TourProvider extends ChangeNotifier {
   }
 
   /// Check if the tour welcome prompt should be shown.
-  /// Returns true if user is unverified and hasn't skipped the tour this session.
-  /// The card stays available even after completing the tour — as long as the
-  /// account is still under review the driver can retake it.
-  bool shouldShowPrompt(bool isVerified) {
-    return !isVerified && !_hasSkippedTour;
+  /// Returns true if the driver has no orders yet and hasn't skipped the tour
+  /// this session.  The card stays available even after completing the tour —
+  /// as long as the driver hasn't received any orders they can retake it.
+  bool shouldShowPrompt(bool hasOrders) {
+    return !hasOrders && !_hasSkippedTour;
   }
 
   /// Start the tour

@@ -8,6 +8,7 @@ class LocaleProvider extends ChangeNotifier {
     Locale('en'),
     Locale('de'),
     Locale('fr'),
+    Locale('ar'),
   ];
 
   Locale _locale = const Locale('en');
@@ -41,6 +42,8 @@ class LocaleProvider extends ChangeNotifier {
         return 'Deutsch';
       case 'fr':
         return 'Français';
+      case 'ar':
+        return 'العربية';
       default:
         return 'English';
     }

@@ -124,7 +124,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                   ),
                   const SizedBox(width: 12),
                   Text(
-                    'Select Country',
+                    AppLocalizations.of(context)!.selectCountry,
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w600,
@@ -224,16 +224,27 @@ class _PhoneScreenState extends State<PhoneScreen> {
               const Spacer(),
 
               // Logo
-              Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Icon(
-                  Icons.local_shipping,
-                  color: AppColors.primary,
-                  size: 32,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(14),
+                child: Image.asset(
+                  'assets/icons/tybetogo.jpg',
+                  width: 60,
+                  height: 60,
+                  fit: BoxFit.contain,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      padding: const EdgeInsets.all(14),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(
+                        Icons.local_shipping,
+                        color: AppColors.primary,
+                        size: 32,
+                      ),
+                    );
+                  },
                 ),
               ),
 
@@ -271,7 +282,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Secure',
+                          l10n.secure,
                           style: TextStyle(
                             fontSize: 12,
                             color: AppColors.info,
@@ -283,7 +294,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                   ),
                   const SizedBox(width: 8),
                   Text(
-                    'We\'ll send you a verification code',
+                    l10n.wellSendVerificationCode,
                     style: TextStyle(fontSize: 14, color: secondaryColor),
                   ),
                 ],
@@ -403,9 +414,9 @@ class _PhoneScreenState extends State<PhoneScreen> {
                               ),
                             )
                           : const Icon(Icons.arrow_forward, size: 20),
-                      label: const Text(
-                        'Continue',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                      label: Text(
+                        l10n.continueText,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
@@ -462,10 +473,12 @@ class _PhoneScreenState extends State<PhoneScreen> {
                       color: secondaryColor,
                     ),
                     const SizedBox(width: 6),
-                    Text(
-                      'By continuing, you agree to our Terms & Privacy',
-                      style: TextStyle(fontSize: 12, color: secondaryColor),
-                      textAlign: TextAlign.center,
+                    Flexible(
+                      child: Text(
+                        l10n.byConsentTerms,
+                        style: TextStyle(fontSize: 12, color: secondaryColor),
+                        textAlign: TextAlign.center,
+                      ),
                     ),
                   ],
                 ),

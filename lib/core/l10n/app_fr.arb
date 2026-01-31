@@ -181,6 +181,7 @@
   "english": "Anglais",
   "german": "Allemand",
   "french": "Français",
+  "arabic": "Arabe",
   "theme": "Thème",
   "lightMode": "Mode clair",
   "darkMode": "Mode sombre",
@@ -321,5 +322,83 @@
   "tourCompleteTitle": "Visite terminée !",
   "tourCompleteDesc": "Vous êtes prêt à accepter des commandes et gagner avec TypeToGo !",
   "tourBrowseKb": "Parcourir la base de connaissances",
-  "tourGetStarted": "Commencer"
+  "tourGetStarted": "Commencer",
+
+  "selectCountry": "Sélectionner le pays",
+  "secure": "Sécurisé",
+  "wellSendVerificationCode": "Nous vous enverrons un code de vérification",
+  "byConsentTerms": "En continuant, vous acceptez nos Conditions et Politique de confidentialité",
+  "otpSentSuccessfully": "Code de vérification envoyé avec succès",
+  "resendIn": "Renvoyer dans {seconds}s",
+  "@resendIn": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "resendCode": "Renvoyer le code",
+  "verify": "Vérifier",
+  "tellUsAboutYourself": "Parlez-nous de vous",
+  "basicInfoSubtitle": "Nous avons besoin de quelques informations de base pour configurer votre compte chauffeur",
+  "enterYourFullName": "Entrez votre nom complet",
+  "notAvailable": "Non disponible",
+  "verifiedViaOtp": "Vérifié par OTP",
+  "selectYourVehicle": "Sélectionnez votre véhicule",
+  "vehicleStepSubtitle": "Choisissez le type de véhicule que vous utiliserez pour les livraisons",
+  "chooseYourServices": "Choisissez vos services",
+  "servicesStepSubtitle": "Sélectionnez les types de livraisons que vous souhaitez accepter",
+  "deliverFoodDesc": "Livrer de la nourriture des restaurants",
+  "deliverPackagesDesc": "Livrer des colis et des paquets",
+  "transportPassengersDesc": "Transporter des passagers",
+  "changeServiceLater": "Vous pouvez modifier vos préférences de service plus tard dans les paramètres",
+  "back": "Retour",
+  "completeRegistration": "Terminer l'inscription",
+  "pleaseEnterYourName": "Veuillez entrer votre nom",
+  "pleaseSelectService": "Veuillez sélectionner au moins un type de service",
+  "registrationFailed": "L'inscription a échoué. Veuillez réessayer.",
+  "stepPersonal": "Personnel",
+  "stepVehicle": "Véhicule",
+  "stepServices": "Services",
+  "ecoFriendlyOption": "Option écologique",
+  "fastAndAgile": "Rapide et agile",
+  "mostVersatile": "Le plus polyvalent",
+  "largeDeliveries": "Grandes livraisons",
+  "van": "Fourgon",
+  "deleteDataWarning": "Cela supprimera définitivement toutes vos données, y compris le profil, les évaluations et l'historique des commandes.",
+  "finalConfirmation": "Confirmation finale",
+  "finalDeleteWarning": "Êtes-vous absolument sûr ? Cette action est irréversible et vous perdrez toutes vos données.",
+  "deleteMyAccount": "Supprimer mon compte",
+  "deletingAccount": "Suppression du compte...",
+  "accountDeletedSuccessfully": "Compte supprimé avec succès",
+  "failedToDeleteAccount": "Échec de la suppression du compte : {error}",
+  "@failedToDeleteAccount": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "justNow": "À l'instant",
+  "minutesAgo": "il y a {minutes} min",
+  "@minutesAgo": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "hoursAgo": "il y a {hours} h",
+  "@hoursAgo": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "daysAgo": "il y a {days} j",
+  "@daysAgo": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "clearAllNotificationsConfirm": "Êtes-vous sûr de vouloir effacer toutes les notifications ?",
+  "failedToLoadNotifications": "Échec du chargement des notifications",
+  "calculatingRoute": "Calcul de l'itinéraire...",
+  "orderNotFound": "Commande introuvable",
+  "goBack": "Retour",
+  "gpsUnavailableTapRetry": "GPS indisponible. Appuyez pour réessayer.",
+  "googleMaps": "Google Maps"
 }

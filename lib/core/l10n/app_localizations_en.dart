@@ -504,6 +504,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get french => 'French';
 
   @override
+  String get arabic => 'Arabic';
+
+  @override
   String get theme => 'Theme';
 
   @override
@@ -916,4 +919,178 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourGetStarted => 'Get Started';
+
+  @override
+  String get selectCountry => 'Select Country';
+
+  @override
+  String get secure => 'Secure';
+
+  @override
+  String get wellSendVerificationCode => 'We\'ll send you a verification code';
+
+  @override
+  String get byConsentTerms =>
+      'By continuing, you agree to our Terms & Privacy';
+
+  @override
+  String get otpSentSuccessfully => 'OTP sent successfully';
+
+  @override
+  String resendIn(int seconds) {
+    return 'Resend in ${seconds}s';
+  }
+
+  @override
+  String get resendCode => 'Resend code';
+
+  @override
+  String get verify => 'Verify';
+
+  @override
+  String get tellUsAboutYourself => 'Tell us about yourself';
+
+  @override
+  String get basicInfoSubtitle =>
+      'We need some basic information to set up your driver account';
+
+  @override
+  String get enterYourFullName => 'Enter your full name';
+
+  @override
+  String get notAvailable => 'Not available';
+
+  @override
+  String get verifiedViaOtp => 'Verified via OTP';
+
+  @override
+  String get selectYourVehicle => 'Select your vehicle';
+
+  @override
+  String get vehicleStepSubtitle =>
+      'Choose the type of vehicle you\'ll use for deliveries';
+
+  @override
+  String get chooseYourServices => 'Choose your services';
+
+  @override
+  String get servicesStepSubtitle =>
+      'Select the types of deliveries you want to accept';
+
+  @override
+  String get deliverFoodDesc => 'Deliver food from restaurants';
+
+  @override
+  String get deliverPackagesDesc => 'Deliver packages and parcels';
+
+  @override
+  String get transportPassengersDesc => 'Transport passengers';
+
+  @override
+  String get changeServiceLater =>
+      'You can change your service preferences later in settings';
+
+  @override
+  String get back => 'Back';
+
+  @override
+  String get completeRegistration => 'Complete Registration';
+
+  @override
+  String get pleaseEnterYourName => 'Please enter your name';
+
+  @override
+  String get pleaseSelectService => 'Please select at least one service type';
+
+  @override
+  String get registrationFailed => 'Registration failed. Please try again.';
+
+  @override
+  String get stepPersonal => 'Personal';
+
+  @override
+  String get stepVehicle => 'Vehicle';
+
+  @override
+  String get stepServices => 'Services';
+
+  @override
+  String get ecoFriendlyOption => 'Eco-friendly option';
+
+  @override
+  String get fastAndAgile => 'Fast and agile';
+
+  @override
+  String get mostVersatile => 'Most versatile';
+
+  @override
+  String get largeDeliveries => 'Large deliveries';
+
+  @override
+  String get van => 'Van';
+
+  @override
+  String get deleteDataWarning =>
+      'This will permanently delete all your data including profile, ratings, and order history.';
+
+  @override
+  String get finalConfirmation => 'Final Confirmation';
+
+  @override
+  String get finalDeleteWarning =>
+      'Are you absolutely sure? This action is irreversible and you will lose all your data.';
+
+  @override
+  String get deleteMyAccount => 'Delete My Account';
+
+  @override
+  String get deletingAccount => 'Deleting account...';
+
+  @override
+  String get accountDeletedSuccessfully => 'Account deleted successfully';
+
+  @override
+  String failedToDeleteAccount(String error) {
+    return 'Failed to delete account: $error';
+  }
+
+  @override
+  String get justNow => 'Just now';
+
+  @override
+  String minutesAgo(int minutes) {
+    return '${minutes}m ago';
+  }
+
+  @override
+  String hoursAgo(int hours) {
+    return '${hours}h ago';
+  }
+
+  @override
+  String daysAgo(int days) {
+    return '${days}d ago';
+  }
+
+  @override
+  String get clearAllNotificationsConfirm =>
+      'Are you sure you want to clear all notifications?';
+
+  @override
+  String get failedToLoadNotifications => 'Failed to load notifications';
+
+  @override
+  String get calculatingRoute => 'Calculating route...';
+
+  @override
+  String get orderNotFound => 'Order not found';
+
+  @override
+  String get goBack => 'Go Back';
+
+  @override
+  String get gpsUnavailableTapRetry => 'GPS unavailable. Tap to retry.';
+
+  @override
+  String get googleMaps => 'Google Maps';
 }

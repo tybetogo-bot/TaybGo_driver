@@ -66,11 +66,11 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icons/logo.jpg"
+  image_path: "assets/icons/tybetogo.jpg"
   min_sdk_android: 21
   web:
     generate: true
-    image_path: "assets/icons/logo.jpg"
+    image_path: "assets/icons/tybetogo.jpg"
     background_color: "#ffffff"
     theme_color: "#4CAF50"
   windows:

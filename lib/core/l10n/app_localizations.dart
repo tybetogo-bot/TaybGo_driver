@@ -5,6 +5,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
+import 'app_localizations_ar.dart';
 import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
 import 'app_localizations_fr.dart';
@@ -95,6 +96,7 @@ abstract class AppLocalizations {
 
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
+    Locale('ar'),
     Locale('de'),
     Locale('en'),
     Locale('fr'),
@@ -1066,6 +1068,12 @@ abstract class AppLocalizations {
   /// **'French'**
   String get french;
 
+  /// No description provided for @arabic.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get arabic;
+
   /// No description provided for @theme.
   ///
   /// In en, this message translates to:
@@ -1833,6 +1841,318 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Get Started'**
   String get tourGetStarted;
+
+  /// No description provided for @selectCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Country'**
+  String get selectCountry;
+
+  /// No description provided for @secure.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure'**
+  String get secure;
+
+  /// No description provided for @wellSendVerificationCode.
+  ///
+  /// In en, this message translates to:
+  /// **'We\'ll send you a verification code'**
+  String get wellSendVerificationCode;
+
+  /// No description provided for @byConsentTerms.
+  ///
+  /// In en, this message translates to:
+  /// **'By continuing, you agree to our Terms & Privacy'**
+  String get byConsentTerms;
+
+  /// No description provided for @otpSentSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'OTP sent successfully'**
+  String get otpSentSuccessfully;
+
+  /// No description provided for @resendIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend in {seconds}s'**
+  String resendIn(int seconds);
+
+  /// No description provided for @resendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get resendCode;
+
+  /// No description provided for @verify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get verify;
+
+  /// No description provided for @tellUsAboutYourself.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us about yourself'**
+  String get tellUsAboutYourself;
+
+  /// No description provided for @basicInfoSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'We need some basic information to set up your driver account'**
+  String get basicInfoSubtitle;
+
+  /// No description provided for @enterYourFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your full name'**
+  String get enterYourFullName;
+
+  /// No description provided for @notAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get notAvailable;
+
+  /// No description provided for @verifiedViaOtp.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified via OTP'**
+  String get verifiedViaOtp;
+
+  /// No description provided for @selectYourVehicle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select your vehicle'**
+  String get selectYourVehicle;
+
+  /// No description provided for @vehicleStepSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose the type of vehicle you\'ll use for deliveries'**
+  String get vehicleStepSubtitle;
+
+  /// No description provided for @chooseYourServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose your services'**
+  String get chooseYourServices;
+
+  /// No description provided for @servicesStepSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select the types of deliveries you want to accept'**
+  String get servicesStepSubtitle;
+
+  /// No description provided for @deliverFoodDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deliver food from restaurants'**
+  String get deliverFoodDesc;
+
+  /// No description provided for @deliverPackagesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Deliver packages and parcels'**
+  String get deliverPackagesDesc;
+
+  /// No description provided for @transportPassengersDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Transport passengers'**
+  String get transportPassengersDesc;
+
+  /// No description provided for @changeServiceLater.
+  ///
+  /// In en, this message translates to:
+  /// **'You can change your service preferences later in settings'**
+  String get changeServiceLater;
+
+  /// No description provided for @back.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get back;
+
+  /// No description provided for @completeRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete Registration'**
+  String get completeRegistration;
+
+  /// No description provided for @pleaseEnterYourName.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your name'**
+  String get pleaseEnterYourName;
+
+  /// No description provided for @pleaseSelectService.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select at least one service type'**
+  String get pleaseSelectService;
+
+  /// No description provided for @registrationFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration failed. Please try again.'**
+  String get registrationFailed;
+
+  /// No description provided for @stepPersonal.
+  ///
+  /// In en, this message translates to:
+  /// **'Personal'**
+  String get stepPersonal;
+
+  /// No description provided for @stepVehicle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle'**
+  String get stepVehicle;
+
+  /// No description provided for @stepServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get stepServices;
+
+  /// No description provided for @ecoFriendlyOption.
+  ///
+  /// In en, this message translates to:
+  /// **'Eco-friendly option'**
+  String get ecoFriendlyOption;
+
+  /// No description provided for @fastAndAgile.
+  ///
+  /// In en, this message translates to:
+  /// **'Fast and agile'**
+  String get fastAndAgile;
+
+  /// No description provided for @mostVersatile.
+  ///
+  /// In en, this message translates to:
+  /// **'Most versatile'**
+  String get mostVersatile;
+
+  /// No description provided for @largeDeliveries.
+  ///
+  /// In en, this message translates to:
+  /// **'Large deliveries'**
+  String get largeDeliveries;
+
+  /// No description provided for @van.
+  ///
+  /// In en, this message translates to:
+  /// **'Van'**
+  String get van;
+
+  /// No description provided for @deleteDataWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This will permanently delete all your data including profile, ratings, and order history.'**
+  String get deleteDataWarning;
+
+  /// No description provided for @finalConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Final Confirmation'**
+  String get finalConfirmation;
+
+  /// No description provided for @finalDeleteWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you absolutely sure? This action is irreversible and you will lose all your data.'**
+  String get finalDeleteWarning;
+
+  /// No description provided for @deleteMyAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete My Account'**
+  String get deleteMyAccount;
+
+  /// No description provided for @deletingAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Deleting account...'**
+  String get deletingAccount;
+
+  /// No description provided for @accountDeletedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Account deleted successfully'**
+  String get accountDeletedSuccessfully;
+
+  /// No description provided for @failedToDeleteAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete account: {error}'**
+  String failedToDeleteAccount(String error);
+
+  /// No description provided for @justNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get justNow;
+
+  /// No description provided for @minutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes}m ago'**
+  String minutesAgo(int minutes);
+
+  /// No description provided for @hoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours}h ago'**
+  String hoursAgo(int hours);
+
+  /// No description provided for @daysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{days}d ago'**
+  String daysAgo(int days);
+
+  /// No description provided for @clearAllNotificationsConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to clear all notifications?'**
+  String get clearAllNotificationsConfirm;
+
+  /// No description provided for @failedToLoadNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load notifications'**
+  String get failedToLoadNotifications;
+
+  /// No description provided for @calculatingRoute.
+  ///
+  /// In en, this message translates to:
+  /// **'Calculating route...'**
+  String get calculatingRoute;
+
+  /// No description provided for @orderNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Order not found'**
+  String get orderNotFound;
+
+  /// No description provided for @goBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Go Back'**
+  String get goBack;
+
+  /// No description provided for @gpsUnavailableTapRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'GPS unavailable. Tap to retry.'**
+  String get gpsUnavailableTapRetry;
+
+  /// No description provided for @googleMaps.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Maps'**
+  String get googleMaps;
 }
 
 class _AppLocalizationsDelegate
@@ -1846,7 +2166,7 @@ class _AppLocalizationsDelegate
 
   @override
   bool isSupported(Locale locale) =>
-      <String>['de', 'en', 'fr'].contains(locale.languageCode);
+      <String>['ar', 'de', 'en', 'fr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -1855,6 +2175,8 @@ class _AppLocalizationsDelegate
 AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
+    case 'ar':
+      return AppLocalizationsAr();
     case 'de':
       return AppLocalizationsDe();
     case 'en':

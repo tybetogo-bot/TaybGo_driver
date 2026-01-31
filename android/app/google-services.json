@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "356779144732",
+    "project_id": "tybetogodriver",
+    "storage_bucket": "tybetogodriver.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356779144732:android:bc37d5ff8c8466a5bdd1d9",
+        "android_client_info": {
+          "package_name": "com.tybetogo.driver"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyATutMN0TyF1gVEkalzAl7YmgRVHEDsU_E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

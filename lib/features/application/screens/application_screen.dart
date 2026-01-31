@@ -36,11 +36,11 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   bool _isLoading = false;
   String? _error;
 
-  final List<Map<String, dynamic>> _vehicleTypes = [
-    {'value': 'BIKE', 'label': 'Bicycle', 'icon': Icons.pedal_bike, 'description': 'Eco-friendly option'},
-    {'value': 'MOTOR', 'label': 'Motorcycle', 'icon': Icons.two_wheeler, 'description': 'Fast and agile'},
-    {'value': 'CAR', 'label': 'Car', 'icon': Icons.directions_car, 'description': 'Most versatile'},
-    {'value': 'VAN', 'label': 'Van', 'icon': Icons.airport_shuttle, 'description': 'Large deliveries'},
+  List<Map<String, dynamic>> _getVehicleTypes(AppLocalizations l10n) => [
+    {'value': 'BIKE', 'label': l10n.bicycle, 'icon': Icons.pedal_bike, 'description': l10n.ecoFriendlyOption},
+    {'value': 'MOTOR', 'label': l10n.motorcycle, 'icon': Icons.two_wheeler, 'description': l10n.fastAndAgile},
+    {'value': 'CAR', 'label': l10n.car, 'icon': Icons.directions_car, 'description': l10n.mostVersatile},
+    {'value': 'VAN', 'label': l10n.van, 'icon': Icons.airport_shuttle, 'description': l10n.largeDeliveries},
   ];
 
   @override
@@ -54,7 +54,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     if (_currentStep == 0) {
       // Validate personal info
       if (_nameController.text.trim().isEmpty) {
-        setState(() => _error = 'Please enter your name');
+        setState(() => _error = AppLocalizations.of(context)!.pleaseEnterYourName);
         return;
       }
     }
@@ -86,7 +86,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   Future<void> _submit() async {
     // Must select at least one service
     if (!_acceptsFood && !_acceptsShipping && !_acceptsTaxi) {
-      setState(() => _error = 'Please select at least one service type');
+      setState(() => _error = AppLocalizations.of(context)!.pleaseSelectService);
       return;
     }
 
@@ -141,7 +141,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() {
-        _error = 'Registration failed. Please try again.';
+        _error = AppLocalizations.of(context)!.registrationFailed;
         _isLoading = false;
       });
     }
@@ -197,7 +197,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
                     _buildPersonalInfoStep(textColor, secondaryColor, surfaceColor),
-                    _buildVehicleStep(textColor, secondaryColor, surfaceColor),
+                    _buildVehicleStep(textColor, secondaryColor, surfaceColor, l10n),
                     _buildServicesStep(textColor, secondaryColor, surfaceColor, l10n),
                   ],
                 ),
@@ -241,7 +241,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   }
 
   Widget _buildStepIndicator(Color textColor, Color secondaryColor) {
-    final steps = ['Personal', 'Vehicle', 'Services'];
+    final l10n = AppLocalizations.of(context)!;
+    final steps = [l10n.stepPersonal, l10n.stepVehicle, l10n.stepServices];
 
     return Row(
       children: List.generate(steps.length, (index) {
@@ -320,7 +321,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           const SizedBox(height: 8),
           // Header
           Text(
-            'Tell us about yourself',
+            AppLocalizations.of(context)!.tellUsAboutYourself,
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -329,7 +330,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'We need some basic information to set up your driver account',
+            AppLocalizations.of(context)!.basicInfoSubtitle,
             style: TextStyle(fontSize: 15, color: secondaryColor),
           ),
           const SizedBox(height: 32),
@@ -337,8 +338,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           // Name field
           _buildTextField(
             controller: _nameController,
-            label: 'Full Name',
-            hint: 'Enter your full name',
+            label: AppLocalizations.of(context)!.fullName,
+            hint: AppLocalizations.of(context)!.enterYourFullName,
             icon: Icons.person_outline,
             surfaceColor: surfaceColor,
             textColor: textColor,
@@ -348,7 +349,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
           // Phone (read-only)
           Text(
-            'Phone Number',
+            AppLocalizations.of(context)!.phoneNumber,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -379,7 +380,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        phone.isNotEmpty ? phone : 'Not available',
+                        phone.isNotEmpty ? phone : AppLocalizations.of(context)!.notAvailable,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -387,7 +388,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                         ),
                       ),
                       Text(
-                        'Verified via OTP',
+                        AppLocalizations.of(context)!.verifiedViaOtp,
                         style: TextStyle(fontSize: 12, color: AppColors.success),
                       ),
                     ],
@@ -402,7 +403,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     );
   }
 
-  Widget _buildVehicleStep(Color textColor, Color secondaryColor, Color surfaceColor) {
+  Widget _buildVehicleStep(Color textColor, Color secondaryColor, Color surfaceColor, AppLocalizations l10n) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -411,7 +412,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           const SizedBox(height: 8),
           // Header
           Text(
-            'Select your vehicle',
+            l10n.selectYourVehicle,
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -420,14 +421,14 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Choose the type of vehicle you\'ll use for deliveries',
+            l10n.vehicleStepSubtitle,
             style: TextStyle(fontSize: 15, color: secondaryColor),
           ),
           const SizedBox(height: 24),
 
           // Vehicle cards
-          ...List.generate(_vehicleTypes.length, (index) {
-            final vehicle = _vehicleTypes[index];
+          ...List.generate(_getVehicleTypes(l10n).length, (index) {
+            final vehicle = _getVehicleTypes(l10n)[index];
             final isSelected = _selectedVehicle == vehicle['value'];
 
             return Padding(
@@ -456,7 +457,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           const SizedBox(height: 8),
           // Header
           Text(
-            'Choose your services',
+            l10n.chooseYourServices,
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -465,7 +466,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Select the types of deliveries you want to accept',
+            l10n.servicesStepSubtitle,
             style: TextStyle(fontSize: 15, color: secondaryColor),
           ),
           const SizedBox(height: 24),
@@ -473,7 +474,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           // Service cards
           _buildServiceCard(
             title: l10n.foodDelivery,
-            description: 'Deliver food from restaurants',
+            description: l10n.deliverFoodDesc,
             icon: Icons.restaurant_outlined,
             isSelected: _acceptsFood,
             onTap: () => setState(() => _acceptsFood = !_acceptsFood),
@@ -484,7 +485,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           const SizedBox(height: 12),
           _buildServiceCard(
             title: l10n.shipping,
-            description: 'Deliver packages and parcels',
+            description: l10n.deliverPackagesDesc,
             icon: Icons.inventory_2_outlined,
             isSelected: _acceptsShipping,
             onTap: () => setState(() => _acceptsShipping = !_acceptsShipping),
@@ -495,7 +496,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           const SizedBox(height: 12),
           _buildServiceCard(
             title: l10n.taxi,
-            description: 'Transport passengers',
+            description: l10n.transportPassengersDesc,
             icon: Icons.local_taxi_outlined,
             isSelected: _acceptsTaxi,
             onTap: () => setState(() => _acceptsTaxi = !_acceptsTaxi),
@@ -520,7 +521,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'You can change your service preferences later in settings',
+                    l10n.changeServiceLater,
                     style: TextStyle(fontSize: 13, color: textColor),
                   ),
                 ),
@@ -802,7 +803,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                 ),
               ),
               child: Text(
-                'Back',
+                AppLocalizations.of(context)!.back,
                 style: TextStyle(
                   color: textColor,
                   fontWeight: FontWeight.w600,
@@ -839,7 +840,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        isLastStep ? 'Complete Registration' : 'Continue',
+                        isLastStep ? AppLocalizations.of(context)!.completeRegistration : AppLocalizations.of(context)!.continueText,
                         style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,

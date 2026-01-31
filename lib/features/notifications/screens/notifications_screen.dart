@@ -198,7 +198,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Failed to load notifications',
+                l10n.failedToLoadNotifications,
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -218,7 +218,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               ElevatedButton.icon(
                 onPressed: () => provider.fetchNotifications(),
                 icon: const Icon(Icons.refresh),
-                label: const Text('Retry'),
+                label: Text(l10n.retry),
               ),
             ],
           ),
@@ -487,17 +487,18 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   String _formatTimeAgo(DateTime timestamp) {
     final now = DateTime.now();
     final difference = now.difference(timestamp);
+    final l10n = AppLocalizations.of(context)!;
 
     if (difference.inMinutes < 1) {
-      return 'Just now';
+      return l10n.justNow;
     } else if (difference.inMinutes < 60) {
-      return '${difference.inMinutes}m ago';
+      return l10n.minutesAgo(difference.inMinutes);
     } else if (difference.inHours < 24) {
-      return '${difference.inHours}h ago';
+      return l10n.hoursAgo(difference.inHours);
     } else if (difference.inDays == 1) {
-      return 'Yesterday';
+      return l10n.yesterday;
     } else if (difference.inDays < 7) {
-      return '${difference.inDays}d ago';
+      return l10n.daysAgo(difference.inDays);
     } else {
       return '${timestamp.day}/${timestamp.month}/${timestamp.year}';
     }
@@ -508,7 +509,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.clearAll),
-        content: const Text('Are you sure you want to clear all notifications?'),
+        content: Text(l10n.clearAllNotificationsConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

@@ -420,20 +420,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(height: 16),
-            ...['en', 'de', 'fr'].map(
-              (code) => ListTile(
+            ...LocaleProvider.supportedLocales.map(
+              (locale) => ListTile(
                 onTap: () {
-                  localeProvider.setLocale(Locale(code));
+                  localeProvider.setLocale(locale);
                   Navigator.pop(ctx);
                 },
                 leading: Icon(
-                  localeProvider.locale.languageCode == code
+                  localeProvider.locale.languageCode == locale.languageCode
                       ? Icons.radio_button_checked
                       : Icons.radio_button_off,
                   color: AppColors.primary,
                 ),
                 title: Text(
-                  localeProvider.getLanguageName(code),
+                  localeProvider.getLanguageName(locale.languageCode),
                   style: TextStyle(
                     color: isDark ? AppColors.darkText : AppColors.lightText,
                   ),
@@ -599,7 +599,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'This will permanently delete all your data including profile, ratings, and order history.',
+                      l10n.deleteDataWarning,
                       style: TextStyle(
                         fontSize: 13,
                         color: AppColors.error.withValues(alpha: 0.9),
@@ -655,12 +655,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ),
             const SizedBox(width: 12),
-            const Expanded(child: Text('Final Confirmation')),
+            Expanded(child: Text(l10n.finalConfirmation)),
           ],
         ),
-        content: const Text(
-          'Are you absolutely sure? This action is irreversible and you will lose all your data.',
-          style: TextStyle(fontWeight: FontWeight.w500),
+        content: Text(
+          l10n.finalDeleteWarning,
+          style: const TextStyle(fontWeight: FontWeight.w500),
         ),
         actions: [
           TextButton(
@@ -679,9 +679,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 borderRadius: BorderRadius.circular(8),
               ),
             ),
-            child: const Text(
-              'Delete My Account',
-              style: TextStyle(fontWeight: FontWeight.w600),
+            child: Text(
+              l10n.deleteMyAccount,
+              style: const TextStyle(fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -697,16 +697,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (ctx) => const Center(
+      builder: (ctx) => Center(
         child: Card(
           child: Padding(
-            padding: EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(24.0),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                CircularProgressIndicator(),
-                SizedBox(height: 16),
-                Text('Deleting account...'),
+                const CircularProgressIndicator(),
+                const SizedBox(height: 16),
+                Text(l10n.deletingAccount),
               ],
             ),
           ),
@@ -738,8 +738,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       // Show success message
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Account deleted successfully'),
+          SnackBar(
+            content: Text(l10n.accountDeletedSuccessfully),
             backgroundColor: AppColors.success,
           ),
         );
@@ -754,7 +754,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to delete account: ${e.toString()}'),
+            content: Text(l10n.failedToDeleteAccount(e.toString())),
             backgroundColor: AppColors.error,
             duration: const Duration(seconds: 5),
           ),

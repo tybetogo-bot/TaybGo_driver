@@ -78,8 +78,8 @@ class _OtpScreenState extends State<OtpScreen> {
     if (mounted && success) {
       _startTimer();
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('OTP sent successfully'),
+        SnackBar(
+          content: Text(AppLocalizations.of(context)!.otpSentSuccessfully),
           backgroundColor: AppColors.success,
         ),
       );
@@ -298,7 +298,7 @@ class _OtpScreenState extends State<OtpScreen> {
                             Icon(Icons.timer, size: 16, color: secondaryColor),
                             const SizedBox(width: 8),
                             Text(
-                              'Resend in ${_resendSeconds}s',
+                              l10n.resendIn(_resendSeconds),
                               style: TextStyle(fontSize: 14, color: secondaryColor),
                             ),
                           ],
@@ -307,9 +307,9 @@ class _OtpScreenState extends State<OtpScreen> {
                     : TextButton.icon(
                         onPressed: _resendOtp,
                         icon: const Icon(Icons.refresh, size: 18, color: AppColors.primary),
-                        label: const Text(
-                          'Resend code',
-                          style: TextStyle(
+                        label: Text(
+                          l10n.resendCode,
+                          style: const TextStyle(
                             fontSize: 14,
                             color: AppColors.primary,
                             fontWeight: FontWeight.w600,
@@ -336,7 +336,7 @@ class _OtpScreenState extends State<OtpScreen> {
                               child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                             )
                           : const Icon(Icons.check_circle, size: 20),
-                      label: const Text('Verify', style: TextStyle(fontWeight: FontWeight.w600)),
+                      label: Text(l10n.verify, style: const TextStyle(fontWeight: FontWeight.w600)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.primary,
                         foregroundColor: Colors.white,

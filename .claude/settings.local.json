@@ -13,7 +13,10 @@
       "Bash(git commit:*)",
       "Bash(git remote add:*)",
       "Bash(git branch:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(flutter build:*)",
+      "Bash(dir:*)",
+      "Bash(dart run flutter_launcher_icons:*)"
     ]
   }
 }

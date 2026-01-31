@@ -181,6 +181,7 @@
   "english": "Englisch",
   "german": "Deutsch",
   "french": "Französisch",
+  "arabic": "Arabisch",
   "theme": "Design",
   "lightMode": "Heller Modus",
   "darkMode": "Dunkler Modus",
@@ -321,5 +322,83 @@
   "tourCompleteTitle": "Tour abgeschlossen!",
   "tourCompleteDesc": "Sie sind bereit, Bestellungen anzunehmen und mit TypeToGo zu verdienen!",
   "tourBrowseKb": "Wissensdatenbank durchsuchen",
-  "tourGetStarted": "Loslegen"
+  "tourGetStarted": "Loslegen",
+
+  "selectCountry": "Land auswählen",
+  "secure": "Sicher",
+  "wellSendVerificationCode": "Wir senden Ihnen einen Bestätigungscode",
+  "byConsentTerms": "Mit dem Fortfahren stimmen Sie unseren AGB und Datenschutzrichtlinien zu",
+  "otpSentSuccessfully": "Bestätigungscode erfolgreich gesendet",
+  "resendIn": "Erneut senden in {seconds}s",
+  "@resendIn": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "resendCode": "Code erneut senden",
+  "verify": "Bestätigen",
+  "tellUsAboutYourself": "Erzählen Sie uns von sich",
+  "basicInfoSubtitle": "Wir benötigen einige grundlegende Informationen zur Einrichtung Ihres Fahrerkontos",
+  "enterYourFullName": "Geben Sie Ihren vollständigen Namen ein",
+  "notAvailable": "Nicht verfügbar",
+  "verifiedViaOtp": "Per OTP verifiziert",
+  "selectYourVehicle": "Wählen Sie Ihr Fahrzeug",
+  "vehicleStepSubtitle": "Wählen Sie den Fahrzeugtyp, den Sie für Lieferungen verwenden",
+  "chooseYourServices": "Wählen Sie Ihre Dienste",
+  "servicesStepSubtitle": "Wählen Sie die Lieferarten, die Sie annehmen möchten",
+  "deliverFoodDesc": "Essen von Restaurants liefern",
+  "deliverPackagesDesc": "Pakete und Sendungen liefern",
+  "transportPassengersDesc": "Passagiere transportieren",
+  "changeServiceLater": "Sie können Ihre Dienstpräferenzen später in den Einstellungen ändern",
+  "back": "Zurück",
+  "completeRegistration": "Registrierung abschließen",
+  "pleaseEnterYourName": "Bitte geben Sie Ihren Namen ein",
+  "pleaseSelectService": "Bitte wählen Sie mindestens einen Diensttyp",
+  "registrationFailed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
+  "stepPersonal": "Persönlich",
+  "stepVehicle": "Fahrzeug",
+  "stepServices": "Dienste",
+  "ecoFriendlyOption": "Umweltfreundliche Option",
+  "fastAndAgile": "Schnell und wendig",
+  "mostVersatile": "Am vielseitigsten",
+  "largeDeliveries": "Große Lieferungen",
+  "van": "Transporter",
+  "deleteDataWarning": "Dadurch werden alle Ihre Daten dauerhaft gelöscht, einschließlich Profil, Bewertungen und Bestellverlauf.",
+  "finalConfirmation": "Letzte Bestätigung",
+  "finalDeleteWarning": "Sind Sie absolut sicher? Diese Aktion ist unwiderruflich und Sie verlieren alle Ihre Daten.",
+  "deleteMyAccount": "Mein Konto löschen",
+  "deletingAccount": "Konto wird gelöscht...",
+  "accountDeletedSuccessfully": "Konto erfolgreich gelöscht",
+  "failedToDeleteAccount": "Konto konnte nicht gelöscht werden: {error}",
+  "@failedToDeleteAccount": {
+    "placeholders": {
+      "error": {"type": "String"}
+    }
+  },
+  "justNow": "Gerade eben",
+  "minutesAgo": "vor {minutes} Min.",
+  "@minutesAgo": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "hoursAgo": "vor {hours} Std.",
+  "@hoursAgo": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "daysAgo": "vor {days} Tagen",
+  "@daysAgo": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "clearAllNotificationsConfirm": "Sind Sie sicher, dass Sie alle Benachrichtigungen löschen möchten?",
+  "failedToLoadNotifications": "Benachrichtigungen konnten nicht geladen werden",
+  "calculatingRoute": "Route wird berechnet...",
+  "orderNotFound": "Bestellung nicht gefunden",
+  "goBack": "Zurück",
+  "gpsUnavailableTapRetry": "GPS nicht verfügbar. Tippen zum Wiederholen.",
+  "googleMaps": "Google Maps"
 }

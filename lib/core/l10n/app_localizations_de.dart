@@ -506,6 +506,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get french => 'Französisch';
 
   @override
+  String get arabic => 'Arabisch';
+
+  @override
   String get theme => 'Design';
 
   @override
@@ -925,4 +928,183 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get tourGetStarted => 'Loslegen';
+
+  @override
+  String get selectCountry => 'Land auswählen';
+
+  @override
+  String get secure => 'Sicher';
+
+  @override
+  String get wellSendVerificationCode =>
+      'Wir senden Ihnen einen Bestätigungscode';
+
+  @override
+  String get byConsentTerms =>
+      'Mit dem Fortfahren stimmen Sie unseren AGB und Datenschutzrichtlinien zu';
+
+  @override
+  String get otpSentSuccessfully => 'Bestätigungscode erfolgreich gesendet';
+
+  @override
+  String resendIn(int seconds) {
+    return 'Erneut senden in ${seconds}s';
+  }
+
+  @override
+  String get resendCode => 'Code erneut senden';
+
+  @override
+  String get verify => 'Bestätigen';
+
+  @override
+  String get tellUsAboutYourself => 'Erzählen Sie uns von sich';
+
+  @override
+  String get basicInfoSubtitle =>
+      'Wir benötigen einige grundlegende Informationen zur Einrichtung Ihres Fahrerkontos';
+
+  @override
+  String get enterYourFullName => 'Geben Sie Ihren vollständigen Namen ein';
+
+  @override
+  String get notAvailable => 'Nicht verfügbar';
+
+  @override
+  String get verifiedViaOtp => 'Per OTP verifiziert';
+
+  @override
+  String get selectYourVehicle => 'Wählen Sie Ihr Fahrzeug';
+
+  @override
+  String get vehicleStepSubtitle =>
+      'Wählen Sie den Fahrzeugtyp, den Sie für Lieferungen verwenden';
+
+  @override
+  String get chooseYourServices => 'Wählen Sie Ihre Dienste';
+
+  @override
+  String get servicesStepSubtitle =>
+      'Wählen Sie die Lieferarten, die Sie annehmen möchten';
+
+  @override
+  String get deliverFoodDesc => 'Essen von Restaurants liefern';
+
+  @override
+  String get deliverPackagesDesc => 'Pakete und Sendungen liefern';
+
+  @override
+  String get transportPassengersDesc => 'Passagiere transportieren';
+
+  @override
+  String get changeServiceLater =>
+      'Sie können Ihre Dienstpräferenzen später in den Einstellungen ändern';
+
+  @override
+  String get back => 'Zurück';
+
+  @override
+  String get completeRegistration => 'Registrierung abschließen';
+
+  @override
+  String get pleaseEnterYourName => 'Bitte geben Sie Ihren Namen ein';
+
+  @override
+  String get pleaseSelectService =>
+      'Bitte wählen Sie mindestens einen Diensttyp';
+
+  @override
+  String get registrationFailed =>
+      'Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.';
+
+  @override
+  String get stepPersonal => 'Persönlich';
+
+  @override
+  String get stepVehicle => 'Fahrzeug';
+
+  @override
+  String get stepServices => 'Dienste';
+
+  @override
+  String get ecoFriendlyOption => 'Umweltfreundliche Option';
+
+  @override
+  String get fastAndAgile => 'Schnell und wendig';
+
+  @override
+  String get mostVersatile => 'Am vielseitigsten';
+
+  @override
+  String get largeDeliveries => 'Große Lieferungen';
+
+  @override
+  String get van => 'Transporter';
+
+  @override
+  String get deleteDataWarning =>
+      'Dadurch werden alle Ihre Daten dauerhaft gelöscht, einschließlich Profil, Bewertungen und Bestellverlauf.';
+
+  @override
+  String get finalConfirmation => 'Letzte Bestätigung';
+
+  @override
+  String get finalDeleteWarning =>
+      'Sind Sie absolut sicher? Diese Aktion ist unwiderruflich und Sie verlieren alle Ihre Daten.';
+
+  @override
+  String get deleteMyAccount => 'Mein Konto löschen';
+
+  @override
+  String get deletingAccount => 'Konto wird gelöscht...';
+
+  @override
+  String get accountDeletedSuccessfully => 'Konto erfolgreich gelöscht';
+
+  @override
+  String failedToDeleteAccount(String error) {
+    return 'Konto konnte nicht gelöscht werden: $error';
+  }
+
+  @override
+  String get justNow => 'Gerade eben';
+
+  @override
+  String minutesAgo(int minutes) {
+    return 'vor $minutes Min.';
+  }
+
+  @override
+  String hoursAgo(int hours) {
+    return 'vor $hours Std.';
+  }
+
+  @override
+  String daysAgo(int days) {
+    return 'vor $days Tagen';
+  }
+
+  @override
+  String get clearAllNotificationsConfirm =>
+      'Sind Sie sicher, dass Sie alle Benachrichtigungen löschen möchten?';
+
+  @override
+  String get failedToLoadNotifications =>
+      'Benachrichtigungen konnten nicht geladen werden';
+
+  @override
+  String get calculatingRoute => 'Route wird berechnet...';
+
+  @override
+  String get orderNotFound => 'Bestellung nicht gefunden';
+
+  @override
+  String get goBack => 'Zurück';
+
+  @override
+  String get gpsUnavailableTapRetry =>
+      'GPS nicht verfügbar. Tippen zum Wiederholen.';
+
+  @override
+  String get googleMaps => 'Google Maps';
 }

@@ -35,7 +35,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   LatLng? _currentLocation;
   RouteTarget _routeTarget = RouteTarget.pickup;
   List<LatLng> _routePoints = [];
-  String _currentInstruction = 'Calculating route...';
+  String _currentInstruction = '';
   String _distanceRemaining = '--';
   String _timeRemaining = '--';
   bool _isLoading = true;
@@ -405,11 +405,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
             children: [
               Icon(Icons.error_outline, size: 48, color: secondaryColor),
               const SizedBox(height: 12),
-              Text('Order not found', style: TextStyle(color: secondaryColor)),
+              Text(l10n.orderNotFound, style: TextStyle(color: secondaryColor)),
               const SizedBox(height: 16),
               TextButton(
                 onPressed: () => context.pop(),
-                child: const Text('Go Back'),
+                child: Text(l10n.goBack),
               ),
             ],
           ),
@@ -556,7 +556,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                _locationErrorMessage ?? 'GPS unavailable. Tap to retry.',
+                _locationErrorMessage ?? AppLocalizations.of(context)!.gpsUnavailableTapRetry,
                 style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.warning,
@@ -642,7 +642,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  _currentInstruction,
+                  _currentInstruction.isEmpty ? AppLocalizations.of(context)!.calculatingRoute : _currentInstruction,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -833,9 +833,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
             child: OutlinedButton.icon(
               onPressed: _openInExternalMaps,
               icon: const Icon(Icons.map_outlined, size: 18),
-              label: const Text(
-                'Google Maps',
-                style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+              label: Text(
+                AppLocalizations.of(context)!.googleMaps,
+                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
               ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.info,

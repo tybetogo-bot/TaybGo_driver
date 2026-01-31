@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/l10n/app_localizations.dart';
+import '../../../core/constants/route_constants.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../../core/providers/locale_provider.dart';
+import '../../../core/providers/order_provider.dart';
+import '../../../core/providers/tour_provider.dart';
 import '../../../core/theme/app_colors.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -29,6 +32,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final localeProvider = Provider.of<LocaleProvider>(context);
     final l10n = AppLocalizations.of(context)!;
+    final tourProvider = Provider.of<TourProvider>(context, listen: false);
 
     return Scaffold(
       appBar: AppBar(
@@ -82,10 +86,73 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _buildLanguageOption(l10n.german, '\u{1F1E9}\u{1F1EA}', const Locale('de'), localeProvider, textColor, borderColor),
                 Divider(height: 1, indent: 56, color: borderColor),
                 _buildLanguageOption(l10n.french, '\u{1F1EB}\u{1F1F7}', const Locale('fr'), localeProvider, textColor, borderColor),
+                Divider(height: 1, indent: 56, color: borderColor),
+                _buildLanguageOption(l10n.arabic, '\u{1F1F8}\u{1F1E6}', const Locale('ar'), localeProvider, textColor, borderColor),
               ],
             ),
           ),
           const SizedBox(height: 24),
+
+          // Tour (only when driver has no orders yet)
+          Consumer<OrderProvider>(
+            builder: (context, orderProvider, _) {
+              if (orderProvider.totalOrders > 0) {
+                return const SizedBox.shrink();
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(Icons.school_outlined, size: 16, color: secondaryColor),
+                      const SizedBox(width: 6),
+                      Text(l10n.tourWelcomeTitle, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w500, color: secondaryColor)),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    decoration: BoxDecoration(
+                      color: surfaceColor,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: borderColor),
+                    ),
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          l10n.tourWelcomeDesc,
+                          style: TextStyle(fontSize: 13, color: secondaryColor),
+                        ),
+                        const SizedBox(height: 12),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton.icon(
+                            onPressed: () async {
+                              context.go(RouteConstants.home);
+                              await Future.delayed(const Duration(milliseconds: 350));
+                              await tourProvider.startTour();
+                            },
+                            icon: const Icon(Icons.play_arrow),
+                            label: Text(l10n.tourStartBtn),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              );
+            },
+          ),
 
           // Appearance
           Row(
@@ -171,13 +238,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
           Center(
             child: Column(
               children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: Image.asset(
+                    'assets/icons/tybetogo.jpg',
+                    width: 60,
+                    height: 60,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.local_shipping, color: AppColors.primary, size: 24),
+                      );
+                    },
                   ),
-                  child: const Icon(Icons.local_shipping, color: AppColors.primary, size: 24),
                 ),
                 const SizedBox(height: 12),
                 Text(l10n.appName, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: textColor)),

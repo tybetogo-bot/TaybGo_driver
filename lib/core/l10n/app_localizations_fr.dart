@@ -506,6 +506,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get french => 'Français';
 
   @override
+  String get arabic => 'Arabe';
+
+  @override
   String get theme => 'Thème';
 
   @override
@@ -923,4 +926,183 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get tourGetStarted => 'Commencer';
+
+  @override
+  String get selectCountry => 'Sélectionner le pays';
+
+  @override
+  String get secure => 'Sécurisé';
+
+  @override
+  String get wellSendVerificationCode =>
+      'Nous vous enverrons un code de vérification';
+
+  @override
+  String get byConsentTerms =>
+      'En continuant, vous acceptez nos Conditions et Politique de confidentialité';
+
+  @override
+  String get otpSentSuccessfully => 'Code de vérification envoyé avec succès';
+
+  @override
+  String resendIn(int seconds) {
+    return 'Renvoyer dans ${seconds}s';
+  }
+
+  @override
+  String get resendCode => 'Renvoyer le code';
+
+  @override
+  String get verify => 'Vérifier';
+
+  @override
+  String get tellUsAboutYourself => 'Parlez-nous de vous';
+
+  @override
+  String get basicInfoSubtitle =>
+      'Nous avons besoin de quelques informations de base pour configurer votre compte chauffeur';
+
+  @override
+  String get enterYourFullName => 'Entrez votre nom complet';
+
+  @override
+  String get notAvailable => 'Non disponible';
+
+  @override
+  String get verifiedViaOtp => 'Vérifié par OTP';
+
+  @override
+  String get selectYourVehicle => 'Sélectionnez votre véhicule';
+
+  @override
+  String get vehicleStepSubtitle =>
+      'Choisissez le type de véhicule que vous utiliserez pour les livraisons';
+
+  @override
+  String get chooseYourServices => 'Choisissez vos services';
+
+  @override
+  String get servicesStepSubtitle =>
+      'Sélectionnez les types de livraisons que vous souhaitez accepter';
+
+  @override
+  String get deliverFoodDesc => 'Livrer de la nourriture des restaurants';
+
+  @override
+  String get deliverPackagesDesc => 'Livrer des colis et des paquets';
+
+  @override
+  String get transportPassengersDesc => 'Transporter des passagers';
+
+  @override
+  String get changeServiceLater =>
+      'Vous pouvez modifier vos préférences de service plus tard dans les paramètres';
+
+  @override
+  String get back => 'Retour';
+
+  @override
+  String get completeRegistration => 'Terminer l\'inscription';
+
+  @override
+  String get pleaseEnterYourName => 'Veuillez entrer votre nom';
+
+  @override
+  String get pleaseSelectService =>
+      'Veuillez sélectionner au moins un type de service';
+
+  @override
+  String get registrationFailed =>
+      'L\'inscription a échoué. Veuillez réessayer.';
+
+  @override
+  String get stepPersonal => 'Personnel';
+
+  @override
+  String get stepVehicle => 'Véhicule';
+
+  @override
+  String get stepServices => 'Services';
+
+  @override
+  String get ecoFriendlyOption => 'Option écologique';
+
+  @override
+  String get fastAndAgile => 'Rapide et agile';
+
+  @override
+  String get mostVersatile => 'Le plus polyvalent';
+
+  @override
+  String get largeDeliveries => 'Grandes livraisons';
+
+  @override
+  String get van => 'Fourgon';
+
+  @override
+  String get deleteDataWarning =>
+      'Cela supprimera définitivement toutes vos données, y compris le profil, les évaluations et l\'historique des commandes.';
+
+  @override
+  String get finalConfirmation => 'Confirmation finale';
+
+  @override
+  String get finalDeleteWarning =>
+      'Êtes-vous absolument sûr ? Cette action est irréversible et vous perdrez toutes vos données.';
+
+  @override
+  String get deleteMyAccount => 'Supprimer mon compte';
+
+  @override
+  String get deletingAccount => 'Suppression du compte...';
+
+  @override
+  String get accountDeletedSuccessfully => 'Compte supprimé avec succès';
+
+  @override
+  String failedToDeleteAccount(String error) {
+    return 'Échec de la suppression du compte : $error';
+  }
+
+  @override
+  String get justNow => 'À l\'instant';
+
+  @override
+  String minutesAgo(int minutes) {
+    return 'il y a $minutes min';
+  }
+
+  @override
+  String hoursAgo(int hours) {
+    return 'il y a $hours h';
+  }
+
+  @override
+  String daysAgo(int days) {
+    return 'il y a $days j';
+  }
+
+  @override
+  String get clearAllNotificationsConfirm =>
+      'Êtes-vous sûr de vouloir effacer toutes les notifications ?';
+
+  @override
+  String get failedToLoadNotifications =>
+      'Échec du chargement des notifications';
+
+  @override
+  String get calculatingRoute => 'Calcul de l\'itinéraire...';
+
+  @override
+  String get orderNotFound => 'Commande introuvable';
+
+  @override
+  String get goBack => 'Retour';
+
+  @override
+  String get gpsUnavailableTapRetry =>
+      'GPS indisponible. Appuyez pour réessayer.';
+
+  @override
+  String get googleMaps => 'Google Maps';
 }
