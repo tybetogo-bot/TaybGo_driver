@@ -3,18 +3,24 @@ import 'package:flutter/foundation.dart';
 import '../api/api_client.dart';
 import '../models/notification_model.dart';
 import '../services/notification_service.dart';
+import '../services/fcm_service.dart';
 
 class NotificationProvider extends ChangeNotifier {
   final NotificationService _notificationService;
+  final FcmService _fcmService;
 
   List<NotificationModel> _notifications = [];
   bool _isLoading = false;
   String? _error;
   bool _isTokenRegistered = false;
 
-  NotificationProvider({NotificationService? notificationService, ApiClient? apiClient})
-      : _notificationService = notificationService ??
-            NotificationService(apiClient: apiClient ?? ApiClient());
+  NotificationProvider({
+    NotificationService? notificationService,
+    ApiClient? apiClient,
+    FcmService? fcmService,
+  })  : _notificationService = notificationService ??
+            NotificationService(apiClient: apiClient ?? ApiClient()),
+        _fcmService = fcmService ?? FcmService();
 
   List<NotificationModel> get notifications => _notifications;
   bool get isLoading => _isLoading;
@@ -42,6 +48,27 @@ class NotificationProvider extends ChangeNotifier {
     final now = DateTime.now();
     final yesterdayStart = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 1));
     return _notifications.where((n) => n.createdAt.isBefore(yesterdayStart)).toList();
+  }
+
+  /// Retrieve the FCM token, register it with the backend, and listen for refreshes.
+  /// Call this after the user is authenticated.
+  Future<void> initializePushNotifications() async {
+    // Get current token and register
+    final token = await _fcmService.getToken();
+    debugPrint('[NotificationProvider] FCM token retrieved: ${token != null ? '${token.substring(0, 20)}...' : 'NULL'}');
+
+    if (token != null) {
+      final success = await registerDeviceToken(token);
+      debugPrint('[NotificationProvider] Token registration ${success ? 'SUCCEEDED' : 'FAILED'}');
+    } else {
+      debugPrint('[NotificationProvider] WARNING: No FCM token available — push notifications will not work');
+    }
+
+    // Re-register whenever the token rotates
+    _fcmService.onTokenRefresh((newToken) {
+      debugPrint('[NotificationProvider] Token rotated, re-registering...');
+      registerDeviceToken(newToken);
+    });
   }
 
   /// Register FCM device token with the server

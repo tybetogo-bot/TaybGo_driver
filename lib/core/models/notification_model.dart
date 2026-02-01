@@ -2,7 +2,7 @@ class NotificationModel {
   final int id;
   final String title;
   final String body;
-  final String? data;
+  final Map<String, dynamic>? data;
   final bool isRead;
   final DateTime? readAt;
   final DateTime createdAt;
@@ -17,18 +17,34 @@ class NotificationModel {
     required this.createdAt,
   });
 
+  /// Helper to read a value from the data payload
+  String? dataValue(String key) {
+    if (data == null) return null;
+    return data![key]?.toString();
+  }
+
   factory NotificationModel.fromJson(Map<String, dynamic> json) {
+    // data can be a Map, a String, or null from the API
+    Map<String, dynamic>? parsedData;
+    final rawData = json['data'];
+    if (rawData is Map<String, dynamic>) {
+      parsedData = rawData;
+    } else if (rawData is String) {
+      // Legacy: if it was stored as a JSON string, ignore it
+      parsedData = null;
+    }
+
     return NotificationModel(
       id: json['id'] as int,
       title: json['title'] as String? ?? '',
       body: json['body'] as String? ?? '',
-      data: json['data'] as String?,
+      data: parsedData,
       isRead: json['is_read'] as bool? ?? false,
       readAt: json['read_at'] != null
-          ? DateTime.tryParse(json['read_at'] as String)
+          ? DateTime.tryParse(json['read_at'] as String)?.toLocal()
           : null,
       createdAt: json['created_at'] != null
-          ? DateTime.parse(json['created_at'] as String)
+          ? DateTime.parse(json['created_at'] as String).toLocal()
           : DateTime.now(),
     );
   }
@@ -49,7 +65,7 @@ class NotificationModel {
     int? id,
     String? title,
     String? body,
-    String? data,
+    Map<String, dynamic>? data,
     bool? isRead,
     DateTime? readAt,
     DateTime? createdAt,

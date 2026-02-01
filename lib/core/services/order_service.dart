@@ -76,6 +76,12 @@ class OrderService {
           statusCode: 409,
         );
       }
+      if (e.response?.statusCode == 403) {
+        throw ApiException(
+          message: 'Order suggestion expired',
+          statusCode: 403,
+        );
+      }
       if (e.response?.statusCode == 404) {
         throw ApiException(
           message: 'Order not found',
@@ -137,8 +143,9 @@ class OrderService {
       debugPrint('[OrderService] Update Order Status Error: ${e.message}');
       debugPrint('[OrderService] Error Response: ${e.response?.data}');
       if (e.response?.statusCode == 400) {
+        final detail = e.response?.data is Map ? e.response?.data['detail'] : null;
         throw ApiException(
-          message: 'Invalid status transition',
+          message: detail?.toString() ?? 'Invalid status transition',
           statusCode: 400,
         );
       }

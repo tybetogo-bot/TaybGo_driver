@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/driver_provider.dart';
+import '../../../core/providers/notification_provider.dart';
 import '../../../core/providers/order_provider.dart';
 import '../../../core/providers/tour_provider.dart';
 import '../../../core/theme/app_colors.dart';
@@ -20,9 +21,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _pulseController;
-  late Animation<double> _pulseAnimation;
+    with TickerProviderStateMixin {
+  // Slide-in + fade entrance animation
+  late AnimationController _slideController;
+  late Animation<Offset> _slideAnimation;
+  late Animation<double> _fadeAnimation;
+
+  // Glowing border animation
+  late AnimationController _glowController;
+  late Animation<double> _glowAnimation;
+
   bool _showNewOrderAnimation = false;
   bool _isRefreshing = false;
   OrderProvider? _orderProvider;
@@ -33,12 +41,33 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void initState() {
     super.initState();
-    _pulseController = AnimationController(
+
+    // Slide-in from bottom + fade
+    _slideController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 800),
+      duration: const Duration(milliseconds: 500),
     );
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _slideController,
+      curve: Curves.easeOutCubic,
+    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _slideController,
+        curve: const Interval(0.0, 0.7, curve: Curves.easeOut),
+      ),
+    );
+
+    // Glowing border pulse
+    _glowController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1200),
+    );
+    _glowAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _glowController, curve: Curves.easeInOut),
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -52,11 +81,19 @@ class _HomeScreenState extends State<HomeScreen>
 
       _orderProvider!.onNewOrderReceived = _onNewOrder;
 
+      // If there's already a pending order, show card immediately (no animation)
+      if (_orderProvider!.pendingOrder != null) {
+        _slideController.value = 1.0;
+      }
+
       // Fetch order history for recent orders display
       _orderProvider!.fetchOrderHistory();
 
       // Check for any active order (in case app was closed during delivery)
       _orderProvider!.checkActiveOrder();
+
+      // Register FCM token with backend
+      context.read<NotificationProvider>().initializePushNotifications();
 
       // Fetch profile and sync stats to order provider
       driverProvider.fetchProfile().then((_) {
@@ -82,17 +119,82 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _onNewOrder() {
+    // Double-tap haptic pattern
     HapticFeedback.heavyImpact();
-    setState(() => _showNewOrderAnimation = true);
-    _pulseController.repeat(reverse: true);
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) HapticFeedback.mediumImpact();
+    });
 
-    Future.delayed(const Duration(seconds: 3), () {
+    setState(() => _showNewOrderAnimation = true);
+
+    // Slide-in entrance
+    _slideController.forward(from: 0);
+
+    // Glowing border pulse for 6 seconds
+    _glowController.repeat(reverse: true);
+    Future.delayed(const Duration(seconds: 6), () {
       if (mounted) {
-        _pulseController.stop();
-        _pulseController.reset();
+        _glowController.stop();
+        _glowController.value = 0;
         setState(() => _showNewOrderAnimation = false);
       }
     });
+
+    // Show in-app notification banner
+    _showNewOrderBanner();
+  }
+
+  void _showNewOrderBanner() {
+    final l10n = AppLocalizations.of(context)!;
+    final order = _orderProvider?.pendingOrder;
+    if (order == null) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: Colors.white.withValues(alpha: 0.2),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(Icons.local_shipping, color: Colors.white, size: 18),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.newOrderTitle,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: Colors.white,
+                      fontSize: 14,
+                    ),
+                  ),
+                  Text(
+                    '${order.formattedPrice} \u2022 ${order.formattedDistance}',
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: AppColors.primary,
+        behavior: SnackBarBehavior.floating,
+        margin: const EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 8),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        duration: const Duration(seconds: 4),
+        dismissDirection: DismissDirection.up,
+      ),
+    );
   }
 
   String _getGreeting(AppLocalizations l10n) {
@@ -246,7 +348,8 @@ class _HomeScreenState extends State<HomeScreen>
   @override
   void dispose() {
     _orderProvider?.onNewOrderReceived = null;
-    _pulseController.dispose();
+    _slideController.dispose();
+    _glowController.dispose();
     super.dispose();
   }
 
@@ -485,24 +588,27 @@ class _HomeScreenState extends State<HomeScreen>
 
                     const SizedBox(height: 20),
 
-                    // New Order Card
+                    // New Order Card with slide-in + glow animation
                     if (orderProvider.pendingOrder != null)
-                      AnimatedBuilder(
-                        animation: _pulseAnimation,
-                        builder: (context, child) {
-                          return Transform.scale(
-                            scale: _showNewOrderAnimation ? _pulseAnimation.value : 1.0,
-                            child: child,
-                          );
-                        },
-                        child: _buildNewOrderCard(
-                          orderProvider.pendingOrder!,
-                          orderProvider,
-                          textColor,
-                          secondaryColor,
-                          surfaceColor,
-                          borderColor,
-                          l10n,
+                      SlideTransition(
+                        position: _slideAnimation,
+                        child: FadeTransition(
+                          opacity: _fadeAnimation,
+                          child: AnimatedBuilder(
+                            animation: _glowAnimation,
+                            builder: (context, child) {
+                              return child!;
+                            },
+                            child: _buildNewOrderCard(
+                              orderProvider.pendingOrder!,
+                              orderProvider,
+                              textColor,
+                              secondaryColor,
+                              surfaceColor,
+                              borderColor,
+                              l10n,
+                            ),
+                          ),
                         ),
                       ),
 
@@ -675,6 +781,10 @@ class _HomeScreenState extends State<HomeScreen>
     Color borderColor,
     AppLocalizations l10n,
   ) {
+    final glowValue = _showNewOrderAnimation ? _glowAnimation.value : 0.0;
+    final glowOpacity = 0.15 + (glowValue * 0.25); // 0.15 → 0.40
+    final borderWidth = 1.5 + (glowValue * 0.5);   // 1.5 → 2.0
+
     return GestureDetector(
       onTap: () => context.push(RouteConstants.orderDetailPath(order.id)),
       child: Container(
@@ -683,8 +793,20 @@ class _HomeScreenState extends State<HomeScreen>
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: surfaceColor,
-          border: Border.all(color: AppColors.primary, width: 1.5),
+          border: Border.all(
+            color: AppColors.primary,
+            width: borderWidth,
+          ),
           borderRadius: BorderRadius.circular(14),
+          boxShadow: _showNewOrderAnimation
+              ? [
+                  BoxShadow(
+                    color: AppColors.primary.withValues(alpha: glowOpacity),
+                    blurRadius: 12 + (glowValue * 8),
+                    spreadRadius: glowValue * 2,
+                  ),
+                ]
+              : null,
         ),
         child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -832,7 +954,86 @@ class _HomeScreenState extends State<HomeScreen>
             ],
           ),
 
+          // Order items (for food orders)
+          if (order.items.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: borderColor.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.itemsOrdered,
+                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: secondaryColor),
+                  ),
+                  const SizedBox(height: 6),
+                  ...order.items.map((item) => Padding(
+                    padding: const EdgeInsets.only(bottom: 3),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            '${item.quantity}x ${item.name}',
+                            style: TextStyle(fontSize: 13, color: textColor),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        Text(
+                          '\$${(item.price * item.quantity).toStringAsFixed(2)}',
+                          style: TextStyle(fontSize: 13, color: textColor, fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                  )),
+                ],
+              ),
+            ),
+          ],
+
+          // Pricing breakdown
+          const SizedBox(height: 14),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: borderColor.withValues(alpha: 0.3),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Column(
+              children: [
+                if (order.subtotal > 0)
+                  _buildPriceRow('Subtotal', order.formattedSubtotal, secondaryColor),
+                _buildPriceRow(l10n.deliveryFee, order.formattedDeliveryFee, secondaryColor),
+                if (order.tip > 0)
+                  _buildPriceRow(l10n.tip, order.formattedTip, secondaryColor),
+                const Divider(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.total,
+                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: textColor),
+                    ),
+                    Text(
+                      order.formattedTotal,
+                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.primary),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+
           const SizedBox(height: 16),
+
+          // Accept button
           SizedBox(
             width: double.infinity,
             child: ElevatedButton(
@@ -867,6 +1068,19 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ],
       ),
+      ),
+    );
+  }
+
+  Widget _buildPriceRow(String label, String value, Color color) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(label, style: TextStyle(fontSize: 13, color: color)),
+          Text(value, style: TextStyle(fontSize: 13, color: color, fontWeight: FontWeight.w500)),
+        ],
       ),
     );
   }

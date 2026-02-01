@@ -230,6 +230,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 // Customer Info
                 _buildCustomerCard(
                     order, l10n, textColor, secondaryColor, surfaceColor),
+
+                // Order Items (for food orders)
+                if (order.items.isNotEmpty) ...[
+                  const SizedBox(height: 16),
+                  _buildItemsCard(order, l10n, textColor, secondaryColor, surfaceColor),
+                ],
                 const SizedBox(height: 16),
 
                 // Earnings Card
@@ -385,6 +391,35 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       ),
       child: Column(
         children: [
+          // Restaurant name (for food orders)
+          if (order.restaurantName != null && order.restaurantName!.isNotEmpty) ...[
+            Row(
+              children: [
+                Container(
+                  width: 32,
+                  height: 32,
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.restaurant, size: 16, color: AppColors.warning),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    order.restaurantName!,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const Divider(height: 20),
+          ],
+
           // Pickup
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -432,12 +467,33 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     Text(
                       order.pickupCity ?? order.pickupAddress,
                       style: TextStyle(fontSize: 12, color: secondaryColor),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    if (order.pickupAddress.isNotEmpty && order.pickupCity != null)
+                      Text(
+                        order.pickupAddress,
+                        style: TextStyle(fontSize: 11, color: secondaryColor.withValues(alpha: 0.7)),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                   ],
                 ),
               ),
+              // Navigate to pickup
+              if (order.pickupLat != null && order.pickupLng != null)
+                GestureDetector(
+                  onTap: () => _openInGoogleMaps(lat: order.pickupLat!, lng: order.pickupLng!),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.directions, size: 16, color: AppColors.primary),
+                  ),
+                ),
             ],
           ),
 
@@ -482,12 +538,33 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     Text(
                       order.dropoffCity ?? order.dropoffAddress,
                       style: TextStyle(fontSize: 12, color: secondaryColor),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
+                    if (order.dropoffAddress.isNotEmpty && order.dropoffCity != null)
+                      Text(
+                        order.dropoffAddress,
+                        style: TextStyle(fontSize: 11, color: secondaryColor.withValues(alpha: 0.7)),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
                   ],
                 ),
               ),
+              // Navigate to dropoff
+              if (order.dropoffLat != null && order.dropoffLng != null)
+                GestureDetector(
+                  onTap: () => _openInGoogleMaps(lat: order.dropoffLat!, lng: order.dropoffLng!),
+                  child: Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: AppColors.error.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(Icons.directions, size: 16, color: AppColors.error),
+                  ),
+                ),
             ],
           ),
 
@@ -527,6 +604,100 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               color: color,
             ),
           ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildItemsCard(OrderModel order, AppLocalizations l10n,
+      Color textColor, Color secondaryColor, Color surfaceColor) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.shopping_bag_outlined, size: 16, color: secondaryColor),
+              const SizedBox(width: 8),
+              Text(
+                l10n.itemsOrdered,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                ),
+              ),
+              const Spacer(),
+              Text(
+                '${order.items.length} ${l10n.items}',
+                style: TextStyle(fontSize: 12, color: secondaryColor),
+              ),
+            ],
+          ),
+          const Divider(height: 20),
+          ...order.items.map((item) => Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Center(
+                    child: Text(
+                      '${item.quantity}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        item.name,
+                        style: TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: textColor,
+                        ),
+                      ),
+                      if (item.notes != null && item.notes!.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2),
+                          child: Text(
+                            item.notes!,
+                            style: TextStyle(fontSize: 11, color: secondaryColor, fontStyle: FontStyle.italic),
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                Text(
+                  '\$${(item.price * item.quantity).toStringAsFixed(2)}',
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w500,
+                    color: textColor,
+                  ),
+                ),
+              ],
+            ),
+          )),
         ],
       ),
     );
@@ -598,6 +769,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       ),
       child: Column(
         children: [
+          if (order.subtotal > 0) ...[
+            _buildEarningRow('Subtotal', order.formattedSubtotal,
+                secondaryColor, textColor),
+            const SizedBox(height: 10),
+          ],
           _buildEarningRow(l10n.deliveryFee, order.formattedDeliveryFee,
               secondaryColor, textColor),
           const SizedBox(height: 10),
@@ -690,6 +866,26 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             secondaryColor,
             textColor,
           ),
+          if (order.acceptedAt != null) ...[
+            const SizedBox(height: 10),
+            _buildMetaRow(
+              Icons.check_circle_outline,
+              'Accepted',
+              _formatDateTime(order.acceptedAt!),
+              secondaryColor,
+              textColor,
+            ),
+          ],
+          if (order.completedAt != null) ...[
+            const SizedBox(height: 10),
+            _buildMetaRow(
+              Icons.done_all,
+              'Completed',
+              _formatDateTime(order.completedAt!),
+              secondaryColor,
+              textColor,
+            ),
+          ],
           if (order.items.isNotEmpty) ...[
             const SizedBox(height: 10),
             _buildMetaRow(

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import '../api/api_client.dart';
 import '../services/order_service.dart';
 import '../mock/tour_mock_data.dart';
@@ -31,7 +30,8 @@ class OrderProvider extends ChangeNotifier {
 
   // Order history
   List<OrderModel> _orderHistory = [];
-  List<OrderModel> get orderHistory => List.unmodifiable(_orderHistory);
+  List<OrderModel> get orderHistory => List.unmodifiable(
+      _orderHistory.where((o) => !TourMockData.isMockOrder(o.id)));
 
   // Recent completed orders for display (last 3)
   List<OrderModel> get recentOrders => completedOrders.take(3).toList();
@@ -39,16 +39,18 @@ class OrderProvider extends ChangeNotifier {
   // Active orders (ACCEPTED, ON_THE_WAY, DELIVERED status)
   List<OrderModel> get activeOrders => _orderHistory
       .where((order) =>
-          order.status == OrderStatus.accepted ||
+          !TourMockData.isMockOrder(order.id) &&
+          (order.status == OrderStatus.accepted ||
           order.status == OrderStatus.onTheWay ||
-          order.status == OrderStatus.delivered)
+          order.status == OrderStatus.delivered))
       .toList();
 
   // Completed orders (COMPLETED, CANCELLED status) for history
   List<OrderModel> get completedOrders => _orderHistory
       .where((order) =>
-          order.status == OrderStatus.completed ||
-          order.status == OrderStatus.cancelled)
+          !TourMockData.isMockOrder(order.id) &&
+          (order.status == OrderStatus.completed ||
+          order.status == OrderStatus.cancelled))
       .toList();
 
   // Polling and timers
@@ -110,10 +112,7 @@ class OrderProvider extends ChangeNotifier {
       if (orders.isNotEmpty) {
         _pendingOrder = orders.first;
 
-        // Trigger haptic feedback
-        HapticFeedback.heavyImpact();
-
-        // Notify about new order
+        // Notify about new order (haptic handled in UI callback)
         onNewOrderReceived?.call();
 
         // Start accept countdown
@@ -144,6 +143,7 @@ class OrderProvider extends ChangeNotifier {
     if (_pendingOrder == null) return false;
 
     // Tour mode: Simulate acceptance without API call
+    // Do NOT inflate real stats — mock orders are for demonstration only
     if (_isTourActive?.call() == true && TourMockData.isMockOrder(_pendingOrder!.id)) {
       _acceptTimer?.cancel();
 
@@ -151,9 +151,6 @@ class OrderProvider extends ChangeNotifier {
         status: OrderStatus.accepted,
         acceptedAt: DateTime.now(),
       );
-
-      _totalOrders++;
-      _totalEarnings += _pendingOrder!.deliveryFee;
 
       _pendingOrder = null;
       _acceptCountdown = 0;
@@ -187,8 +184,11 @@ class OrderProvider extends ChangeNotifier {
       _error = e.toString();
       _isLoading = false;
 
-      // If order was taken by someone else, clear pending
-      if (e.toString().contains('already taken') || e.toString().contains('409')) {
+      // If order was taken by someone else or suggestion expired, clear pending
+      if (e.toString().contains('already taken') ||
+          e.toString().contains('409') ||
+          e.toString().contains('suggestion expired') ||
+          e.toString().contains('403')) {
         _pendingOrder = null;
         _acceptCountdown = 0;
       }
@@ -219,6 +219,7 @@ class OrderProvider extends ChangeNotifier {
   /// Update order status: ACCEPTED -> ON_THE_WAY
   Future<bool> startDelivery() async {
     if (_activeOrder == null) return false;
+    if (_activeOrder!.status == OrderStatus.onTheWay) return true;
 
     // Tour mode: Simulate status update without API call
     if (_isTourActive?.call() == true && TourMockData.isMockOrder(_activeOrder!.id)) {
@@ -250,6 +251,7 @@ class OrderProvider extends ChangeNotifier {
   /// Update order status: ON_THE_WAY -> DELIVERED
   Future<bool> markDelivered() async {
     if (_activeOrder == null) return false;
+    if (_activeOrder!.status == OrderStatus.delivered) return true;
 
     // Tour mode: Simulate status update without API call
     if (_isTourActive?.call() == true && TourMockData.isMockOrder(_activeOrder!.id)) {
@@ -271,6 +273,15 @@ class OrderProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
+      // If backend says order is already past DELIVERED, sync local state
+      final errorMsg = e.toString().toLowerCase();
+      if (errorMsg.contains('cannot update status from delivered') ||
+          errorMsg.contains('invalid status transition from delivered to delivered')) {
+        _activeOrder = _activeOrder!.copyWith(status: OrderStatus.delivered);
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      }
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
@@ -281,16 +292,16 @@ class OrderProvider extends ChangeNotifier {
   /// Update order status: DELIVERED -> COMPLETED
   Future<bool> completeOrder() async {
     if (_activeOrder == null) return false;
+    if (_activeOrder!.status == OrderStatus.completed) return true;
 
     // Tour mode: Simulate status update without API call
+    // Do NOT add mock orders to history — they are cleaned up by clearMockOrder()
     if (_isTourActive?.call() == true && TourMockData.isMockOrder(_activeOrder!.id)) {
       _activeOrder = _activeOrder!.copyWith(
         status: OrderStatus.completed,
         completedAt: DateTime.now(),
       );
 
-      // Move to history
-      _orderHistory.insert(0, _activeOrder!);
       _activeOrder = null;
       notifyListeners();
       return true;
@@ -313,6 +324,20 @@ class OrderProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
+      // If the backend says the order is already completed, clean up local state
+      final errorMsg = e.toString().toLowerCase();
+      if (errorMsg.contains('cannot update status from completed') ||
+          errorMsg.contains('already completed')) {
+        final completedOrder = _activeOrder!.copyWith(
+          status: OrderStatus.completed,
+          completedAt: DateTime.now(),
+        );
+        _orderHistory.insert(0, completedOrder);
+        _activeOrder = null;
+        _isLoading = false;
+        notifyListeners();
+        return true;
+      }
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
@@ -435,10 +460,15 @@ class OrderProvider extends ChangeNotifier {
   }
 
   /// Get all orders including active order for earnings calculation
+  /// Excludes mock tour orders so they never affect real earnings
   List<OrderModel> get allOrdersForEarnings {
-    final orders = List<OrderModel>.from(_orderHistory);
-    // Add active order if it's not already in history
-    if (_activeOrder != null && !orders.any((o) => o.id == _activeOrder!.id)) {
+    final orders = _orderHistory
+        .where((o) => !TourMockData.isMockOrder(o.id))
+        .toList();
+    // Add active order if it's not already in history and is not a mock order
+    if (_activeOrder != null &&
+        !TourMockData.isMockOrder(_activeOrder!.id) &&
+        !orders.any((o) => o.id == _activeOrder!.id)) {
       orders.insert(0, _activeOrder!);
     }
     return orders;
@@ -469,14 +499,27 @@ class OrderProvider extends ChangeNotifier {
 
   /// Clear mock order from tour
   void clearMockOrder() {
+    bool changed = false;
+
     if (_pendingOrder != null && TourMockData.isMockOrder(_pendingOrder!.id)) {
       _pendingOrder = null;
       _acceptCountdown = 0;
       _acceptTimer?.cancel();
-      notifyListeners();
+      changed = true;
     }
     if (_activeOrder != null && TourMockData.isMockOrder(_activeOrder!.id)) {
       _activeOrder = null;
+      changed = true;
+    }
+
+    // Remove any mock orders that ended up in history (e.g. via completeOrder)
+    final beforeLen = _orderHistory.length;
+    _orderHistory.removeWhere((o) => TourMockData.isMockOrder(o.id));
+    if (_orderHistory.length != beforeLen) {
+      changed = true;
+    }
+
+    if (changed) {
       notifyListeners();
     }
   }
