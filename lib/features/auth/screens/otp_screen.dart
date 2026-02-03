@@ -18,7 +18,8 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
-  final _controller = TextEditingController();
+  final List<TextEditingController> _controllers = List.generate(6, (_) => TextEditingController());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   int _resendSeconds = 30;
   Timer? _timer;
 
@@ -26,12 +27,23 @@ class _OtpScreenState extends State<OtpScreen> {
   void initState() {
     super.initState();
     _startTimer();
+    // Auto-focus first field
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        _focusNodes[0].requestFocus();
+      }
+    });
   }
 
   @override
   void dispose() {
     _timer?.cancel();
-    _controller.dispose();
+    for (var controller in _controllers) {
+      controller.dispose();
+    }
+    for (var focusNode in _focusNodes) {
+      focusNode.dispose();
+    }
     super.dispose();
   }
 
@@ -47,11 +59,37 @@ class _OtpScreenState extends State<OtpScreen> {
     });
   }
 
+  String get _otpCode => _controllers.map((c) => c.text).join();
+
+  void _handlePaste(String pastedText) {
+    // Remove any non-digit characters
+    final digits = pastedText.replaceAll(RegExp(r'\D'), '');
+    if (digits.isEmpty) return;
+
+    // Fill the boxes with the pasted digits
+    for (int i = 0; i < 6 && i < digits.length; i++) {
+      _controllers[i].text = digits[i];
+    }
+
+    // Focus the last filled field or the next empty one
+    final lastIndex = digits.length >= 6 ? 5 : digits.length;
+    if (lastIndex < 6) {
+      _focusNodes[lastIndex].requestFocus();
+    } else {
+      _focusNodes[5].unfocus();
+      // Auto-verify if we have 6 digits
+      if (digits.length >= 6) {
+        setState(() {});
+        _verify();
+      }
+    }
+  }
+
   Future<void> _verify() async {
-    if (_controller.text.length != 6) return;
+    if (_otpCode.length != 6) return;
 
     final authProvider = context.read<AuthProvider>();
-    final success = await authProvider.verifyOtp(_controller.text);
+    final success = await authProvider.verifyOtp(_otpCode);
 
     if (mounted && success) {
       // Check if user needs to complete profile
@@ -146,31 +184,28 @@ class _OtpScreenState extends State<OtpScreen> {
                 ),
               ),
               const SizedBox(height: 12),
+              Text(
+                l10n.enterOtp,
+                style: TextStyle(
+                  fontSize: 15,
+                  color: secondaryColor,
+                  height: 1.5,
+                ),
+              ),
+              const SizedBox(height: 8),
               Row(
                 children: [
-                  Icon(Icons.phone_android, size: 16, color: secondaryColor),
-                  const SizedBox(width: 6),
+                  Icon(Icons.phone_android, size: 16, color: AppColors.primary),
+                  const SizedBox(width: 8),
                   Text(
-                    l10n.enterOtp,
-                    style: TextStyle(fontSize: 14, color: secondaryColor),
+                    widget.phoneNumber,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ],
-              ),
-              const SizedBox(height: 4),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  widget.phoneNumber,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
-                  ),
-                ),
               ),
 
               // Debug OTP display
@@ -215,73 +250,21 @@ class _OtpScreenState extends State<OtpScreen> {
 
               const SizedBox(height: 40),
 
-              // Code input container
-              Container(
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: surfaceColor,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: _controller.text.isNotEmpty ? AppColors.primary.withValues(alpha: 0.3) : borderColor,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    TextField(
-                      controller: _controller,
-                      keyboardType: TextInputType.number,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.w600,
-                        color: textColor,
-                        letterSpacing: 16,
-                      ),
-                      decoration: InputDecoration(
-                        hintText: '000000',
-                        hintStyle: TextStyle(
-                          fontSize: 32,
-                          fontWeight: FontWeight.w400,
-                          color: isDark ? AppColors.darkTextHint : AppColors.lightTextHint,
-                          letterSpacing: 16,
-                        ),
-                        border: InputBorder.none,
-                        enabledBorder: InputBorder.none,
-                        focusedBorder: InputBorder.none,
-                        filled: false,
-                        contentPadding: EdgeInsets.zero,
-                      ),
-                      inputFormatters: [
-                        FilteringTextInputFormatter.digitsOnly,
-                        LengthLimitingTextInputFormatter(6),
-                      ],
-                      onChanged: (value) {
-                        setState(() {});
-                        if (value.length == 6) _verify();
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    // Progress indicator
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: List.generate(6, (index) {
-                        final filled = index < _controller.text.length;
-                        return Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4),
-                          width: 32,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            color: filled ? AppColors.primary : borderColor,
-                            borderRadius: BorderRadius.circular(2),
-                          ),
-                        );
-                      }),
-                    ),
-                  ],
-                ),
+              // OTP Input - Individual digit boxes
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: List.generate(6, (index) {
+                  return _buildOtpBox(
+                    context,
+                    index,
+                    textColor,
+                    surfaceColor,
+                    borderColor,
+                  );
+                }),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 32),
 
               // Resend
               Center(
@@ -328,7 +311,7 @@ class _OtpScreenState extends State<OtpScreen> {
                     width: double.infinity,
                     height: 56,
                     child: ElevatedButton.icon(
-                      onPressed: _controller.text.length == 6 && !isLoading ? _verify : null,
+                      onPressed: _otpCode.length == 6 && !isLoading ? _verify : null,
                       icon: isLoading
                           ? const SizedBox(
                               width: 20,
@@ -349,6 +332,120 @@ class _OtpScreenState extends State<OtpScreen> {
                 },
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildOtpBox(
+    BuildContext context,
+    int index,
+    Color textColor,
+    Color surfaceColor,
+    Color borderColor,
+  ) {
+    final isFilled = _controllers[index].text.isNotEmpty;
+    final isFocused = _focusNodes[index].hasFocus;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    return GestureDetector(
+      onTap: () {
+        _focusNodes[index].requestFocus();
+        // Select all text if filled so typing replaces it
+        if (isFilled) {
+          _controllers[index].selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: _controllers[index].text.length,
+          );
+        }
+      },
+      child: Container(
+        width: 48,
+        height: 56,
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.darkSurface : surfaceColor,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isFocused
+                ? AppColors.primary
+                : isFilled
+                    ? AppColors.primary.withValues(alpha: 0.5)
+                    : borderColor.withValues(alpha: 0.4),
+            width: 2,
+          ),
+        ),
+        child: Center(
+          child: KeyboardListener(
+            focusNode: FocusNode(),
+            onKeyEvent: (event) {
+              if (event is KeyDownEvent &&
+                  event.logicalKey == LogicalKeyboardKey.backspace) {
+                if (_controllers[index].text.isEmpty && index > 0) {
+                  // Move to previous field on backspace if current field is empty
+                  _focusNodes[index - 1].requestFocus();
+                  // Select the text in the previous field
+                  _controllers[index - 1].selection = TextSelection(
+                    baseOffset: 0,
+                    extentOffset: _controllers[index - 1].text.length,
+                  );
+                } else if (_controllers[index].text.isNotEmpty) {
+                  // Clear current field
+                  _controllers[index].clear();
+                  setState(() {});
+                }
+              }
+            },
+            child: TextField(
+              controller: _controllers[index],
+              focusNode: _focusNodes[index],
+              keyboardType: TextInputType.number,
+              textAlign: TextAlign.center,
+              maxLength: 1,
+              autofocus: index == 0,
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: textColor,
+              ),
+              decoration: InputDecoration(
+                counterText: '',
+                border: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                hintText: '·',
+                hintStyle: TextStyle(
+                  fontSize: 24,
+                  color: borderColor.withValues(alpha: 0.5),
+                ),
+                contentPadding: EdgeInsets.zero,
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.digitsOnly,
+              ],
+              onChanged: (value) {
+                // Handle paste - if more than 1 character, treat as paste
+                if (value.length > 1) {
+                  _handlePaste(value);
+                  return;
+                }
+
+                setState(() {});
+                if (value.isNotEmpty) {
+                  // Move to next field
+                  if (index < 5) {
+                    _focusNodes[index + 1].requestFocus();
+                  } else {
+                    // Last field - verify
+                    _focusNodes[index].unfocus();
+                    if (_otpCode.length == 6) {
+                      _verify();
+                    }
+                  }
+                }
+              },
+            ),
           ),
         ),
       ),
