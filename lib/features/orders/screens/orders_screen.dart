@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
@@ -20,6 +22,7 @@ class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   bool _isRefreshing = false;
+  Timer? _refreshTimer;
 
   // Tour keys from singleton
   final _tourKeys = TourKeys.instance;
@@ -28,6 +31,11 @@ class _OrdersScreenState extends State<OrdersScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+
+    // Start auto-refresh every 5 seconds
+    _refreshTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+      context.read<OrderProvider>().fetchOrderHistory();
+    });
   }
 
   Future<void> _refreshData() async {
@@ -43,6 +51,7 @@ class _OrdersScreenState extends State<OrdersScreen>
 
   @override
   void dispose() {
+    _refreshTimer?.cancel();
     _tabController.dispose();
     super.dispose();
   }
@@ -209,6 +218,19 @@ class _OrdersScreenState extends State<OrdersScreen>
       builder: (context, orderProvider, _) {
         final history = orderProvider.orderHistory;
 
+        // Calculate stats from completed orders only
+        final completedOrders = history.where((o) => o.status == OrderStatus.completed).toList();
+        final completedCount = completedOrders.length;
+        final totalDeliveryFees = completedOrders.fold<double>(
+          0.0,
+          (sum, order) => sum + order.deliveryFee,
+        );
+        final totalTips = completedOrders.fold<double>(
+          0.0,
+          (sum, order) => sum + order.tip,
+        );
+        final totalEarnings = totalDeliveryFees + totalTips;
+
         return ListView(
           padding: const EdgeInsets.all(20),
           children: [
@@ -219,38 +241,72 @@ class _OrdersScreenState extends State<OrdersScreen>
                 color: surfaceColor,
                 borderRadius: BorderRadius.circular(14),
               ),
-              child: Row(
+              child: Column(
                 children: [
-                  Expanded(
-                    child: _buildStatItem(
-                      Icons.receipt_long,
-                      '${orderProvider.totalOrders}',
-                      l10n.orders,
-                      AppColors.primary,
-                      textColor,
-                      secondaryColor,
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatItem(
+                          Icons.receipt_long,
+                          '$completedCount',
+                          l10n.orders,
+                          AppColors.primary,
+                          textColor,
+                          secondaryColor,
+                        ),
+                      ),
+                      Container(width: 1, height: 48, color: borderColor),
+                      Expanded(
+                        child: _buildStatItem(
+                          Icons.local_shipping_outlined,
+                          '\$${totalDeliveryFees.toStringAsFixed(2)}',
+                          l10n.deliveryFee,
+                          AppColors.info,
+                          textColor,
+                          secondaryColor,
+                        ),
+                      ),
+                      Container(width: 1, height: 48, color: borderColor),
+                      Expanded(
+                        child: _buildStatItem(
+                          Icons.volunteer_activism,
+                          '\$${totalTips.toStringAsFixed(2)}',
+                          l10n.tip,
+                          AppColors.warning,
+                          textColor,
+                          secondaryColor,
+                        ),
+                      ),
+                    ],
                   ),
-                  Container(width: 1, height: 48, color: borderColor),
-                  Expanded(
-                    child: _buildStatItem(
-                      Icons.attach_money,
-                      '\$${orderProvider.totalEarnings.toStringAsFixed(0)}',
-                      l10n.earnings_label,
-                      AppColors.success,
-                      textColor,
-                      secondaryColor,
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: AppColors.success.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                  ),
-                  Container(width: 1, height: 48, color: borderColor),
-                  Expanded(
-                    child: _buildStatItem(
-                      Icons.schedule,
-                      '22m',
-                      l10n.estimatedTime,
-                      AppColors.info,
-                      textColor,
-                      secondaryColor,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          l10n.total,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: textColor,
+                          ),
+                        ),
+                        Text(
+                          '\$${totalEarnings.toStringAsFixed(2)}',
+                          style: const TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.success,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

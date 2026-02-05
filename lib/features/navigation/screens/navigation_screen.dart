@@ -80,10 +80,16 @@ class _NavigationScreenState extends State<NavigationScreen> {
     }
 
     if (_order != null) {
-      // Set initial route target based on order status
-      if (_order!.status == OrderStatus.onTheWay ||
-          _order!.status == OrderStatus.delivered) {
+      // Set initial route target based on order status:
+      // - Before "on the way" (pending, accepted, etc.) → pickup
+      // - "On the way" or later (delivered, completed) → dropoff
+      final status = _order!.status;
+      if (status == OrderStatus.onTheWay ||
+          status == OrderStatus.delivered ||
+          status == OrderStatus.completed) {
         _routeTarget = RouteTarget.dropoff;
+      } else {
+        _routeTarget = RouteTarget.pickup;
       }
 
       if (_isTourMode) {
@@ -343,6 +349,44 @@ class _NavigationScreenState extends State<NavigationScreen> {
     }
   }
 
+  Future<void> _confirmCompletion(AppLocalizations l10n) async {
+    final order = _order;
+    if (order == null) return;
+
+    final message = !order.isPaid
+        ? '${l10n.collectCashReminder}\n\n${l10n.completeOrderConfirmation}'
+        : l10n.completeOrderConfirmation;
+
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(l10n.completeOrder),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(l10n.cancel),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(l10n.confirm),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true) {
+      _updateOrderStatus(OrderStatus.completed);
+    }
+  }
+
   Future<void> _updateOrderStatus(OrderStatus newStatus) async {
     if (_isUpdating || _order == null) return;
 
@@ -380,7 +424,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
       if (success && newStatus == OrderStatus.completed) {
         context.pop();
       } else if (!success) {
-        final error = orderProvider.error ?? 'Failed to update status';
+        final l10n = AppLocalizations.of(context)!;
+        final error = orderProvider.error ?? l10n.failedToUpdateStatus;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(error), backgroundColor: AppColors.error),
         );
@@ -740,6 +785,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
               _buildDestinationInfo(textColor, secondaryColor, l10n),
               const SizedBox(height: 10),
 
+              // Payment status banner
+              _buildPaymentBanner(order, l10n),
+              const SizedBox(height: 10),
+
               // Action buttons row
               _buildActionButtons(l10n, isPickupPhase),
             ],
@@ -818,6 +867,54 @@ class _NavigationScreenState extends State<NavigationScreen> {
           fontWeight: FontWeight.w600,
           color: color,
         ),
+      ),
+    );
+  }
+
+  Widget _buildPaymentBanner(OrderModel order, AppLocalizations l10n) {
+    final isPaid = order.isPaid;
+    final color = isPaid ? AppColors.success : AppColors.error;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: color.withValues(alpha: 0.3),
+          width: 1,
+        ),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isPaid ? Icons.check_circle : Icons.payments,
+            size: 18,
+            color: color,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            isPaid ? l10n.orderPaid : l10n.collectCash,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              isPaid
+                  ? l10n.orderPaidDescription
+                  : l10n.collectCashReminder,
+              style: TextStyle(
+                fontSize: 11,
+                color: color.withValues(alpha: 0.8),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -1076,7 +1173,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
         text = l10n.orderCompleted;
         icon = Icons.check_circle;
         color = AppColors.success;
-        onPressed = () => _updateOrderStatus(OrderStatus.completed);
+        onPressed = () => _confirmCompletion(l10n);
         break;
       default:
         text = l10n.navigate;

@@ -103,14 +103,32 @@ class OrderProvider extends ChangeNotifier {
 
   /// Fetch suggested orders from API
   Future<void> _fetchSuggestedOrders() async {
+    debugPrint('[OrderProvider] === FETCH SUGGESTED ORDERS ===');
+    debugPrint('[OrderProvider] pendingOrder: ${_pendingOrder?.id}');
+    debugPrint('[OrderProvider] activeOrder: ${_activeOrder?.id}');
+
     // Don't fetch if we already have a pending or active order
-    if (_pendingOrder != null || _activeOrder != null) return;
+    if (_pendingOrder != null || _activeOrder != null) {
+      debugPrint('[OrderProvider] Skipping fetch - already have pending/active order');
+      return;
+    }
 
     try {
+      debugPrint('[OrderProvider] Calling orderService.getSuggestedOrders()...');
       final orders = await _orderService.getSuggestedOrders();
+      debugPrint('[OrderProvider] Received ${orders.length} suggested orders');
 
       if (orders.isNotEmpty) {
         _pendingOrder = orders.first;
+        debugPrint('[OrderProvider] Set pendingOrder: ${_pendingOrder?.id}');
+        debugPrint('[OrderProvider] Order details:');
+        debugPrint('[OrderProvider]   status: ${_pendingOrder?.status}');
+        debugPrint('[OrderProvider]   restaurant: ${_pendingOrder?.restaurantName}');
+        debugPrint('[OrderProvider]   customer: ${_pendingOrder?.customerName}');
+        debugPrint('[OrderProvider]   items: ${_pendingOrder?.items.length}');
+        debugPrint('[OrderProvider]   pickup: ${_pendingOrder?.pickupAddress}');
+        debugPrint('[OrderProvider]   dropoff: ${_pendingOrder?.dropoffAddress}');
+        debugPrint('[OrderProvider]   total: ${_pendingOrder?.total}');
 
         // Notify about new order (haptic handled in UI callback)
         onNewOrderReceived?.call();
@@ -118,9 +136,12 @@ class OrderProvider extends ChangeNotifier {
         // Start accept countdown
         _startAcceptCountdown();
         notifyListeners();
+      } else {
+        debugPrint('[OrderProvider] No suggested orders available');
       }
-    } catch (e) {
-      debugPrint('Error fetching suggested orders: $e');
+    } catch (e, stackTrace) {
+      debugPrint('[OrderProvider] Error fetching suggested orders: $e');
+      debugPrint('[OrderProvider] Stack trace: $stackTrace');
     }
   }
 
@@ -164,16 +185,16 @@ class OrderProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final acceptedOrder = await _orderService.acceptOrder(_pendingOrder!.id);
+      await _orderService.acceptOrder(_pendingOrder!.id);
 
-      _activeOrder = acceptedOrder.copyWith(
+      // Use pending order data and update status locally
+      _activeOrder = _pendingOrder!.copyWith(
         status: OrderStatus.accepted,
         acceptedAt: DateTime.now(),
       );
 
-      // Add earnings when order is accepted (use deliveryFee as driver earnings)
-      _totalOrders++;
-      _totalEarnings += acceptedOrder.deliveryFee;
+      // Note: Stats are updated when order is COMPLETED, not accepted
+      // This ensures only finished deliveries count towards earnings
 
       _pendingOrder = null;
       _acceptCountdown = 0;
@@ -232,11 +253,11 @@ class OrderProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final updatedOrder = await _orderService.updateOrderStatus(
+      final newStatus = await _orderService.updateOrderStatus(
         _activeOrder!.id,
         OrderStatus.onTheWay,
       );
-      _activeOrder = updatedOrder;
+      _activeOrder = _activeOrder!.copyWith(status: newStatus);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -264,11 +285,11 @@ class OrderProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final updatedOrder = await _orderService.updateOrderStatus(
+      final newStatus = await _orderService.updateOrderStatus(
         _activeOrder!.id,
         OrderStatus.delivered,
       );
-      _activeOrder = updatedOrder;
+      _activeOrder = _activeOrder!.copyWith(status: newStatus);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -311,13 +332,25 @@ class OrderProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final updatedOrder = await _orderService.updateOrderStatus(
+      final newStatus = await _orderService.updateOrderStatus(
         _activeOrder!.id,
         OrderStatus.completed,
       );
 
+      // Update local order with completed status
+      final completedOrder = _activeOrder!.copyWith(
+        status: newStatus,
+        completedAt: DateTime.now(),
+      );
+
+      // Remove any existing entry with the same ID to avoid duplicates
+      _orderHistory.removeWhere((o) => o.id == completedOrder.id);
       // Add to history
-      _orderHistory.insert(0, updatedOrder);
+      _orderHistory.insert(0, completedOrder);
+
+      // Update stats when order is COMPLETED (not accepted)
+      _totalOrders++;
+      _totalEarnings += completedOrder.deliveryFee + completedOrder.tip;
 
       _activeOrder = null;
       _isLoading = false;
@@ -332,7 +365,14 @@ class OrderProvider extends ChangeNotifier {
           status: OrderStatus.completed,
           completedAt: DateTime.now(),
         );
+        // Remove any existing entry with the same ID to avoid duplicates
+        _orderHistory.removeWhere((o) => o.id == completedOrder.id);
         _orderHistory.insert(0, completedOrder);
+
+        // Update stats for completed order
+        _totalOrders++;
+        _totalEarnings += completedOrder.deliveryFee + completedOrder.tip;
+
         _activeOrder = null;
         _isLoading = false;
         notifyListeners();
@@ -378,6 +418,32 @@ class OrderProvider extends ChangeNotifier {
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  /// Fetch full order details from /orders/{id}/ endpoint
+  Future<OrderModel?> fetchOrderDetails(String orderId) async {
+    try {
+      final order = await _orderService.getOrderDetails(orderId);
+
+      // Update cached data with the fresh details
+      if (_activeOrder?.id == orderId) {
+        _activeOrder = order;
+      } else if (_pendingOrder?.id == orderId) {
+        _pendingOrder = order;
+      }
+
+      // Update in history list too
+      final historyIndex = _orderHistory.indexWhere((o) => o.id == orderId);
+      if (historyIndex >= 0) {
+        _orderHistory[historyIndex] = order;
+      }
+
+      notifyListeners();
+      return order;
+    } catch (e) {
+      debugPrint('[OrderProvider] Error fetching order details: $e');
+      return null;
     }
   }
 
@@ -448,30 +514,20 @@ class OrderProvider extends ChangeNotifier {
   }
 
   void setStats(int orders, double earnings) {
-    // Add active order earnings to profile stats if there's an active order
-    if (_activeOrder != null) {
-      _totalOrders = orders + 1;
-      _totalEarnings = earnings + _activeOrder!.deliveryFee;
-    } else {
-      _totalOrders = orders;
-      _totalEarnings = earnings;
-    }
+    // Only set stats from completed orders (from profile)
+    // Active orders are not counted until they are completed
+    _totalOrders = orders;
+    _totalEarnings = earnings;
     notifyListeners();
   }
 
-  /// Get all orders including active order for earnings calculation
+  /// Get all COMPLETED orders for earnings calculation
   /// Excludes mock tour orders so they never affect real earnings
+  /// Only returns completed orders - active orders are not counted
   List<OrderModel> get allOrdersForEarnings {
-    final orders = _orderHistory
-        .where((o) => !TourMockData.isMockOrder(o.id))
+    return completedOrders
+        .where((o) => o.status == OrderStatus.completed)
         .toList();
-    // Add active order if it's not already in history and is not a mock order
-    if (_activeOrder != null &&
-        !TourMockData.isMockOrder(_activeOrder!.id) &&
-        !orders.any((o) => o.id == _activeOrder!.id)) {
-      orders.insert(0, _activeOrder!);
-    }
-    return orders;
   }
 
   // ========== Tour Mode Methods ==========

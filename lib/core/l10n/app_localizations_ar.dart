@@ -279,6 +279,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get goOffline => 'قطع الاتصال';
 
   @override
+  String get tapToGoOnline => 'انقر للاتصال';
+
+  @override
+  String get tapToGoOffline => 'انقر لقطع الاتصال';
+
+  @override
   String get youAreOnline => 'أنت متصل وجاهز لاستقبال الطلبات';
 
   @override
@@ -384,6 +390,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get estimatedTime => 'الوقت المقدر';
+
+  @override
+  String get yourDistanceTo => 'المسافة إلى';
 
   @override
   String get km => 'كم';
@@ -1086,4 +1095,39 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get googleMaps => 'خرائط جوجل';
+
+  @override
+  String get fetchingLocation => 'جاري تحديد الموقع...';
+
+  @override
+  String secondsAgo(int seconds) {
+    return 'منذ $seconds ث';
+  }
+
+  @override
+  String get subtotal => 'المجموع الفرعي';
+
+  @override
+  String get orderType => 'النوع';
+
+  @override
+  String get created => 'تم الإنشاء';
+
+  @override
+  String get accepted => 'تم القبول';
+
+  @override
+  String get completed => 'مكتمل';
+
+  @override
+  String get orderPaid => 'مدفوع';
+
+  @override
+  String get orderPaidDescription => 'لا حاجة لتحصيل نقدي';
+
+  @override
+  String get collectCash => 'تحصيل نقدي';
+
+  @override
+  String get collectCashReminder => 'تذكّر تحصيل المبلغ من العميل';
 }

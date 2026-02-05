@@ -42,7 +42,7 @@ class DriverProfile {
     if (totalEarnings >= 1000) {
       return '\$${(totalEarnings / 1000).toStringAsFixed(1)}K';
     }
-    return '\$${totalEarnings.toStringAsFixed(0)}';
+    return '\$${totalEarnings.toStringAsFixed(2)}';
   }
 
   String get memberSince {

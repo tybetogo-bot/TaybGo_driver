@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../api/api_client.dart';
@@ -9,6 +10,22 @@ class OrderService {
 
   OrderService({required ApiClient apiClient}) : _apiClient = apiClient;
 
+  /// Helper to print large JSON objects in chunks (debugPrint truncates at ~1000 chars)
+  void _printFullJson(String prefix, dynamic data) {
+    try {
+      final jsonStr = const JsonEncoder.withIndent('  ').convert(data);
+      final lines = jsonStr.split('\n');
+      debugPrint('$prefix ▼▼▼ FULL JSON START ▼▼▼');
+      for (final line in lines) {
+        debugPrint('$prefix $line');
+      }
+      debugPrint('$prefix ▲▲▲ FULL JSON END ▲▲▲');
+    } catch (e) {
+      debugPrint('$prefix Failed to pretty print JSON: $e');
+      debugPrint('$prefix Raw: $data');
+    }
+  }
+
   /// Fetch suggested orders available for the driver
   Future<List<OrderModel>> getSuggestedOrders() async {
     try {
@@ -19,22 +36,45 @@ class OrderService {
 
       debugPrint('[OrderService] === GET SUGGESTED ORDERS RESPONSE ===');
       debugPrint('[OrderService] Status: ${response.statusCode}');
-      debugPrint('[OrderService] Data: ${response.data}');
+      debugPrint('[OrderService] Response type: ${response.data.runtimeType}');
+      debugPrint('[OrderService] RAW RESPONSE: ${response.data}');
+      _printFullJson('[OrderService]', response.data);
 
       final List<OrderModel> orders = [];
 
       // Handle paginated response
       if (response.data is Map && response.data['results'] != null) {
-        for (final json in response.data['results']) {
+        final results = response.data['results'] as List;
+        debugPrint('[OrderService] Found ${results.length} orders in "results"');
+        if (results.isEmpty) {
+          debugPrint('[OrderService] Results array is EMPTY - no suggested orders available from API');
+        }
+        for (int i = 0; i < results.length; i++) {
+          final json = results[i];
+          debugPrint('[OrderService] *** ORDER $i RAW DATA ***');
+          _printFullJson('[OrderService]', json);
+          // Log items specifically
+          _logItemsField(json, i);
           orders.add(OrderModel.fromJson(json));
         }
       } else if (response.data is List) {
-        for (final json in response.data) {
+        final dataList = response.data as List;
+        debugPrint('[OrderService] Found ${dataList.length} orders in array');
+        if (dataList.isEmpty) {
+          debugPrint('[OrderService] Data array is EMPTY - no suggested orders available from API');
+        }
+        for (int i = 0; i < dataList.length; i++) {
+          final json = dataList[i];
+          debugPrint('[OrderService] *** ORDER $i RAW DATA ***');
+          _printFullJson('[OrderService]', json);
+          _logItemsField(json, i);
           orders.add(OrderModel.fromJson(json));
         }
+      } else {
+        debugPrint('[OrderService] UNEXPECTED RESPONSE FORMAT: ${response.data}');
       }
 
-      debugPrint('[OrderService] Parsed ${orders.length} orders');
+      debugPrint('[OrderService] === SUGGESTED ORDERS RESULT: ${orders.length} orders ===');
       return orders;
     } on DioException catch (e) {
       debugPrint('[OrderService] Get Suggested Orders Error: ${e.message}');
@@ -43,9 +83,31 @@ class OrderService {
     }
   }
 
+  /// Log items field specifically for debugging
+  void _logItemsField(Map<String, dynamic> json, int orderIndex) {
+    debugPrint('[OrderService] --- ORDER $orderIndex ITEMS DEBUG ---');
+    final possibleItemFields = ['items', 'order_items', 'line_items', 'products'];
+    for (final field in possibleItemFields) {
+      if (json[field] != null) {
+        debugPrint('[OrderService] Found "$field" field:');
+        if (json[field] is List) {
+          final items = json[field] as List;
+          debugPrint('[OrderService]   Count: ${items.length}');
+          for (int j = 0; j < items.length; j++) {
+            debugPrint('[OrderService]   Item $j:');
+            _printFullJson('[OrderService]    ', items[j]);
+          }
+        } else {
+          debugPrint('[OrderService]   Value: ${json[field]}');
+        }
+      }
+    }
+    debugPrint('[OrderService] --- END ITEMS DEBUG ---');
+  }
+
   /// Accept an order - uses atomic locking on backend
-  /// Returns the accepted order, or throws on conflict (409)
-  Future<OrderModel> acceptOrder(String orderId) async {
+  /// Throws on conflict (409), expiry (403), or not found (404)
+  Future<void> acceptOrder(String orderId) async {
     try {
       debugPrint('[OrderService] === ACCEPT ORDER REQUEST ===');
       debugPrint('[OrderService] Endpoint: ${ApiConstants.acceptOrder}');
@@ -58,15 +120,9 @@ class OrderService {
 
       debugPrint('[OrderService] === ACCEPT ORDER RESPONSE ===');
       debugPrint('[OrderService] Status: ${response.statusCode}');
-      debugPrint('[OrderService] Data: ${response.data}');
+      _printFullJson('[OrderService]', response.data);
 
-      // Backend may return order details or just confirmation
-      if (response.data is Map && response.data['order'] != null) {
-        return OrderModel.fromJson(response.data['order']);
-      }
-
-      // If no order returned, fetch it
-      return getOrderDetails(orderId);
+      // Success - provider will use pendingOrder data
     } on DioException catch (e) {
       debugPrint('[OrderService] Accept Order Error: ${e.message}');
       debugPrint('[OrderService] Error Response: ${e.response?.data}');
@@ -115,7 +171,8 @@ class OrderService {
   }
 
   /// Update order status (ACCEPTED -> ON_THE_WAY -> DELIVERED -> COMPLETED)
-  Future<OrderModel> updateOrderStatus(String orderId, OrderStatus newStatus) async {
+  /// Returns the new status if successful, throws on error
+  Future<OrderStatus> updateOrderStatus(String orderId, OrderStatus newStatus) async {
     try {
       debugPrint('[OrderService] === UPDATE ORDER STATUS REQUEST ===');
       debugPrint('[OrderService] Endpoint: ${ApiConstants.updateOrderStatus}');
@@ -133,12 +190,13 @@ class OrderService {
       debugPrint('[OrderService] Status: ${response.statusCode}');
       debugPrint('[OrderService] Data: ${response.data}');
 
-      if (response.data is Map && response.data['order'] != null) {
-        return OrderModel.fromJson(response.data['order']);
+      // Backend returns {message, order_id, status} - just return the new status
+      if (response.data is Map && response.data['status'] != null) {
+        return OrderStatus.fromApi(response.data['status']);
       }
 
-      // Return updated order model
-      return getOrderDetails(orderId);
+      // Fallback to the requested status if response doesn't include it
+      return newStatus;
     } on DioException catch (e) {
       debugPrint('[OrderService] Update Order Status Error: ${e.message}');
       debugPrint('[OrderService] Error Response: ${e.response?.data}');
@@ -163,7 +221,13 @@ class OrderService {
 
       debugPrint('[OrderService] === GET ORDER DETAILS RESPONSE ===');
       debugPrint('[OrderService] Status: ${response.statusCode}');
-      debugPrint('[OrderService] Data: ${response.data}');
+      debugPrint('[OrderService] *** SINGLE ORDER RAW DATA ***');
+      _printFullJson('[OrderService]', response.data);
+
+      // Log items specifically
+      if (response.data is Map<String, dynamic>) {
+        _logItemsField(response.data, 0);
+      }
 
       return OrderModel.fromJson(response.data);
     } on DioException catch (e) {
@@ -187,16 +251,26 @@ class OrderService {
 
       debugPrint('[OrderService] === GET ORDER HISTORY RESPONSE ===');
       debugPrint('[OrderService] Status: ${response.statusCode}');
-      debugPrint('[OrderService] Data: ${response.data}');
+      _printFullJson('[OrderService]', response.data);
 
       final List<OrderModel> orders = [];
 
       if (response.data is Map && response.data['results'] != null) {
-        for (final json in response.data['results']) {
+        final results = response.data['results'] as List;
+        debugPrint('[OrderService] Found ${results.length} orders in history "results"');
+        for (int i = 0; i < results.length; i++) {
+          final json = results[i];
+          debugPrint('[OrderService] *** HISTORY ORDER $i RAW DATA ***');
+          _logItemsField(json, i);
           orders.add(OrderModel.fromJson(json));
         }
       } else if (response.data is List) {
-        for (final json in response.data) {
+        final dataList = response.data as List;
+        debugPrint('[OrderService] Found ${dataList.length} orders in history array');
+        for (int i = 0; i < dataList.length; i++) {
+          final json = dataList[i];
+          debugPrint('[OrderService] *** HISTORY ORDER $i RAW DATA ***');
+          _logItemsField(json, i);
           orders.add(OrderModel.fromJson(json));
         }
       }

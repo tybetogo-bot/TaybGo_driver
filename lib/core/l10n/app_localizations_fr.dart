@@ -279,6 +279,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get goOffline => 'Se déconnecter';
 
   @override
+  String get tapToGoOnline => 'Appuyez pour vous connecter';
+
+  @override
+  String get tapToGoOffline => 'Appuyez pour vous déconnecter';
+
+  @override
   String get youAreOnline =>
       'Vous êtes en ligne et prêt à recevoir des commandes';
 
@@ -386,6 +392,9 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get estimatedTime => 'Temps estimé';
+
+  @override
+  String get yourDistanceTo => 'Votre distance à';
 
   @override
   String get km => 'km';
@@ -1105,4 +1114,40 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get googleMaps => 'Google Maps';
+
+  @override
+  String get fetchingLocation => 'Localisation en cours...';
+
+  @override
+  String secondsAgo(int seconds) {
+    return 'il y a ${seconds}s';
+  }
+
+  @override
+  String get subtotal => 'Sous-total';
+
+  @override
+  String get orderType => 'Type';
+
+  @override
+  String get created => 'Créée';
+
+  @override
+  String get accepted => 'Acceptée';
+
+  @override
+  String get completed => 'Terminée';
+
+  @override
+  String get orderPaid => 'Payé';
+
+  @override
+  String get orderPaidDescription => 'Aucun encaissement nécessaire';
+
+  @override
+  String get collectCash => 'Encaisser';
+
+  @override
+  String get collectCashReminder =>
+      'N\'oubliez pas d\'encaisser le paiement du client';
 }

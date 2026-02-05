@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import '../api/api_client.dart';
 import '../models/driver_profile.dart';
@@ -25,7 +27,10 @@ class DriverProvider extends ChangeNotifier {
   String? _error;
   LocationPermissionStatus? _locationStatus;
   String? _currentPlaceName;
+  DateTime? _lastLocationUpdate;
   bool? _profileExists; // null = unknown, true = has profile, false = no profile (needs registration)
+
+  Timer? _forceLocationTimer;
 
   // Tour mode reference (will be set after initialization)
   bool Function()? _isTourActive;
@@ -49,6 +54,7 @@ class DriverProvider extends ChangeNotifier {
   LocationPermissionStatus? get locationStatus => _locationStatus;
   LocationService get locationService => _locationService;
   String? get currentPlaceName => _currentPlaceName;
+  DateTime? get lastLocationUpdate => _lastLocationUpdate;
   /// Returns true if profile exists, false if no profile (403), null if unknown
   bool? get profileExists => _profileExists;
 
@@ -109,108 +115,116 @@ class DriverProvider extends ChangeNotifier {
     }
   }
 
-  /// Toggle online status with location permission check
-  /// Returns ToggleOnlineResult indicating success or specific failure reason
+  /// Toggle online status — independent of location.
+  /// Location tracking starts after going online, not before.
   Future<ToggleOnlineResult> toggleOnline() async {
     if (_profile == null) return ToggleOnlineResult.apiError;
     if (_isLoading) return ToggleOnlineResult.apiError;
 
     final newStatus = !_profile!.isOnline;
 
-    // Tour mode: Simulate toggle without API call or location checks
+    // Tour mode: Simulate toggle without API call
     if (_isTourActive?.call() == true) {
       _profile = _profile!.copyWith(isOnline: newStatus);
       notifyListeners();
       return ToggleOnlineResult.success;
     }
 
-    _isLoading = true;
-    notifyListeners();
-
-    // If going online, check account verification first
+    // Check account verification first
     if (newStatus && !_profile!.isVerified) {
-      _isLoading = false;
-      notifyListeners();
       return ToggleOnlineResult.accountNotVerified;
     }
 
-    // If going online, check location permission first
-    if (newStatus) {
-      final locationResult = await _locationService.getCurrentLocation();
-
-      if (!locationResult.success) {
-        _locationStatus = locationResult.status;
-        _isLoading = false;
-        notifyListeners();
-
-        switch (locationResult.status) {
-          case LocationPermissionStatus.denied:
-            return ToggleOnlineResult.locationDenied;
-          case LocationPermissionStatus.deniedForever:
-            return ToggleOnlineResult.locationDeniedForever;
-          case LocationPermissionStatus.serviceDisabled:
-            return ToggleOnlineResult.locationServiceDisabled;
-          default:
-            return ToggleOnlineResult.apiError;
-        }
-      }
-
-      // Send initial location to server and get place name
-      if (locationResult.position != null) {
-        await updateLocation(
-          locationResult.position!.latitude,
-          locationResult.position!.longitude,
-        );
-        // Also fetch place name for initial location
-        _updatePlaceName(
-          locationResult.position!.latitude,
-          locationResult.position!.longitude,
-        );
-      }
-
-      // Start continuous location updates
-      _locationService.startLocationUpdates(
-        onLocationUpdate: (position) {
-          updateLocation(position.latitude, position.longitude);
-        },
-      );
-    } else {
-      // Going offline - stop location updates and clear place name
-      _locationService.stopLocationUpdates();
-      _currentPlaceName = null;
-      _geocodingService.clearCache();
-    }
-
-    // Optimistic update
+    // Optimistic update — UI flips immediately
     _profile = _profile!.copyWith(isOnline: newStatus);
+    _isLoading = true;
     notifyListeners();
 
     try {
       final confirmedStatus = await _driverService.toggleOnlineStatus(newStatus);
       _profile = _profile!.copyWith(isOnline: confirmedStatus);
-
-      // If API says we're offline but we expected online, stop location updates
-      if (!confirmedStatus && newStatus) {
-        _locationService.stopLocationUpdates();
-      }
-
       _isLoading = false;
       notifyListeners();
+
+      if (confirmedStatus) {
+        // Now online — start location tracking in background
+        _startLocationTracking();
+      } else {
+        // Now offline — stop everything
+        _stopLocationTracking();
+      }
+
       return ToggleOnlineResult.success;
     } catch (e) {
       // Revert on failure
       _profile = _profile!.copyWith(isOnline: !newStatus);
       _error = e.toString();
-
-      // Stop location updates if we failed to go online
-      if (newStatus) {
-        _locationService.stopLocationUpdates();
-      }
-
       _isLoading = false;
       notifyListeners();
       return ToggleOnlineResult.apiError;
     }
+  }
+
+  /// Start location tracking after going online
+  void _startLocationTracking() {
+    // Request permission, then start updates
+    _locationService.checkPermission().then((status) async {
+      if (status != LocationPermissionStatus.granted) {
+        status = await _locationService.requestPermission();
+      }
+      _locationStatus = status;
+
+      if (status != LocationPermissionStatus.granted) {
+        debugPrint('[DriverProvider] Location permission not granted: $status');
+        notifyListeners();
+        return;
+      }
+
+      // Start continuous updates
+      _locationService.startLocationUpdates(
+        onLocationUpdate: (position) async {
+          await updateLocation(position.latitude, position.longitude);
+        },
+        onError: (error) {
+          debugPrint('[DriverProvider] Location update error: $error');
+        },
+      );
+
+      // Also get an immediate fix
+      final result = await _locationService.getCurrentLocation();
+      if (result.success && result.position != null) {
+        await updateLocation(
+          result.position!.latitude,
+          result.position!.longitude,
+        );
+      }
+
+      // Force a location update every 5 minutes even if driver hasn't moved
+      _forceLocationTimer?.cancel();
+      _forceLocationTimer = Timer.periodic(const Duration(minutes: 5), (_) async {
+        if (!(_profile?.isOnline ?? false)) return;
+        final lastUpdate = _lastLocationUpdate;
+        if (lastUpdate != null &&
+            DateTime.now().difference(lastUpdate).inMinutes < 5) {
+          return; // Already updated recently via movement
+        }
+        debugPrint('[DriverProvider] === FORCED 5-MIN LOCATION UPDATE ===');
+        final loc = await _locationService.getCurrentLocation();
+        if (loc.success && loc.position != null) {
+          await updateLocation(loc.position!.latitude, loc.position!.longitude);
+        }
+      });
+    });
+  }
+
+  /// Stop location tracking when going offline
+  void _stopLocationTracking() {
+    _forceLocationTimer?.cancel();
+    _forceLocationTimer = null;
+    _locationService.stopLocationUpdates();
+    _currentPlaceName = null;
+    _lastLocationUpdate = null;
+    _geocodingService.clearCache();
   }
 
   /// Check location permission status without toggling
@@ -230,25 +244,30 @@ class DriverProvider extends ChangeNotifier {
   }
 
   Future<void> updateLocation(double latitude, double longitude) async {
+    debugPrint('[DriverProvider] === SENDING LOCATION TO API ===');
+    debugPrint('[DriverProvider] Coordinates: $latitude, $longitude');
     try {
       await _driverService.updateLocation(
         latitude: latitude,
         longitude: longitude,
       );
+      _lastLocationUpdate = DateTime.now();
+      debugPrint('[DriverProvider] === LOCATION SENT SUCCESSFULLY ===');
 
-      // Update place name (don't await to avoid blocking)
+      // Update place name in background
       _updatePlaceName(latitude, longitude);
+
+      notifyListeners();
     } catch (e) {
-      // Silent fail for location updates
-      debugPrint('Location update failed: $e');
+      debugPrint('[DriverProvider] === LOCATION UPDATE FAILED ===');
+      debugPrint('[DriverProvider] Error: $e');
     }
   }
 
   Future<void> _updatePlaceName(double latitude, double longitude) async {
     final placeName = await _geocodingService.getPlaceName(latitude, longitude);
-    if (placeName != null && placeName != _currentPlaceName) {
+    if (placeName != null) {
       _currentPlaceName = placeName;
-      notifyListeners();
     }
   }
 

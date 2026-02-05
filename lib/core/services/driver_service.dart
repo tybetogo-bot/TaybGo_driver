@@ -96,21 +96,27 @@ class DriverService {
       final lat = double.parse(latitude.toStringAsFixed(6));
       final lng = double.parse(longitude.toStringAsFixed(6));
 
+      final requestData = {
+        'lat': lat,
+        'lng': lng,
+      };
+
       debugPrint('[DriverService] === UPDATE LOCATION REQUEST ===');
-      debugPrint('[DriverService] Endpoint: ${ApiConstants.driverLocation}');
-      debugPrint('[DriverService] Data: {lat: $lat, lng: $lng}');
+      debugPrint('[DriverService] Endpoint: ${ApiConstants.baseUrl}${ApiConstants.driverLocation}');
+      debugPrint('[DriverService] Method: POST');
+      debugPrint('[DriverService] Request Body: $requestData');
 
       final response = await _apiClient.post(
         ApiConstants.driverLocation,
-        data: {
-          'lat': lat,
-          'lng': lng,
-        },
+        data: requestData,
       );
 
       debugPrint('[DriverService] === UPDATE LOCATION RESPONSE ===');
-      debugPrint('[DriverService] Status: ${response.statusCode}');
-      debugPrint('[DriverService] Data: ${response.data}');
+      debugPrint('[DriverService] Status Code: ${response.statusCode}');
+      debugPrint('[DriverService] Status Message: ${response.statusMessage}');
+      debugPrint('[DriverService] Headers: ${response.headers.map}');
+      debugPrint('[DriverService] Raw Data Type: ${response.data.runtimeType}');
+      debugPrint('[DriverService] Raw Data: ${response.data}');
     } on DioException catch (e) {
       debugPrint('[DriverService] Update Location Error: ${e.message}');
       debugPrint('[DriverService] Error Response: ${e.response?.data}');

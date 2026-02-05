@@ -1,5 +1,7 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -7,6 +9,7 @@ import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/order_provider.dart';
 import '../../../core/providers/tour_provider.dart';
+import '../../../core/services/location_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../tour/tour_keys.dart';
 import '../models/order_model.dart';
@@ -29,10 +32,119 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   // Tour keys
   final _tourKeys = TourKeys.instance;
 
+  // Location tracking for driver distance
+  final LocationService _locationService = LocationService();
+  Position? _driverPosition;
+  double? _distanceToTarget;
+  bool _isLoadingLocation = false;
+
   @override
   void initState() {
     super.initState();
     _loadOrder();
+    _startLocationTracking();
+  }
+
+  @override
+  void dispose() {
+    _locationService.stopLocationUpdates();
+    super.dispose();
+  }
+
+  void _startLocationTracking() {
+    // Start tracking driver location for active orders
+    _locationService.startLocationUpdates(
+      onLocationUpdate: (position) {
+        if (mounted) {
+          setState(() {
+            _driverPosition = position;
+            _updateDistanceToTarget();
+          });
+        }
+      },
+      onError: (error) {
+        debugPrint('[OrderDetail] Location error: $error');
+      },
+    );
+
+    // Also get initial location
+    _getInitialLocation();
+  }
+
+  Future<void> _getInitialLocation() async {
+    setState(() => _isLoadingLocation = true);
+    final result = await _locationService.getCurrentLocation();
+    if (mounted && result.success && result.position != null) {
+      setState(() {
+        _driverPosition = result.position;
+        _isLoadingLocation = false;
+        _updateDistanceToTarget();
+      });
+    } else {
+      setState(() => _isLoadingLocation = false);
+    }
+  }
+
+  void _updateDistanceToTarget() {
+    if (_driverPosition == null || _order == null) return;
+
+    double? targetLat;
+    double? targetLng;
+
+    // Determine target based on order status
+    final status = _order!.status;
+
+    // For pending/accepted orders - show distance to pickup
+    if (status == OrderStatus.pending ||
+        status == OrderStatus.searchingForDriver ||
+        status == OrderStatus.driverNotificationSent ||
+        status == OrderStatus.accepted) {
+      targetLat = _order!.pickupLat;
+      targetLng = _order!.pickupLng;
+    }
+    // For on the way/delivered orders - show distance to dropoff
+    else if (status == OrderStatus.onTheWay ||
+        status == OrderStatus.delivered) {
+      targetLat = _order!.dropoffLat;
+      targetLng = _order!.dropoffLng;
+    }
+
+    if (targetLat != null && targetLng != null) {
+      _distanceToTarget = _calculateHaversineDistance(
+        _driverPosition!.latitude,
+        _driverPosition!.longitude,
+        targetLat,
+        targetLng,
+      );
+    }
+  }
+
+  /// Calculate distance between two coordinates using Haversine formula
+  double _calculateHaversineDistance(
+    double lat1,
+    double lon1,
+    double lat2,
+    double lon2,
+  ) {
+    const double earthRadiusKm = 6371.0;
+    final double dLat = _degreesToRadians(lat2 - lat1);
+    final double dLon = _degreesToRadians(lon2 - lon1);
+    final double lat1Rad = _degreesToRadians(lat1);
+    final double lat2Rad = _degreesToRadians(lat2);
+
+    final double a =
+        math.sin(dLat / 2) * math.sin(dLat / 2) +
+        math.cos(lat1Rad) *
+            math.cos(lat2Rad) *
+            math.sin(dLon / 2) *
+            math.sin(dLon / 2);
+    final double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
+
+    return earthRadiusKm * c;
+  }
+
+  double _degreesToRadians(double degrees) {
+    return degrees * (math.pi / 180);
   }
 
   void _loadOrder() {
@@ -71,13 +183,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     // Order not found locally
     setState(() {
       _isLoading = false;
-      _error = 'Order not found';
+      _error = null;
     });
   }
 
-  Future<void> _openInGoogleMaps({required double lat, required double lng}) async {
+  Future<void> _openInGoogleMaps({
+    required double lat,
+    required double lng,
+  }) async {
     final url = Uri.parse(
-      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng'
+      'https://www.google.com/maps/dir/?api=1&destination=$lat,$lng',
     );
     if (await canLaunchUrl(url)) {
       await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -114,7 +229,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           if (newStatus == OrderStatus.completed) {
             _order = _order!.copyWith(status: OrderStatus.completed);
           } else {
-            _order = orderProvider.activeOrder ?? _order!.copyWith(status: newStatus);
+            _order =
+                orderProvider.activeOrder ??
+                _order!.copyWith(status: newStatus);
           }
         }
       });
@@ -125,7 +242,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         }
       } else {
         // Show error message
-        final error = orderProvider.error ?? 'Failed to update status';
+        final l10n = AppLocalizations.of(context)!;
+        final error = orderProvider.error ?? l10n.failedToUpdateStatus;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(error), backgroundColor: AppColors.error),
         );
@@ -145,13 +263,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       setState(() {
         _isUpdating = false;
         if (success) {
-          _order = orderProvider.activeOrder ?? _order!.copyWith(status: OrderStatus.accepted);
+          _order =
+              orderProvider.activeOrder ??
+              _order!.copyWith(status: OrderStatus.accepted);
         }
       });
 
       if (!success) {
         // Show error message
-        final error = orderProvider.error ?? 'Failed to accept order';
+        final l10n = AppLocalizations.of(context)!;
+        final error = orderProvider.error ?? l10n.failedToUpdateStatus;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(error), backgroundColor: AppColors.error),
         );
@@ -163,11 +284,31 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final secondaryColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final secondaryColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
     final bgColor = isDark ? AppColors.darkBg : AppColors.lightBg;
     final l10n = AppLocalizations.of(context)!;
+
+    // Watch the provider and sync order with latest data
+    final orderProvider = context.watch<OrderProvider>();
+    OrderModel? currentOrder;
+    if (orderProvider.activeOrder?.id == widget.orderId) {
+      currentOrder = orderProvider.activeOrder;
+    } else if (orderProvider.pendingOrder?.id == widget.orderId) {
+      currentOrder = orderProvider.pendingOrder;
+    } else {
+      currentOrder = orderProvider.orderHistory
+          .where((o) => o.id == widget.orderId)
+          .firstOrNull;
+    }
+    // Update local state if provider has newer data
+    if (currentOrder != null && currentOrder.status != _order?.status) {
+      _order = currentOrder;
+    }
 
     if (_isLoading) {
       return Scaffold(
@@ -185,11 +326,16 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.receipt_long_outlined,
-                  size: 48, color: secondaryColor.withValues(alpha: 0.5)),
+              Icon(
+                Icons.receipt_long_outlined,
+                size: 48,
+                color: secondaryColor.withValues(alpha: 0.5),
+              ),
               const SizedBox(height: 12),
-              Text(_error ?? l10n.orderNotFound,
-                  style: TextStyle(color: secondaryColor)),
+              Text(
+                _error ?? l10n.orderNotFound,
+                style: TextStyle(color: secondaryColor),
+              ),
             ],
           ),
         ),
@@ -198,10 +344,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
     final order = _order!;
     final isTourActive = context.watch<TourProvider>().isTourActive;
-    final isPending = order.status == OrderStatus.pending ||
+    final isPending =
+        order.status == OrderStatus.pending ||
         order.status == OrderStatus.searchingForDriver ||
         order.status == OrderStatus.driverNotificationSent;
-    final isActive = order.status == OrderStatus.accepted ||
+    final isActive =
+        order.status == OrderStatus.accepted ||
         order.status == OrderStatus.onTheWay ||
         order.status == OrderStatus.delivered;
     final showBottomBar = isPending || isActive;
@@ -218,36 +366,76 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               children: [
                 // Status Badge
                 _buildStatusBadge(order, l10n),
-                const SizedBox(height: 20),
+                const SizedBox(height: 12),
 
                 // Route Card
                 Container(
                   key: isTourActive ? _tourKeys.orderDetailRouteCardKey : null,
-                  child: _buildRouteCard(order, l10n, textColor, secondaryColor, surfaceColor),
+                  child: _buildRouteCard(
+                    order,
+                    l10n,
+                    textColor,
+                    secondaryColor,
+                    surfaceColor,
+                  ),
                 ),
                 const SizedBox(height: 16),
 
                 // Customer Info
                 _buildCustomerCard(
-                    order, l10n, textColor, secondaryColor, surfaceColor),
+                  order,
+                  l10n,
+                  textColor,
+                  secondaryColor,
+                  surfaceColor,
+                ),
 
                 // Order Items (for food orders)
                 if (order.items.isNotEmpty) ...[
                   const SizedBox(height: 16),
-                  _buildItemsCard(order, l10n, textColor, secondaryColor, surfaceColor),
+                  _buildItemsCard(
+                    order,
+                    l10n,
+                    textColor,
+                    secondaryColor,
+                    surfaceColor,
+                  ),
                 ],
                 const SizedBox(height: 16),
 
                 // Earnings Card
                 Container(
-                  key: isTourActive ? _tourKeys.orderDetailEarningsCardKey : null,
+                  key: isTourActive
+                      ? _tourKeys.orderDetailEarningsCardKey
+                      : null,
                   child: _buildEarningsCard(
-                      order, l10n, textColor, secondaryColor, surfaceColor),
+                    order,
+                    l10n,
+                    textColor,
+                    secondaryColor,
+                    surfaceColor,
+                  ),
+                ),
+                const SizedBox(height: 12),
+
+                // Payment Status Section
+                _buildPaymentBanner(
+                  order,
+                  l10n,
+                  textColor,
+                  secondaryColor,
+                  surfaceColor,
                 ),
                 const SizedBox(height: 16),
 
                 // Order Meta
-                _buildMetaCard(order, l10n, textColor, secondaryColor, surfaceColor),
+                _buildMetaCard(
+                  order,
+                  l10n,
+                  textColor,
+                  secondaryColor,
+                  surfaceColor,
+                ),
 
                 const SizedBox(height: 100),
               ],
@@ -256,7 +444,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           bottomNavigationBar: showBottomBar
               ? Container(
                   key: isTourActive ? _tourKeys.orderDetailBottomBarKey : null,
-                  child: _buildBottomBar(context, order, l10n, surfaceColor, isPending),
+                  child: _buildBottomBar(
+                    context,
+                    order,
+                    l10n,
+                    surfaceColor,
+                    isPending,
+                  ),
                 )
               : null,
         ),
@@ -265,28 +459,29 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           Container(
             color: Colors.black.withValues(alpha: 0.5),
             child: Center(
-              child: Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: surfaceColor,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircularProgressIndicator(
-                      color: AppColors.primary,
-                    ),
-                    const SizedBox(height: 16),
-                    Text(
-                      l10n.updatingStatus,
-                      style: TextStyle(
-                        color: textColor,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: surfaceColor,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const CircularProgressIndicator(color: AppColors.primary),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.updatingStatus,
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -296,7 +491,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   PreferredSizeWidget _buildAppBar(
-      BuildContext context, AppLocalizations l10n, Color textColor) {
+    BuildContext context,
+    AppLocalizations l10n,
+    Color textColor,
+  ) {
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -381,8 +579,62 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  Widget _buildRouteCard(OrderModel order, AppLocalizations l10n,
-      Color textColor, Color secondaryColor, Color surfaceColor) {
+  Widget _buildPaymentBanner(
+    OrderModel order,
+    AppLocalizations l10n,
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+  ) {
+    final isPaid = order.isPaid;
+    final color = isPaid ? AppColors.success : AppColors.error;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
+      ),
+      child: Row(
+        children: [
+          Icon(
+            isPaid ? Icons.check_circle : Icons.payments,
+            size: 18,
+            color: color,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            isPaid ? l10n.orderPaid : l10n.collectCash,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+          const SizedBox(width: 6),
+          Expanded(
+            child: Text(
+              isPaid ? l10n.orderPaidDescription : l10n.collectCashReminder,
+              style: TextStyle(
+                fontSize: 11,
+                color: color.withValues(alpha: 0.8),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRouteCard(
+    OrderModel order,
+    AppLocalizations l10n,
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -392,7 +644,8 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: Column(
         children: [
           // Restaurant name (for food orders)
-          if (order.restaurantName != null && order.restaurantName!.isNotEmpty) ...[
+          if (order.restaurantName != null &&
+              order.restaurantName!.isNotEmpty) ...[
             Row(
               children: [
                 Container(
@@ -402,7 +655,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     color: AppColors.warning.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.restaurant, size: 16, color: AppColors.warning),
+                  child: const Icon(
+                    Icons.restaurant,
+                    size: 16,
+                    color: AppColors.warning,
+                  ),
                 ),
                 const SizedBox(width: 10),
                 Expanded(
@@ -470,10 +727,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (order.pickupAddress.isNotEmpty && order.pickupCity != null)
+                    if (order.pickupAddress.isNotEmpty &&
+                        order.pickupCity != null)
                       Text(
                         order.pickupAddress,
-                        style: TextStyle(fontSize: 11, color: secondaryColor.withValues(alpha: 0.7)),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: secondaryColor.withValues(alpha: 0.7),
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -483,7 +744,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               // Navigate to pickup
               if (order.pickupLat != null && order.pickupLng != null)
                 GestureDetector(
-                  onTap: () => _openInGoogleMaps(lat: order.pickupLat!, lng: order.pickupLng!),
+                  onTap: () => _openInGoogleMaps(
+                    lat: order.pickupLat!,
+                    lng: order.pickupLng!,
+                  ),
                   child: Container(
                     width: 32,
                     height: 32,
@@ -491,7 +755,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.directions, size: 16, color: AppColors.primary),
+                    child: const Icon(
+                      Icons.directions,
+                      size: 16,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
             ],
@@ -541,10 +809,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (order.dropoffAddress.isNotEmpty && order.dropoffCity != null)
+                    if (order.dropoffAddress.isNotEmpty &&
+                        order.dropoffCity != null)
                       Text(
                         order.dropoffAddress,
-                        style: TextStyle(fontSize: 11, color: secondaryColor.withValues(alpha: 0.7)),
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: secondaryColor.withValues(alpha: 0.7),
+                        ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -554,7 +826,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               // Navigate to dropoff
               if (order.dropoffLat != null && order.dropoffLng != null)
                 GestureDetector(
-                  onTap: () => _openInGoogleMaps(lat: order.dropoffLat!, lng: order.dropoffLng!),
+                  onTap: () => _openInGoogleMaps(
+                    lat: order.dropoffLat!,
+                    lng: order.dropoffLng!,
+                  ),
                   child: Container(
                     width: 32,
                     height: 32,
@@ -562,46 +837,199 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                       color: AppColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.directions, size: 16, color: AppColors.error),
+                    child: const Icon(
+                      Icons.directions,
+                      size: 16,
+                      color: AppColors.error,
+                    ),
                   ),
                 ),
             ],
           ),
 
           const SizedBox(height: 12),
-          // Distance & Time row
-          Row(
-            children: [
-              _buildInfoChip(
-                  Icons.route, order.formattedDistance, AppColors.info),
-              const SizedBox(width: 8),
-              _buildInfoChip(Icons.schedule, '~${order.estimatedMinutes} ${l10n.min}',
-                  AppColors.warning),
-            ],
+          // Distance & Time row - shows pickup to dropoff
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.info.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color: AppColors.info.withValues(alpha: 0.2),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.route, size: 18, color: AppColors.info),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        '${l10n.pickup} → ${l10n.dropoff}',
+                        style: TextStyle(fontSize: 11, color: secondaryColor),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        order.formattedDistance,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: 1,
+                  height: 30,
+                  color: secondaryColor.withValues(alpha: 0.2),
+                ),
+                const SizedBox(width: 12),
+                Icon(Icons.schedule, size: 18, color: AppColors.warning),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.estimatedTime,
+                        style: TextStyle(fontSize: 11, color: secondaryColor),
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        '~${order.estimatedMinutes} ${l10n.min}',
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
+
+          // Driver's current distance to target (show for all non-completed orders)
+          if (_distanceToTarget != null &&
+              order.status != OrderStatus.completed &&
+              order.status != OrderStatus.cancelled &&
+              order.status != OrderStatus.rejected) ...[
+            const SizedBox(height: 10),
+            _buildDriverDistanceWidget(order, l10n, textColor, secondaryColor),
+          ],
         ],
       ),
     );
   }
 
-  Widget _buildInfoChip(IconData icon, String text, Color color) {
+  Widget _buildDriverDistanceWidget(
+    OrderModel order,
+    AppLocalizations l10n,
+    Color textColor,
+    Color secondaryColor,
+  ) {
+    // Pending and accepted orders show distance to pickup
+    final isGoingToPickup =
+        order.status == OrderStatus.pending ||
+        order.status == OrderStatus.searchingForDriver ||
+        order.status == OrderStatus.driverNotificationSent ||
+        order.status == OrderStatus.accepted;
+    final targetLabel = isGoingToPickup ? l10n.pickup : l10n.dropoff;
+    final targetIcon = isGoingToPickup ? Icons.store : Icons.person_pin_circle;
+    final targetColor = isGoingToPickup ? AppColors.primary : AppColors.success;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(6),
+        gradient: LinearGradient(
+          colors: [
+            targetColor.withValues(alpha: 0.1),
+            targetColor.withValues(alpha: 0.05),
+          ],
+          begin: Alignment.centerLeft,
+          end: Alignment.centerRight,
+        ),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: targetColor.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 14, color: color),
-          const SizedBox(width: 4),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-              color: color,
+          Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              color: targetColor.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.my_location, size: 16, color: targetColor),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      l10n.yourDistanceTo,
+                      style: TextStyle(fontSize: 11, color: secondaryColor),
+                    ),
+                    const SizedBox(width: 4),
+                    Icon(targetIcon, size: 12, color: targetColor),
+                    const SizedBox(width: 2),
+                    Text(
+                      targetLabel,
+                      style: TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: targetColor,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  _isLoadingLocation
+                      ? '...'
+                      : '${_distanceToTarget!.toStringAsFixed(1)} km',
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    color: textColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // Refresh button
+          GestureDetector(
+            onTap: _isLoadingLocation ? null : _getInitialLocation,
+            child: Container(
+              width: 32,
+              height: 32,
+              decoration: BoxDecoration(
+                color: secondaryColor.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: _isLoadingLocation
+                  ? const Padding(
+                      padding: EdgeInsets.all(9),
+                      child: SizedBox(
+                        width: 14,
+                        height: 14,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    )
+                  : Icon(Icons.refresh, size: 16, color: secondaryColor),
             ),
           ),
         ],
@@ -609,8 +1037,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  Widget _buildItemsCard(OrderModel order, AppLocalizations l10n,
-      Color textColor, Color secondaryColor, Color surfaceColor) {
+  Widget _buildItemsCard(
+    OrderModel order,
+    AppLocalizations l10n,
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -622,7 +1055,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         children: [
           Row(
             children: [
-              Icon(Icons.shopping_bag_outlined, size: 16, color: secondaryColor),
+              Icon(
+                Icons.shopping_bag_outlined,
+                size: 16,
+                color: secondaryColor,
+              ),
               const SizedBox(width: 8),
               Text(
                 l10n.itemsOrdered,
@@ -640,71 +1077,83 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ],
           ),
           const Divider(height: 20),
-          ...order.items.map((item) => Padding(
-            padding: const EdgeInsets.only(bottom: 8),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Center(
-                    child: Text(
-                      '${item.quantity}',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
+          ...order.items.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 24,
+                    height: 24,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Center(
+                      child: Text(
+                        '${item.quantity}',
+                        style: const TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.primary,
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 10),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        item.name,
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: textColor,
-                        ),
-                      ),
-                      if (item.notes != null && item.notes!.isNotEmpty)
-                        Padding(
-                          padding: const EdgeInsets.only(top: 2),
-                          child: Text(
-                            item.notes!,
-                            style: TextStyle(fontSize: 11, color: secondaryColor, fontStyle: FontStyle.italic),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          item.name,
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: textColor,
                           ),
                         ),
-                    ],
+                        if (item.notes != null && item.notes!.isNotEmpty)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2),
+                            child: Text(
+                              item.notes!,
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: secondaryColor,
+                                fontStyle: FontStyle.italic,
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
-                ),
-                Text(
-                  '\$${(item.price * item.quantity).toStringAsFixed(2)}',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    color: textColor,
-                  ),
-                ),
-              ],
+                  if (item.price > 0)
+                    Text(
+                      '\$${(item.price * item.quantity).toStringAsFixed(2)}',
+                      style: TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
+                      ),
+                    ),
+                ],
+              ),
             ),
-          )),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildCustomerCard(OrderModel order, AppLocalizations l10n,
-      Color textColor, Color secondaryColor, Color surfaceColor) {
+  Widget _buildCustomerCard(
+    OrderModel order,
+    AppLocalizations l10n,
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -751,16 +1200,24 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 color: AppColors.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child:
-                  const Icon(Icons.phone, color: AppColors.success, size: 18),
+              child: const Icon(
+                Icons.phone,
+                color: AppColors.success,
+                size: 18,
+              ),
             ),
         ],
       ),
     );
   }
 
-  Widget _buildEarningsCard(OrderModel order, AppLocalizations l10n,
-      Color textColor, Color secondaryColor, Color surfaceColor) {
+  Widget _buildEarningsCard(
+    OrderModel order,
+    AppLocalizations l10n,
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -770,15 +1227,27 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: Column(
         children: [
           if (order.subtotal > 0) ...[
-            _buildEarningRow('Subtotal', order.formattedSubtotal,
-                secondaryColor, textColor),
+            _buildEarningRow(
+              l10n.subtotal,
+              order.formattedSubtotal,
+              secondaryColor,
+              textColor,
+            ),
             const SizedBox(height: 10),
           ],
-          _buildEarningRow(l10n.deliveryFee, order.formattedDeliveryFee,
-              secondaryColor, textColor),
+          _buildEarningRow(
+            l10n.deliveryFee,
+            order.formattedDeliveryFee,
+            secondaryColor,
+            textColor,
+          ),
           const SizedBox(height: 10),
           _buildEarningRow(
-              l10n.tip, order.formattedTip, secondaryColor, textColor),
+            l10n.tip,
+            order.formattedTip,
+            secondaryColor,
+            textColor,
+          ),
           const Padding(
             padding: EdgeInsets.symmetric(vertical: 10),
             child: Divider(height: 1),
@@ -810,7 +1279,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   }
 
   Widget _buildEarningRow(
-      String label, String value, Color secondaryColor, Color textColor) {
+    String label,
+    String value,
+    Color secondaryColor,
+    Color textColor,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -818,14 +1291,22 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         Text(
           value,
           style: TextStyle(
-              fontSize: 13, fontWeight: FontWeight.w500, color: textColor),
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: textColor,
+          ),
         ),
       ],
     );
   }
 
-  Widget _buildMetaCard(OrderModel order, AppLocalizations l10n,
-      Color textColor, Color secondaryColor, Color surfaceColor) {
+  Widget _buildMetaCard(
+    OrderModel order,
+    AppLocalizations l10n,
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -853,7 +1334,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           const SizedBox(height: 10),
           _buildMetaRow(
             Icons.category,
-            'Type',
+            l10n.orderType,
             order.orderType.name.toUpperCase(),
             secondaryColor,
             textColor,
@@ -861,7 +1342,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           const SizedBox(height: 10),
           _buildMetaRow(
             Icons.access_time,
-            'Created',
+            l10n.created,
             _formatDateTime(order.createdAt),
             secondaryColor,
             textColor,
@@ -870,7 +1351,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             const SizedBox(height: 10),
             _buildMetaRow(
               Icons.check_circle_outline,
-              'Accepted',
+              l10n.accepted,
               _formatDateTime(order.acceptedAt!),
               secondaryColor,
               textColor,
@@ -880,7 +1361,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             const SizedBox(height: 10),
             _buildMetaRow(
               Icons.done_all,
-              'Completed',
+              l10n.completed,
               _formatDateTime(order.completedAt!),
               secondaryColor,
               textColor,
@@ -901,9 +1382,14 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
-  Widget _buildMetaRow(IconData icon, String label, String value,
-      Color secondaryColor, Color textColor,
-      {VoidCallback? onTap}) {
+  Widget _buildMetaRow(
+    IconData icon,
+    String label,
+    String value,
+    Color secondaryColor,
+    Color textColor, {
+    VoidCallback? onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Row(
@@ -948,7 +1434,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
+        backgroundColor: isDark
+            ? AppColors.darkSurface
+            : AppColors.lightSurface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Text(title),
         content: Text(message),
@@ -974,8 +1462,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
   }
 
-  Widget _buildBottomBar(BuildContext context, OrderModel order,
-      AppLocalizations l10n, Color surfaceColor, bool isPending) {
+  Widget _buildBottomBar(
+    BuildContext context,
+    OrderModel order,
+    AppLocalizations l10n,
+    Color surfaceColor,
+    bool isPending,
+  ) {
     // Determine which action button to show based on status
     String actionText;
     String confirmTitle;
@@ -1012,7 +1505,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         case OrderStatus.delivered:
           actionText = l10n.orderCompleted;
           confirmTitle = l10n.completeOrder;
-          confirmMessage = l10n.completeOrderConfirmation;
+          confirmMessage = !order.isPaid
+              ? '${l10n.collectCashReminder}\n\n${l10n.completeOrderConfirmation}'
+              : l10n.completeOrderConfirmation;
           actionIcon = Icons.check_circle;
           nextStatus = OrderStatus.completed;
           actionColor = AppColors.success;
@@ -1065,15 +1560,25 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         child: SizedBox(
                           height: 46,
                           child: OutlinedButton.icon(
-                            onPressed: () => context.push(RouteConstants.navigationPath(order.id)),
-                            icon: const Icon(Icons.navigation_outlined, size: 18),
-                            label: Text(l10n.navigate,
-                                style: const TextStyle(fontWeight: FontWeight.w600)),
+                            onPressed: () => context.push(
+                              RouteConstants.navigationPath(order.id),
+                            ),
+                            icon: const Icon(
+                              Icons.navigation_outlined,
+                              size: 18,
+                            ),
+                            label: Text(
+                              l10n.navigate,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.primary,
                               side: const BorderSide(color: AppColors.primary),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           ),
                         ),
@@ -1084,15 +1589,23 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                         child: SizedBox(
                           height: 46,
                           child: OutlinedButton.icon(
-                            onPressed: () => _openInGoogleMaps(lat: targetLat!, lng: targetLng!),
+                            onPressed: () => _openInGoogleMaps(
+                              lat: targetLat!,
+                              lng: targetLng!,
+                            ),
                             icon: const Icon(Icons.map_outlined, size: 18),
-                            label: Text(l10n.googleMaps,
-                                style: const TextStyle(fontWeight: FontWeight.w600)),
+                            label: Text(
+                              l10n.googleMaps,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                             style: OutlinedButton.styleFrom(
                               foregroundColor: AppColors.info,
                               side: const BorderSide(color: AppColors.info),
                               shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(10)),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
                             ),
                           ),
                         ),
@@ -1131,14 +1644,17 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           ),
                         )
                       : Icon(actionIcon, size: 20),
-                  label: Text(actionText,
-                      style: const TextStyle(fontWeight: FontWeight.w600)),
+                  label: Text(
+                    actionText,
+                    style: const TextStyle(fontWeight: FontWeight.w600),
+                  ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: actionColor,
                     foregroundColor: Colors.white,
                     elevation: 0,
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ),

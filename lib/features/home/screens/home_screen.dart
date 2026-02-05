@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/route_constants.dart';
@@ -8,6 +11,7 @@ import '../../../core/providers/driver_provider.dart';
 import '../../../core/providers/notification_provider.dart';
 import '../../../core/providers/order_provider.dart';
 import '../../../core/providers/tour_provider.dart';
+import '../../../core/services/location_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../orders/models/order_model.dart';
 import '../../tour/widgets/tour_welcome_card.dart';
@@ -34,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen>
   bool _showNewOrderAnimation = false;
   bool _isRefreshing = false;
   OrderProvider? _orderProvider;
+  Timer? _refreshTimer;
 
   // Tour keys from singleton
   final _tourKeys = TourKeys.instance;
@@ -92,6 +97,11 @@ class _HomeScreenState extends State<HomeScreen>
       // Check for any active order (in case app was closed during delivery)
       _orderProvider!.checkActiveOrder();
 
+      // Start auto-refresh every 5 seconds
+      _refreshTimer = Timer.periodic(const Duration(seconds: 5), (_) {
+        _orderProvider?.fetchOrderHistory();
+      });
+
       // Register FCM token with backend
       context.read<NotificationProvider>().initializePushNotifications();
 
@@ -119,6 +129,10 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   void _onNewOrder() {
+    debugPrint('[HomeScreen] === NEW ORDER RECEIVED ===');
+    debugPrint('[HomeScreen] pendingOrder: ${_orderProvider?.pendingOrder?.id}');
+    debugPrint('[HomeScreen] Starting order animation and haptic feedback');
+
     // Double-tap haptic pattern
     HapticFeedback.heavyImpact();
     Future.delayed(const Duration(milliseconds: 300), () {
@@ -347,6 +361,7 @@ class _HomeScreenState extends State<HomeScreen>
 
   @override
   void dispose() {
+    _refreshTimer?.cancel();
     _orderProvider?.onNewOrderReceived = null;
     _slideController.dispose();
     _glowController.dispose();
@@ -515,74 +530,125 @@ class _HomeScreenState extends State<HomeScreen>
                       },
                     ),
 
-                    // Status Card
-                    Container(
+                    // Status Toggle Button
+                    GestureDetector(
                       key: _tourKeys.onlineToggleKey,
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: isOnline ? AppColors.primary.withValues(alpha: 0.08) : surfaceColor,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: isOnline ? AppColors.primary.withValues(alpha: 0.3) : borderColor,
+                      onTap: driverProvider.isLoading
+                          ? null
+                          : () => _toggleOnline(driverProvider, orderProvider),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: isOnline ? AppColors.primary : surfaceColor,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: isOnline ? AppColors.primary : borderColor,
+                            width: isOnline ? 0 : 1,
+                          ),
+                          boxShadow: isOnline
+                              ? [
+                                  BoxShadow(
+                                    color: AppColors.primary.withValues(alpha: 0.3),
+                                    blurRadius: 12,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ]
+                              : null,
                         ),
-                      ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: isOnline
-                                  ? AppColors.primary.withValues(alpha: 0.15)
-                                  : borderColor.withValues(alpha: 0.5),
-                              borderRadius: BorderRadius.circular(10),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 44,
+                              height: 44,
+                              decoration: BoxDecoration(
+                                color: isOnline
+                                    ? Colors.white.withValues(alpha: 0.2)
+                                    : borderColor.withValues(alpha: 0.5),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: driverProvider.isLoading
+                                  ? const Padding(
+                                      padding: EdgeInsets.all(10),
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Icon(
+                                      isOnline ? Icons.power_settings_new : Icons.power_settings_new,
+                                      color: isOnline ? Colors.white : secondaryColor,
+                                      size: 22,
+                                    ),
                             ),
-                            child: Icon(
-                              isOnline ? Icons.wifi : Icons.wifi_off,
-                              color: isOnline ? AppColors.primary : secondaryColor,
-                              size: 20,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  isOnline ? l10n.youAreOnline : l10n.youAreOffline,
-                                  style: TextStyle(
-                                    fontSize: 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: isOnline ? AppColors.primary : textColor,
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    isOnline ? l10n.online : l10n.offline,
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w700,
+                                      color: isOnline ? Colors.white : textColor,
+                                    ),
                                   ),
-                                ),
-                                Text(
-                                  isOnline
-                                      ? (driverProvider.currentPlaceName ?? l10n.receivingOrders)
-                                      : l10n.goOnlineToStart,
-                                  style: TextStyle(fontSize: 13, color: secondaryColor),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
+                                  if (isOnline) ...[
+                                    const SizedBox(height: 2),
+                                    Row(
+                                      children: [
+                                        Icon(
+                                          Icons.location_on,
+                                          size: 12,
+                                          color: Colors.white.withValues(alpha: 0.8),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            driverProvider.currentPlaceName ?? l10n.fetchingLocation,
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.white.withValues(alpha: 0.8),
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                        if (driverProvider.lastLocationUpdate != null) ...[
+                                          const SizedBox(width: 6),
+                                          Text(
+                                            _formatLastUpdate(driverProvider.lastLocationUpdate!, l10n),
+                                            style: TextStyle(
+                                              fontSize: 10,
+                                              color: Colors.white.withValues(alpha: 0.6),
+                                            ),
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                  ],
+                                ],
+                              ),
                             ),
-                          ),
-                          driverProvider.isLoading
-                              ? const SizedBox(
-                                  width: 24,
-                                  height: 24,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: AppColors.primary,
-                                  ),
-                                )
-                              : Switch(
-                                  value: isOnline,
-                                  onChanged: (_) => _toggleOnline(driverProvider, orderProvider),
-                                  activeTrackColor: AppColors.primary.withValues(alpha: 0.5),
-                                  activeThumbColor: AppColors.primary,
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: isOnline
+                                    ? Colors.white.withValues(alpha: 0.2)
+                                    : AppColors.primary.withValues(alpha: 0.1),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Text(
+                                isOnline ? l10n.tapToGoOffline : l10n.tapToGoOnline,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w600,
+                                  color: isOnline ? Colors.white : AppColors.primary,
                                 ),
-                        ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
 
@@ -625,70 +691,118 @@ class _HomeScreenState extends State<HomeScreen>
                         l10n,
                       ),
 
-                    // Stats Card
-                    Container(
-                      key: _tourKeys.statsCardKey,
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: surfaceColor,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                    // Stats Card - calculate from completed orders only
+                    Builder(
+                      builder: (context) {
+                        final completedOrders = orderProvider.orderHistory
+                            .where((o) => o.status == OrderStatus.completed)
+                            .toList();
+                        final completedCount = completedOrders.length;
+                        final totalDeliveryFees = completedOrders.fold<double>(
+                          0.0,
+                          (sum, order) => sum + order.deliveryFee,
+                        );
+                        final totalTips = completedOrders.fold<double>(
+                          0.0,
+                          (sum, order) => sum + order.tip,
+                        );
+                        final totalEarnings = totalDeliveryFees + totalTips;
+
+                        return Container(
+                          key: _tourKeys.statsCardKey,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: surfaceColor,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Icon(Icons.insert_chart_outlined, size: 16, color: secondaryColor),
-                              const SizedBox(width: 6),
-                              Text(
-                                l10n.todayEarnings,
-                                style: TextStyle(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
-                                  color: secondaryColor,
+                              Row(
+                                children: [
+                                  Icon(Icons.insert_chart_outlined, size: 16, color: secondaryColor),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    l10n.todayEarnings,
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w500,
+                                      color: secondaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 18),
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: _buildStatItem(
+                                      Icons.receipt_long,
+                                      '$completedCount',
+                                      l10n.orders,
+                                      AppColors.primary,
+                                      textColor,
+                                      secondaryColor,
+                                    ),
+                                  ),
+                                  Container(width: 1, height: 40, color: borderColor),
+                                  Expanded(
+                                    child: _buildStatItem(
+                                      Icons.local_shipping_outlined,
+                                      '\$${totalDeliveryFees.toStringAsFixed(2)}',
+                                      l10n.deliveryFee,
+                                      AppColors.info,
+                                      textColor,
+                                      secondaryColor,
+                                    ),
+                                  ),
+                                  Container(width: 1, height: 40, color: borderColor),
+                                  Expanded(
+                                    child: _buildStatItem(
+                                      Icons.volunteer_activism,
+                                      '\$${totalTips.toStringAsFixed(2)}',
+                                      l10n.tip,
+                                      AppColors.warning,
+                                      textColor,
+                                      secondaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                decoration: BoxDecoration(
+                                  color: AppColors.success.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      l10n.total,
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                        color: textColor,
+                                      ),
+                                    ),
+                                    Text(
+                                      '\$${totalEarnings.toStringAsFixed(2)}',
+                                      style: const TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.success,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 18),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: _buildStatItem(
-                                  Icons.receipt_long,
-                                  '${orderProvider.totalOrders}',
-                                  l10n.orders,
-                                  AppColors.primary,
-                                  textColor,
-                                  secondaryColor,
-                                ),
-                              ),
-                              Container(width: 1, height: 40, color: borderColor),
-                              Expanded(
-                                child: _buildStatItem(
-                                  Icons.attach_money,
-                                  '\$${orderProvider.totalEarnings.toStringAsFixed(0)}',
-                                  l10n.earnings_label,
-                                  AppColors.success,
-                                  textColor,
-                                  secondaryColor,
-                                ),
-                              ),
-                              Container(width: 1, height: 40, color: borderColor),
-                              Expanded(
-                                child: _buildStatItem(
-                                  Icons.star_rounded,
-                                  profile?.formattedRating ?? '0.0',
-                                  l10n.rating,
-                                  AppColors.warning,
-                                  textColor,
-                                  secondaryColor,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                        );
+                      },
                     ),
 
                     const SizedBox(height: 24),
@@ -750,6 +864,14 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  String _formatLastUpdate(DateTime dt, AppLocalizations l10n) {
+    final diff = DateTime.now().difference(dt);
+    if (diff.inSeconds < 10) return l10n.justNow;
+    if (diff.inSeconds < 60) return l10n.secondsAgo(diff.inSeconds);
+    if (diff.inMinutes < 60) return l10n.minutesAgo(diff.inMinutes);
+    return l10n.hoursAgo(diff.inHours);
+  }
+
   Widget _buildStatItem(
     IconData icon,
     String value,
@@ -785,9 +907,7 @@ class _HomeScreenState extends State<HomeScreen>
     final glowOpacity = 0.15 + (glowValue * 0.25); // 0.15 → 0.40
     final borderWidth = 1.5 + (glowValue * 0.5);   // 1.5 → 2.0
 
-    return GestureDetector(
-      onTap: () => context.push(RouteConstants.orderDetailPath(order.id)),
-      child: Container(
+    return Container(
         key: _tourKeys.newOrderCardKey,
         margin: const EdgeInsets.only(bottom: 20),
         padding: const EdgeInsets.all(16),
@@ -845,48 +965,134 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ],
           ),
+          const SizedBox(height: 12),
+
+          // Payment status banner
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            decoration: BoxDecoration(
+              color: order.isPaid
+                  ? AppColors.success.withValues(alpha: 0.08)
+                  : AppColors.error.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: order.isPaid
+                    ? AppColors.success.withValues(alpha: 0.3)
+                    : AppColors.error.withValues(alpha: 0.3),
+                width: 1,
+              ),
+            ),
+            child: Row(
+              children: [
+                Icon(
+                  order.isPaid ? Icons.check_circle : Icons.payments,
+                  size: 18,
+                  color: order.isPaid ? AppColors.success : AppColors.error,
+                ),
+                const SizedBox(width: 8),
+                Text(
+                  order.isPaid ? l10n.orderPaid : l10n.collectCash,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: order.isPaid ? AppColors.success : AppColors.error,
+                  ),
+                ),
+                const SizedBox(width: 6),
+                Expanded(
+                  child: Text(
+                    order.isPaid
+                        ? l10n.orderPaidDescription
+                        : l10n.collectCashReminder,
+                    style: TextStyle(
+                      fontSize: 11,
+                      color: order.isPaid
+                          ? AppColors.success.withValues(alpha: 0.8)
+                          : AppColors.error.withValues(alpha: 0.8),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
           const SizedBox(height: 14),
 
           // Route info
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.info.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.route, size: 12, color: AppColors.info),
-                    const SizedBox(width: 4),
-                    Text(
-                      order.formattedDistance,
-                      style: const TextStyle(fontSize: 12, color: AppColors.info, fontWeight: FontWeight.w500),
+          Builder(builder: (context) {
+            // Calculate driver-to-pickup distance
+            final driverPos = LocationService().lastPosition;
+            String? driverToPickup;
+            if (driverPos != null && order.pickupLat != null && order.pickupLng != null) {
+              final meters = Geolocator.distanceBetween(
+                driverPos.latitude, driverPos.longitude,
+                order.pickupLat!, order.pickupLng!,
+              );
+              driverToPickup = '${(meters / 1000).toStringAsFixed(1)} km';
+            }
+
+            return Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (driverToPickup != null)
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(4),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(width: 8),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.schedule, size: 12, color: AppColors.warning),
-                    const SizedBox(width: 4),
-                    Text(
-                      '~${order.estimatedMinutes} min',
-                      style: const TextStyle(fontSize: 12, color: AppColors.warning, fontWeight: FontWeight.w500),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.my_location, size: 12, color: AppColors.primary),
+                        const SizedBox(width: 4),
+                        Text(
+                          driverToPickup,
+                          style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w500),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.info.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.route, size: 12, color: AppColors.info),
+                      const SizedBox(width: 4),
+                      Text(
+                        order.formattedDistance,
+                        style: const TextStyle(fontSize: 12, color: AppColors.info, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.warning.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.schedule, size: 12, color: AppColors.warning),
+                      const SizedBox(width: 4),
+                      Text(
+                        '~${order.estimatedMinutes} min',
+                        style: const TextStyle(fontSize: 12, color: AppColors.warning, fontWeight: FontWeight.w500),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            );
+          }),
           const SizedBox(height: 14),
 
           // Locations
@@ -934,20 +1140,13 @@ class _HomeScreenState extends State<HomeScreen>
                         overflow: TextOverflow.ellipsis,
                       ),
                     const SizedBox(height: 10),
-                    // Dropoff info
+                    // Dropoff info - show address only, not customer name
                     Text(
-                      order.customerName,
+                      order.dropoffAddress,
                       style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: textColor),
-                      maxLines: 1,
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    if (order.dropoffStreet != null || order.dropoffCity != null)
-                      Text(
-                        [order.dropoffStreet, order.dropoffCity].where((e) => e != null).join(', '),
-                        style: TextStyle(fontSize: 11, color: secondaryColor),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
                   ],
                 ),
               ),
@@ -1009,7 +1208,7 @@ class _HomeScreenState extends State<HomeScreen>
             child: Column(
               children: [
                 if (order.subtotal > 0)
-                  _buildPriceRow('Subtotal', order.formattedSubtotal, secondaryColor),
+                  _buildPriceRow(l10n.subtotal, order.formattedSubtotal, secondaryColor),
                 _buildPriceRow(l10n.deliveryFee, order.formattedDeliveryFee, secondaryColor),
                 if (order.tip > 0)
                   _buildPriceRow(l10n.tip, order.formattedTip, secondaryColor),
@@ -1067,7 +1266,6 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
         ],
-      ),
       ),
     );
   }

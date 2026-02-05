@@ -107,6 +107,8 @@
   "offline": "Offline",
   "goOnline": "Go Online",
   "goOffline": "Go Offline",
+  "tapToGoOnline": "Tap to go online",
+  "tapToGoOffline": "Tap to go offline",
   "youAreOnline": "You're online and ready to receive orders",
   "youAreOffline": "You're offline. Go online to receive orders",
 
@@ -149,6 +151,7 @@
   "callCustomer": "Call Customer",
   "distance": "Distance",
   "estimatedTime": "Est. Time",
+  "yourDistanceTo": "Your distance to",
   "km": "km",
   "min": "min",
 
@@ -432,5 +435,21 @@
   "orderNotFound": "Order not found",
   "goBack": "Go Back",
   "gpsUnavailableTapRetry": "GPS unavailable. Tap to retry.",
-  "googleMaps": "Google Maps"
+  "googleMaps": "Google Maps",
+  "fetchingLocation": "Fetching location...",
+  "secondsAgo": "{seconds}s ago",
+  "@secondsAgo": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "subtotal": "Subtotal",
+  "orderType": "Type",
+  "created": "Created",
+  "accepted": "Accepted",
+  "completed": "Completed",
+  "orderPaid": "Paid",
+  "orderPaidDescription": "No cash collection needed",
+  "collectCash": "Collect Cash",
+  "collectCashReminder": "Remember to collect payment from the customer"
 }

@@ -140,35 +140,69 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 // Stats grid — always show during tour so the tour overlay
                 // can highlight it, even when there are 0 real orders.
                 if (stats.orders > 0 || isTourActive) ...[
-                  Row(
+                  Container(
                     key: _tourKeys.statsGridKey,
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          Icons.receipt_long,
-                          '${stats.orders}',
-                          l10n.orders,
-                          AppColors.primary,
-                          surfaceColor,
-                          textColor,
-                          secondaryColor,
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatCard(
+                                Icons.receipt_long,
+                                '${stats.orders}',
+                                l10n.orders,
+                                AppColors.primary,
+                                surfaceColor,
+                                textColor,
+                                secondaryColor,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildStatCard(
+                                Icons.local_shipping_outlined,
+                                '\$${stats.deliveryFees.toStringAsFixed(2)}',
+                                l10n.deliveryFee,
+                                AppColors.info,
+                                surfaceColor,
+                                textColor,
+                                secondaryColor,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: _buildStatCard(
-                          Icons.local_shipping,
-                          stats.orders > 0
-                              ? '\$${(stats.earnings / stats.orders).toStringAsFixed(2)}'
-                              : '--',
-                          l10n.avgPerOrder,
-                          AppColors.success,
-                          surfaceColor,
-                          textColor,
-                          secondaryColor,
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildStatCard(
+                                Icons.volunteer_activism,
+                                '\$${stats.tips.toStringAsFixed(2)}',
+                                l10n.tip,
+                                AppColors.warning,
+                                surfaceColor,
+                                textColor,
+                                secondaryColor,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: _buildStatCard(
+                                Icons.trending_up,
+                                stats.orders > 0
+                                    ? '\$${(stats.earnings / stats.orders).toStringAsFixed(2)}'
+                                    : '--',
+                                l10n.avgPerOrder,
+                                AppColors.success,
+                                surfaceColor,
+                                textColor,
+                                secondaryColor,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ],
               ],
@@ -254,7 +288,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
   }
 
   _EarningsStats _calculateStats(List<OrderModel> orders) {
-    double totalEarnings = 0;
+    double totalDeliveryFees = 0;
+    double totalTips = 0;
     int totalOrders = 0;
 
     for (final order in orders) {
@@ -265,18 +300,29 @@ class _EarningsScreenState extends State<EarningsScreen> {
           order.status == OrderStatus.completed;
       if (!isActiveOrCompleted) continue;
 
-      // Use deliveryFee as driver earnings
-      totalEarnings += order.deliveryFee;
+      totalDeliveryFees += order.deliveryFee;
+      totalTips += order.tip;
       totalOrders++;
     }
 
-    return _EarningsStats(totalEarnings, totalOrders);
+    return _EarningsStats(
+      deliveryFees: totalDeliveryFees,
+      tips: totalTips,
+      orders: totalOrders,
+    );
   }
 }
 
 class _EarningsStats {
-  final double earnings;
+  final double deliveryFees;
+  final double tips;
   final int orders;
 
-  _EarningsStats(this.earnings, this.orders);
+  _EarningsStats({
+    required this.deliveryFees,
+    required this.tips,
+    required this.orders,
+  });
+
+  double get earnings => deliveryFees + tips;
 }

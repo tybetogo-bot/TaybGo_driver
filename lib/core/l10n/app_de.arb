@@ -100,6 +100,8 @@
   "offline": "Offline",
   "goOnline": "Online gehen",
   "goOffline": "Offline gehen",
+  "tapToGoOnline": "Tippen um online zu gehen",
+  "tapToGoOffline": "Tippen um offline zu gehen",
   "youAreOnline": "Sie sind online und bereit, Aufträge zu erhalten",
   "youAreOffline": "Sie sind offline. Gehen Sie online, um Aufträge zu erhalten",
 
@@ -137,6 +139,7 @@
   "callCustomer": "Kunden anrufen",
   "distance": "Entfernung",
   "estimatedTime": "Geschätzte Zeit",
+  "yourDistanceTo": "Ihre Entfernung zu",
   "km": "km",
   "min": "Min",
 
@@ -400,5 +403,21 @@
   "orderNotFound": "Bestellung nicht gefunden",
   "goBack": "Zurück",
   "gpsUnavailableTapRetry": "GPS nicht verfügbar. Tippen zum Wiederholen.",
-  "googleMaps": "Google Maps"
+  "googleMaps": "Google Maps",
+  "fetchingLocation": "Standort wird ermittelt...",
+  "secondsAgo": "vor {seconds}s",
+  "@secondsAgo": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "subtotal": "Zwischensumme",
+  "orderType": "Typ",
+  "created": "Erstellt",
+  "accepted": "Angenommen",
+  "completed": "Abgeschlossen",
+  "orderPaid": "Bezahlt",
+  "orderPaidDescription": "Kein Bargeld einzuziehen",
+  "collectCash": "Bargeld kassieren",
+  "collectCashReminder": "Vergessen Sie nicht, die Zahlung vom Kunden einzuziehen"
 }

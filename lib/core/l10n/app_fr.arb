@@ -100,6 +100,8 @@
   "offline": "Hors ligne",
   "goOnline": "Se connecter",
   "goOffline": "Se déconnecter",
+  "tapToGoOnline": "Appuyez pour vous connecter",
+  "tapToGoOffline": "Appuyez pour vous déconnecter",
   "youAreOnline": "Vous êtes en ligne et prêt à recevoir des commandes",
   "youAreOffline": "Vous êtes hors ligne. Connectez-vous pour recevoir des commandes",
 
@@ -137,6 +139,7 @@
   "callCustomer": "Appeler le client",
   "distance": "Distance",
   "estimatedTime": "Temps estimé",
+  "yourDistanceTo": "Votre distance à",
   "km": "km",
   "min": "min",
 
@@ -400,5 +403,21 @@
   "orderNotFound": "Commande introuvable",
   "goBack": "Retour",
   "gpsUnavailableTapRetry": "GPS indisponible. Appuyez pour réessayer.",
-  "googleMaps": "Google Maps"
+  "googleMaps": "Google Maps",
+  "fetchingLocation": "Localisation en cours...",
+  "secondsAgo": "il y a {seconds}s",
+  "@secondsAgo": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "subtotal": "Sous-total",
+  "orderType": "Type",
+  "created": "Créée",
+  "accepted": "Acceptée",
+  "completed": "Terminée",
+  "orderPaid": "Payé",
+  "orderPaidDescription": "Aucun encaissement nécessaire",
+  "collectCash": "Encaisser",
+  "collectCashReminder": "N'oubliez pas d'encaisser le paiement du client"
 }

@@ -160,22 +160,42 @@ class LocationService {
       distanceFilter: 50, // Update every 50 meters
     );
 
+    debugPrint('[LocationService] === STARTING LOCATION STREAM ===');
+    debugPrint('[LocationService] Accuracy: high, Distance filter: 50m');
+
     _positionStream = Geolocator.getPositionStream(
       locationSettings: locationSettings,
     ).listen(
       (Position position) {
+        debugPrint('[LocationService] === POSITION STREAM EVENT ===');
+        debugPrint('[LocationService] New position: ${position.latitude}, ${position.longitude}');
+        debugPrint('[LocationService] Accuracy: ${position.accuracy}m, Speed: ${position.speed}m/s');
+        if (_lastPosition != null) {
+          final distance = Geolocator.distanceBetween(
+            _lastPosition!.latitude,
+            _lastPosition!.longitude,
+            position.latitude,
+            position.longitude,
+          );
+          debugPrint('[LocationService] Distance from last: ${distance.toStringAsFixed(1)}m');
+        }
         _lastPosition = position;
         onLocationUpdate(position);
       },
       onError: (error) {
-        debugPrint('Location stream error: $error');
+        debugPrint('[LocationService] === LOCATION STREAM ERROR ===');
+        debugPrint('[LocationService] Error: $error');
         onError?.call('Location tracking error');
       },
     );
+    debugPrint('[LocationService] Location stream started');
   }
 
   /// Stop location updates
   void stopLocationUpdates() {
+    if (_positionStream != null) {
+      debugPrint('[LocationService] === STOPPING LOCATION STREAM ===');
+    }
     _positionStream?.cancel();
     _positionStream = null;
   }

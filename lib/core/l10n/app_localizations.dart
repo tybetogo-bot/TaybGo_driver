@@ -630,6 +630,18 @@ abstract class AppLocalizations {
   /// **'Go Offline'**
   String get goOffline;
 
+  /// No description provided for @tapToGoOnline.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to go online'**
+  String get tapToGoOnline;
+
+  /// No description provided for @tapToGoOffline.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to go offline'**
+  String get tapToGoOffline;
+
   /// No description provided for @youAreOnline.
   ///
   /// In en, this message translates to:
@@ -839,6 +851,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Est. Time'**
   String get estimatedTime;
+
+  /// No description provided for @yourDistanceTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Your distance to'**
+  String get yourDistanceTo;
 
   /// No description provided for @km.
   ///
@@ -2153,6 +2171,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Google Maps'**
   String get googleMaps;
+
+  /// No description provided for @fetchingLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Fetching location...'**
+  String get fetchingLocation;
+
+  /// No description provided for @secondsAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{seconds}s ago'**
+  String secondsAgo(int seconds);
+
+  /// No description provided for @subtotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Subtotal'**
+  String get subtotal;
+
+  /// No description provided for @orderType.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get orderType;
+
+  /// No description provided for @created.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get created;
+
+  /// No description provided for @accepted.
+  ///
+  /// In en, this message translates to:
+  /// **'Accepted'**
+  String get accepted;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @orderPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get orderPaid;
+
+  /// No description provided for @orderPaidDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'No cash collection needed'**
+  String get orderPaidDescription;
+
+  /// No description provided for @collectCash.
+  ///
+  /// In en, this message translates to:
+  /// **'Collect Cash'**
+  String get collectCash;
+
+  /// No description provided for @collectCashReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Remember to collect payment from the customer'**
+  String get collectCashReminder;
 }
 
 class _AppLocalizationsDelegate

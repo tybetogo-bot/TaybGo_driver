@@ -107,6 +107,8 @@
   "offline": "غير متصل",
   "goOnline": "الاتصال",
   "goOffline": "قطع الاتصال",
+  "tapToGoOnline": "انقر للاتصال",
+  "tapToGoOffline": "انقر لقطع الاتصال",
   "youAreOnline": "أنت متصل وجاهز لاستقبال الطلبات",
   "youAreOffline": "أنت غير متصل. اتصل لاستقبال الطلبات",
 
@@ -149,6 +151,7 @@
   "callCustomer": "الاتصال بالعميل",
   "distance": "المسافة",
   "estimatedTime": "الوقت المقدر",
+  "yourDistanceTo": "المسافة إلى",
   "km": "كم",
   "min": "دقيقة",
 
@@ -432,5 +435,21 @@
   "orderNotFound": "الطلب غير موجود",
   "goBack": "رجوع",
   "gpsUnavailableTapRetry": "GPS غير متاح. انقر للمحاولة مرة أخرى.",
-  "googleMaps": "خرائط جوجل"
+  "googleMaps": "خرائط جوجل",
+  "fetchingLocation": "جاري تحديد الموقع...",
+  "secondsAgo": "منذ {seconds} ث",
+  "@secondsAgo": {
+    "placeholders": {
+      "seconds": {"type": "int"}
+    }
+  },
+  "subtotal": "المجموع الفرعي",
+  "orderType": "النوع",
+  "created": "تم الإنشاء",
+  "accepted": "تم القبول",
+  "completed": "مكتمل",
+  "orderPaid": "مدفوع",
+  "orderPaidDescription": "لا حاجة لتحصيل نقدي",
+  "collectCash": "تحصيل نقدي",
+  "collectCashReminder": "تذكّر تحصيل المبلغ من العميل"
 }
