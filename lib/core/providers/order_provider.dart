@@ -387,9 +387,14 @@ class OrderProvider extends ChangeNotifier {
 
   /// Fetch order history from /api/orders/ endpoint
   /// This returns all orders for the driver and we categorize them locally
+  /// Only shows loading indicator on the first fetch (when history is empty).
+  /// Subsequent refreshes update data silently to avoid UI flicker.
   Future<void> fetchOrderHistory() async {
-    _isLoading = true;
-    notifyListeners();
+    final isFirstLoad = _orderHistory.isEmpty;
+    if (isFirstLoad) {
+      _isLoading = true;
+      notifyListeners();
+    }
 
     try {
       _orderHistory = await _orderService.getOrderHistory();
@@ -412,11 +417,11 @@ class OrderProvider extends ChangeNotifier {
         }
       }
 
-      _isLoading = false;
+      if (isFirstLoad) _isLoading = false;
       notifyListeners();
     } catch (e) {
       _error = e.toString();
-      _isLoading = false;
+      if (isFirstLoad) _isLoading = false;
       notifyListeners();
     }
   }

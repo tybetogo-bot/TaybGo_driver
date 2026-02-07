@@ -55,10 +55,22 @@ class DriverProfile {
     // Handle nested user object if present
     final user = json['user'] as Map<String, dynamic>? ?? json;
 
+    // Parse name: try first_name/last_name, then fall back to single 'name' field
+    String? firstName = user['first_name'] ?? json['first_name'];
+    String? lastName = user['last_name'] ?? json['last_name'];
+    if (firstName == null && lastName == null) {
+      final fullName = (user['name'] ?? json['name'] ?? json['full_name'] ?? user['full_name']) as String?;
+      if (fullName != null && fullName.trim().isNotEmpty) {
+        final parts = fullName.trim().split(RegExp(r'\s+'));
+        firstName = parts.first;
+        lastName = parts.length > 1 ? parts.sublist(1).join(' ') : null;
+      }
+    }
+
     return DriverProfile(
       id: json['id'] ?? user['id'] ?? 0,
-      firstName: user['first_name'] ?? json['first_name'],
-      lastName: user['last_name'] ?? json['last_name'],
+      firstName: firstName,
+      lastName: lastName,
       phone: user['phone'] ?? json['phone'] ?? '',
       email: user['email'] ?? json['email'],
       avatarUrl: json['avatar'] ?? json['avatar_url'] ?? user['avatar'],

@@ -293,6 +293,16 @@ class _HomeScreenState extends State<HomeScreen>
         );
         break;
 
+      case ToggleOnlineResult.locationUnavailable:
+        final l10n = AppLocalizations.of(context)!;
+        _showLocationPermissionDialog(
+          title: l10n.locationRequired,
+          message: driverProvider.error ?? l10n.gpsUnavailableTapRetry,
+          actionLabel: l10n.retry,
+          onAction: () => _toggleOnline(driverProvider, orderProvider),
+        );
+        break;
+
       case ToggleOnlineResult.apiError:
         final l10n = AppLocalizations.of(context)!;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -628,23 +638,6 @@ class _HomeScreenState extends State<HomeScreen>
                                     ),
                                   ],
                                 ],
-                              ),
-                            ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                              decoration: BoxDecoration(
-                                color: isOnline
-                                    ? Colors.white.withValues(alpha: 0.2)
-                                    : AppColors.primary.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                isOnline ? l10n.tapToGoOffline : l10n.tapToGoOnline,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: isOnline ? Colors.white : AppColors.primary,
-                                ),
                               ),
                             ),
                           ],

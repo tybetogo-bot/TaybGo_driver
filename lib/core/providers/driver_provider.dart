@@ -14,6 +14,7 @@ enum ToggleOnlineResult {
   locationDenied,
   locationDeniedForever,
   locationServiceDisabled,
+  locationUnavailable,
   apiError,
 }
 
@@ -135,11 +136,20 @@ class DriverProvider extends ChangeNotifier {
       return ToggleOnlineResult.accountNotVerified;
     }
 
-    // Optimistic update — UI flips immediately
-    _profile = _profile!.copyWith(isOnline: newStatus);
     _isLoading = true;
+    _error = null;
     notifyListeners();
 
+    if (newStatus) {
+      final locationResult = await _ensureLocationReadyForOnline();
+      if (locationResult != ToggleOnlineResult.success) {
+        _isLoading = false;
+        notifyListeners();
+        return locationResult;
+      }
+    }
+
+    // Optimistic update — UI flips immediately
     try {
       final confirmedStatus = await _driverService.toggleOnlineStatus(newStatus);
       _profile = _profile!.copyWith(isOnline: confirmedStatus);
@@ -156,12 +166,73 @@ class DriverProvider extends ChangeNotifier {
 
       return ToggleOnlineResult.success;
     } catch (e) {
-      // Revert on failure
-      _profile = _profile!.copyWith(isOnline: !newStatus);
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
       return ToggleOnlineResult.apiError;
+    }
+  }
+
+  Future<ToggleOnlineResult> _ensureLocationReadyForOnline() async {
+    var status = await _locationService.checkPermission();
+    if (status != LocationPermissionStatus.granted) {
+      status = await _locationService.requestPermission();
+    }
+    _locationStatus = status;
+
+    final permissionResult = _mapPermissionStatusToToggleResult(status);
+    if (permissionResult != ToggleOnlineResult.success) {
+      _error = _locationService.getStatusMessage(status);
+      notifyListeners();
+      return permissionResult;
+    }
+
+    final locationResult = await _locationService.getCurrentLocation();
+    if (!locationResult.success || locationResult.position == null) {
+      final failureStatus = locationResult.status;
+      if (failureStatus != null) {
+        _locationStatus = failureStatus;
+        final mappedResult = _mapPermissionStatusToToggleResult(failureStatus);
+        if (mappedResult != ToggleOnlineResult.success) {
+          _error = locationResult.message ??
+              _locationService.getStatusMessage(failureStatus);
+          notifyListeners();
+          return mappedResult;
+        }
+      }
+
+      _error = locationResult.message ??
+          'Unable to get your current location. Please try again.';
+      notifyListeners();
+      return ToggleOnlineResult.locationUnavailable;
+    }
+
+    // Send location to the API before going online
+    try {
+      await updateLocation(
+        locationResult.position!.latitude,
+        locationResult.position!.longitude,
+      );
+    } catch (e) {
+      _error = 'Failed to send location. Please try again.';
+      notifyListeners();
+      return ToggleOnlineResult.locationUnavailable;
+    }
+
+    return ToggleOnlineResult.success;
+  }
+
+  ToggleOnlineResult _mapPermissionStatusToToggleResult(
+      LocationPermissionStatus status) {
+    switch (status) {
+      case LocationPermissionStatus.granted:
+        return ToggleOnlineResult.success;
+      case LocationPermissionStatus.denied:
+        return ToggleOnlineResult.locationDenied;
+      case LocationPermissionStatus.deniedForever:
+        return ToggleOnlineResult.locationDeniedForever;
+      case LocationPermissionStatus.serviceDisabled:
+        return ToggleOnlineResult.locationServiceDisabled;
     }
   }
 
