@@ -187,6 +187,9 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
     AppLocalizations l10n,
   ) {
     final tourProvider = Provider.of<TourProvider>(context, listen: false);
+    final textColor = Theme.of(context).brightness == Brightness.dark
+        ? AppColors.darkText
+        : AppColors.lightText;
     return Container(
       decoration: BoxDecoration(
         color: surfaceColor,
@@ -194,39 +197,42 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
         border: Border.all(color: borderColor),
       ),
       padding: const EdgeInsets.all(16),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  l10n.tourWelcomeTitle,
-                  style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Theme.of(context).brightness == Brightness.dark ? AppColors.darkText : AppColors.lightText),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  l10n.tourWelcomeDesc,
-                  style: TextStyle(fontSize: 12, color: secondaryColor),
-                ),
-              ],
-            ),
+          Text(
+            l10n.tourWelcomeTitle,
+            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: textColor),
           ),
-          const SizedBox(width: 12),
-          ElevatedButton.icon(
-            onPressed: () async {
-              context.go(RouteConstants.home);
-              await Future.delayed(const Duration(milliseconds: 350));
-              await tourProvider.startTour();
-            },
-            icon: const Icon(Icons.play_arrow, size: 18),
-            label: Text(l10n.tourStartBtn),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+          const SizedBox(height: 4),
+          Text(
+            l10n.tourWelcomeDesc,
+            style: TextStyle(fontSize: 12, color: secondaryColor),
+          ),
+          const SizedBox(height: 12),
+          Align(
+            alignment: AlignmentDirectional.centerEnd,
+            child: ElevatedButton(
+              onPressed: () async {
+                context.go(RouteConstants.home);
+                await Future.delayed(const Duration(milliseconds: 350));
+                await tourProvider.startTour();
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(Icons.play_arrow, size: 18),
+                  const SizedBox(width: 6),
+                  Text(l10n.tourStartBtn),
+                ],
               ),
             ),
           ),
@@ -246,22 +252,41 @@ class _KnowledgeBaseScreenState extends State<KnowledgeBaseScreen> {
   ) {
     final categories = _knowledgeBase!.categories;
 
-    return GridView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 12,
-        mainAxisSpacing: 12,
-        childAspectRatio: 1.3,
-      ),
-      itemCount: categories.length,
-      itemBuilder: (context, index) {
-        final category = categories[index];
-        return _buildCategoryGridCard(
-            category, textColor, secondaryColor, surfaceColor, l10n);
-      },
-    );
+    // Build rows of 2 manually to avoid nested scrollable rendering issues
+    final List<Widget> rows = [];
+    for (int i = 0; i < categories.length; i += 2) {
+      final first = categories[i];
+      final second = i + 1 < categories.length ? categories[i + 1] : null;
+
+      rows.add(
+        Padding(
+          padding: EdgeInsets.only(bottom: i + 2 < categories.length ? 12 : 0),
+          child: Row(
+            children: [
+              Expanded(
+                child: AspectRatio(
+                  aspectRatio: 1.3,
+                  child: _buildCategoryGridCard(
+                      first, textColor, secondaryColor, surfaceColor, l10n),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: second != null
+                    ? AspectRatio(
+                        aspectRatio: 1.3,
+                        child: _buildCategoryGridCard(
+                            second, textColor, secondaryColor, surfaceColor, l10n),
+                      )
+                    : const SizedBox.shrink(),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Column(children: rows);
   }
 
   Widget _buildCategoryGridCard(

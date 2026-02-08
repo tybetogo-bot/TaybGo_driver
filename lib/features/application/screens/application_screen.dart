@@ -163,13 +163,14 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: textColor),
-          onPressed: () {
+          onPressed: () async {
             if (_currentStep > 0) {
               _previousStep();
-            } else if (context.canPop()) {
-              context.pop();
             } else {
-              context.go(RouteConstants.phone);
+              final auth = context.read<AuthProvider>();
+              final router = GoRouter.of(context);
+              await auth.logout();
+              router.go(RouteConstants.phone);
             }
           },
         ),
@@ -790,7 +791,32 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
     return Row(
       children: [
-        // Back button (hidden on first step)
+        // Cancel button (first step) / Back button (other steps)
+        if (_currentStep == 0)
+          Expanded(
+            child: OutlinedButton(
+              onPressed: () async {
+                final auth = context.read<AuthProvider>();
+                final router = GoRouter.of(context);
+                await auth.logout();
+                router.go(RouteConstants.phone);
+              },
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                side: BorderSide(color: secondaryColor.withValues(alpha: 0.3)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: Text(
+                AppLocalizations.of(context)!.cancel,
+                style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ),
         if (_currentStep > 0)
           Expanded(
             child: OutlinedButton(
@@ -811,11 +837,11 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               ),
             ),
           ),
-        if (_currentStep > 0) const SizedBox(width: 12),
+        const SizedBox(width: 12),
 
         // Next/Submit button
         Expanded(
-          flex: _currentStep > 0 ? 2 : 1,
+          flex: 2,
           child: ElevatedButton(
             onPressed: _isLoading ? null : (isLastStep ? _submit : _nextStep),
             style: ElevatedButton.styleFrom(

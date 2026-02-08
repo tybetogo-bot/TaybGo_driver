@@ -298,6 +298,13 @@ class DriverProvider extends ChangeNotifier {
     _geocodingService.clearCache();
   }
 
+  /// Resume location tracking if the driver is already online (e.g. on app restart)
+  void resumeLocationTrackingIfOnline() {
+    if (_profile?.isOnline == true) {
+      _startLocationTracking();
+    }
+  }
+
   /// Check location permission status without toggling
   Future<LocationPermissionStatus> checkLocationPermission() async {
     _locationStatus = await _locationService.checkPermission();

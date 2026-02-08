@@ -119,9 +119,10 @@ class _HomeScreenState extends State<HomeScreen>
         if (profile != null) {
           _orderProvider?.setStats(profile.totalOrders, profile.totalEarnings);
 
-          // If driver is already online, start polling for orders
+          // If driver is already online, start polling and resume location tracking
           if (profile.isOnline) {
             _orderProvider?.startPolling();
+            driverProvider.resumeLocationTrackingIfOnline();
           }
         }
       });
@@ -390,6 +391,8 @@ class _HomeScreenState extends State<HomeScreen>
     return Consumer2<OrderProvider, DriverProvider>(
       builder: (context, orderProvider, driverProvider, _) {
         final isOnline = driverProvider.isOnline;
+        final hasLocation = driverProvider.lastLocationUpdate != null;
+        final isOnlineWithLocation = isOnline && hasLocation;
         final profile = driverProvider.profile;
 
         return Scaffold(
@@ -525,12 +528,13 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
 
-                    // Tour Welcome Card
+                    // Tour Welcome Card - only show if no completed orders
                     Consumer2<TourProvider, OrderProvider>(
                       builder: (context, tourProvider, orderProvider, _) {
-                        final hasOrders = orderProvider.totalOrders > 0;
+                        final hasCompletedOrders = orderProvider.orderHistory
+                            .any((o) => o.status == OrderStatus.completed);
                         if (profile != null &&
-                            tourProvider.shouldShowPrompt(hasOrders)) {
+                            tourProvider.shouldShowPrompt(hasCompletedOrders)) {
                           return TourWelcomeCard(
                             onStartTour: () => _startTour(tourProvider),
                             onSkip: () => tourProvider.skipTour(),
@@ -549,13 +553,13 @@ class _HomeScreenState extends State<HomeScreen>
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isOnline ? AppColors.primary : surfaceColor,
+                          color: isOnlineWithLocation ? AppColors.primary : surfaceColor,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: isOnline ? AppColors.primary : borderColor,
-                            width: isOnline ? 0 : 1,
+                            color: isOnlineWithLocation ? AppColors.primary : borderColor,
+                            width: isOnlineWithLocation ? 0 : 1,
                           ),
-                          boxShadow: isOnline
+                          boxShadow: isOnlineWithLocation
                               ? [
                                   BoxShadow(
                                     color: AppColors.primary.withValues(alpha: 0.3),
@@ -571,7 +575,7 @@ class _HomeScreenState extends State<HomeScreen>
                               width: 44,
                               height: 44,
                               decoration: BoxDecoration(
-                                color: isOnline
+                                color: isOnlineWithLocation
                                     ? Colors.white.withValues(alpha: 0.2)
                                     : borderColor.withValues(alpha: 0.5),
                                 borderRadius: BorderRadius.circular(12),
@@ -585,8 +589,8 @@ class _HomeScreenState extends State<HomeScreen>
                                       ),
                                     )
                                   : Icon(
-                                      isOnline ? Icons.power_settings_new : Icons.power_settings_new,
-                                      color: isOnline ? Colors.white : secondaryColor,
+                                      Icons.power_settings_new,
+                                      color: isOnlineWithLocation ? Colors.white : secondaryColor,
                                       size: 22,
                                     ),
                             ),
@@ -596,14 +600,37 @@ class _HomeScreenState extends State<HomeScreen>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    isOnline ? l10n.online : l10n.offline,
+                                    isOnlineWithLocation ? l10n.online : l10n.offline,
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700,
-                                      color: isOnline ? Colors.white : textColor,
+                                      color: isOnlineWithLocation ? Colors.white : textColor,
                                     ),
                                   ),
-                                  if (isOnline) ...[
+                                  if (isOnline && !hasLocation) ...[
+                                    const SizedBox(height: 2),
+                                    Row(
+                                      children: [
+                                        SizedBox(
+                                          width: 12,
+                                          height: 12,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 1.5,
+                                            color: secondaryColor,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 6),
+                                        Text(
+                                          l10n.fetchingLocation,
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: secondaryColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                  if (isOnlineWithLocation) ...[
                                     const SizedBox(height: 2),
                                     Row(
                                       children: [
