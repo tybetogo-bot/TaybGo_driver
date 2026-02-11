@@ -613,16 +613,6 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               color: color,
             ),
           ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              isPaid ? l10n.orderPaidDescription : l10n.collectCashReminder,
-              style: TextStyle(
-                fontSize: 11,
-                color: color.withValues(alpha: 0.8),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -1194,16 +1184,24 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             ),
           ),
           if (order.customerPhone != null && order.customerPhone!.isNotEmpty)
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: AppColors.success.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: const Icon(
-                Icons.phone,
-                color: AppColors.success,
-                size: 18,
+            GestureDetector(
+              onTap: () async {
+                final phoneUrl = Uri.parse('tel:${order.customerPhone}');
+                if (await canLaunchUrl(phoneUrl)) {
+                  await launchUrl(phoneUrl);
+                }
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.success.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.phone,
+                  color: AppColors.success,
+                  size: 18,
+                ),
               ),
             ),
         ],

@@ -902,18 +902,6 @@ class _NavigationScreenState extends State<NavigationScreen> {
               color: color,
             ),
           ),
-          const SizedBox(width: 6),
-          Expanded(
-            child: Text(
-              isPaid
-                  ? l10n.orderPaidDescription
-                  : l10n.collectCashReminder,
-              style: TextStyle(
-                fontSize: 11,
-                color: color.withValues(alpha: 0.8),
-              ),
-            ),
-          ),
         ],
       ),
     );
@@ -924,30 +912,25 @@ class _NavigationScreenState extends State<NavigationScreen> {
       key: _isTourMode ? _tourKeys.navigationActionButtonKey : null,
       children: [
         // Google Maps button
-        Expanded(
-          child: SizedBox(
-            height: 46,
-            child: OutlinedButton.icon(
-              onPressed: _openInExternalMaps,
-              icon: const Icon(Icons.map_outlined, size: 18),
-              label: Text(
-                AppLocalizations.of(context)!.googleMaps,
-                style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        SizedBox(
+          height: 46,
+          width: 46,
+          child: OutlinedButton(
+            onPressed: _openInExternalMaps,
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.info,
+              side: const BorderSide(color: AppColors.info),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
               ),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.info,
-                side: const BorderSide(color: AppColors.info),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
+              padding: EdgeInsets.zero,
             ),
+            child: const Icon(Icons.map_outlined, size: 20),
           ),
         ),
         const SizedBox(width: 10),
         // Action button
         Expanded(
-          flex: 2,
           child: _buildActionButton(l10n, isPickupPhase),
         ),
       ],
@@ -1120,6 +1103,17 @@ class _NavigationScreenState extends State<NavigationScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
+                if (!isPickup && order.customerPhone != null && order.customerPhone!.isNotEmpty) ...[
+                  Text(
+                    order.customerPhone!,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: secondaryColor,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                ],
                 Text(
                   city ?? address,
                   style: TextStyle(fontSize: 12, color: secondaryColor),
