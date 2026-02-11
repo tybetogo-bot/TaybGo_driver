@@ -985,57 +985,6 @@ class _HomeScreenState extends State<HomeScreen>
               ),
             ],
           ),
-          const SizedBox(height: 12),
-
-          // Payment status banner
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: order.isPaid
-                  ? AppColors.success.withValues(alpha: 0.08)
-                  : AppColors.error.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(
-                color: order.isPaid
-                    ? AppColors.success.withValues(alpha: 0.3)
-                    : AppColors.error.withValues(alpha: 0.3),
-                width: 1,
-              ),
-            ),
-            child: Row(
-              children: [
-                Icon(
-                  order.isPaid ? Icons.check_circle : Icons.payments,
-                  size: 18,
-                  color: order.isPaid ? AppColors.success : AppColors.error,
-                ),
-                const SizedBox(width: 8),
-                Text(
-                  order.isPaid ? l10n.orderPaid : l10n.collectCash,
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w700,
-                    color: order.isPaid ? AppColors.success : AppColors.error,
-                  ),
-                ),
-                const SizedBox(width: 6),
-                Expanded(
-                  child: Text(
-                    order.isPaid
-                        ? l10n.orderPaidDescription
-                        : l10n.collectCashReminder,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: order.isPaid
-                          ? AppColors.success.withValues(alpha: 0.8)
-                          : AppColors.error.withValues(alpha: 0.8),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
           const SizedBox(height: 14),
 
           // Route info

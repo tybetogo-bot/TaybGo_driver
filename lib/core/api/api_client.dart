@@ -6,6 +6,11 @@ import 'token_storage.dart';
 class ApiClient {
   late final Dio _dio;
   final TokenStorage _tokenStorage;
+  late final _AuthInterceptor _authInterceptor;
+
+  /// Callback invoked when token refresh fails and tokens are cleared
+  /// Use this to trigger logout in your auth provider
+  void Function()? onTokenRefreshFailed;
 
   ApiClient({TokenStorage? tokenStorage})
       : _tokenStorage = tokenStorage ?? TokenStorage() {
@@ -20,7 +25,8 @@ class ApiClient {
       },
     ));
 
-    _dio.interceptors.add(_AuthInterceptor(_dio, _tokenStorage));
+    _authInterceptor = _AuthInterceptor(_dio, _tokenStorage, this);
+    _dio.interceptors.add(_authInterceptor);
     _dio.interceptors.add(LogInterceptor(
       requestBody: true,
       responseBody: true,
@@ -67,9 +73,10 @@ class ApiClient {
 class _AuthInterceptor extends Interceptor {
   final Dio _dio;
   final TokenStorage _tokenStorage;
+  final ApiClient _apiClient;
   bool _isRefreshing = false;
 
-  _AuthInterceptor(this._dio, this._tokenStorage);
+  _AuthInterceptor(this._dio, this._tokenStorage, this._apiClient);
 
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
@@ -156,12 +163,41 @@ class _AuthInterceptor extends Interceptor {
         }
       } catch (e) {
         debugPrint('[AuthInterceptor] Token refresh failed: $e');
-        // Clear tokens only if refresh request itself failed
+
+        // Clear tokens when refresh fails
         await _tokenStorage.clearTokens();
         debugPrint('[AuthInterceptor] Tokens cleared due to refresh failure');
-      }
 
-      _isRefreshing = false;
+        // Notify the auth provider to handle logout
+        _apiClient.onTokenRefreshFailed?.call();
+        debugPrint('[AuthInterceptor] Token refresh failure callback invoked');
+
+        _isRefreshing = false;
+
+        // Extract error message from the refresh failure
+        String errorMessage = 'Session expired. Please login again.';
+        if (e is DioException && e.response?.data is Map) {
+          final responseData = e.response!.data as Map;
+          errorMessage = responseData['detail']?.toString() ??
+                        responseData['message']?.toString() ??
+                        responseData['error']?.toString() ??
+                        errorMessage;
+        }
+
+        // Return a TokenRefreshException wrapped in DioException
+        final tokenRefreshError = DioException(
+          requestOptions: err.requestOptions,
+          error: TokenRefreshException(errorMessage),
+          type: DioExceptionType.badResponse,
+          response: Response(
+            requestOptions: err.requestOptions,
+            statusCode: 401,
+            data: {'detail': errorMessage},
+          ),
+        );
+
+        return handler.next(tokenRefreshError);
+      }
     }
 
     handler.next(err);
@@ -210,4 +246,13 @@ class ApiException implements Exception {
 
   @override
   String toString() => message;
+}
+
+class TokenRefreshException implements Exception {
+  final String message;
+
+  TokenRefreshException(this.message);
+
+  @override
+  String toString() => 'TokenRefreshException: $message';
 }

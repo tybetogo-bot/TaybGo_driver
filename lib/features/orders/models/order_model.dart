@@ -545,7 +545,10 @@ class OrderModel {
     debugPrint('[OrderModel] ═══════════════════════════════════════════════════');
 
     // Parse payment status
-    final isPaid = json['is_paid'] == true || json['is_paid'] == 1 || json['is_paid'] == '1';
+    final isPaid = json['is_paid'] == true ||
+                   json['is_paid'] == 1 ||
+                   json['is_paid'] == '1' ||
+                   json['is_paid'] == 'true';
 
     return OrderModel(
       id: orderId,

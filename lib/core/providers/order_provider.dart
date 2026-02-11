@@ -53,14 +53,9 @@ class OrderProvider extends ChangeNotifier {
           order.status == OrderStatus.cancelled))
       .toList();
 
-  // Polling and timers
+  // Polling
   Timer? _pollingTimer;
-  Timer? _acceptTimer;
   static const _pollingInterval = Duration(seconds: 15);
-
-  // Accept countdown
-  int _acceptCountdown = 0;
-  int get acceptCountdown => _acceptCountdown;
 
   // Loading states
   bool _isLoading = false;
@@ -90,15 +85,12 @@ class OrderProvider extends ChangeNotifier {
   void stopPolling() {
     _stopPolling();
     _pendingOrder = null;
-    _acceptCountdown = 0;
     notifyListeners();
   }
 
   void _stopPolling() {
     _pollingTimer?.cancel();
     _pollingTimer = null;
-    _acceptTimer?.cancel();
-    _acceptTimer = null;
   }
 
   /// Fetch suggested orders from API
@@ -133,8 +125,6 @@ class OrderProvider extends ChangeNotifier {
         // Notify about new order (haptic handled in UI callback)
         onNewOrderReceived?.call();
 
-        // Start accept countdown
-        _startAcceptCountdown();
         notifyListeners();
       } else {
         debugPrint('[OrderProvider] No suggested orders available');
@@ -145,20 +135,6 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
-  void _startAcceptCountdown() {
-    _acceptCountdown = 30; // 30 seconds to accept
-    _acceptTimer?.cancel();
-    _acceptTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (_acceptCountdown > 0) {
-        _acceptCountdown--;
-        notifyListeners();
-      } else {
-        // Auto-reject if not accepted in time
-        rejectOrder();
-      }
-    });
-  }
-
   /// Accept pending order
   Future<bool> acceptOrder() async {
     if (_pendingOrder == null) return false;
@@ -166,20 +142,16 @@ class OrderProvider extends ChangeNotifier {
     // Tour mode: Simulate acceptance without API call
     // Do NOT inflate real stats — mock orders are for demonstration only
     if (_isTourActive?.call() == true && TourMockData.isMockOrder(_pendingOrder!.id)) {
-      _acceptTimer?.cancel();
-
       _activeOrder = _pendingOrder!.copyWith(
         status: OrderStatus.accepted,
         acceptedAt: DateTime.now(),
       );
 
       _pendingOrder = null;
-      _acceptCountdown = 0;
       notifyListeners();
       return true;
     }
 
-    _acceptTimer?.cancel();
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -197,7 +169,6 @@ class OrderProvider extends ChangeNotifier {
       // This ensures only finished deliveries count towards earnings
 
       _pendingOrder = null;
-      _acceptCountdown = 0;
       _isLoading = false;
       notifyListeners();
       return true;
@@ -211,7 +182,6 @@ class OrderProvider extends ChangeNotifier {
           e.toString().contains('suggestion expired') ||
           e.toString().contains('403')) {
         _pendingOrder = null;
-        _acceptCountdown = 0;
       }
 
       notifyListeners();
@@ -223,11 +193,9 @@ class OrderProvider extends ChangeNotifier {
   Future<void> rejectOrder() async {
     if (_pendingOrder == null) return;
 
-    _acceptTimer?.cancel();
     final orderId = _pendingOrder!.id;
 
     _pendingOrder = null;
-    _acceptCountdown = 0;
     notifyListeners();
 
     try {
@@ -538,17 +506,14 @@ class OrderProvider extends ChangeNotifier {
   // ========== Tour Mode Methods ==========
 
   /// Inject mock order for tour demonstration.
-  /// Does NOT start the accept countdown — mock orders persist until
-  /// the tour coordinator explicitly clears or accepts them.
+  /// Mock orders persist until the tour coordinator explicitly clears or accepts them.
   void injectMockOrder(OrderModel mockOrder) {
     _pendingOrder = mockOrder;
-    _acceptTimer?.cancel();
-    _acceptCountdown = 0;
     onNewOrderReceived?.call();
     notifyListeners();
   }
 
-  /// Inject a mock order directly as an active order (skips pending/countdown).
+  /// Inject a mock order directly as an active order (skips pending).
   /// Used by the tour coordinator so the Orders screen shows an active order.
   void injectMockActiveOrder(OrderModel mockOrder) {
     _activeOrder = mockOrder.copyWith(
@@ -564,8 +529,6 @@ class OrderProvider extends ChangeNotifier {
 
     if (_pendingOrder != null && TourMockData.isMockOrder(_pendingOrder!.id)) {
       _pendingOrder = null;
-      _acceptCountdown = 0;
-      _acceptTimer?.cancel();
       changed = true;
     }
     if (_activeOrder != null && TourMockData.isMockOrder(_activeOrder!.id)) {

@@ -24,7 +24,16 @@ class AuthProvider extends ChangeNotifier {
   String? _debugOtp;
 
   AuthProvider({AuthService? authService})
-      : _authService = authService ?? AuthService();
+      : _authService = authService ?? AuthService() {
+    // Set up callback for token refresh failures
+    _authService.setTokenRefreshFailedCallback(() {
+      debugPrint('[AuthProvider] Token refresh failed callback - forcing logout');
+      _status = AuthStatus.unauthenticated;
+      _phoneNumber = null;
+      _isNewUser = false;
+      notifyListeners();
+    });
+  }
 
   AuthStatus get status => _status;
   bool get isLoading => _isLoading;
@@ -190,5 +199,12 @@ class AuthProvider extends ChangeNotifier {
   void clearNewUserFlag() {
     _isNewUser = false;
     notifyListeners();
+  }
+
+  /// Handle token refresh failures by logging out
+  /// Call this when catching exceptions from API calls
+  Future<void> handleAuthenticationError() async {
+    debugPrint('[AuthProvider] Handling authentication error - forcing logout');
+    await logout();
   }
 }

@@ -49,6 +49,11 @@ class AuthService {
 
   ApiClient get apiClient => _apiClient;
 
+  /// Set callback to handle token refresh failures
+  void setTokenRefreshFailedCallback(void Function() callback) {
+    _apiClient.onTokenRefreshFailed = callback;
+  }
+
   Future<OtpRequestResponse> requestOtp(String phoneNumber) async {
     try {
       debugPrint('[AuthService] Sending OTP request to: ${ApiConstants.otpRequest}');
