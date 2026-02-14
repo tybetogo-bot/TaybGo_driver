@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>TypeToGo Driver</string>
+	<string>TaybGo Driver</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -13,7 +13,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>TypeToGo Driver</string>
+	<string>TaybGo Driver</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -54,10 +54,10 @@
 	</array>
 	<!-- Location permissions for geolocator -->
 	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>TypeToGo Driver needs your location to show you nearby orders and help customers track deliveries.</string>
+	<string>TaybGo Driver needs your location to show you nearby orders and help customers track deliveries.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>TypeToGo Driver needs your location to show you nearby orders and help customers track deliveries, even when the app is in the background.</string>
+	<string>TaybGo Driver needs your location to show you nearby orders and help customers track deliveries, even when the app is in the background.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
-	<string>TypeToGo Driver needs your location to show you nearby orders and help customers track deliveries, even when the app is in the background.</string>
+	<string>TaybGo Driver needs your location to show you nearby orders and help customers track deliveries, even when the app is in the background.</string>
 </dict>
 </plist>

@@ -246,6 +246,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       _buildMenuItem(
+                        Icons.support_agent,
+                        l10n.supportTickets,
+                        null,
+                        AppColors.primary,
+                        textColor,
+                        secondaryColor,
+                        borderColor,
+                        false,
+                        () => context.push(RouteConstants.support),
+                      ),
+                      _buildMenuItem(
                         Icons.contrast,
                         l10n.theme,
                         themeProvider.themeModeName,

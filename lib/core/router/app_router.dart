@@ -16,6 +16,9 @@ import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/knowledge_base/screens/knowledge_base_screen.dart';
 import '../../features/knowledge_base/screens/kb_article_screen.dart';
 import '../../features/knowledge_base/models/kb_models.dart';
+import '../../features/support/presentation/screens/support_tickets_screen.dart';
+import '../../features/support/presentation/screens/ticket_detail_screen.dart';
+import '../../features/support/presentation/screens/create_ticket_screen.dart';
 import '../constants/route_constants.dart';
 import '../providers/auth_provider.dart';
 import 'shell_scaffold.dart';
@@ -181,6 +184,23 @@ class AppRouter {
             article: article,
           );
         },
+      ),
+
+      // Support
+      GoRoute(
+        path: RouteConstants.support,
+        builder: (context, state) => const SupportTicketsScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.supportTicketDetail,
+        builder: (context, state) {
+          final ticketId = state.pathParameters['ticketId'] ?? '';
+          return TicketDetailScreen(ticketId: ticketId);
+        },
+      ),
+      GoRoute(
+        path: RouteConstants.supportCreate,
+        builder: (context, state) => const CreateTicketScreen(),
       ),
     ],
     );

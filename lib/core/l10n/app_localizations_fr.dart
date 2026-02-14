@@ -1150,4 +1150,143 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get collectCashReminder =>
       'N\'oubliez pas d\'encaisser le paiement du client';
+
+  @override
+  String get supportTickets => 'Tickets de support';
+
+  @override
+  String get supportFilterAll => 'Tous';
+
+  @override
+  String get supportFilterOpen => 'Ouverts';
+
+  @override
+  String get supportFilterInProgress => 'En cours';
+
+  @override
+  String get supportFilterClosed => 'Fermés';
+
+  @override
+  String get supportStatusOpen => 'Ouvert';
+
+  @override
+  String get supportStatusInProgress => 'En cours';
+
+  @override
+  String get supportStatusClosed => 'Fermé';
+
+  @override
+  String get supportPriorityLow => 'Faible';
+
+  @override
+  String get supportPriorityMedium => 'Moyen';
+
+  @override
+  String get supportPriorityHigh => 'Élevé';
+
+  @override
+  String get supportNoTickets => 'Aucun ticket de support';
+
+  @override
+  String get supportNoTicketsDesc =>
+      'Appuyez sur + pour créer un nouveau ticket de support';
+
+  @override
+  String get supportTicketDetail => 'Détail du ticket';
+
+  @override
+  String get supportOrderInfo => 'Commande';
+
+  @override
+  String get supportCreatedAt => 'Créé';
+
+  @override
+  String get supportMessages => 'Messages';
+
+  @override
+  String get supportYou => 'Vous';
+
+  @override
+  String get supportTeam => 'Support';
+
+  @override
+  String get supportSystem => 'Système';
+
+  @override
+  String get supportTypeMessage => 'Tapez un message...';
+
+  @override
+  String get supportSend => 'Envoyer';
+
+  @override
+  String get supportTicketClosed => 'Ce ticket est fermé';
+
+  @override
+  String get supportCreateTicket => 'Créer un ticket';
+
+  @override
+  String get supportSubject => 'Sujet';
+
+  @override
+  String get supportSubjectHint => 'Brève description de votre problème';
+
+  @override
+  String get supportCategory => 'Catégorie';
+
+  @override
+  String get supportCategoryOrder => 'Problème de commande';
+
+  @override
+  String get supportCategoryPayment => 'Paiement';
+
+  @override
+  String get supportCategoryAccount => 'Compte';
+
+  @override
+  String get supportCategoryTechnical => 'Technique';
+
+  @override
+  String get supportCategoryOther => 'Autre';
+
+  @override
+  String get supportPriority => 'Priorité';
+
+  @override
+  String get supportMessage => 'Message';
+
+  @override
+  String get supportMessageHint => 'Décrivez votre problème en détail...';
+
+  @override
+  String get supportSelectOrder => 'Sélectionner une commande (optionnel)';
+
+  @override
+  String get supportSubmit => 'Soumettre le ticket';
+
+  @override
+  String get supportSubjectRequired => 'Le sujet est requis';
+
+  @override
+  String get supportMessageRequired => 'Le message est requis';
+
+  @override
+  String get supportTicketCreated => 'Ticket créé avec succès';
+
+  @override
+  String get supportRelatedOrder => 'Commande associée';
+
+  @override
+  String get supportSubmitTicket => 'Soumettre le ticket';
+
+  @override
+  String get supportNoOrder => 'Aucune commande';
+
+  @override
+  String get supportCategoryGeneral => 'Général';
+
+  @override
+  String get supportCategoryOrderIssue => 'Problème de commande';
+
+  @override
+  String get supportNoMessages => 'Aucun message pour le moment';
 }

@@ -1138,4 +1138,142 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get collectCashReminder =>
       'Remember to collect payment from the customer';
+
+  @override
+  String get supportTickets => 'Support Tickets';
+
+  @override
+  String get supportFilterAll => 'All';
+
+  @override
+  String get supportFilterOpen => 'Open';
+
+  @override
+  String get supportFilterInProgress => 'In Progress';
+
+  @override
+  String get supportFilterClosed => 'Closed';
+
+  @override
+  String get supportStatusOpen => 'Open';
+
+  @override
+  String get supportStatusInProgress => 'In Progress';
+
+  @override
+  String get supportStatusClosed => 'Closed';
+
+  @override
+  String get supportPriorityLow => 'Low';
+
+  @override
+  String get supportPriorityMedium => 'Medium';
+
+  @override
+  String get supportPriorityHigh => 'High';
+
+  @override
+  String get supportNoTickets => 'No support tickets';
+
+  @override
+  String get supportNoTicketsDesc => 'Tap + to create a new support ticket';
+
+  @override
+  String get supportTicketDetail => 'Ticket Detail';
+
+  @override
+  String get supportOrderInfo => 'Order';
+
+  @override
+  String get supportCreatedAt => 'Created';
+
+  @override
+  String get supportMessages => 'Messages';
+
+  @override
+  String get supportYou => 'You';
+
+  @override
+  String get supportTeam => 'Support';
+
+  @override
+  String get supportSystem => 'System';
+
+  @override
+  String get supportTypeMessage => 'Type a message...';
+
+  @override
+  String get supportSend => 'Send';
+
+  @override
+  String get supportTicketClosed => 'This ticket is closed';
+
+  @override
+  String get supportCreateTicket => 'Create Ticket';
+
+  @override
+  String get supportSubject => 'Subject';
+
+  @override
+  String get supportSubjectHint => 'Brief description of your issue';
+
+  @override
+  String get supportCategory => 'Category';
+
+  @override
+  String get supportCategoryOrder => 'Order Issue';
+
+  @override
+  String get supportCategoryPayment => 'Payment';
+
+  @override
+  String get supportCategoryAccount => 'Account';
+
+  @override
+  String get supportCategoryTechnical => 'Technical';
+
+  @override
+  String get supportCategoryOther => 'Other';
+
+  @override
+  String get supportPriority => 'Priority';
+
+  @override
+  String get supportMessage => 'Message';
+
+  @override
+  String get supportMessageHint => 'Describe your issue in detail...';
+
+  @override
+  String get supportSelectOrder => 'Select an order (optional)';
+
+  @override
+  String get supportSubmit => 'Submit Ticket';
+
+  @override
+  String get supportSubjectRequired => 'Subject is required';
+
+  @override
+  String get supportMessageRequired => 'Message is required';
+
+  @override
+  String get supportTicketCreated => 'Ticket created successfully';
+
+  @override
+  String get supportRelatedOrder => 'Related Order';
+
+  @override
+  String get supportSubmitTicket => 'Submit Ticket';
+
+  @override
+  String get supportNoOrder => 'No order';
+
+  @override
+  String get supportCategoryGeneral => 'General';
+
+  @override
+  String get supportCategoryOrderIssue => 'Order Issue';
+
+  @override
+  String get supportNoMessages => 'No messages yet';
 }

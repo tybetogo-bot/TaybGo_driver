@@ -1,5 +1,5 @@
 name: teybatdriver
-description: "TypeToGo Driver - Driver partner application"
+description: "TaybGo Driver - Driver partner application"
 publish_to: 'none'
 version: 1.0.0+1
 
@@ -69,11 +69,11 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/icons/tybetogo.jpg"
+  image_path: "assets/icons/newlogo (2).jpg"
   min_sdk_android: 21
   web:
     generate: true
-    image_path: "assets/icons/tybetogo.jpg"
+    image_path: "assets/icons/newlogo (2).jpg"
     background_color: "#ffffff"
     theme_color: "#4CAF50"
   windows:

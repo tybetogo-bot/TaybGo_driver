@@ -1,11 +1,11 @@
 {
-    "name": "TypeToGo Driver",
-    "short_name": "TypeToGo",
+    "name": "TaybGo Driver",
+    "short_name": "TaybGo",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#ffffff",
     "theme_color": "#4CAF50",
-    "description": "TypeToGo Driver - Driver partner application",
+    "description": "TaybGo Driver - Driver partner application",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

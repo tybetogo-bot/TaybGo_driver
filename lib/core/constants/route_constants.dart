@@ -28,9 +28,16 @@ class RouteConstants {
   static const String knowledgeBase = '/knowledge-base';
   static const String kbArticle = '/knowledge-base/:categoryId/:articleId';
 
+  // Support
+  static const String support = '/support';
+  static const String supportTicketDetail = '/support/ticket/:ticketId';
+  static const String supportCreate = '/support/create';
+
   // Helper methods
   static String orderDetailPath(String id) => '/order/$id';
   static String navigationPath(String id) => '/navigation/$id';
   static String kbArticlePath(String categoryId, String articleId) =>
       '/knowledge-base/$categoryId/$articleId';
+  static String supportTicketDetailPath(String ticketId) =>
+      '/support/ticket/$ticketId';
 }
