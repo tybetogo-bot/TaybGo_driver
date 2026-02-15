@@ -84,6 +84,9 @@ class _HomeScreenState extends State<HomeScreen>
       _orderProvider!.setTourModeChecker(() => tourProvider.isTourActive);
       driverProvider.setTourModeChecker(() => tourProvider.isTourActive);
 
+      // Set up driver verification checker in order provider
+      _orderProvider!.setDriverVerificationChecker(() => driverProvider.isVerified);
+
       _orderProvider!.onNewOrderReceived = _onNewOrder;
 
       // If there's already a pending order, show card immediately (no animation)

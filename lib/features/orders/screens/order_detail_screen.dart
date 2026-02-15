@@ -150,41 +150,51 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   void _loadOrder() {
     final orderProvider = context.read<OrderProvider>();
 
-    // Check active order first
+    // Use cached data immediately if available (active/pending/history)
+    OrderModel? cached;
     if (orderProvider.activeOrder?.id == widget.orderId) {
-      setState(() {
-        _order = orderProvider.activeOrder;
-        _isLoading = false;
-      });
-      return;
+      cached = orderProvider.activeOrder;
+    } else if (orderProvider.pendingOrder?.id == widget.orderId) {
+      cached = orderProvider.pendingOrder;
+    } else {
+      cached = orderProvider.orderHistory
+          .where((o) => o.id == widget.orderId)
+          .firstOrNull;
     }
 
-    // Check pending order
-    if (orderProvider.pendingOrder?.id == widget.orderId) {
+    if (cached != null) {
       setState(() {
-        _order = orderProvider.pendingOrder;
+        _order = cached;
         _isLoading = false;
       });
-      return;
     }
 
-    // Check order history
-    final historyOrder = orderProvider.orderHistory
-        .where((o) => o.id == widget.orderId)
-        .firstOrNull;
-    if (historyOrder != null) {
-      setState(() {
-        _order = historyOrder;
-        _isLoading = false;
-      });
-      return;
-    }
+    // Always try to refresh from the order details API for complete data
+    _fetchOrderDetailsFromAPI(orderProvider, hasCachedData: cached != null);
+  }
 
-    // Order not found locally
-    setState(() {
-      _isLoading = false;
-      _error = null;
-    });
+  Future<void> _fetchOrderDetailsFromAPI(
+    OrderProvider orderProvider, {
+    bool hasCachedData = false,
+  }) async {
+    try {
+      final order = await orderProvider.fetchOrderDetails(widget.orderId);
+      if (mounted && order != null) {
+        setState(() {
+          _order = order;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('[OrderDetail] Failed to fetch order details: $e');
+      // Only show error if we have no cached data to display
+      if (mounted && !hasCachedData) {
+        setState(() {
+          _isLoading = false;
+          _error = e.toString();
+        });
+      }
+    }
   }
 
   Future<void> _openInGoogleMaps({
@@ -306,7 +316,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           .firstOrNull;
     }
     // Update local state if provider has newer data
-    if (currentOrder != null && currentOrder.status != _order?.status) {
+    if (currentOrder != null && currentOrder != _order) {
       _order = currentOrder;
     }
 

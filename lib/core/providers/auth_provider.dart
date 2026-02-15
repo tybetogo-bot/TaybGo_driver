@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../services/auth_service.dart';
+import '../services/cache_service.dart';
 import '../api/api_client.dart';
 
 const _onboardingCompleteKey = 'onboarding_complete';
@@ -142,7 +143,18 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    await _authService.logout();
+    try {
+      await _authService.logout();
+    } catch (e) {
+      debugPrint('[AuthProvider] Error during logout API call: $e');
+    }
+
+    // Clear all cache and saved data
+    try {
+      await CacheService.clearAllCache();
+    } catch (e) {
+      debugPrint('[AuthProvider] Error clearing cache: $e');
+    }
 
     _status = AuthStatus.unauthenticated;
     _phoneNumber = null;
