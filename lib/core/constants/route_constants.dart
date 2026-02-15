@@ -23,6 +23,7 @@ class RouteConstants {
   static const String navigation = '/navigation/:id';
   static const String settings = '/settings';
   static const String notifications = '/notifications';
+  static const String editProfile = '/edit-profile';
 
   // Knowledge Base
   static const String knowledgeBase = '/knowledge-base';

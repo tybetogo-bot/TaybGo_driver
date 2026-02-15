@@ -498,5 +498,12 @@
   "supportNoOrder": "بدون طلب",
   "supportCategoryGeneral": "عام",
   "supportCategoryOrderIssue": "مشكلة في الطلب",
-  "supportNoMessages": "لا توجد رسائل بعد"
+  "supportNoMessages": "لا توجد رسائل بعد",
+
+  "firstName": "الاسم الأول",
+  "lastName": "اسم العائلة",
+  "enterFirstName": "أدخل اسمك الأول",
+  "enterLastName": "أدخل اسم عائلتك",
+  "profileUpdatedSuccessfully": "تم تحديث الملف الشخصي بنجاح",
+  "failedToUpdateProfile": "فشل تحديث الملف الشخصي"
 }

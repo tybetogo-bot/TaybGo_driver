@@ -19,6 +19,7 @@ class ApiConstants {
 
   // User endpoints
   static const String userMe = '/me/';
+  static const String updateUserProfile = '/users/me';
 
   // Notifications
   static const String notifications = '/notifications';

@@ -1197,9 +1197,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             GestureDetector(
               onTap: () async {
                 final phoneUrl = Uri.parse('tel:${order.customerPhone}');
-                if (await canLaunchUrl(phoneUrl)) {
-                  await launchUrl(phoneUrl);
-                }
+                await launchUrl(phoneUrl);
               },
               child: Container(
                 padding: const EdgeInsets.all(8),

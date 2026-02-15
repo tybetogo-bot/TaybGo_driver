@@ -209,6 +209,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 const SizedBox(height: 24),
 
+                // Edit Profile
+                Container(
+                  decoration: BoxDecoration(
+                    color: surfaceColor,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: _buildMenuItem(
+                    Icons.edit,
+                    l10n.editProfile,
+                    null,
+                    AppColors.primary,
+                    textColor,
+                    secondaryColor,
+                    borderColor,
+                    true,
+                    () => context.push(RouteConstants.editProfile),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
                 // Settings Section
                 Container(
                   key: _tourKeys.settingsMenuKey,

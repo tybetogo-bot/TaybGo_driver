@@ -466,5 +466,12 @@
   "supportNoOrder": "Keine Bestellung",
   "supportCategoryGeneral": "Allgemein",
   "supportCategoryOrderIssue": "Bestellproblem",
-  "supportNoMessages": "Noch keine Nachrichten"
+  "supportNoMessages": "Noch keine Nachrichten",
+
+  "firstName": "Vorname",
+  "lastName": "Nachname",
+  "enterFirstName": "Geben Sie Ihren Vornamen ein",
+  "enterLastName": "Geben Sie Ihren Nachnamen ein",
+  "profileUpdatedSuccessfully": "Profil erfolgreich aktualisiert",
+  "failedToUpdateProfile": "Profil konnte nicht aktualisiert werden"
 }

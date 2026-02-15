@@ -1289,4 +1289,22 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get supportNoMessages => 'Aucun message pour le moment';
+
+  @override
+  String get firstName => 'Prénom';
+
+  @override
+  String get lastName => 'Nom de famille';
+
+  @override
+  String get enterFirstName => 'Entrez votre prénom';
+
+  @override
+  String get enterLastName => 'Entrez votre nom de famille';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profil mis à jour avec succès';
+
+  @override
+  String get failedToUpdateProfile => 'Échec de la mise à jour du profil';
 }

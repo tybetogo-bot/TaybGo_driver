@@ -12,7 +12,12 @@ class SupportProvider extends ChangeNotifier {
 
   // Ticket list
   List<SupportTicket> _tickets = [];
-  List<SupportTicket> get tickets => List.unmodifiable(_tickets);
+  List<SupportTicket> get tickets {
+    if (_statusFilter == null) return List.unmodifiable(_tickets);
+    return List.unmodifiable(
+      _tickets.where((t) => t.status == _statusFilter),
+    );
+  }
 
   // Filter
   TicketStatus? _statusFilter;

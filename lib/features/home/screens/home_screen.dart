@@ -550,7 +550,7 @@ class _HomeScreenState extends State<HomeScreen>
                     // Status Toggle Button
                     GestureDetector(
                       key: _tourKeys.onlineToggleKey,
-                      onTap: driverProvider.isLoading
+                      onTap: driverProvider.isLoading || profile == null
                           ? null
                           : () => _toggleOnline(driverProvider, orderProvider),
                       child: Container(
@@ -583,12 +583,12 @@ class _HomeScreenState extends State<HomeScreen>
                                     : borderColor.withValues(alpha: 0.5),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: driverProvider.isLoading
-                                  ? const Padding(
-                                      padding: EdgeInsets.all(10),
+                              child: driverProvider.isLoading || profile == null
+                                  ? Padding(
+                                      padding: const EdgeInsets.all(10),
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        color: Colors.white,
+                                        color: isOnlineWithLocation ? Colors.white : AppColors.primary,
                                       ),
                                     )
                                   : Icon(
@@ -603,7 +603,9 @@ class _HomeScreenState extends State<HomeScreen>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    isOnlineWithLocation ? l10n.online : l10n.offline,
+                                    profile == null
+                                        ? '...'
+                                        : (isOnline ? l10n.online : l10n.offline),
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700,

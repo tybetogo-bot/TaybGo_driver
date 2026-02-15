@@ -1291,4 +1291,22 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get supportNoMessages => 'Noch keine Nachrichten';
+
+  @override
+  String get firstName => 'Vorname';
+
+  @override
+  String get lastName => 'Nachname';
+
+  @override
+  String get enterFirstName => 'Geben Sie Ihren Vornamen ein';
+
+  @override
+  String get enterLastName => 'Geben Sie Ihren Nachnamen ein';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profil erfolgreich aktualisiert';
+
+  @override
+  String get failedToUpdateProfile => 'Profil konnte nicht aktualisiert werden';
 }

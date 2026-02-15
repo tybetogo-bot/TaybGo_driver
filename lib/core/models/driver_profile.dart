@@ -12,6 +12,15 @@ class DriverProfile {
   final bool isVerified;
   final String? vehicleType;
   final String? vehiclePlate;
+  final int? age;
+  final String? vehiclePlateNumber;
+  final String? vehicleColor;
+  final String? vehicleMake;
+  final String? vehicleModel;
+  final int? vehicleYear;
+  final bool acceptsFood;
+  final bool acceptsShipping;
+  final bool acceptsTaxi;
   final DateTime? createdAt;
 
   DriverProfile({
@@ -28,6 +37,15 @@ class DriverProfile {
     this.isVerified = false,
     this.vehicleType,
     this.vehiclePlate,
+    this.age,
+    this.vehiclePlateNumber,
+    this.vehicleColor,
+    this.vehicleMake,
+    this.vehicleModel,
+    this.vehicleYear,
+    this.acceptsFood = false,
+    this.acceptsShipping = false,
+    this.acceptsTaxi = false,
     this.createdAt,
   });
 
@@ -81,6 +99,15 @@ class DriverProfile {
       isVerified: json['is_verified'] ?? json['verified'] ?? json['status'] == 'APPROVED',
       vehicleType: json['vehicle_type'],
       vehiclePlate: json['vehicle_plate'] ?? json['license_plate'],
+      age: _parseInt(json['age']),
+      vehiclePlateNumber: json['vehicle_plate_number'],
+      vehicleColor: json['vehicle_color'],
+      vehicleMake: json['vehicle_make'],
+      vehicleModel: json['vehicle_model'],
+      vehicleYear: _parseInt(json['vehicle_year']),
+      acceptsFood: json['accepts_food'] ?? false,
+      acceptsShipping: json['accepts_shipping'] ?? false,
+      acceptsTaxi: json['accepts_taxi'] ?? false,
       createdAt: _parseDateTime(json['created_at'] ?? user['date_joined']),
     );
   }
@@ -109,6 +136,15 @@ class DriverProfile {
     bool? isVerified,
     String? vehicleType,
     String? vehiclePlate,
+    int? age,
+    String? vehiclePlateNumber,
+    String? vehicleColor,
+    String? vehicleMake,
+    String? vehicleModel,
+    int? vehicleYear,
+    bool? acceptsFood,
+    bool? acceptsShipping,
+    bool? acceptsTaxi,
     DateTime? createdAt,
   }) {
     return DriverProfile(
@@ -125,6 +161,15 @@ class DriverProfile {
       isVerified: isVerified ?? this.isVerified,
       vehicleType: vehicleType ?? this.vehicleType,
       vehiclePlate: vehiclePlate ?? this.vehiclePlate,
+      age: age ?? this.age,
+      vehiclePlateNumber: vehiclePlateNumber ?? this.vehiclePlateNumber,
+      vehicleColor: vehicleColor ?? this.vehicleColor,
+      vehicleMake: vehicleMake ?? this.vehicleMake,
+      vehicleModel: vehicleModel ?? this.vehicleModel,
+      vehicleYear: vehicleYear ?? this.vehicleYear,
+      acceptsFood: acceptsFood ?? this.acceptsFood,
+      acceptsShipping: acceptsShipping ?? this.acceptsShipping,
+      acceptsTaxi: acceptsTaxi ?? this.acceptsTaxi,
       createdAt: createdAt ?? this.createdAt,
     );
   }

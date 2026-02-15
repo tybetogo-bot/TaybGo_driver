@@ -465,7 +465,7 @@ class OrderModel {
           json['recipient_name'] ??
           json['buyer_name'] ??
           'Customer';
-      customerPhone = json['customer_phone'] ?? json['recipient_phone'] ?? json['buyer_phone'];
+      customerPhone = json['customer_phone'] ?? json['customer_phone_number'] ?? json['recipient_phone'] ?? json['buyer_phone'];
       debugPrint('[OrderModel] Customer from direct fields: name=$customerName, phone=$customerPhone');
     }
 
@@ -473,6 +473,35 @@ class OrderModel {
     if (customerName == 'Customer' && dropoffCustomerName != null && dropoffCustomerName.isNotEmpty) {
       customerName = dropoffCustomerName;
       debugPrint('[OrderModel] Customer from dropoff label: $customerName');
+    }
+
+    // Fallback: try top-level phone fields if still missing
+    if (customerPhone == null || customerPhone.isEmpty) {
+      customerPhone = (json['customer_phone_number'] ?? json['customer_phone'] ?? json['phone_number'] ?? json['phone'])?.toString();
+      if (customerPhone != null && customerPhone.isNotEmpty) {
+        debugPrint('[OrderModel] Phone from top-level field: $customerPhone');
+      }
+    }
+
+    // Fallback: try to extract phone from address objects if still missing
+    if (customerPhone == null || customerPhone.isEmpty) {
+      final addressSources = [
+        json['dropoff'],
+        json['dropoff_address'],
+        json['delivery_address'],
+        json['pickup'],
+        json['pickup_address'],
+      ];
+      for (final src in addressSources) {
+        if (src is Map) {
+          final phone = src['phone'] ?? src['phone_number'] ?? src['mobile'] ?? src['contact_phone'];
+          if (phone != null && phone.toString().isNotEmpty) {
+            customerPhone = phone.toString();
+            debugPrint('[OrderModel] Phone from address object: $customerPhone');
+            break;
+          }
+        }
+      }
     }
 
     debugPrint('[OrderModel] Final customer: name=$customerName, phone=$customerPhone');

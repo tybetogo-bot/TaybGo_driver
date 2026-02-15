@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/order_provider.dart';
@@ -122,6 +123,15 @@ class _EarningsScreenState extends State<EarningsScreen> {
                                   style: TextStyle(fontSize: 14, color: secondaryColor),
                                 ),
                               ],
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              DateFormat.MMMM(Localizations.localeOf(context).toString()).format(DateTime.now()),
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: AppColors.primary,
+                              ),
                             ),
                             const SizedBox(height: 12),
                             Text(

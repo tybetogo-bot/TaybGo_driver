@@ -498,5 +498,12 @@
   "supportNoOrder": "No order",
   "supportCategoryGeneral": "General",
   "supportCategoryOrderIssue": "Order Issue",
-  "supportNoMessages": "No messages yet"
+  "supportNoMessages": "No messages yet",
+
+  "firstName": "First Name",
+  "lastName": "Last Name",
+  "enterFirstName": "Enter your first name",
+  "enterLastName": "Enter your last name",
+  "profileUpdatedSuccessfully": "Profile updated successfully",
+  "failedToUpdateProfile": "Failed to update profile"
 }

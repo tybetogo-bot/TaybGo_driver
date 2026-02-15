@@ -466,5 +466,12 @@
   "supportNoOrder": "Aucune commande",
   "supportCategoryGeneral": "Général",
   "supportCategoryOrderIssue": "Problème de commande",
-  "supportNoMessages": "Aucun message pour le moment"
+  "supportNoMessages": "Aucun message pour le moment",
+
+  "firstName": "Prénom",
+  "lastName": "Nom de famille",
+  "enterFirstName": "Entrez votre prénom",
+  "enterLastName": "Entrez votre nom de famille",
+  "profileUpdatedSuccessfully": "Profil mis à jour avec succès",
+  "failedToUpdateProfile": "Échec de la mise à jour du profil"
 }

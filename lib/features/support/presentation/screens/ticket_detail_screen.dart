@@ -303,6 +303,22 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
       );
     }
 
+    // Sent (user/driver) messages: green tint, right-aligned
+    // Received (support/admin) messages: blue tint, left-aligned
+    final bubbleColor = isUser
+        ? (isDark
+            ? AppColors.primary.withValues(alpha: 0.25)
+            : AppColors.primary.withValues(alpha: 0.15))
+        : (isDark
+            ? AppColors.info.withValues(alpha: 0.20)
+            : AppColors.info.withValues(alpha: 0.10));
+
+    final senderLabel = isUser
+        ? null
+        : (message.authorName ?? 'Admin Support');
+
+    final senderLabelColor = isUser ? AppColors.primary : AppColors.info;
+
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -312,9 +328,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         margin: const EdgeInsets.only(bottom: 8),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: isUser
-              ? AppColors.primary.withValues(alpha: 0.15)
-              : surfaceColor,
+          color: bubbleColor,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
@@ -326,15 +340,15 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
           crossAxisAlignment:
               isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            if (!isUser && message.authorName != null)
+            if (senderLabel != null)
               Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Text(
-                  message.authorName!,
+                  senderLabel,
                   style: TextStyle(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.primary,
+                    color: senderLabelColor,
                   ),
                 ),
               ),

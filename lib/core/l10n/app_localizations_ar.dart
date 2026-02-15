@@ -1268,4 +1268,22 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get supportNoMessages => 'لا توجد رسائل بعد';
+
+  @override
+  String get firstName => 'الاسم الأول';
+
+  @override
+  String get lastName => 'اسم العائلة';
+
+  @override
+  String get enterFirstName => 'أدخل اسمك الأول';
+
+  @override
+  String get enterLastName => 'أدخل اسم عائلتك';
+
+  @override
+  String get profileUpdatedSuccessfully => 'تم تحديث الملف الشخصي بنجاح';
+
+  @override
+  String get failedToUpdateProfile => 'فشل تحديث الملف الشخصي';
 }

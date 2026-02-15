@@ -116,6 +116,52 @@ class DriverProvider extends ChangeNotifier {
     }
   }
 
+  Future<bool> updateUserProfile({
+    String? name,
+    String? phone,
+    String? email,
+    int? age,
+    String? vehicleType,
+    String? vehiclePlateNumber,
+    String? vehicleColor,
+    String? vehicleMake,
+    String? vehicleModel,
+    int? vehicleYear,
+    bool? acceptsFood,
+    bool? acceptsShipping,
+    bool? acceptsTaxi,
+  }) async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await _driverService.updateUserProfile(
+        name: name,
+        phone: phone,
+        email: email,
+        age: age,
+        vehicleType: vehicleType,
+        vehiclePlateNumber: vehiclePlateNumber,
+        vehicleColor: vehicleColor,
+        vehicleMake: vehicleMake,
+        vehicleModel: vehicleModel,
+        vehicleYear: vehicleYear,
+        acceptsFood: acceptsFood,
+        acceptsShipping: acceptsShipping,
+        acceptsTaxi: acceptsTaxi,
+      );
+      // Refresh driver profile to reflect changes
+      await fetchProfile();
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   /// Toggle online status — independent of location.
   /// Location tracking starts after going online, not before.
   Future<ToggleOnlineResult> toggleOnline() async {
