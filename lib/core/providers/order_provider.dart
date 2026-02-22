@@ -10,9 +10,6 @@ class OrderProvider extends ChangeNotifier {
 
   // Tour mode reference (will be set after initialization)
   bool Function()? _isTourActive;
-  
-  // Driver verification status checker (will be set after initialization)
-  bool Function()? _isDriverVerified;
 
   OrderProvider({OrderService? orderService, ApiClient? apiClient})
       : _orderService = orderService ??
@@ -21,11 +18,6 @@ class OrderProvider extends ChangeNotifier {
   /// Set tour mode checker (called from tour integration)
   void setTourModeChecker(bool Function() checker) {
     _isTourActive = checker;
-  }
-
-  /// Set driver verification status checker (called from app initialization)
-  void setDriverVerificationChecker(bool Function() checker) {
-    _isDriverVerified = checker;
   }
 
   // Pending order (waiting for driver to accept/reject)
@@ -107,15 +99,9 @@ class OrderProvider extends ChangeNotifier {
     debugPrint('[OrderProvider] pendingOrder: ${_pendingOrder?.id}');
     debugPrint('[OrderProvider] activeOrder: ${_activeOrder?.id}');
 
-    // Don't fetch if account is under review (not verified)
-    if (_isDriverVerified?.call() != true) {
-      debugPrint('[OrderProvider] Skipping fetch - account is under review (not verified)');
-      return;
-    }
-
-    // Don't fetch if we already have a pending or active order
-    if (_pendingOrder != null || _activeOrder != null) {
-      debugPrint('[OrderProvider] Skipping fetch - already have pending/active order');
+    // Don't fetch if we already have a pending order waiting for response
+    if (_pendingOrder != null) {
+      debugPrint('[OrderProvider] Skipping fetch - already have pending order');
       return;
     }
 
@@ -173,7 +159,7 @@ class OrderProvider extends ChangeNotifier {
     try {
       await _orderService.acceptOrder(_pendingOrder!.id);
 
-      // Use pending order data temporarily and update status locally
+      // Use pending order data and update status locally
       _activeOrder = _pendingOrder!.copyWith(
         status: OrderStatus.accepted,
         acceptedAt: DateTime.now(),
@@ -183,13 +169,6 @@ class OrderProvider extends ChangeNotifier {
       // This ensures only finished deliveries count towards earnings
 
       _pendingOrder = null;
-      notifyListeners();
-
-      // Refresh from order history API to get complete/accurate data
-      // (suggested orders API may have incomplete fields like isPaid, customerName)
-      // Await so callers only proceed once fresh data is available
-      await _refreshActiveOrderFromHistory();
-
       _isLoading = false;
       notifyListeners();
       return true;
@@ -371,25 +350,6 @@ class OrderProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
       return false;
-    }
-  }
-
-  /// Silently refresh activeOrder from the order history API
-  /// Called after accepting an order to replace stale suggested-order data
-  Future<void> _refreshActiveOrderFromHistory() async {
-    if (_activeOrder == null) return;
-    final activeId = _activeOrder!.id;
-
-    try {
-      final history = await _orderService.getOrderHistory();
-      final fresh = history.where((o) => o.id == activeId).firstOrNull;
-      if (fresh != null) {
-        _activeOrder = fresh;
-        debugPrint('[OrderProvider] Refreshed activeOrder from history: $activeId');
-        notifyListeners();
-      }
-    } catch (e) {
-      debugPrint('[OrderProvider] Failed to refresh active order from history: $e');
     }
   }
 

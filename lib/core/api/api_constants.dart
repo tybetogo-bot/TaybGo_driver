@@ -1,5 +1,5 @@
 class ApiConstants {
-  static const String baseUrl = 'https://taybgo.com/api';
+  static const String baseUrl = 'https://taybat-backend-dev.onrender.com/api';
 
   // Auth endpoints
   static const String otpRequest = '/auth/otp/request/';
@@ -19,15 +19,8 @@ class ApiConstants {
 
   // User endpoints
   static const String userMe = '/me/';
-  static const String updateUserProfile = '/users/me';
 
   // Notifications
   static const String notifications = '/notifications';
   static const String deviceToken = '/notifications/device';
-
-  // Support
-  static const String supportTickets = '/driver/support/tickets/';
-  static String supportTicketDetail(int id) => '/driver/support/tickets/$id/';
-  static String supportTicketMessages(int id) =>
-      '/driver/support/tickets/$id/messages/';
 }

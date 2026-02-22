@@ -84,9 +84,6 @@ class _HomeScreenState extends State<HomeScreen>
       _orderProvider!.setTourModeChecker(() => tourProvider.isTourActive);
       driverProvider.setTourModeChecker(() => tourProvider.isTourActive);
 
-      // Set up driver verification checker in order provider
-      _orderProvider!.setDriverVerificationChecker(() => driverProvider.isVerified);
-
       _orderProvider!.onNewOrderReceived = _onNewOrder;
 
       // If there's already a pending order, show card immediately (no animation)
@@ -531,6 +528,86 @@ class _HomeScreenState extends State<HomeScreen>
                         ),
                       ),
 
+                    // Location Permission Warning Banner
+                    if (isOnline && driverProvider.locationPermissionLost)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.error.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.error.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.error.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.location_off,
+                                color: AppColors.error,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.locationRequired,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: textColor,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    l10n.locationPermissionLostWhileOnline,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: secondaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () async {
+                                final status = driverProvider.locationStatus;
+                                if (status == LocationPermissionStatus.serviceDisabled) {
+                                  await driverProvider.openLocationSettings();
+                                } else {
+                                  await driverProvider.openAppSettings();
+                                }
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                decoration: BoxDecoration(
+                                  color: AppColors.error,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  l10n.enable,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
                     // Tour Welcome Card - only show if no completed orders
                     Consumer2<TourProvider, OrderProvider>(
                       builder: (context, tourProvider, orderProvider, _) {
@@ -550,7 +627,7 @@ class _HomeScreenState extends State<HomeScreen>
                     // Status Toggle Button
                     GestureDetector(
                       key: _tourKeys.onlineToggleKey,
-                      onTap: driverProvider.isLoading || profile == null
+                      onTap: driverProvider.isLoading
                           ? null
                           : () => _toggleOnline(driverProvider, orderProvider),
                       child: Container(
@@ -583,12 +660,12 @@ class _HomeScreenState extends State<HomeScreen>
                                     : borderColor.withValues(alpha: 0.5),
                                 borderRadius: BorderRadius.circular(12),
                               ),
-                              child: driverProvider.isLoading || profile == null
-                                  ? Padding(
-                                      padding: const EdgeInsets.all(10),
+                              child: driverProvider.isLoading
+                                  ? const Padding(
+                                      padding: EdgeInsets.all(10),
                                       child: CircularProgressIndicator(
                                         strokeWidth: 2,
-                                        color: isOnlineWithLocation ? Colors.white : AppColors.primary,
+                                        color: Colors.white,
                                       ),
                                     )
                                   : Icon(
@@ -603,9 +680,7 @@ class _HomeScreenState extends State<HomeScreen>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    profile == null
-                                        ? '...'
-                                        : (isOnline ? l10n.online : l10n.offline),
+                                    isOnlineWithLocation ? l10n.online : l10n.offline,
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700,
@@ -1206,38 +1281,87 @@ class _HomeScreenState extends State<HomeScreen>
 
           const SizedBox(height: 16),
 
-          // Accept button
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: orderProvider.isLoading ? null : () => orderProvider.acceptOrder(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
-                disabledForegroundColor: Colors.white,
-                elevation: 0,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              ),
-              child: orderProvider.isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
+          // Accept & Reject buttons
+          Row(
+            children: [
+              // Reject button
+              Expanded(
+                flex: 2,
+                child: OutlinedButton(
+                  onPressed: orderProvider.isLoading ? null : () {
+                    showDialog(
+                      context: context,
+                      builder: (ctx) => AlertDialog(
+                        title: Text(l10n.rejectOrder),
+                        content: Text(l10n.rejectOrderConfirmation),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(ctx).pop(),
+                            child: Text(l10n.cancel),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(ctx).pop();
+                              orderProvider.rejectOrder();
+                            },
+                            style: TextButton.styleFrom(foregroundColor: AppColors.error),
+                            child: Text(l10n.reject),
+                          ),
+                        ],
                       ),
-                    )
-                  : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.check_circle_outline, size: 18),
-                        const SizedBox(width: 8),
-                        Text(l10n.accept, style: const TextStyle(fontWeight: FontWeight.w600)),
-                      ],
-                    ),
-            ),
+                    );
+                  },
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppColors.error,
+                    side: const BorderSide(color: AppColors.error),
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.close, size: 18),
+                      const SizedBox(width: 6),
+                      Text(l10n.reject, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              // Accept button
+              Expanded(
+                flex: 3,
+                child: ElevatedButton(
+                  onPressed: orderProvider.isLoading ? null : () => orderProvider.acceptOrder(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
+                    disabledForegroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: orderProvider.isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(Icons.check_circle_outline, size: 18),
+                            const SizedBox(width: 8),
+                            Text(l10n.accept, style: const TextStyle(fontWeight: FontWeight.w600)),
+                          ],
+                        ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

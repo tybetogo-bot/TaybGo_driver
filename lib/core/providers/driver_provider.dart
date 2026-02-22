@@ -32,6 +32,8 @@ class DriverProvider extends ChangeNotifier {
   bool? _profileExists; // null = unknown, true = has profile, false = no profile (needs registration)
 
   Timer? _forceLocationTimer;
+  Timer? _locationPermissionCheckTimer;
+  bool _locationPermissionLost = false;
 
   // Tour mode reference (will be set after initialization)
   bool Function()? _isTourActive;
@@ -56,6 +58,7 @@ class DriverProvider extends ChangeNotifier {
   LocationService get locationService => _locationService;
   String? get currentPlaceName => _currentPlaceName;
   DateTime? get lastLocationUpdate => _lastLocationUpdate;
+  bool get locationPermissionLost => _locationPermissionLost;
   /// Returns true if profile exists, false if no profile (403), null if unknown
   bool? get profileExists => _profileExists;
 
@@ -284,6 +287,9 @@ class DriverProvider extends ChangeNotifier {
 
   /// Start location tracking after going online
   void _startLocationTracking() {
+    // Start periodic permission monitoring
+    _startLocationPermissionMonitoring();
+
     // Request permission, then start updates
     _locationService.checkPermission().then((status) async {
       if (status != LocationPermissionStatus.granted) {
@@ -338,10 +344,40 @@ class DriverProvider extends ChangeNotifier {
   void _stopLocationTracking() {
     _forceLocationTimer?.cancel();
     _forceLocationTimer = null;
+    _stopLocationPermissionMonitoring();
     _locationService.stopLocationUpdates();
     _currentPlaceName = null;
     _lastLocationUpdate = null;
     _geocodingService.clearCache();
+  }
+
+  /// Start periodic location permission checks while online
+  void _startLocationPermissionMonitoring() {
+    _locationPermissionCheckTimer?.cancel();
+    _locationPermissionLost = false;
+    _locationPermissionCheckTimer =
+        Timer.periodic(const Duration(seconds: 30), (_) async {
+      if (!(_profile?.isOnline ?? false)) return;
+      final status = await _locationService.checkPermission();
+      _locationStatus = status;
+      final wasLost = _locationPermissionLost;
+      _locationPermissionLost = status != LocationPermissionStatus.granted;
+      if (_locationPermissionLost != wasLost) {
+        debugPrint(
+            '[DriverProvider] Location permission changed: lost=$_locationPermissionLost, status=$status');
+        notifyListeners();
+      }
+    });
+  }
+
+  /// Stop location permission monitoring
+  void _stopLocationPermissionMonitoring() {
+    _locationPermissionCheckTimer?.cancel();
+    _locationPermissionCheckTimer = null;
+    if (_locationPermissionLost) {
+      _locationPermissionLost = false;
+      notifyListeners();
+    }
   }
 
   /// Resume location tracking if the driver is already online (e.g. on app restart)

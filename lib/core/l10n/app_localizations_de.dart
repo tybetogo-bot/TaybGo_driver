@@ -424,6 +424,10 @@ class AppLocalizationsDe extends AppLocalizations {
       'Sind Sie sicher, dass Sie diesen Auftrag annehmen möchten?';
 
   @override
+  String get rejectOrderConfirmation =>
+      'Sind Sie sicher, dass Sie diesen Auftrag ablehnen möchten?';
+
+  @override
   String get startDeliveryConfirmation =>
       'Bestätigen Sie, dass Sie den Auftrag abgeholt haben und die Lieferung beginnen?';
 
@@ -516,6 +520,27 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get arabic => 'Arabisch';
+
+  @override
+  String get luxembourgish => 'Luxemburgisch';
+
+  @override
+  String get italian => 'Italienisch';
+
+  @override
+  String get dutch => 'Niederländisch';
+
+  @override
+  String get swedish => 'Schwedisch';
+
+  @override
+  String get norwegian => 'Norwegisch';
+
+  @override
+  String get danish => 'Dänisch';
+
+  @override
+  String get finnish => 'Finnisch';
 
   @override
   String get theme => 'Design';
@@ -942,6 +967,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get selectCountry => 'Land auswählen';
 
   @override
+  String get searchCountry => 'Land suchen...';
+
+  @override
   String get secure => 'Sicher';
 
   @override
@@ -1154,159 +1182,6 @@ class AppLocalizationsDe extends AppLocalizations {
       'Vergessen Sie nicht, die Zahlung vom Kunden einzuziehen';
 
   @override
-  String get supportTickets => 'Support-Tickets';
-
-  @override
-  String get supportFilterAll => 'Alle';
-
-  @override
-  String get supportFilterOpen => 'Offen';
-
-  @override
-  String get supportFilterInProgress => 'In Bearbeitung';
-
-  @override
-  String get supportFilterClosed => 'Geschlossen';
-
-  @override
-  String get supportStatusOpen => 'Offen';
-
-  @override
-  String get supportStatusInProgress => 'In Bearbeitung';
-
-  @override
-  String get supportStatusClosed => 'Geschlossen';
-
-  @override
-  String get supportPriorityLow => 'Niedrig';
-
-  @override
-  String get supportPriorityMedium => 'Mittel';
-
-  @override
-  String get supportPriorityHigh => 'Hoch';
-
-  @override
-  String get supportNoTickets => 'Keine Support-Tickets';
-
-  @override
-  String get supportNoTicketsDesc =>
-      'Tippen Sie auf + um ein neues Support-Ticket zu erstellen';
-
-  @override
-  String get supportTicketDetail => 'Ticket-Details';
-
-  @override
-  String get supportOrderInfo => 'Bestellung';
-
-  @override
-  String get supportCreatedAt => 'Erstellt';
-
-  @override
-  String get supportMessages => 'Nachrichten';
-
-  @override
-  String get supportYou => 'Sie';
-
-  @override
-  String get supportTeam => 'Support';
-
-  @override
-  String get supportSystem => 'System';
-
-  @override
-  String get supportTypeMessage => 'Nachricht eingeben...';
-
-  @override
-  String get supportSend => 'Senden';
-
-  @override
-  String get supportTicketClosed => 'Dieses Ticket ist geschlossen';
-
-  @override
-  String get supportCreateTicket => 'Ticket erstellen';
-
-  @override
-  String get supportSubject => 'Betreff';
-
-  @override
-  String get supportSubjectHint => 'Kurze Beschreibung Ihres Problems';
-
-  @override
-  String get supportCategory => 'Kategorie';
-
-  @override
-  String get supportCategoryOrder => 'Bestellproblem';
-
-  @override
-  String get supportCategoryPayment => 'Zahlung';
-
-  @override
-  String get supportCategoryAccount => 'Konto';
-
-  @override
-  String get supportCategoryTechnical => 'Technisch';
-
-  @override
-  String get supportCategoryOther => 'Sonstiges';
-
-  @override
-  String get supportPriority => 'Priorität';
-
-  @override
-  String get supportMessage => 'Nachricht';
-
-  @override
-  String get supportMessageHint => 'Beschreiben Sie Ihr Problem im Detail...';
-
-  @override
-  String get supportSelectOrder => 'Bestellung auswählen (optional)';
-
-  @override
-  String get supportSubmit => 'Ticket absenden';
-
-  @override
-  String get supportSubjectRequired => 'Betreff ist erforderlich';
-
-  @override
-  String get supportMessageRequired => 'Nachricht ist erforderlich';
-
-  @override
-  String get supportTicketCreated => 'Ticket erfolgreich erstellt';
-
-  @override
-  String get supportRelatedOrder => 'Zugehörige Bestellung';
-
-  @override
-  String get supportSubmitTicket => 'Ticket absenden';
-
-  @override
-  String get supportNoOrder => 'Keine Bestellung';
-
-  @override
-  String get supportCategoryGeneral => 'Allgemein';
-
-  @override
-  String get supportCategoryOrderIssue => 'Bestellproblem';
-
-  @override
-  String get supportNoMessages => 'Noch keine Nachrichten';
-
-  @override
-  String get firstName => 'Vorname';
-
-  @override
-  String get lastName => 'Nachname';
-
-  @override
-  String get enterFirstName => 'Geben Sie Ihren Vornamen ein';
-
-  @override
-  String get enterLastName => 'Geben Sie Ihren Nachnamen ein';
-
-  @override
-  String get profileUpdatedSuccessfully => 'Profil erfolgreich aktualisiert';
-
-  @override
-  String get failedToUpdateProfile => 'Profil konnte nicht aktualisiert werden';
+  String get locationPermissionLostWhileOnline =>
+      'Standortzugriff ist deaktiviert. Sie erhalten keine Bestellungen, bis er aktiviert ist.';
 }

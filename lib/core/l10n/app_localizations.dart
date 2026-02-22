@@ -6,9 +6,16 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_ar.dart';
+import 'app_localizations_da.dart';
 import 'app_localizations_de.dart';
 import 'app_localizations_en.dart';
+import 'app_localizations_fi.dart';
 import 'app_localizations_fr.dart';
+import 'app_localizations_it.dart';
+import 'app_localizations_lb.dart';
+import 'app_localizations_nb.dart';
+import 'app_localizations_nl.dart';
+import 'app_localizations_sv.dart';
 
 // ignore_for_file: type=lint
 
@@ -97,9 +104,16 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('ar'),
+    Locale('da'),
     Locale('de'),
     Locale('en'),
+    Locale('fi'),
     Locale('fr'),
+    Locale('it'),
+    Locale('lb'),
+    Locale('nb'),
+    Locale('nl'),
+    Locale('sv'),
   ];
 
   /// The app name
@@ -912,6 +926,12 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to accept this order?'**
   String get acceptOrderConfirmation;
 
+  /// No description provided for @rejectOrderConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to reject this order?'**
+  String get rejectOrderConfirmation;
+
   /// No description provided for @startDeliveryConfirmation.
   ///
   /// In en, this message translates to:
@@ -1091,6 +1111,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Arabic'**
   String get arabic;
+
+  /// No description provided for @luxembourgish.
+  ///
+  /// In en, this message translates to:
+  /// **'Luxembourgish'**
+  String get luxembourgish;
+
+  /// No description provided for @italian.
+  ///
+  /// In en, this message translates to:
+  /// **'Italian'**
+  String get italian;
+
+  /// No description provided for @dutch.
+  ///
+  /// In en, this message translates to:
+  /// **'Dutch'**
+  String get dutch;
+
+  /// No description provided for @swedish.
+  ///
+  /// In en, this message translates to:
+  /// **'Swedish'**
+  String get swedish;
+
+  /// No description provided for @norwegian.
+  ///
+  /// In en, this message translates to:
+  /// **'Norwegian'**
+  String get norwegian;
+
+  /// No description provided for @danish.
+  ///
+  /// In en, this message translates to:
+  /// **'Danish'**
+  String get danish;
+
+  /// No description provided for @finnish.
+  ///
+  /// In en, this message translates to:
+  /// **'Finnish'**
+  String get finnish;
 
   /// No description provided for @theme.
   ///
@@ -1866,6 +1928,12 @@ abstract class AppLocalizations {
   /// **'Select Country'**
   String get selectCountry;
 
+  /// No description provided for @searchCountry.
+  ///
+  /// In en, this message translates to:
+  /// **'Search country...'**
+  String get searchCountry;
+
   /// No description provided for @secure.
   ///
   /// In en, this message translates to:
@@ -2238,317 +2306,11 @@ abstract class AppLocalizations {
   /// **'Remember to collect payment from the customer'**
   String get collectCashReminder;
 
-  /// No description provided for @supportTickets.
+  /// No description provided for @locationPermissionLostWhileOnline.
   ///
   /// In en, this message translates to:
-  /// **'Support Tickets'**
-  String get supportTickets;
-
-  /// No description provided for @supportFilterAll.
-  ///
-  /// In en, this message translates to:
-  /// **'All'**
-  String get supportFilterAll;
-
-  /// No description provided for @supportFilterOpen.
-  ///
-  /// In en, this message translates to:
-  /// **'Open'**
-  String get supportFilterOpen;
-
-  /// No description provided for @supportFilterInProgress.
-  ///
-  /// In en, this message translates to:
-  /// **'In Progress'**
-  String get supportFilterInProgress;
-
-  /// No description provided for @supportFilterClosed.
-  ///
-  /// In en, this message translates to:
-  /// **'Closed'**
-  String get supportFilterClosed;
-
-  /// No description provided for @supportStatusOpen.
-  ///
-  /// In en, this message translates to:
-  /// **'Open'**
-  String get supportStatusOpen;
-
-  /// No description provided for @supportStatusInProgress.
-  ///
-  /// In en, this message translates to:
-  /// **'In Progress'**
-  String get supportStatusInProgress;
-
-  /// No description provided for @supportStatusClosed.
-  ///
-  /// In en, this message translates to:
-  /// **'Closed'**
-  String get supportStatusClosed;
-
-  /// No description provided for @supportPriorityLow.
-  ///
-  /// In en, this message translates to:
-  /// **'Low'**
-  String get supportPriorityLow;
-
-  /// No description provided for @supportPriorityMedium.
-  ///
-  /// In en, this message translates to:
-  /// **'Medium'**
-  String get supportPriorityMedium;
-
-  /// No description provided for @supportPriorityHigh.
-  ///
-  /// In en, this message translates to:
-  /// **'High'**
-  String get supportPriorityHigh;
-
-  /// No description provided for @supportNoTickets.
-  ///
-  /// In en, this message translates to:
-  /// **'No support tickets'**
-  String get supportNoTickets;
-
-  /// No description provided for @supportNoTicketsDesc.
-  ///
-  /// In en, this message translates to:
-  /// **'Tap + to create a new support ticket'**
-  String get supportNoTicketsDesc;
-
-  /// No description provided for @supportTicketDetail.
-  ///
-  /// In en, this message translates to:
-  /// **'Ticket Detail'**
-  String get supportTicketDetail;
-
-  /// No description provided for @supportOrderInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Order'**
-  String get supportOrderInfo;
-
-  /// No description provided for @supportCreatedAt.
-  ///
-  /// In en, this message translates to:
-  /// **'Created'**
-  String get supportCreatedAt;
-
-  /// No description provided for @supportMessages.
-  ///
-  /// In en, this message translates to:
-  /// **'Messages'**
-  String get supportMessages;
-
-  /// No description provided for @supportYou.
-  ///
-  /// In en, this message translates to:
-  /// **'You'**
-  String get supportYou;
-
-  /// No description provided for @supportTeam.
-  ///
-  /// In en, this message translates to:
-  /// **'Support'**
-  String get supportTeam;
-
-  /// No description provided for @supportSystem.
-  ///
-  /// In en, this message translates to:
-  /// **'System'**
-  String get supportSystem;
-
-  /// No description provided for @supportTypeMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Type a message...'**
-  String get supportTypeMessage;
-
-  /// No description provided for @supportSend.
-  ///
-  /// In en, this message translates to:
-  /// **'Send'**
-  String get supportSend;
-
-  /// No description provided for @supportTicketClosed.
-  ///
-  /// In en, this message translates to:
-  /// **'This ticket is closed'**
-  String get supportTicketClosed;
-
-  /// No description provided for @supportCreateTicket.
-  ///
-  /// In en, this message translates to:
-  /// **'Create Ticket'**
-  String get supportCreateTicket;
-
-  /// No description provided for @supportSubject.
-  ///
-  /// In en, this message translates to:
-  /// **'Subject'**
-  String get supportSubject;
-
-  /// No description provided for @supportSubjectHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Brief description of your issue'**
-  String get supportSubjectHint;
-
-  /// No description provided for @supportCategory.
-  ///
-  /// In en, this message translates to:
-  /// **'Category'**
-  String get supportCategory;
-
-  /// No description provided for @supportCategoryOrder.
-  ///
-  /// In en, this message translates to:
-  /// **'Order Issue'**
-  String get supportCategoryOrder;
-
-  /// No description provided for @supportCategoryPayment.
-  ///
-  /// In en, this message translates to:
-  /// **'Payment'**
-  String get supportCategoryPayment;
-
-  /// No description provided for @supportCategoryAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Account'**
-  String get supportCategoryAccount;
-
-  /// No description provided for @supportCategoryTechnical.
-  ///
-  /// In en, this message translates to:
-  /// **'Technical'**
-  String get supportCategoryTechnical;
-
-  /// No description provided for @supportCategoryOther.
-  ///
-  /// In en, this message translates to:
-  /// **'Other'**
-  String get supportCategoryOther;
-
-  /// No description provided for @supportPriority.
-  ///
-  /// In en, this message translates to:
-  /// **'Priority'**
-  String get supportPriority;
-
-  /// No description provided for @supportMessage.
-  ///
-  /// In en, this message translates to:
-  /// **'Message'**
-  String get supportMessage;
-
-  /// No description provided for @supportMessageHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Describe your issue in detail...'**
-  String get supportMessageHint;
-
-  /// No description provided for @supportSelectOrder.
-  ///
-  /// In en, this message translates to:
-  /// **'Select an order (optional)'**
-  String get supportSelectOrder;
-
-  /// No description provided for @supportSubmit.
-  ///
-  /// In en, this message translates to:
-  /// **'Submit Ticket'**
-  String get supportSubmit;
-
-  /// No description provided for @supportSubjectRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Subject is required'**
-  String get supportSubjectRequired;
-
-  /// No description provided for @supportMessageRequired.
-  ///
-  /// In en, this message translates to:
-  /// **'Message is required'**
-  String get supportMessageRequired;
-
-  /// No description provided for @supportTicketCreated.
-  ///
-  /// In en, this message translates to:
-  /// **'Ticket created successfully'**
-  String get supportTicketCreated;
-
-  /// No description provided for @supportRelatedOrder.
-  ///
-  /// In en, this message translates to:
-  /// **'Related Order'**
-  String get supportRelatedOrder;
-
-  /// No description provided for @supportSubmitTicket.
-  ///
-  /// In en, this message translates to:
-  /// **'Submit Ticket'**
-  String get supportSubmitTicket;
-
-  /// No description provided for @supportNoOrder.
-  ///
-  /// In en, this message translates to:
-  /// **'No order'**
-  String get supportNoOrder;
-
-  /// No description provided for @supportCategoryGeneral.
-  ///
-  /// In en, this message translates to:
-  /// **'General'**
-  String get supportCategoryGeneral;
-
-  /// No description provided for @supportCategoryOrderIssue.
-  ///
-  /// In en, this message translates to:
-  /// **'Order Issue'**
-  String get supportCategoryOrderIssue;
-
-  /// No description provided for @supportNoMessages.
-  ///
-  /// In en, this message translates to:
-  /// **'No messages yet'**
-  String get supportNoMessages;
-
-  /// No description provided for @firstName.
-  ///
-  /// In en, this message translates to:
-  /// **'First Name'**
-  String get firstName;
-
-  /// No description provided for @lastName.
-  ///
-  /// In en, this message translates to:
-  /// **'Last Name'**
-  String get lastName;
-
-  /// No description provided for @enterFirstName.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your first name'**
-  String get enterFirstName;
-
-  /// No description provided for @enterLastName.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your last name'**
-  String get enterLastName;
-
-  /// No description provided for @profileUpdatedSuccessfully.
-  ///
-  /// In en, this message translates to:
-  /// **'Profile updated successfully'**
-  String get profileUpdatedSuccessfully;
-
-  /// No description provided for @failedToUpdateProfile.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to update profile'**
-  String get failedToUpdateProfile;
+  /// **'Location access is disabled. You won\'t receive orders until it\'s enabled.'**
+  String get locationPermissionLostWhileOnline;
 }
 
 class _AppLocalizationsDelegate
@@ -2561,8 +2323,19 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['ar', 'de', 'en', 'fr'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>[
+    'ar',
+    'da',
+    'de',
+    'en',
+    'fi',
+    'fr',
+    'it',
+    'lb',
+    'nb',
+    'nl',
+    'sv',
+  ].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -2573,12 +2346,26 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   switch (locale.languageCode) {
     case 'ar':
       return AppLocalizationsAr();
+    case 'da':
+      return AppLocalizationsDa();
     case 'de':
       return AppLocalizationsDe();
     case 'en':
       return AppLocalizationsEn();
+    case 'fi':
+      return AppLocalizationsFi();
     case 'fr':
       return AppLocalizationsFr();
+    case 'it':
+      return AppLocalizationsIt();
+    case 'lb':
+      return AppLocalizationsLb();
+    case 'nb':
+      return AppLocalizationsNb();
+    case 'nl':
+      return AppLocalizationsNl();
+    case 'sv':
+      return AppLocalizationsSv();
   }
 
   throw FlutterError(

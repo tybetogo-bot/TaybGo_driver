@@ -13,7 +13,6 @@ import 'core/providers/auth_provider.dart';
 import 'core/providers/driver_provider.dart';
 import 'core/providers/notification_provider.dart';
 import 'core/providers/tour_provider.dart';
-import 'features/support/application/support_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/services/fcm_service.dart';
 
@@ -70,7 +69,6 @@ class TybeToGoDriverApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => DriverProvider()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider.value(value: tourProvider),
-        ChangeNotifierProvider(create: (_) => SupportProvider()),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, _) {

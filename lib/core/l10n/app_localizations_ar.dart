@@ -422,6 +422,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get acceptOrderConfirmation => 'هل أنت متأكد أنك تريد قبول هذا الطلب؟';
 
   @override
+  String get rejectOrderConfirmation => 'هل أنت متأكد أنك تريد رفض هذا الطلب؟';
+
+  @override
   String get startDeliveryConfirmation =>
       'تأكيد أنك قد استلمت الطلب وبدأت التوصيل؟';
 
@@ -512,6 +515,27 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get arabic => 'العربية';
+
+  @override
+  String get luxembourgish => 'اللوكسمبورغية';
+
+  @override
+  String get italian => 'الإيطالية';
+
+  @override
+  String get dutch => 'الهولندية';
+
+  @override
+  String get swedish => 'السويدية';
+
+  @override
+  String get norwegian => 'النرويجية';
+
+  @override
+  String get danish => 'الدنماركية';
+
+  @override
+  String get finnish => 'الفنلندية';
 
   @override
   String get theme => 'المظهر';
@@ -928,6 +952,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get selectCountry => 'اختر الدولة';
 
   @override
+  String get searchCountry => 'ابحث عن دولة...';
+
+  @override
   String get secure => 'آمن';
 
   @override
@@ -1132,158 +1159,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get collectCashReminder => 'تذكّر تحصيل المبلغ من العميل';
 
   @override
-  String get supportTickets => 'تذاكر الدعم';
-
-  @override
-  String get supportFilterAll => 'الكل';
-
-  @override
-  String get supportFilterOpen => 'مفتوحة';
-
-  @override
-  String get supportFilterInProgress => 'قيد التنفيذ';
-
-  @override
-  String get supportFilterClosed => 'مغلقة';
-
-  @override
-  String get supportStatusOpen => 'مفتوحة';
-
-  @override
-  String get supportStatusInProgress => 'قيد التنفيذ';
-
-  @override
-  String get supportStatusClosed => 'مغلقة';
-
-  @override
-  String get supportPriorityLow => 'منخفضة';
-
-  @override
-  String get supportPriorityMedium => 'متوسطة';
-
-  @override
-  String get supportPriorityHigh => 'عالية';
-
-  @override
-  String get supportNoTickets => 'لا توجد تذاكر دعم';
-
-  @override
-  String get supportNoTicketsDesc => 'انقر + لإنشاء تذكرة دعم جديدة';
-
-  @override
-  String get supportTicketDetail => 'تفاصيل التذكرة';
-
-  @override
-  String get supportOrderInfo => 'الطلب';
-
-  @override
-  String get supportCreatedAt => 'تاريخ الإنشاء';
-
-  @override
-  String get supportMessages => 'الرسائل';
-
-  @override
-  String get supportYou => 'أنت';
-
-  @override
-  String get supportTeam => 'الدعم';
-
-  @override
-  String get supportSystem => 'النظام';
-
-  @override
-  String get supportTypeMessage => 'اكتب رسالة...';
-
-  @override
-  String get supportSend => 'إرسال';
-
-  @override
-  String get supportTicketClosed => 'هذه التذكرة مغلقة';
-
-  @override
-  String get supportCreateTicket => 'إنشاء تذكرة';
-
-  @override
-  String get supportSubject => 'الموضوع';
-
-  @override
-  String get supportSubjectHint => 'وصف مختصر لمشكلتك';
-
-  @override
-  String get supportCategory => 'الفئة';
-
-  @override
-  String get supportCategoryOrder => 'مشكلة في الطلب';
-
-  @override
-  String get supportCategoryPayment => 'الدفع';
-
-  @override
-  String get supportCategoryAccount => 'الحساب';
-
-  @override
-  String get supportCategoryTechnical => 'تقني';
-
-  @override
-  String get supportCategoryOther => 'أخرى';
-
-  @override
-  String get supportPriority => 'الأولوية';
-
-  @override
-  String get supportMessage => 'الرسالة';
-
-  @override
-  String get supportMessageHint => 'صف مشكلتك بالتفصيل...';
-
-  @override
-  String get supportSelectOrder => 'اختر طلباً (اختياري)';
-
-  @override
-  String get supportSubmit => 'إرسال التذكرة';
-
-  @override
-  String get supportSubjectRequired => 'الموضوع مطلوب';
-
-  @override
-  String get supportMessageRequired => 'الرسالة مطلوبة';
-
-  @override
-  String get supportTicketCreated => 'تم إنشاء التذكرة بنجاح';
-
-  @override
-  String get supportRelatedOrder => 'الطلب المرتبط';
-
-  @override
-  String get supportSubmitTicket => 'إرسال التذكرة';
-
-  @override
-  String get supportNoOrder => 'بدون طلب';
-
-  @override
-  String get supportCategoryGeneral => 'عام';
-
-  @override
-  String get supportCategoryOrderIssue => 'مشكلة في الطلب';
-
-  @override
-  String get supportNoMessages => 'لا توجد رسائل بعد';
-
-  @override
-  String get firstName => 'الاسم الأول';
-
-  @override
-  String get lastName => 'اسم العائلة';
-
-  @override
-  String get enterFirstName => 'أدخل اسمك الأول';
-
-  @override
-  String get enterLastName => 'أدخل اسم عائلتك';
-
-  @override
-  String get profileUpdatedSuccessfully => 'تم تحديث الملف الشخصي بنجاح';
-
-  @override
-  String get failedToUpdateProfile => 'فشل تحديث الملف الشخصي';
+  String get locationPermissionLostWhileOnline =>
+      'الوصول إلى الموقع معطل. لن تتلقى طلبات حتى يتم تفعيله.';
 }

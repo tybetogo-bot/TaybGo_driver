@@ -9,6 +9,13 @@ class LocaleProvider extends ChangeNotifier {
     Locale('de'),
     Locale('fr'),
     Locale('ar'),
+    Locale('lb'),
+    Locale('it'),
+    Locale('nl'),
+    Locale('sv'),
+    Locale('nb'),
+    Locale('da'),
+    Locale('fi'),
   ];
 
   Locale _locale = const Locale('en');
@@ -44,6 +51,20 @@ class LocaleProvider extends ChangeNotifier {
         return 'Français';
       case 'ar':
         return 'العربية';
+      case 'lb':
+        return 'Lëtzebuergesch';
+      case 'it':
+        return 'Italiano';
+      case 'nl':
+        return 'Nederlands';
+      case 'sv':
+        return 'Svenska';
+      case 'nb':
+        return 'Norsk';
+      case 'da':
+        return 'Dansk';
+      case 'fi':
+        return 'Suomi';
       default:
         return 'English';
     }

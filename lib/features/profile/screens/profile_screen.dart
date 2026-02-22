@@ -6,7 +6,6 @@ import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/providers/locale_provider.dart';
-import '../../../core/providers/order_provider.dart';
 import '../../../core/providers/theme_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../tour/tour_keys.dart';
@@ -209,27 +208,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 const SizedBox(height: 24),
 
-                // Edit Profile
-                Container(
-                  decoration: BoxDecoration(
-                    color: surfaceColor,
-                    borderRadius: BorderRadius.circular(14),
-                  ),
-                  child: _buildMenuItem(
-                    Icons.edit,
-                    l10n.editProfile,
-                    null,
-                    AppColors.primary,
-                    textColor,
-                    secondaryColor,
-                    borderColor,
-                    true,
-                    () => context.push(RouteConstants.editProfile),
-                  ),
-                ),
-
-                const SizedBox(height: 16),
-
                 // Settings Section
                 Container(
                   key: _tourKeys.settingsMenuKey,
@@ -266,17 +244,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           false,
                           () => context.push(RouteConstants.knowledgeBase),
                         ),
-                      ),
-                      _buildMenuItem(
-                        Icons.support_agent,
-                        l10n.supportTickets,
-                        null,
-                        AppColors.primary,
-                        textColor,
-                        secondaryColor,
-                        borderColor,
-                        false,
-                        () => context.push(RouteConstants.support),
                       ),
                       _buildMenuItem(
                         Icons.contrast,
@@ -568,7 +535,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onPressed: () async {
               Navigator.pop(ctx);
               context.read<DriverProvider>().clearProfile();
-              context.read<OrderProvider>().stopPolling();
               await context.read<AuthProvider>().logout();
             },
             child: Text(
