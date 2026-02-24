@@ -1184,4 +1184,98 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get locationPermissionLostWhileOnline =>
       'Standortzugriff ist deaktiviert. Sie erhalten keine Bestellungen, bis er aktiviert ist.';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profil erfolgreich aktualisiert';
+
+  @override
+  String get failedToUpdateProfile => 'Profil konnte nicht aktualisiert werden';
+
+  @override
+  String get supportTickets => 'Support-Tickets';
+
+  @override
+  String get supportFilterAll => 'Alle';
+
+  @override
+  String get supportFilterOpen => 'Offen';
+
+  @override
+  String get supportFilterInProgress => 'In Bearbeitung';
+
+  @override
+  String get supportFilterClosed => 'Geschlossen';
+
+  @override
+  String get supportStatusOpen => 'Offen';
+
+  @override
+  String get supportStatusInProgress => 'In Bearbeitung';
+
+  @override
+  String get supportStatusClosed => 'Geschlossen';
+
+  @override
+  String get supportPriorityLow => 'Niedrig';
+
+  @override
+  String get supportPriorityMedium => 'Mittel';
+
+  @override
+  String get supportPriorityHigh => 'Hoch';
+
+  @override
+  String get supportNoTickets => 'Noch keine Tickets';
+
+  @override
+  String get supportNoTicketsDesc =>
+      'Erstellen Sie ein Ticket, wenn Sie Hilfe benötigen';
+
+  @override
+  String get supportCreateTicket => 'Ticket erstellen';
+
+  @override
+  String get supportTicketCreated => 'Ticket erfolgreich erstellt';
+
+  @override
+  String get supportRelatedOrder => 'Zugehörige Bestellung';
+
+  @override
+  String get supportSubject => 'Betreff';
+
+  @override
+  String get supportSubjectHint => 'Kurze Beschreibung Ihres Problems';
+
+  @override
+  String get supportSubjectRequired => 'Betreff ist erforderlich';
+
+  @override
+  String get supportMessage => 'Nachricht';
+
+  @override
+  String get supportMessageHint => 'Beschreiben Sie Ihr Problem im Detail...';
+
+  @override
+  String get supportMessageRequired => 'Nachricht ist erforderlich';
+
+  @override
+  String get supportSubmitTicket => 'Ticket absenden';
+
+  @override
+  String get supportSelectOrder => 'Bestellung auswählen (optional)';
+
+  @override
+  String get supportNoOrder => 'Keine bestimmte Bestellung';
+
+  @override
+  String get supportTicketDetail => 'Ticket-Details';
+
+  @override
+  String get supportNoMessages => 'Noch keine Nachrichten';
+
+  @override
+  String get supportTypeMessage => 'Nachricht eingeben...';
+
+  @override
+  String get supportTicketClosed => 'Dieses Ticket ist geschlossen';
 }

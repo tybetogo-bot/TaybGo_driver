@@ -1182,4 +1182,98 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get locationPermissionLostWhileOnline =>
       'L\'accès à la localisation est désactivé. Vous ne recevrez pas de commandes tant qu\'il ne sera pas activé.';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profil mis à jour avec succès';
+
+  @override
+  String get failedToUpdateProfile => 'Échec de la mise à jour du profil';
+
+  @override
+  String get supportTickets => 'Tickets de support';
+
+  @override
+  String get supportFilterAll => 'Tous';
+
+  @override
+  String get supportFilterOpen => 'Ouvert';
+
+  @override
+  String get supportFilterInProgress => 'En cours';
+
+  @override
+  String get supportFilterClosed => 'Fermé';
+
+  @override
+  String get supportStatusOpen => 'Ouvert';
+
+  @override
+  String get supportStatusInProgress => 'En cours';
+
+  @override
+  String get supportStatusClosed => 'Fermé';
+
+  @override
+  String get supportPriorityLow => 'Faible';
+
+  @override
+  String get supportPriorityMedium => 'Moyen';
+
+  @override
+  String get supportPriorityHigh => 'Élevé';
+
+  @override
+  String get supportNoTickets => 'Pas encore de tickets';
+
+  @override
+  String get supportNoTicketsDesc =>
+      'Créez un ticket si vous avez besoin d\'aide';
+
+  @override
+  String get supportCreateTicket => 'Créer un ticket';
+
+  @override
+  String get supportTicketCreated => 'Ticket créé avec succès';
+
+  @override
+  String get supportRelatedOrder => 'Commande associée';
+
+  @override
+  String get supportSubject => 'Sujet';
+
+  @override
+  String get supportSubjectHint => 'Brève description de votre problème';
+
+  @override
+  String get supportSubjectRequired => 'Le sujet est requis';
+
+  @override
+  String get supportMessage => 'Message';
+
+  @override
+  String get supportMessageHint => 'Décrivez votre problème en détail...';
+
+  @override
+  String get supportMessageRequired => 'Le message est requis';
+
+  @override
+  String get supportSubmitTicket => 'Soumettre le ticket';
+
+  @override
+  String get supportSelectOrder => 'Sélectionner une commande (optionnel)';
+
+  @override
+  String get supportNoOrder => 'Aucune commande spécifique';
+
+  @override
+  String get supportTicketDetail => 'Détail du ticket';
+
+  @override
+  String get supportNoMessages => 'Aucun message pour l\'instant';
+
+  @override
+  String get supportTypeMessage => 'Écrire un message...';
+
+  @override
+  String get supportTicketClosed => 'Ce ticket est fermé';
 }

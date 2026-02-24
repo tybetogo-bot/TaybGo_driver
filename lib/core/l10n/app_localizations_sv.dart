@@ -1172,4 +1172,97 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get locationPermissionLostWhileOnline =>
       'Platsåtkomst är inaktiverad. Du kommer inte att ta emot beställningar förrän den är aktiverad.';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profil uppdaterad';
+
+  @override
+  String get failedToUpdateProfile => 'Kunde inte uppdatera profil';
+
+  @override
+  String get supportTickets => 'Supportärenden';
+
+  @override
+  String get supportFilterAll => 'Alla';
+
+  @override
+  String get supportFilterOpen => 'Öppna';
+
+  @override
+  String get supportFilterInProgress => 'Pågår';
+
+  @override
+  String get supportFilterClosed => 'Stängda';
+
+  @override
+  String get supportStatusOpen => 'Öppen';
+
+  @override
+  String get supportStatusInProgress => 'Pågår';
+
+  @override
+  String get supportStatusClosed => 'Stängd';
+
+  @override
+  String get supportPriorityLow => 'Låg';
+
+  @override
+  String get supportPriorityMedium => 'Medel';
+
+  @override
+  String get supportPriorityHigh => 'Hög';
+
+  @override
+  String get supportNoTickets => 'Inga ärenden ännu';
+
+  @override
+  String get supportNoTicketsDesc => 'Skapa ett ärende om du behöver hjälp';
+
+  @override
+  String get supportCreateTicket => 'Skapa ärende';
+
+  @override
+  String get supportTicketCreated => 'Ärende skapat';
+
+  @override
+  String get supportRelatedOrder => 'Relaterad beställning';
+
+  @override
+  String get supportSubject => 'Ämne';
+
+  @override
+  String get supportSubjectHint => 'Kort beskrivning av ditt problem';
+
+  @override
+  String get supportSubjectRequired => 'Ämne krävs';
+
+  @override
+  String get supportMessage => 'Meddelande';
+
+  @override
+  String get supportMessageHint => 'Beskriv ditt problem i detalj...';
+
+  @override
+  String get supportMessageRequired => 'Meddelande krävs';
+
+  @override
+  String get supportSubmitTicket => 'Skicka ärende';
+
+  @override
+  String get supportSelectOrder => 'Välj en beställning (valfritt)';
+
+  @override
+  String get supportNoOrder => 'Ingen specifik beställning';
+
+  @override
+  String get supportTicketDetail => 'Ärendedetaljer';
+
+  @override
+  String get supportNoMessages => 'Inga meddelanden ännu';
+
+  @override
+  String get supportTypeMessage => 'Skriv ett meddelande...';
+
+  @override
+  String get supportTicketClosed => 'Detta ärende är stängt';
 }

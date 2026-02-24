@@ -1174,4 +1174,98 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get locationPermissionLostWhileOnline =>
       'Locatietoegang is uitgeschakeld. U ontvangt geen bestellingen totdat dit is ingeschakeld.';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profiel succesvol bijgewerkt';
+
+  @override
+  String get failedToUpdateProfile => 'Profiel bijwerken mislukt';
+
+  @override
+  String get supportTickets => 'Supporttickets';
+
+  @override
+  String get supportFilterAll => 'Alle';
+
+  @override
+  String get supportFilterOpen => 'Open';
+
+  @override
+  String get supportFilterInProgress => 'In behandeling';
+
+  @override
+  String get supportFilterClosed => 'Gesloten';
+
+  @override
+  String get supportStatusOpen => 'Open';
+
+  @override
+  String get supportStatusInProgress => 'In behandeling';
+
+  @override
+  String get supportStatusClosed => 'Gesloten';
+
+  @override
+  String get supportPriorityLow => 'Laag';
+
+  @override
+  String get supportPriorityMedium => 'Gemiddeld';
+
+  @override
+  String get supportPriorityHigh => 'Hoog';
+
+  @override
+  String get supportNoTickets => 'Nog geen tickets';
+
+  @override
+  String get supportNoTicketsDesc =>
+      'Maak een ticket aan als je hulp nodig hebt';
+
+  @override
+  String get supportCreateTicket => 'Ticket aanmaken';
+
+  @override
+  String get supportTicketCreated => 'Ticket succesvol aangemaakt';
+
+  @override
+  String get supportRelatedOrder => 'Gerelateerde bestelling';
+
+  @override
+  String get supportSubject => 'Onderwerp';
+
+  @override
+  String get supportSubjectHint => 'Korte beschrijving van je probleem';
+
+  @override
+  String get supportSubjectRequired => 'Onderwerp is verplicht';
+
+  @override
+  String get supportMessage => 'Bericht';
+
+  @override
+  String get supportMessageHint => 'Beschrijf je probleem in detail...';
+
+  @override
+  String get supportMessageRequired => 'Bericht is verplicht';
+
+  @override
+  String get supportSubmitTicket => 'Ticket verzenden';
+
+  @override
+  String get supportSelectOrder => 'Selecteer een bestelling (optioneel)';
+
+  @override
+  String get supportNoOrder => 'Geen specifieke bestelling';
+
+  @override
+  String get supportTicketDetail => 'Ticketdetails';
+
+  @override
+  String get supportNoMessages => 'Nog geen berichten';
+
+  @override
+  String get supportTypeMessage => 'Typ een bericht...';
+
+  @override
+  String get supportTicketClosed => 'Dit ticket is gesloten';
 }

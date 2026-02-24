@@ -1170,4 +1170,97 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get locationPermissionLostWhileOnline =>
       'Location access is disabled. You won\'t receive orders until it\'s enabled.';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profile updated successfully';
+
+  @override
+  String get failedToUpdateProfile => 'Failed to update profile';
+
+  @override
+  String get supportTickets => 'Support Tickets';
+
+  @override
+  String get supportFilterAll => 'All';
+
+  @override
+  String get supportFilterOpen => 'Open';
+
+  @override
+  String get supportFilterInProgress => 'In Progress';
+
+  @override
+  String get supportFilterClosed => 'Closed';
+
+  @override
+  String get supportStatusOpen => 'Open';
+
+  @override
+  String get supportStatusInProgress => 'In Progress';
+
+  @override
+  String get supportStatusClosed => 'Closed';
+
+  @override
+  String get supportPriorityLow => 'Low';
+
+  @override
+  String get supportPriorityMedium => 'Medium';
+
+  @override
+  String get supportPriorityHigh => 'High';
+
+  @override
+  String get supportNoTickets => 'No tickets yet';
+
+  @override
+  String get supportNoTicketsDesc => 'Create a ticket if you need help';
+
+  @override
+  String get supportCreateTicket => 'Create Ticket';
+
+  @override
+  String get supportTicketCreated => 'Ticket created successfully';
+
+  @override
+  String get supportRelatedOrder => 'Related Order';
+
+  @override
+  String get supportSubject => 'Subject';
+
+  @override
+  String get supportSubjectHint => 'Brief description of your issue';
+
+  @override
+  String get supportSubjectRequired => 'Subject is required';
+
+  @override
+  String get supportMessage => 'Message';
+
+  @override
+  String get supportMessageHint => 'Describe your issue in detail...';
+
+  @override
+  String get supportMessageRequired => 'Message is required';
+
+  @override
+  String get supportSubmitTicket => 'Submit Ticket';
+
+  @override
+  String get supportSelectOrder => 'Select an order (optional)';
+
+  @override
+  String get supportNoOrder => 'No specific order';
+
+  @override
+  String get supportTicketDetail => 'Ticket Detail';
+
+  @override
+  String get supportNoMessages => 'No messages yet';
+
+  @override
+  String get supportTypeMessage => 'Type a message...';
+
+  @override
+  String get supportTicketClosed => 'This ticket is closed';
 }

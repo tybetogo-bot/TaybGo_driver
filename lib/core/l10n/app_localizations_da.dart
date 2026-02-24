@@ -1171,4 +1171,98 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get locationPermissionLostWhileOnline =>
       'Placeringsadgang er deaktiveret. Du modtager ikke ordrer, før den er aktiveret.';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profil opdateret';
+
+  @override
+  String get failedToUpdateProfile => 'Kunne ikke opdatere profil';
+
+  @override
+  String get supportTickets => 'Supporthenvendelser';
+
+  @override
+  String get supportFilterAll => 'Alle';
+
+  @override
+  String get supportFilterOpen => 'Åben';
+
+  @override
+  String get supportFilterInProgress => 'I gang';
+
+  @override
+  String get supportFilterClosed => 'Lukket';
+
+  @override
+  String get supportStatusOpen => 'Åben';
+
+  @override
+  String get supportStatusInProgress => 'I gang';
+
+  @override
+  String get supportStatusClosed => 'Lukket';
+
+  @override
+  String get supportPriorityLow => 'Lav';
+
+  @override
+  String get supportPriorityMedium => 'Medium';
+
+  @override
+  String get supportPriorityHigh => 'Høj';
+
+  @override
+  String get supportNoTickets => 'Ingen henvendelser endnu';
+
+  @override
+  String get supportNoTicketsDesc =>
+      'Opret en henvendelse, hvis du har brug for hjælp';
+
+  @override
+  String get supportCreateTicket => 'Opret henvendelse';
+
+  @override
+  String get supportTicketCreated => 'Henvendelse oprettet';
+
+  @override
+  String get supportRelatedOrder => 'Relateret ordre';
+
+  @override
+  String get supportSubject => 'Emne';
+
+  @override
+  String get supportSubjectHint => 'Kort beskrivelse af dit problem';
+
+  @override
+  String get supportSubjectRequired => 'Emne er påkrævet';
+
+  @override
+  String get supportMessage => 'Besked';
+
+  @override
+  String get supportMessageHint => 'Beskriv dit problem i detaljer...';
+
+  @override
+  String get supportMessageRequired => 'Besked er påkrævet';
+
+  @override
+  String get supportSubmitTicket => 'Indsend henvendelse';
+
+  @override
+  String get supportSelectOrder => 'Vælg en ordre (valgfrit)';
+
+  @override
+  String get supportNoOrder => 'Ingen specifik ordre';
+
+  @override
+  String get supportTicketDetail => 'Henvendelsesdetaljer';
+
+  @override
+  String get supportNoMessages => 'Ingen beskeder endnu';
+
+  @override
+  String get supportTypeMessage => 'Skriv en besked...';
+
+  @override
+  String get supportTicketClosed => 'Denne henvendelse er lukket';
 }

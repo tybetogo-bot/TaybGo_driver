@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
@@ -51,10 +50,12 @@ class FcmService {
 
   /// Initialize FCM — call once after Firebase.initializeApp()
   Future<void> initialize() async {
-    // Register the background handler
-    FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    if (!kIsWeb) {
+      // Background handler and local notifications are not supported on web
+      FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+    }
 
-    // Request permission (iOS + Android 13+)
+    // Request permission (iOS + Android 13+ + web)
     final settings = await _messaging.requestPermission(
       alert: true,
       badge: true,
@@ -63,11 +64,13 @@ class FcmService {
     );
     debugPrint('[FCM] Permission status: ${settings.authorizationStatus}');
 
-    // Create Android notification channels
-    await _createNotificationChannels();
+    if (!kIsWeb) {
+      // Create Android notification channels
+      await _createNotificationChannels();
 
-    // Initialize local notifications plugin
-    await _initLocalNotifications();
+      // Initialize local notifications plugin
+      await _initLocalNotifications();
+    }
 
     // Listen for foreground messages
     FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
@@ -75,19 +78,21 @@ class FcmService {
     // Handle notification taps when app is in background (not terminated)
     FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTap);
 
-    // Handle notification tap that launched the app from terminated state
-    final initialMessage = await _messaging.getInitialMessage();
-    if (initialMessage != null) {
-      debugPrint('[FCM] App opened from terminated via notification');
-      _handleNotificationTap(initialMessage);
-    }
+    if (!kIsWeb) {
+      // Handle notification tap that launched the app from terminated state
+      final initialMessage = await _messaging.getInitialMessage();
+      if (initialMessage != null) {
+        debugPrint('[FCM] App opened from terminated via notification');
+        _handleNotificationTap(initialMessage);
+      }
 
-    // Set foreground notification presentation options for iOS
-    await _messaging.setForegroundNotificationPresentationOptions(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+      // Set foreground notification presentation options for iOS
+      await _messaging.setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    }
 
     debugPrint('[FCM] Initialization complete');
   }
@@ -115,7 +120,8 @@ class FcmService {
   // ========== Private ==========
 
   Future<void> _createNotificationChannels() async {
-    if (!Platform.isAndroid) return;
+    if (kIsWeb) return;
+    // Only relevant for Android but safe to call on iOS (resolves to null).
 
     final androidPlugin =
         _localNotifications.resolvePlatformSpecificImplementation<

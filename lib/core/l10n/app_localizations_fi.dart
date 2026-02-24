@@ -1175,4 +1175,97 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get locationPermissionLostWhileOnline =>
       'Sijaintioikeus on poistettu käytöstä. Et vastaanota tilauksia ennen kuin se on otettu käyttöön.';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profiili päivitetty onnistuneesti';
+
+  @override
+  String get failedToUpdateProfile => 'Profiilin päivitys epäonnistui';
+
+  @override
+  String get supportTickets => 'Tukipyynnöt';
+
+  @override
+  String get supportFilterAll => 'Kaikki';
+
+  @override
+  String get supportFilterOpen => 'Avoin';
+
+  @override
+  String get supportFilterInProgress => 'Käynnissä';
+
+  @override
+  String get supportFilterClosed => 'Suljettu';
+
+  @override
+  String get supportStatusOpen => 'Avoin';
+
+  @override
+  String get supportStatusInProgress => 'Käynnissä';
+
+  @override
+  String get supportStatusClosed => 'Suljettu';
+
+  @override
+  String get supportPriorityLow => 'Matala';
+
+  @override
+  String get supportPriorityMedium => 'Keskitaso';
+
+  @override
+  String get supportPriorityHigh => 'Korkea';
+
+  @override
+  String get supportNoTickets => 'Ei tukipyyntöjä vielä';
+
+  @override
+  String get supportNoTicketsDesc => 'Luo tukipyyntö, jos tarvitset apua';
+
+  @override
+  String get supportCreateTicket => 'Luo tukipyyntö';
+
+  @override
+  String get supportTicketCreated => 'Tukipyyntö luotu onnistuneesti';
+
+  @override
+  String get supportRelatedOrder => 'Liittyvä tilaus';
+
+  @override
+  String get supportSubject => 'Aihe';
+
+  @override
+  String get supportSubjectHint => 'Lyhyt kuvaus ongelmastasi';
+
+  @override
+  String get supportSubjectRequired => 'Aihe on pakollinen';
+
+  @override
+  String get supportMessage => 'Viesti';
+
+  @override
+  String get supportMessageHint => 'Kuvaile ongelmasi yksityiskohtaisesti...';
+
+  @override
+  String get supportMessageRequired => 'Viesti on pakollinen';
+
+  @override
+  String get supportSubmitTicket => 'Lähetä tukipyyntö';
+
+  @override
+  String get supportSelectOrder => 'Valitse tilaus (valinnainen)';
+
+  @override
+  String get supportNoOrder => 'Ei tiettyä tilausta';
+
+  @override
+  String get supportTicketDetail => 'Tukipyynnön tiedot';
+
+  @override
+  String get supportNoMessages => 'Ei viestejä vielä';
+
+  @override
+  String get supportTypeMessage => 'Kirjoita viesti...';
+
+  @override
+  String get supportTicketClosed => 'Tämä tukipyyntö on suljettu';
 }

@@ -1184,4 +1184,98 @@ class AppLocalizationsLb extends AppLocalizations {
   @override
   String get locationPermissionLostWhileOnline =>
       'Den Zougang zum Standuert ass desaktivéiert. Dir kritt keng Bestellungen bis en ageschalt ass.';
+
+  @override
+  String get profileUpdatedSuccessfully => 'Profil erfollegräich aktualiséiert';
+
+  @override
+  String get failedToUpdateProfile => 'Profil konnt net aktualiséiert ginn';
+
+  @override
+  String get supportTickets => 'Support-Ticketen';
+
+  @override
+  String get supportFilterAll => 'Alles';
+
+  @override
+  String get supportFilterOpen => 'Op';
+
+  @override
+  String get supportFilterInProgress => 'Am Gaang';
+
+  @override
+  String get supportFilterClosed => 'Zou';
+
+  @override
+  String get supportStatusOpen => 'Op';
+
+  @override
+  String get supportStatusInProgress => 'Am Gaang';
+
+  @override
+  String get supportStatusClosed => 'Zou';
+
+  @override
+  String get supportPriorityLow => 'Niddreg';
+
+  @override
+  String get supportPriorityMedium => 'Mëttel';
+
+  @override
+  String get supportPriorityHigh => 'Héich';
+
+  @override
+  String get supportNoTickets => 'Nach keng Ticketen';
+
+  @override
+  String get supportNoTicketsDesc =>
+      'Erstellt en Ticket wann Dir Hëllef braucht';
+
+  @override
+  String get supportCreateTicket => 'Ticket erstellen';
+
+  @override
+  String get supportTicketCreated => 'Ticket erfollegräich erstallt';
+
+  @override
+  String get supportRelatedOrder => 'Verbonne Bestellung';
+
+  @override
+  String get supportSubject => 'Sujet';
+
+  @override
+  String get supportSubjectHint => 'Kuerz Beschreiwung vun Ärem Problem';
+
+  @override
+  String get supportSubjectRequired => 'Sujet ass erfuerderlech';
+
+  @override
+  String get supportMessage => 'Noriicht';
+
+  @override
+  String get supportMessageHint => 'Beschreift Äert Problem am Detail...';
+
+  @override
+  String get supportMessageRequired => 'Noriicht ass erfuerderlech';
+
+  @override
+  String get supportSubmitTicket => 'Ticket aschécken';
+
+  @override
+  String get supportSelectOrder => 'Eng Bestellung auswielen (optional)';
+
+  @override
+  String get supportNoOrder => 'Keng spezifesch Bestellung';
+
+  @override
+  String get supportTicketDetail => 'Ticket-Detailer';
+
+  @override
+  String get supportNoMessages => 'Nach keng Noriichten';
+
+  @override
+  String get supportTypeMessage => 'Eng Noriicht schreiwen...';
+
+  @override
+  String get supportTicketClosed => 'Dësen Ticket ass zou';
 }

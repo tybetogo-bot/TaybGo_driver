@@ -20,6 +20,11 @@ class ApiConstants {
   // User endpoints
   static const String userMe = '/me/';
 
+  // Support
+  static const String supportTickets = '/support/tickets/';
+  static String supportTicketDetail(int id) => '/support/tickets/$id/';
+  static String supportTicketMessages(int id) => '/support/tickets/$id/messages/';
+
   // Notifications
   static const String notifications = '/notifications';
   static const String deviceToken = '/notifications/device';

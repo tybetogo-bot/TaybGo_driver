@@ -1161,4 +1161,97 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get locationPermissionLostWhileOnline =>
       'الوصول إلى الموقع معطل. لن تتلقى طلبات حتى يتم تفعيله.';
+
+  @override
+  String get profileUpdatedSuccessfully => 'تم تحديث الملف الشخصي بنجاح';
+
+  @override
+  String get failedToUpdateProfile => 'فشل تحديث الملف الشخصي';
+
+  @override
+  String get supportTickets => 'تذاكر الدعم';
+
+  @override
+  String get supportFilterAll => 'الكل';
+
+  @override
+  String get supportFilterOpen => 'مفتوحة';
+
+  @override
+  String get supportFilterInProgress => 'قيد التنفيذ';
+
+  @override
+  String get supportFilterClosed => 'مغلقة';
+
+  @override
+  String get supportStatusOpen => 'مفتوحة';
+
+  @override
+  String get supportStatusInProgress => 'قيد التنفيذ';
+
+  @override
+  String get supportStatusClosed => 'مغلقة';
+
+  @override
+  String get supportPriorityLow => 'منخفضة';
+
+  @override
+  String get supportPriorityMedium => 'متوسطة';
+
+  @override
+  String get supportPriorityHigh => 'عالية';
+
+  @override
+  String get supportNoTickets => 'لا توجد تذاكر بعد';
+
+  @override
+  String get supportNoTicketsDesc => 'أنشئ تذكرة إذا كنت بحاجة إلى مساعدة';
+
+  @override
+  String get supportCreateTicket => 'إنشاء تذكرة';
+
+  @override
+  String get supportTicketCreated => 'تم إنشاء التذكرة بنجاح';
+
+  @override
+  String get supportRelatedOrder => 'الطلب المرتبط';
+
+  @override
+  String get supportSubject => 'الموضوع';
+
+  @override
+  String get supportSubjectHint => 'وصف مختصر لمشكلتك';
+
+  @override
+  String get supportSubjectRequired => 'الموضوع مطلوب';
+
+  @override
+  String get supportMessage => 'الرسالة';
+
+  @override
+  String get supportMessageHint => 'صف مشكلتك بالتفصيل...';
+
+  @override
+  String get supportMessageRequired => 'الرسالة مطلوبة';
+
+  @override
+  String get supportSubmitTicket => 'إرسال التذكرة';
+
+  @override
+  String get supportSelectOrder => 'اختر طلبًا (اختياري)';
+
+  @override
+  String get supportNoOrder => 'لا يوجد طلب محدد';
+
+  @override
+  String get supportTicketDetail => 'تفاصيل التذكرة';
+
+  @override
+  String get supportNoMessages => 'لا توجد رسائل بعد';
+
+  @override
+  String get supportTypeMessage => 'اكتب رسالة...';
+
+  @override
+  String get supportTicketClosed => 'هذه التذكرة مغلقة';
 }

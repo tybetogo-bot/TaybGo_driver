@@ -2311,6 +2311,192 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Location access is disabled. You won\'t receive orders until it\'s enabled.'**
   String get locationPermissionLostWhileOnline;
+
+  /// No description provided for @profileUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile updated successfully'**
+  String get profileUpdatedSuccessfully;
+
+  /// No description provided for @failedToUpdateProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update profile'**
+  String get failedToUpdateProfile;
+
+  /// No description provided for @supportTickets.
+  ///
+  /// In en, this message translates to:
+  /// **'Support Tickets'**
+  String get supportTickets;
+
+  /// No description provided for @supportFilterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get supportFilterAll;
+
+  /// No description provided for @supportFilterOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get supportFilterOpen;
+
+  /// No description provided for @supportFilterInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get supportFilterInProgress;
+
+  /// No description provided for @supportFilterClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get supportFilterClosed;
+
+  /// No description provided for @supportStatusOpen.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get supportStatusOpen;
+
+  /// No description provided for @supportStatusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get supportStatusInProgress;
+
+  /// No description provided for @supportStatusClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get supportStatusClosed;
+
+  /// No description provided for @supportPriorityLow.
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get supportPriorityLow;
+
+  /// No description provided for @supportPriorityMedium.
+  ///
+  /// In en, this message translates to:
+  /// **'Medium'**
+  String get supportPriorityMedium;
+
+  /// No description provided for @supportPriorityHigh.
+  ///
+  /// In en, this message translates to:
+  /// **'High'**
+  String get supportPriorityHigh;
+
+  /// No description provided for @supportNoTickets.
+  ///
+  /// In en, this message translates to:
+  /// **'No tickets yet'**
+  String get supportNoTickets;
+
+  /// No description provided for @supportNoTicketsDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a ticket if you need help'**
+  String get supportNoTicketsDesc;
+
+  /// No description provided for @supportCreateTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Ticket'**
+  String get supportCreateTicket;
+
+  /// No description provided for @supportTicketCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket created successfully'**
+  String get supportTicketCreated;
+
+  /// No description provided for @supportRelatedOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Related Order'**
+  String get supportRelatedOrder;
+
+  /// No description provided for @supportSubject.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject'**
+  String get supportSubject;
+
+  /// No description provided for @supportSubjectHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Brief description of your issue'**
+  String get supportSubjectHint;
+
+  /// No description provided for @supportSubjectRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Subject is required'**
+  String get supportSubjectRequired;
+
+  /// No description provided for @supportMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get supportMessage;
+
+  /// No description provided for @supportMessageHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Describe your issue in detail...'**
+  String get supportMessageHint;
+
+  /// No description provided for @supportMessageRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Message is required'**
+  String get supportMessageRequired;
+
+  /// No description provided for @supportSubmitTicket.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Ticket'**
+  String get supportSubmitTicket;
+
+  /// No description provided for @supportSelectOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Select an order (optional)'**
+  String get supportSelectOrder;
+
+  /// No description provided for @supportNoOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'No specific order'**
+  String get supportNoOrder;
+
+  /// No description provided for @supportTicketDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Ticket Detail'**
+  String get supportTicketDetail;
+
+  /// No description provided for @supportNoMessages.
+  ///
+  /// In en, this message translates to:
+  /// **'No messages yet'**
+  String get supportNoMessages;
+
+  /// No description provided for @supportTypeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message...'**
+  String get supportTypeMessage;
+
+  /// No description provided for @supportTicketClosed.
+  ///
+  /// In en, this message translates to:
+  /// **'This ticket is closed'**
+  String get supportTicketClosed;
 }
 
 class _AppLocalizationsDelegate

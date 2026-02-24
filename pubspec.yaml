@@ -51,14 +51,9 @@ dependencies:
 
   # Localization
   intl: ^0.20.2
-  country_code_picker_plus: ^0.1.0+1
 
-  # Tour & Knowledge Base
+  # Tour
   tutorial_coach_mark: ^1.2.11
-  lottie: ^3.1.0
-  flutter_svg: ^2.0.10
-  expandable: ^5.0.1
-  flutter_markdown: ^0.7.3
 
 dev_dependencies:
   flutter_test:

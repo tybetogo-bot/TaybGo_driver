@@ -1,4 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -28,8 +29,15 @@ void main() async {
   debugPrint('[Main] Firebase initialized');
 
   // Initialize FCM (permissions, channels, listeners)
+  // On web, run non-blocking so a stuck permission prompt doesn't prevent app load
   final fcmService = FcmService();
-  await fcmService.initialize();
+  if (kIsWeb) {
+    fcmService.initialize().catchError((e) {
+      debugPrint('[Main] FCM web init failed: $e');
+    });
+  } else {
+    await fcmService.initialize();
+  }
 
   // Initialize auth provider before running app
   final authProvider = AuthProvider();

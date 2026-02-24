@@ -7,10 +7,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'No Firebase configuration found for web. '
-        'Run `flutterfire configure` to generate one.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -23,6 +20,16 @@ class DefaultFirebaseOptions {
         );
     }
   }
+
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyDa0R4NIDT7yFqzNmyedYpKQo3IXOeMjhc',
+    appId: '1:356779144732:web:25604849c62be4d2bdd1d9',
+    messagingSenderId: '356779144732',
+    projectId: 'tybetogodriver',
+    storageBucket: 'tybetogodriver.firebasestorage.app',
+    authDomain: 'tybetogodriver.firebaseapp.com',
+    measurementId: 'G-PXSLY985VL',
+  );
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyATutMN0TyF1gVEkalzAl7YmgRVHEDsU_E',
