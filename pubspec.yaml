@@ -52,6 +52,10 @@ dependencies:
   # Localization
   intl: ^0.20.2
 
+  # Local packages
+  phone_otp_auth_ui:
+    path: packages/phone_otp_auth_ui
+
   # Tour
   tutorial_coach_mark: ^1.2.11
 
