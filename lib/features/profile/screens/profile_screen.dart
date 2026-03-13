@@ -153,38 +153,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ],
                       ),
-                      if (profile?.isVerified == true) ...[
-                        const SizedBox(height: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: AppColors.success.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(
-                                Icons.verified,
-                                size: 14,
-                                color: AppColors.success,
+                      if (profile != null && profile.email != null && profile.email!.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.email_outlined,
+                              size: 14,
+                              color: secondaryColor,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              profile.email!,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: secondaryColor,
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                l10n.verified,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w500,
-                                  color: AppColors.success,
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                       ],
+                      const SizedBox(height: 8),
+                      // Status badge
+                      _buildStatusBadge(profile?.status),
                       const SizedBox(height: 20),
                       // Stats Row
                       Row(
@@ -202,11 +194,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ],
                       ),
+                      if (profile?.memberSince != 'N/A') ...[
+                        const SizedBox(height: 12),
+                        Text(
+                          'Member since ${profile?.memberSince ?? ''}',
+                          style: TextStyle(fontSize: 12, color: secondaryColor),
+                        ),
+                      ],
                     ],
                   ),
                 ),
 
                 const SizedBox(height: 24),
+
+                // Account Section
+                Container(
+                  decoration: BoxDecoration(
+                    color: surfaceColor,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Column(
+                    children: [
+                      _buildMenuItem(
+                        Icons.edit,
+                        l10n.editProfile,
+                        null,
+                        AppColors.primary,
+                        textColor,
+                        secondaryColor,
+                        borderColor,
+                        true,
+                        () => context.push(RouteConstants.editProfile),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 16),
 
                 // Settings Section
                 Container(
@@ -346,6 +370,50 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
+  Widget _buildStatusBadge(String? status) {
+    if (status == null) return const SizedBox.shrink();
+
+    Color color;
+    IconData icon;
+    switch (status.toUpperCase()) {
+      case 'APPROVED':
+        color = AppColors.success;
+        icon = Icons.verified;
+      case 'PENDING':
+        color = AppColors.warning;
+        icon = Icons.hourglass_top;
+      case 'REJECTED':
+        color = AppColors.error;
+        icon = Icons.cancel;
+      default:
+        color = AppColors.info;
+        icon = Icons.info_outline;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: color),
+          const SizedBox(width: 4),
+          Text(
+            status[0] + status.substring(1).toLowerCase(),
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+              color: color,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMenuItem(
     IconData icon,
     String title,
@@ -401,47 +469,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (ctx) => Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.language,
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w600,
-                color: isDark ? AppColors.darkText : AppColors.lightText,
-              ),
-            ),
-            const SizedBox(height: 16),
-            ...LocaleProvider.supportedLocales.map(
-              (locale) => ListTile(
-                onTap: () {
-                  localeProvider.setLocale(locale);
-                  Navigator.pop(ctx);
-                },
-                leading: Icon(
-                  localeProvider.locale.languageCode == locale.languageCode
-                      ? Icons.radio_button_checked
-                      : Icons.radio_button_off,
-                  color: AppColors.primary,
-                ),
-                title: Text(
-                  localeProvider.getLanguageName(locale.languageCode),
-                  style: TextStyle(
-                    color: isDark ? AppColors.darkText : AppColors.lightText,
-                  ),
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.6,
+        minChildSize: 0.3,
+        maxChildSize: 0.85,
+        expand: false,
+        builder: (context, scrollController) => Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                l10n.language,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  color: isDark ? AppColors.darkText : AppColors.lightText,
                 ),
               ),
-            ),
-            const SizedBox(height: 10),
-          ],
+              const SizedBox(height: 16),
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  children: LocaleProvider.supportedLocales.map(
+                    (locale) => ListTile(
+                      onTap: () {
+                        localeProvider.setLocale(locale);
+                        Navigator.pop(ctx);
+                      },
+                      leading: Icon(
+                        localeProvider.locale.languageCode == locale.languageCode
+                            ? Icons.radio_button_checked
+                            : Icons.radio_button_off,
+                        color: AppColors.primary,
+                      ),
+                      title: Text(
+                        localeProvider.getLanguageName(locale.languageCode),
+                        style: TextStyle(
+                          color: isDark ? AppColors.darkText : AppColors.lightText,
+                        ),
+                      ),
+                    ),
+                  ).toList(),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -550,7 +629,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void _showDeleteAccountDialog(BuildContext context, AppLocalizations l10n) {
     showDialog(
       context: context,
-      barrierDismissible: false, // Prevent accidental dismissal
+      barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         title: Row(
@@ -693,7 +772,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     BuildContext context,
     AppLocalizations l10n,
   ) async {
-    // Show loading dialog
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -715,27 +793,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
 
     try {
-      // Clear driver profile first
       if (context.mounted) {
         context.read<DriverProvider>().clearProfile();
       }
-
-      // Delete account
       if (context.mounted) {
         await context.read<AuthProvider>().deleteAccount();
       }
-
-      // Close loading dialog
       if (context.mounted) {
         Navigator.pop(context);
       }
-
-      // Navigate to phone screen
       if (context.mounted) {
         context.go(RouteConstants.phone);
       }
-
-      // Show success message
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -745,12 +814,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
         );
       }
     } catch (e) {
-      // Close loading dialog
       if (context.mounted) {
         Navigator.pop(context);
       }
-
-      // Show error message
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

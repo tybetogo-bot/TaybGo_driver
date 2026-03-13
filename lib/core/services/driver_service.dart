@@ -67,9 +67,9 @@ class DriverService {
   Future<void> updateUserProfile({
     String? name,
     String? phone,
-    String? email,
     int? age,
     String? vehicleType,
+    String? carSize,
     String? vehiclePlateNumber,
     String? vehicleColor,
     String? vehicleMake,
@@ -78,14 +78,17 @@ class DriverService {
     bool? acceptsFood,
     bool? acceptsShipping,
     bool? acceptsTaxi,
+    String? drivingLicense,
+    String? idDocument,
+    String? otherDocuments,
   }) async {
     try {
       final data = <String, dynamic>{};
       if (name != null) data['name'] = name;
       if (phone != null) data['phone'] = phone;
-      if (email != null) data['email'] = email;
       if (age != null) data['age'] = age;
       if (vehicleType != null) data['vehicle_type'] = vehicleType;
+      if (carSize != null) data['car_size'] = carSize;
       if (vehiclePlateNumber != null) data['vehicle_plate_number'] = vehiclePlateNumber;
       if (vehicleColor != null) data['vehicle_color'] = vehicleColor;
       if (vehicleMake != null) data['vehicle_make'] = vehicleMake;
@@ -94,6 +97,9 @@ class DriverService {
       if (acceptsFood != null) data['accepts_food'] = acceptsFood;
       if (acceptsShipping != null) data['accepts_shipping'] = acceptsShipping;
       if (acceptsTaxi != null) data['accepts_taxi'] = acceptsTaxi;
+      if (drivingLicense != null) data['driving_license'] = drivingLicense;
+      if (idDocument != null) data['id_document'] = idDocument;
+      if (otherDocuments != null) data['other_documents'] = otherDocuments;
 
       debugPrint('[DriverService] === UPDATE USER PROFILE REQUEST ===');
       debugPrint('[DriverService] Endpoint: ${ApiConstants.driverProfile}');

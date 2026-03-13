@@ -10,8 +10,11 @@ class DriverProfile {
   final double totalEarnings;
   final bool isOnline;
   final bool isVerified;
+  final String? status; // PENDING, APPROVED, REJECTED, etc.
+  final List<String> roles;
   final String? vehicleType;
   final String? vehiclePlate;
+  final String? carSize;
   final int? age;
   final String? vehiclePlateNumber;
   final String? vehicleColor;
@@ -21,6 +24,9 @@ class DriverProfile {
   final bool acceptsFood;
   final bool acceptsShipping;
   final bool acceptsTaxi;
+  final String? drivingLicense;
+  final String? idDocument;
+  final String? otherDocuments;
   final DateTime? createdAt;
 
   DriverProfile({
@@ -35,8 +41,11 @@ class DriverProfile {
     this.totalEarnings = 0.0,
     this.isOnline = false,
     this.isVerified = false,
+    this.status,
+    this.roles = const [],
     this.vehicleType,
     this.vehiclePlate,
+    this.carSize,
     this.age,
     this.vehiclePlateNumber,
     this.vehicleColor,
@@ -46,6 +55,9 @@ class DriverProfile {
     this.acceptsFood = false,
     this.acceptsShipping = false,
     this.acceptsTaxi = false,
+    this.drivingLicense,
+    this.idDocument,
+    this.otherDocuments,
     this.createdAt,
   });
 
@@ -85,6 +97,15 @@ class DriverProfile {
       }
     }
 
+    // Parse roles
+    final rolesList = <String>[];
+    final rolesRaw = json['roles'];
+    if (rolesRaw is List) {
+      for (final r in rolesRaw) {
+        if (r is String) rolesList.add(r);
+      }
+    }
+
     return DriverProfile(
       id: json['id'] ?? user['id'] ?? 0,
       firstName: firstName,
@@ -97,8 +118,11 @@ class DriverProfile {
       totalEarnings: _parseDouble(json['total_earnings'] ?? json['earnings']),
       isOnline: json['is_online'] ?? false,
       isVerified: json['is_verified'] ?? json['verified'] ?? json['status'] == 'APPROVED',
+      status: json['status'] as String?,
+      roles: rolesList,
       vehicleType: json['vehicle_type'],
       vehiclePlate: json['vehicle_plate'] ?? json['license_plate'],
+      carSize: json['car_size'] as String?,
       age: _parseInt(json['age']),
       vehiclePlateNumber: json['vehicle_plate_number'],
       vehicleColor: json['vehicle_color'],
@@ -108,6 +132,9 @@ class DriverProfile {
       acceptsFood: json['accepts_food'] ?? false,
       acceptsShipping: json['accepts_shipping'] ?? false,
       acceptsTaxi: json['accepts_taxi'] ?? false,
+      drivingLicense: json['driving_license'] as String?,
+      idDocument: json['id_document'] as String?,
+      otherDocuments: json['other_documents'] as String?,
       createdAt: _parseDateTime(json['created_at'] ?? user['date_joined']),
     );
   }
@@ -134,8 +161,11 @@ class DriverProfile {
     double? totalEarnings,
     bool? isOnline,
     bool? isVerified,
+    String? status,
+    List<String>? roles,
     String? vehicleType,
     String? vehiclePlate,
+    String? carSize,
     int? age,
     String? vehiclePlateNumber,
     String? vehicleColor,
@@ -145,6 +175,9 @@ class DriverProfile {
     bool? acceptsFood,
     bool? acceptsShipping,
     bool? acceptsTaxi,
+    String? drivingLicense,
+    String? idDocument,
+    String? otherDocuments,
     DateTime? createdAt,
   }) {
     return DriverProfile(
@@ -159,8 +192,11 @@ class DriverProfile {
       totalEarnings: totalEarnings ?? this.totalEarnings,
       isOnline: isOnline ?? this.isOnline,
       isVerified: isVerified ?? this.isVerified,
+      status: status ?? this.status,
+      roles: roles ?? this.roles,
       vehicleType: vehicleType ?? this.vehicleType,
       vehiclePlate: vehiclePlate ?? this.vehiclePlate,
+      carSize: carSize ?? this.carSize,
       age: age ?? this.age,
       vehiclePlateNumber: vehiclePlateNumber ?? this.vehiclePlateNumber,
       vehicleColor: vehicleColor ?? this.vehicleColor,
@@ -170,6 +206,9 @@ class DriverProfile {
       acceptsFood: acceptsFood ?? this.acceptsFood,
       acceptsShipping: acceptsShipping ?? this.acceptsShipping,
       acceptsTaxi: acceptsTaxi ?? this.acceptsTaxi,
+      drivingLicense: drivingLicense ?? this.drivingLicense,
+      idDocument: idDocument ?? this.idDocument,
+      otherDocuments: otherDocuments ?? this.otherDocuments,
       createdAt: createdAt ?? this.createdAt,
     );
   }

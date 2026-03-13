@@ -122,9 +122,9 @@ class DriverProvider extends ChangeNotifier {
   Future<bool> updateUserProfile({
     String? name,
     String? phone,
-    String? email,
     int? age,
     String? vehicleType,
+    String? carSize,
     String? vehiclePlateNumber,
     String? vehicleColor,
     String? vehicleMake,
@@ -133,6 +133,9 @@ class DriverProvider extends ChangeNotifier {
     bool? acceptsFood,
     bool? acceptsShipping,
     bool? acceptsTaxi,
+    String? drivingLicense,
+    String? idDocument,
+    String? otherDocuments,
   }) async {
     _isLoading = true;
     _error = null;
@@ -142,9 +145,9 @@ class DriverProvider extends ChangeNotifier {
       await _driverService.updateUserProfile(
         name: name,
         phone: phone,
-        email: email,
         age: age,
         vehicleType: vehicleType,
+        carSize: carSize,
         vehiclePlateNumber: vehiclePlateNumber,
         vehicleColor: vehicleColor,
         vehicleMake: vehicleMake,
@@ -153,6 +156,9 @@ class DriverProvider extends ChangeNotifier {
         acceptsFood: acceptsFood,
         acceptsShipping: acceptsShipping,
         acceptsTaxi: acceptsTaxi,
+        drivingLicense: drivingLicense,
+        idDocument: idDocument,
+        otherDocuments: otherDocuments,
       );
       // Refresh driver profile to reflect changes
       await fetchProfile();

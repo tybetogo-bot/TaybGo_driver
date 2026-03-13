@@ -18,7 +18,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   // Personal info controllers
   late TextEditingController _nameController;
-  late TextEditingController _emailController;
   late TextEditingController _phoneController;
   late TextEditingController _ageController;
 
@@ -29,13 +28,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _vehicleModelController;
   late TextEditingController _vehicleYearController;
 
+  // Document controllers
+  late TextEditingController _drivingLicenseController;
+  late TextEditingController _idDocumentController;
+  late TextEditingController _otherDocumentsController;
+
   // Service toggles
   late bool _acceptsFood;
   late bool _acceptsShipping;
   late bool _acceptsTaxi;
 
-  // Vehicle type
+  // Vehicle type & car size
   String? _selectedVehicleType;
+  String? _selectedCarSize;
 
   bool _isSaving = false;
 
@@ -46,7 +51,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     // Initialize personal info
     _nameController = TextEditingController(text: profile?.fullName ?? '');
-    _emailController = TextEditingController(text: profile?.email ?? '');
     _phoneController = TextEditingController(text: profile?.phone ?? '');
     _ageController = TextEditingController(
       text: profile?.age != null && profile!.age! > 0 ? profile.age.toString() : '',
@@ -54,6 +58,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     // Initialize vehicle info
     _selectedVehicleType = profile?.vehicleType;
+    _selectedCarSize = profile?.carSize;
     _vehiclePlateNumberController = TextEditingController(
       text: profile?.vehiclePlateNumber ?? '',
     );
@@ -66,6 +71,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           : '',
     );
 
+    // Initialize document controllers
+    _drivingLicenseController = TextEditingController(text: profile?.drivingLicense ?? '');
+    _idDocumentController = TextEditingController(text: profile?.idDocument ?? '');
+    _otherDocumentsController = TextEditingController(text: profile?.otherDocuments ?? '');
+
     // Initialize service toggles
     _acceptsFood = profile?.acceptsFood ?? false;
     _acceptsShipping = profile?.acceptsShipping ?? false;
@@ -75,7 +85,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _emailController.dispose();
     _phoneController.dispose();
     _ageController.dispose();
     _vehiclePlateNumberController.dispose();
@@ -83,6 +92,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _vehicleMakeController.dispose();
     _vehicleModelController.dispose();
     _vehicleYearController.dispose();
+    _drivingLicenseController.dispose();
+    _idDocumentController.dispose();
+    _otherDocumentsController.dispose();
     super.dispose();
   }
 
@@ -97,9 +109,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final success = await driverProvider.updateUserProfile(
       name: _nameController.text.trim().isNotEmpty ? _nameController.text.trim() : null,
       phone: _phoneController.text.trim().isNotEmpty ? _phoneController.text.trim() : null,
-      email: _emailController.text.trim().isNotEmpty ? _emailController.text.trim() : null,
       age: _ageController.text.trim().isNotEmpty ? int.tryParse(_ageController.text.trim()) : null,
       vehicleType: _selectedVehicleType,
+      carSize: _selectedCarSize,
       vehiclePlateNumber: _vehiclePlateNumberController.text.trim().isNotEmpty
           ? _vehiclePlateNumberController.text.trim()
           : null,
@@ -118,6 +130,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       acceptsFood: _acceptsFood,
       acceptsShipping: _acceptsShipping,
       acceptsTaxi: _acceptsTaxi,
+      drivingLicense: _drivingLicenseController.text.trim().isNotEmpty
+          ? _drivingLicenseController.text.trim()
+          : null,
+      idDocument: _idDocumentController.text.trim().isNotEmpty
+          ? _idDocumentController.text.trim()
+          : null,
+      otherDocuments: _otherDocumentsController.text.trim().isNotEmpty
+          ? _otherDocumentsController.text.trim()
+          : null,
     );
 
     if (!mounted) return;
@@ -285,30 +306,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               const SizedBox(height: 16),
 
-              // Email
-              _buildFieldLabel(Icons.email_outlined, l10n.email, secondaryColor),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _emailController,
-                hint: l10n.enterEmail,
-                keyboardType: TextInputType.emailAddress,
-                surfaceColor: surfaceColor,
-                borderColor: borderColor,
-                textColor: textColor,
-                hintColor: hintColor,
-                validator: (value) {
-                  if (value != null && value.trim().isNotEmpty) {
-                    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+$');
-                    if (!emailRegex.hasMatch(value.trim())) {
-                      return l10n.enterEmail;
-                    }
-                  }
-                  return null;
-                },
-              ),
-
-              const SizedBox(height: 16),
-
               // Age
               _buildFieldLabel(Icons.cake_outlined, 'Age', secondaryColor),
               const SizedBox(height: 8),
@@ -342,6 +339,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 hint: 'Select vehicle type',
                 onChanged: (value) {
                   setState(() => _selectedVehicleType = value);
+                },
+                surfaceColor: surfaceColor,
+                borderColor: borderColor,
+                textColor: textColor,
+                hintColor: hintColor,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Car Size Dropdown
+              _buildFieldLabel(Icons.straighten_outlined, 'Car Size', secondaryColor),
+              const SizedBox(height: 8),
+              _buildDropdown(
+                value: _selectedCarSize,
+                items: ['X', 'S', 'M', 'L', 'XL'],
+                hint: 'Select car size',
+                onChanged: (value) {
+                  setState(() => _selectedCarSize = value);
                 },
                 surfaceColor: surfaceColor,
                 borderColor: borderColor,
@@ -459,6 +474,56 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 (value) => setState(() => _acceptsTaxi = value),
                 surfaceColor,
                 textColor,
+              ),
+
+              const SizedBox(height: 28),
+
+              // Documents Section
+              _buildSectionHeader(
+                l10n.documents,
+                Icons.description_outlined,
+                textColor,
+              ),
+              const SizedBox(height: 16),
+
+              // Driving License
+              _buildFieldLabel(Icons.drive_eta_outlined, 'Driving License', secondaryColor),
+              const SizedBox(height: 8),
+              _buildTextField(
+                controller: _drivingLicenseController,
+                hint: 'Enter driving license number or URL',
+                surfaceColor: surfaceColor,
+                borderColor: borderColor,
+                textColor: textColor,
+                hintColor: hintColor,
+              ),
+
+              const SizedBox(height: 16),
+
+              // ID Document
+              _buildFieldLabel(Icons.badge_outlined, 'ID Document', secondaryColor),
+              const SizedBox(height: 8),
+              _buildTextField(
+                controller: _idDocumentController,
+                hint: 'Enter ID document number or URL',
+                surfaceColor: surfaceColor,
+                borderColor: borderColor,
+                textColor: textColor,
+                hintColor: hintColor,
+              ),
+
+              const SizedBox(height: 16),
+
+              // Other Documents
+              _buildFieldLabel(Icons.folder_outlined, 'Other Documents', secondaryColor),
+              const SizedBox(height: 8),
+              _buildTextField(
+                controller: _otherDocumentsController,
+                hint: 'Enter other document details or URL',
+                surfaceColor: surfaceColor,
+                borderColor: borderColor,
+                textColor: textColor,
+                hintColor: hintColor,
               ),
 
               const SizedBox(height: 36),
