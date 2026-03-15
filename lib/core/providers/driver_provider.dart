@@ -438,9 +438,14 @@ class DriverProvider extends ChangeNotifier {
   }
 
   void clearProfile() {
+    _stopLocationTracking();
     _profile = null;
     _profileExists = null;
     _error = null;
+    _locationStatus = null;
+    _currentPlaceName = null;
+    _lastLocationUpdate = null;
+    _locationPermissionLost = false;
     notifyListeners();
   }
 

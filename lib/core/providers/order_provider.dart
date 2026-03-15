@@ -481,6 +481,19 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
+  /// Clear all order data (called on logout)
+  void clearAll() {
+    _stopPolling();
+    _pendingOrder = null;
+    _activeOrder = null;
+    _orderHistory = [];
+    _totalOrders = 0;
+    _totalEarnings = 0.0;
+    _isLoading = false;
+    _error = null;
+    notifyListeners();
+  }
+
   void clearError() {
     _error = null;
     notifyListeners();

@@ -24,11 +24,16 @@ class AuthProvider extends ChangeNotifier {
   bool _initialized = false;
   String? _debugOtp;
 
+  /// Called when logout happens (including forced logout from token expiry)
+  /// so other providers can clear their in-memory data.
+  VoidCallback? onLogoutCallback;
+
   AuthProvider({AuthService? authService})
       : _authService = authService ?? AuthService() {
     // Set up callback for token refresh failures
     _authService.setTokenRefreshFailedCallback(() {
       debugPrint('[AuthProvider] Token refresh failed callback - forcing logout');
+      onLogoutCallback?.call();
       _status = AuthStatus.unauthenticated;
       _phoneNumber = null;
       _isNewUser = false;
@@ -155,6 +160,9 @@ class AuthProvider extends ChangeNotifier {
     } catch (e) {
       debugPrint('[AuthProvider] Error clearing cache: $e');
     }
+
+    // Notify other providers to clear their in-memory data
+    onLogoutCallback?.call();
 
     _status = AuthStatus.unauthenticated;
     _phoneNumber = null;

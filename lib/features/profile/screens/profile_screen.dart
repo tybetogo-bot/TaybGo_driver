@@ -6,7 +6,10 @@ import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/providers/locale_provider.dart';
+import '../../../core/providers/notification_provider.dart';
+import '../../../core/providers/order_provider.dart';
 import '../../../core/providers/theme_provider.dart';
+import '../../../core/providers/tour_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../tour/tour_keys.dart';
 
@@ -614,6 +617,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
             onPressed: () async {
               Navigator.pop(ctx);
               context.read<DriverProvider>().clearProfile();
+              context.read<OrderProvider>().clearAll();
+              context.read<NotificationProvider>().clearAll();
+              context.read<TourProvider>().resetTour();
               await context.read<AuthProvider>().logout();
             },
             child: Text(

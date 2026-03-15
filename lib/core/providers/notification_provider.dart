@@ -147,6 +147,9 @@ class NotificationProvider extends ChangeNotifier {
   /// Clear all notifications locally
   void clearAll() {
     _notifications = [];
+    _isTokenRegistered = false;
+    _isLoading = false;
+    _error = null;
     notifyListeners();
   }
 

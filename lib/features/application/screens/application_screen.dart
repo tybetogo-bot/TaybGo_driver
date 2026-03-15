@@ -5,6 +5,9 @@ import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/driver_provider.dart';
+import '../../../core/providers/notification_provider.dart';
+import '../../../core/providers/order_provider.dart';
+import '../../../core/providers/tour_provider.dart';
 import '../../../core/services/driver_registration_service.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -167,6 +170,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             if (_currentStep > 0) {
               _previousStep();
             } else {
+              context.read<DriverProvider>().clearProfile();
+              context.read<OrderProvider>().clearAll();
+              context.read<NotificationProvider>().clearAll();
+              context.read<TourProvider>().resetTour();
               final auth = context.read<AuthProvider>();
               final router = GoRouter.of(context);
               await auth.logout();
@@ -796,6 +803,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           Expanded(
             child: OutlinedButton(
               onPressed: () async {
+                context.read<DriverProvider>().clearProfile();
+                context.read<OrderProvider>().clearAll();
+                context.read<NotificationProvider>().clearAll();
+                context.read<TourProvider>().resetTour();
                 final auth = context.read<AuthProvider>();
                 final router = GoRouter.of(context);
                 await auth.logout();

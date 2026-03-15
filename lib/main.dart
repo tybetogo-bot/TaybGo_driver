@@ -68,14 +68,27 @@ class TybeToGoDriverApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final orderProvider = OrderProvider();
+    final driverProvider = DriverProvider();
+    final notificationProvider = NotificationProvider();
+
+    // Wire up logout callback so all providers clear on any logout
+    // (including forced logout from expired tokens)
+    authProvider.onLogoutCallback = () {
+      driverProvider.clearProfile();
+      orderProvider.clearAll();
+      notificationProvider.clearAll();
+      tourProvider.resetTour();
+    };
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => LocaleProvider()),
-        ChangeNotifierProvider(create: (_) => OrderProvider()),
+        ChangeNotifierProvider.value(value: orderProvider),
         ChangeNotifierProvider.value(value: authProvider),
-        ChangeNotifierProvider(create: (_) => DriverProvider()),
-        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider.value(value: driverProvider),
+        ChangeNotifierProvider.value(value: notificationProvider),
         ChangeNotifierProvider.value(value: tourProvider),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(
