@@ -251,7 +251,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                     isLoading: authProvider.isLoading,
                     errorText: authProvider.error,
                     initialCountry: Country.all.firstWhere(
-                      (c) => c.code == 'DE',
+                      (c) => c.code == 'AT',
                       orElse: () => Country.defaultCountry,
                     ),
                     autofocus: false,

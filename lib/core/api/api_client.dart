@@ -70,7 +70,7 @@ class ApiClient {
   }
 }
 
-class _AuthInterceptor extends Interceptor {
+class _AuthInterceptor extends QueuedInterceptor {
   final Dio _dio;
   final TokenStorage _tokenStorage;
   final ApiClient _apiClient;
@@ -84,6 +84,7 @@ class _AuthInterceptor extends Interceptor {
     final publicEndpoints = [
       ApiConstants.otpRequest,
       ApiConstants.otpVerify,
+      ApiConstants.tokenRefresh,
     ];
 
     // Use exact match or endsWith to avoid false positives
@@ -94,7 +95,6 @@ class _AuthInterceptor extends Interceptor {
     if (!isPublic) {
       final token = await _tokenStorage.getAccessToken();
       debugPrint('[AuthInterceptor] Token exists: ${token != null}');
-      debugPrint('[AuthInterceptor] Token (first 20 chars): ${token?.substring(0, token.length > 20 ? 20 : token.length)}...');
       if (token != null) {
         options.headers['Authorization'] = 'Bearer $token';
       }
@@ -108,7 +108,11 @@ class _AuthInterceptor extends Interceptor {
     debugPrint('[AuthInterceptor] Error: ${err.response?.statusCode} - ${err.message}');
     debugPrint('[AuthInterceptor] Error Response: ${err.response?.data}');
 
-    if (err.response?.statusCode == 401 && !_isRefreshing) {
+    // Skip refresh for token refresh endpoint itself to avoid infinite loop
+    final isRefreshRequest = err.requestOptions.path == ApiConstants.tokenRefresh ||
+        err.requestOptions.path.endsWith(ApiConstants.tokenRefresh);
+
+    if (err.response?.statusCode == 401 && !_isRefreshing && !isRefreshRequest) {
       debugPrint('[AuthInterceptor] Attempting token refresh...');
       _isRefreshing = true;
 
@@ -116,13 +120,15 @@ class _AuthInterceptor extends Interceptor {
       debugPrint('[AuthInterceptor] Refresh token exists: ${refreshToken != null}');
 
       if (refreshToken == null) {
-        debugPrint('[AuthInterceptor] No refresh token, cannot refresh');
+        debugPrint('[AuthInterceptor] No refresh token, forcing logout');
         _isRefreshing = false;
+        await _tokenStorage.clearTokens();
+        _apiClient.onTokenRefreshFailed?.call();
         return handler.next(err);
       }
 
       try {
-        // Try to refresh the token
+        // Try to refresh the token using a separate Dio instance
         final response = await Dio(BaseOptions(
           baseUrl: ApiConstants.baseUrl,
           headers: {'Content-Type': 'application/json'},
@@ -143,18 +149,17 @@ class _AuthInterceptor extends Interceptor {
           );
           debugPrint('[AuthInterceptor] New tokens saved');
 
-          // Retry the original request
+          _isRefreshing = false;
+
+          // Retry the original request with new token
           final options = err.requestOptions;
           options.headers['Authorization'] = 'Bearer $newAccessToken';
 
           try {
             final retryResponse = await _dio.fetch(options);
-            _isRefreshing = false;
             return handler.resolve(retryResponse);
           } catch (retryError) {
             debugPrint('[AuthInterceptor] Retry request failed: $retryError');
-            _isRefreshing = false;
-            // Return the retry error, not the original 401
             if (retryError is DioException) {
               return handler.next(retryError);
             }
