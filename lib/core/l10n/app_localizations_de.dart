@@ -9,7 +9,7 @@ class AppLocalizationsDe extends AppLocalizations {
   AppLocalizationsDe([String locale = 'de']) : super(locale);
 
   @override
-  String get appName => 'TybeToGo Fahrer';
+  String get appName => 'TaybGo Fahrer';
 
   @override
   String get welcome => 'Willkommen';
@@ -1278,4 +1278,110 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get supportTicketClosed => 'Dieses Ticket ist geschlossen';
+
+  @override
+  String get enterAge => 'Enter your age';
+
+  @override
+  String get carSize => 'Car Size';
+
+  @override
+  String get selectCarSize => 'Select car size';
+
+  @override
+  String get carSizeX => 'Standard (X)';
+
+  @override
+  String get carSizeComfort => 'Comfort';
+
+  @override
+  String get carSizeXL => 'XL';
+
+  @override
+  String get carSizeBlack => 'Black';
+
+  @override
+  String get vehicleMake => 'Vehicle Make';
+
+  @override
+  String get enterVehicleMake => 'e.g. Toyota, BMW';
+
+  @override
+  String get enterVehicleModel => 'e.g. Corolla, 3 Series';
+
+  @override
+  String get enterVehiclePlateNumber => 'e.g. W-AB 1234';
+
+  @override
+  String get enterVehicleColor => 'e.g. White, Black';
+
+  @override
+  String get enterVehicleYear => 'e.g. 2020';
+
+  @override
+  String get vehicleDetailsTitle => 'Vehicle Details';
+
+  @override
+  String get vehicleDetailsSubtitle => 'Tell us more about your vehicle';
+
+  @override
+  String get stepDetails => 'Details';
+
+  @override
+  String get stepDocuments => 'Docs';
+
+  @override
+  String get documentsTitle => 'Upload Documents';
+
+  @override
+  String get documentsSubtitle =>
+      'Add your documents (optional - you can add them later)';
+
+  @override
+  String get tapToUpload => 'Tap to upload';
+
+  @override
+  String get uploadingFile => 'Uploading...';
+
+  @override
+  String get uploadFailed => 'Upload failed. Tap to retry.';
+
+  @override
+  String get uploaded => 'Uploaded';
+
+  @override
+  String get changePhoto => 'Change';
+
+  @override
+  String get camera => 'Camera';
+
+  @override
+  String get gallery => 'Gallery';
+
+  @override
+  String get pleaseEnterAge => 'Please enter your age';
+
+  @override
+  String get invalidAge => 'Please enter a valid age (18-80)';
+
+  @override
+  String get pleaseSelectCarSize => 'Please select a car size';
+
+  @override
+  String get pleaseEnterPlateNumber => 'Please enter your vehicle plate number';
+
+  @override
+  String get pleaseEnterVehicleColor => 'Please enter your vehicle color';
+
+  @override
+  String get pleaseEnterVehicleMake => 'Please enter your vehicle make';
+
+  @override
+  String get pleaseEnterVehicleModel => 'Please enter your vehicle model';
+
+  @override
+  String get pleaseEnterVehicleYear => 'Please enter your vehicle year';
+
+  @override
+  String get invalidVehicleYear => 'Please enter a valid year';
 }

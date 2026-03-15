@@ -241,7 +241,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: Image.asset(
-                    'assets/icons/tybetogo.jpg',
+                    'assets/icons/TaybGo_green.png',
                     width: 60,
                     height: 60,
                     fit: BoxFit.contain,

@@ -9,7 +9,7 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get appName => 'TybeToGo سائق';
+  String get appName => 'TaybGo سائق';
 
   @override
   String get welcome => 'مرحباً';
@@ -1254,4 +1254,109 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get supportTicketClosed => 'هذه التذكرة مغلقة';
+
+  @override
+  String get enterAge => 'أدخل عمرك';
+
+  @override
+  String get carSize => 'حجم السيارة';
+
+  @override
+  String get selectCarSize => 'اختر حجم السيارة';
+
+  @override
+  String get carSizeX => 'عادي (X)';
+
+  @override
+  String get carSizeComfort => 'مريح';
+
+  @override
+  String get carSizeXL => 'XL';
+
+  @override
+  String get carSizeBlack => 'بلاك';
+
+  @override
+  String get vehicleMake => 'ماركة المركبة';
+
+  @override
+  String get enterVehicleMake => 'مثال: تويوتا، بي إم دبليو';
+
+  @override
+  String get enterVehicleModel => 'مثال: كورولا، الفئة الثالثة';
+
+  @override
+  String get enterVehiclePlateNumber => 'مثال: W-AB 1234';
+
+  @override
+  String get enterVehicleColor => 'مثال: أبيض، أسود';
+
+  @override
+  String get enterVehicleYear => 'مثال: 2020';
+
+  @override
+  String get vehicleDetailsTitle => 'تفاصيل المركبة';
+
+  @override
+  String get vehicleDetailsSubtitle => 'أخبرنا المزيد عن مركبتك';
+
+  @override
+  String get stepDetails => 'التفاصيل';
+
+  @override
+  String get stepDocuments => 'الوثائق';
+
+  @override
+  String get documentsTitle => 'رفع الوثائق';
+
+  @override
+  String get documentsSubtitle => 'أضف وثائقك (اختياري - يمكنك إضافتها لاحقاً)';
+
+  @override
+  String get tapToUpload => 'انقر للرفع';
+
+  @override
+  String get uploadingFile => 'جاري الرفع...';
+
+  @override
+  String get uploadFailed => 'فشل الرفع. انقر للمحاولة مرة أخرى.';
+
+  @override
+  String get uploaded => 'تم الرفع';
+
+  @override
+  String get changePhoto => 'تغيير';
+
+  @override
+  String get camera => 'الكاميرا';
+
+  @override
+  String get gallery => 'المعرض';
+
+  @override
+  String get pleaseEnterAge => 'يرجى إدخال عمرك';
+
+  @override
+  String get invalidAge => 'يرجى إدخال عمر صحيح (18-80)';
+
+  @override
+  String get pleaseSelectCarSize => 'يرجى اختيار حجم السيارة';
+
+  @override
+  String get pleaseEnterPlateNumber => 'يرجى إدخال رقم لوحة المركبة';
+
+  @override
+  String get pleaseEnterVehicleColor => 'يرجى إدخال لون المركبة';
+
+  @override
+  String get pleaseEnterVehicleMake => 'يرجى إدخال ماركة المركبة';
+
+  @override
+  String get pleaseEnterVehicleModel => 'يرجى إدخال موديل المركبة';
+
+  @override
+  String get pleaseEnterVehicleYear => 'يرجى إدخال سنة المركبة';
+
+  @override
+  String get invalidVehicleYear => 'يرجى إدخال سنة صحيحة';
 }

@@ -94,7 +94,7 @@ class TybeToGoDriverApp extends StatelessWidget {
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, _) {
           return MaterialApp.router(
-            title: 'TybeToGo Driver',
+            title: 'TaybGo Driver',
             debugShowCheckedModeBanner: false,
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,

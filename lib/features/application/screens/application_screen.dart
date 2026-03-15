@@ -1,5 +1,8 @@
+import 'dart:io';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
@@ -8,6 +11,7 @@ import '../../../core/providers/driver_provider.dart';
 import '../../../core/providers/notification_provider.dart';
 import '../../../core/providers/order_provider.dart';
 import '../../../core/providers/tour_provider.dart';
+import '../../../core/services/cloudinary_service.dart';
 import '../../../core/services/driver_registration_service.dart';
 import '../../../core/theme/app_colors.dart';
 
@@ -24,13 +28,35 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   // Current step (0-indexed)
   int _currentStep = 0;
-  static const int _totalSteps = 3;
+  static const int _totalSteps = 5;
 
   // Text controllers
   final _nameController = TextEditingController();
+  final _ageController = TextEditingController();
+  final _plateNumberController = TextEditingController();
+  final _vehicleColorController = TextEditingController();
+  final _vehicleMakeController = TextEditingController();
+  final _vehicleModelController = TextEditingController();
+  final _vehicleYearController = TextEditingController();
+  // Document upload state
+  final CloudinaryService _cloudinaryService = CloudinaryService();
+  final ImagePicker _imagePicker = ImagePicker();
+
+  File? _drivingLicenseFile;
+  String? _drivingLicenseUrl;
+  bool _drivingLicenseUploading = false;
+
+  File? _idDocumentFile;
+  String? _idDocumentUrl;
+  bool _idDocumentUploading = false;
+
+  File? _otherDocumentsFile;
+  String? _otherDocumentsUrl;
+  bool _otherDocumentsUploading = false;
 
   // Form state
   String _selectedVehicle = 'CAR';
+  String? _selectedCarSize;
   bool _acceptsFood = true;
   bool _acceptsShipping = false;
   bool _acceptsTaxi = false;
@@ -46,20 +72,84 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     {'value': 'VAN', 'label': l10n.van, 'icon': Icons.airport_shuttle, 'description': l10n.largeDeliveries},
   ];
 
+  List<Map<String, String>> _getCarSizes(AppLocalizations l10n) => [
+    {'value': 'X', 'label': l10n.carSizeX},
+    {'value': 'COMFORT', 'label': l10n.carSizeComfort},
+    {'value': 'XL', 'label': l10n.carSizeXL},
+    {'value': 'BLACK', 'label': l10n.carSizeBlack},
+  ];
+
   @override
   void dispose() {
     _nameController.dispose();
+    _ageController.dispose();
+    _plateNumberController.dispose();
+    _vehicleColorController.dispose();
+    _vehicleMakeController.dispose();
+    _vehicleModelController.dispose();
+    _vehicleYearController.dispose();
     _pageController.dispose();
     super.dispose();
   }
 
+  String? _validateCurrentStep(AppLocalizations l10n) {
+    switch (_currentStep) {
+      case 0: // Personal info
+        if (_nameController.text.trim().isEmpty) {
+          return l10n.pleaseEnterYourName;
+        }
+        if (_ageController.text.trim().isEmpty) {
+          return l10n.pleaseEnterAge;
+        }
+        final age = int.tryParse(_ageController.text.trim());
+        if (age == null || age < 18 || age > 80) {
+          return l10n.invalidAge;
+        }
+        return null;
+      case 1: // Vehicle type
+        return null; // Always has a selection
+      case 2: // Vehicle details
+        if (_selectedCarSize == null) {
+          return l10n.pleaseSelectCarSize;
+        }
+        if (_plateNumberController.text.trim().isEmpty) {
+          return l10n.pleaseEnterPlateNumber;
+        }
+        if (_vehicleColorController.text.trim().isEmpty) {
+          return l10n.pleaseEnterVehicleColor;
+        }
+        if (_vehicleMakeController.text.trim().isEmpty) {
+          return l10n.pleaseEnterVehicleMake;
+        }
+        if (_vehicleModelController.text.trim().isEmpty) {
+          return l10n.pleaseEnterVehicleModel;
+        }
+        if (_vehicleYearController.text.trim().isEmpty) {
+          return l10n.pleaseEnterVehicleYear;
+        }
+        final year = int.tryParse(_vehicleYearController.text.trim());
+        if (year == null || year < 1990 || year > DateTime.now().year + 1) {
+          return l10n.invalidVehicleYear;
+        }
+        return null;
+      case 3: // Services
+        if (!_acceptsFood && !_acceptsShipping && !_acceptsTaxi) {
+          return l10n.pleaseSelectService;
+        }
+        return null;
+      case 4: // Documents (optional)
+        return null;
+      default:
+        return null;
+    }
+  }
+
   void _nextStep() {
-    if (_currentStep == 0) {
-      // Validate personal info
-      if (_nameController.text.trim().isEmpty) {
-        setState(() => _error = AppLocalizations.of(context)!.pleaseEnterYourName);
-        return;
-      }
+    final l10n = AppLocalizations.of(context)!;
+    final error = _validateCurrentStep(l10n);
+    if (error != null) {
+      setState(() => _error = error);
+      return;
     }
 
     setState(() => _error = null);
@@ -87,9 +177,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   }
 
   Future<void> _submit() async {
-    // Must select at least one service
-    if (!_acceptsFood && !_acceptsShipping && !_acceptsTaxi) {
-      setState(() => _error = AppLocalizations.of(context)!.pleaseSelectService);
+    final l10n = AppLocalizations.of(context)!;
+    final error = _validateCurrentStep(l10n);
+    if (error != null) {
+      setState(() => _error = error);
       return;
     }
 
@@ -118,11 +209,20 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
       final result = await registrationService.registerDriver(
         name: _nameController.text.trim(),
         phone: phone,
-        age: 25, // Default age since we removed the field
+        age: int.parse(_ageController.text.trim()),
         vehicleType: _selectedVehicle,
+        carSize: _selectedCarSize!,
+        vehiclePlateNumber: _plateNumberController.text.trim(),
+        vehicleColor: _vehicleColorController.text.trim(),
+        vehicleMake: _vehicleMakeController.text.trim(),
+        vehicleModel: _vehicleModelController.text.trim(),
+        vehicleYear: int.parse(_vehicleYearController.text.trim()),
         acceptsFood: _acceptsFood,
         acceptsShipping: _acceptsShipping,
         acceptsTaxi: _acceptsTaxi,
+        drivingLicense: _drivingLicenseUrl,
+        idDocument: _idDocumentUrl,
+        otherDocuments: _otherDocumentsUrl,
       );
 
       if (!mounted) return;
@@ -192,7 +292,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           children: [
             // Step Indicator
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               child: _buildStepIndicator(textColor, secondaryColor),
             ),
 
@@ -206,7 +306,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                   children: [
                     _buildPersonalInfoStep(textColor, secondaryColor, surfaceColor),
                     _buildVehicleStep(textColor, secondaryColor, surfaceColor, l10n),
+                    _buildVehicleDetailsStep(textColor, secondaryColor, surfaceColor, l10n),
                     _buildServicesStep(textColor, secondaryColor, surfaceColor, l10n),
+                    _buildDocumentsStep(textColor, secondaryColor, surfaceColor, l10n),
                   ],
                 ),
               ),
@@ -250,7 +352,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   Widget _buildStepIndicator(Color textColor, Color secondaryColor) {
     final l10n = AppLocalizations.of(context)!;
-    final steps = [l10n.stepPersonal, l10n.stepVehicle, l10n.stepServices];
+    final steps = [l10n.stepPersonal, l10n.stepVehicle, l10n.stepDetails, l10n.stepServices, l10n.stepDocuments];
 
     return Row(
       children: List.generate(steps.length, (index) {
@@ -262,8 +364,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             children: [
               // Step circle
               Container(
-                width: 32,
-                height: 32,
+                width: 28,
+                height: 28,
                 decoration: BoxDecoration(
                   color: isActive || isCompleted
                       ? AppColors.primary
@@ -272,27 +374,28 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                 ),
                 child: Center(
                   child: isCompleted
-                      ? const Icon(Icons.check, color: Colors.white, size: 18)
+                      ? const Icon(Icons.check, color: Colors.white, size: 16)
                       : Text(
                           '${index + 1}',
                           style: TextStyle(
                             color: isActive ? Colors.white : AppColors.primary,
                             fontWeight: FontWeight.w600,
-                            fontSize: 14,
+                            fontSize: 12,
                           ),
                         ),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: 4),
               // Step label
-              Expanded(
+              Flexible(
                 child: Text(
                   steps[index],
                   style: TextStyle(
                     color: isActive ? textColor : secondaryColor,
                     fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                    fontSize: 13,
+                    fontSize: 11,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
               // Connector line
@@ -300,7 +403,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                 Expanded(
                   child: Container(
                     height: 2,
-                    margin: const EdgeInsets.symmetric(horizontal: 8),
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
                     decoration: BoxDecoration(
                       color: isCompleted
                           ? AppColors.primary
@@ -320,6 +423,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     final authPhone = context.watch<AuthProvider>().phoneNumber;
     final profilePhone = context.watch<DriverProvider>().profile?.phone;
     final phone = authPhone ?? profilePhone ?? '';
+    final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -327,9 +431,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 8),
-          // Header
           Text(
-            AppLocalizations.of(context)!.tellUsAboutYourself,
+            l10n.tellUsAboutYourself,
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -338,7 +441,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            AppLocalizations.of(context)!.basicInfoSubtitle,
+            l10n.basicInfoSubtitle,
             style: TextStyle(fontSize: 15, color: secondaryColor),
           ),
           const SizedBox(height: 32),
@@ -346,8 +449,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           // Name field
           _buildTextField(
             controller: _nameController,
-            label: AppLocalizations.of(context)!.fullName,
-            hint: AppLocalizations.of(context)!.enterYourFullName,
+            label: l10n.fullName,
+            hint: l10n.enterYourFullName,
             icon: Icons.person_outline,
             surfaceColor: surfaceColor,
             textColor: textColor,
@@ -355,9 +458,22 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           ),
           const SizedBox(height: 20),
 
+          // Age field
+          _buildTextField(
+            controller: _ageController,
+            label: l10n.age,
+            hint: l10n.enterAge,
+            icon: Icons.cake_outlined,
+            surfaceColor: surfaceColor,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 20),
+
           // Phone (read-only)
           Text(
-            AppLocalizations.of(context)!.phoneNumber,
+            l10n.phoneNumber,
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,
@@ -388,7 +504,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        phone.isNotEmpty ? phone : AppLocalizations.of(context)!.notAvailable,
+                        phone.isNotEmpty ? phone : l10n.notAvailable,
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
@@ -396,8 +512,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                         ),
                       ),
                       Text(
-                        AppLocalizations.of(context)!.verifiedViaOtp,
-                        style: TextStyle(fontSize: 12, color: AppColors.success),
+                        l10n.verifiedViaOtp,
+                        style: const TextStyle(fontSize: 12, color: AppColors.success),
                       ),
                     ],
                   ),
@@ -418,7 +534,6 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 8),
-          // Header
           Text(
             l10n.selectYourVehicle,
             style: TextStyle(
@@ -456,6 +571,158 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     );
   }
 
+  Widget _buildVehicleDetailsStep(Color textColor, Color secondaryColor, Color surfaceColor, AppLocalizations l10n) {
+    final carSizes = _getCarSizes(l10n);
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          Text(
+            l10n.vehicleDetailsTitle,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.vehicleDetailsSubtitle,
+            style: TextStyle(fontSize: 15, color: secondaryColor),
+          ),
+          const SizedBox(height: 24),
+
+          // Car size dropdown
+          Text(
+            l10n.carSize,
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+              color: secondaryColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: surfaceColor,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: DropdownButtonFormField<String>(
+              initialValue: _selectedCarSize,
+              decoration: InputDecoration(
+                hintText: l10n.selectCarSize,
+                hintStyle: TextStyle(color: secondaryColor.withValues(alpha: 0.6)),
+                prefixIcon: Container(
+                  margin: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Icon(Icons.straighten, color: AppColors.primary, size: 20),
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              ),
+              dropdownColor: surfaceColor,
+              style: TextStyle(color: textColor, fontSize: 16),
+              items: carSizes.map((size) {
+                return DropdownMenuItem<String>(
+                  value: size['value'],
+                  child: Text(size['label']!),
+                );
+              }).toList(),
+              onChanged: (value) => setState(() => _selectedCarSize = value),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Vehicle make
+          _buildTextField(
+            controller: _vehicleMakeController,
+            label: l10n.vehicleMake,
+            hint: l10n.enterVehicleMake,
+            icon: Icons.factory_outlined,
+            surfaceColor: surfaceColor,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+          ),
+          const SizedBox(height: 16),
+
+          // Vehicle model
+          _buildTextField(
+            controller: _vehicleModelController,
+            label: l10n.vehicleModel,
+            hint: l10n.enterVehicleModel,
+            icon: Icons.directions_car_outlined,
+            surfaceColor: surfaceColor,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+          ),
+          const SizedBox(height: 16),
+
+          // Vehicle year
+          _buildTextField(
+            controller: _vehicleYearController,
+            label: l10n.vehicleYear,
+            hint: l10n.enterVehicleYear,
+            icon: Icons.calendar_today_outlined,
+            surfaceColor: surfaceColor,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            keyboardType: TextInputType.number,
+          ),
+          const SizedBox(height: 16),
+
+          // Vehicle color
+          _buildTextField(
+            controller: _vehicleColorController,
+            label: l10n.vehicleColor,
+            hint: l10n.enterVehicleColor,
+            icon: Icons.palette_outlined,
+            surfaceColor: surfaceColor,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+          ),
+          const SizedBox(height: 16),
+
+          // Plate number
+          _buildTextField(
+            controller: _plateNumberController,
+            label: l10n.licensePlate,
+            hint: l10n.enterVehiclePlateNumber,
+            icon: Icons.pin_outlined,
+            surfaceColor: surfaceColor,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
   Widget _buildServicesStep(Color textColor, Color secondaryColor, Color surfaceColor, AppLocalizations l10n) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -463,7 +730,6 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 8),
-          // Header
           Text(
             l10n.chooseYourServices,
             style: TextStyle(
@@ -479,7 +745,6 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           ),
           const SizedBox(height: 24),
 
-          // Service cards
           _buildServiceCard(
             title: l10n.foodDelivery,
             description: l10n.deliverFoodDesc,
@@ -537,6 +802,322 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             ),
           ),
         ],
+      ),
+    );
+  }
+
+  Future<void> _pickAndUpload({
+    required String label,
+    required String folder,
+    required void Function(File? file) setFile,
+    required void Function(String? url) setUrl,
+    required void Function(bool loading) setLoading,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    final source = await showModalBottomSheet<ImageSource>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        final sheetBg = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+        return Container(
+          color: sheetBg,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(label, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.pop(ctx, ImageSource.camera),
+                      icon: const Icon(Icons.camera_alt_outlined),
+                      label: Text(l10n.camera),
+                      style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () => Navigator.pop(ctx, ImageSource.gallery),
+                      icon: const Icon(Icons.photo_library_outlined),
+                      label: Text(l10n.gallery),
+                      style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      },
+    );
+
+    if (source == null) return;
+
+    final picked = await _imagePicker.pickImage(source: source, imageQuality: 80);
+    if (picked == null) return;
+
+    final file = File(picked.path);
+    setState(() {
+      setFile(file);
+      setLoading(true);
+      _error = null;
+    });
+
+    final url = await _cloudinaryService.uploadImage(file, folder: folder);
+
+    if (!mounted) return;
+    setState(() {
+      setLoading(false);
+      if (url != null) {
+        setUrl(url);
+      } else {
+        _error = l10n.uploadFailed;
+      }
+    });
+  }
+
+  Widget _buildDocumentsStep(Color textColor, Color secondaryColor, Color surfaceColor, AppLocalizations l10n) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          Text(
+            l10n.documentsTitle,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.documentsSubtitle,
+            style: TextStyle(fontSize: 15, color: secondaryColor),
+          ),
+          const SizedBox(height: 24),
+
+          // Driving license
+          _buildUploadCard(
+            label: l10n.driversLicense,
+            icon: Icons.badge_outlined,
+            file: _drivingLicenseFile,
+            url: _drivingLicenseUrl,
+            isUploading: _drivingLicenseUploading,
+            onTap: () => _pickAndUpload(
+              label: l10n.driversLicense,
+              folder: 'driver_licenses',
+              setFile: (f) => _drivingLicenseFile = f,
+              setUrl: (u) => _drivingLicenseUrl = u,
+              setLoading: (l) => _drivingLicenseUploading = l,
+            ),
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            surfaceColor: surfaceColor,
+            l10n: l10n,
+          ),
+          const SizedBox(height: 16),
+
+          // ID document
+          _buildUploadCard(
+            label: l10n.nationalId,
+            icon: Icons.credit_card_outlined,
+            file: _idDocumentFile,
+            url: _idDocumentUrl,
+            isUploading: _idDocumentUploading,
+            onTap: () => _pickAndUpload(
+              label: l10n.nationalId,
+              folder: 'id_documents',
+              setFile: (f) => _idDocumentFile = f,
+              setUrl: (u) => _idDocumentUrl = u,
+              setLoading: (l) => _idDocumentUploading = l,
+            ),
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            surfaceColor: surfaceColor,
+            l10n: l10n,
+          ),
+          const SizedBox(height: 16),
+
+          // Other documents
+          _buildUploadCard(
+            label: l10n.documents,
+            icon: Icons.description_outlined,
+            file: _otherDocumentsFile,
+            url: _otherDocumentsUrl,
+            isUploading: _otherDocumentsUploading,
+            onTap: () => _pickAndUpload(
+              label: l10n.documents,
+              folder: 'other_documents',
+              setFile: (f) => _otherDocumentsFile = f,
+              setUrl: (u) => _otherDocumentsUrl = u,
+              setLoading: (l) => _otherDocumentsUploading = l,
+            ),
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            surfaceColor: surfaceColor,
+            l10n: l10n,
+          ),
+          const SizedBox(height: 24),
+
+          // Info card
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: AppColors.info.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: AppColors.info.withValues(alpha: 0.3)),
+            ),
+            child: Row(
+              children: [
+                const Icon(Icons.info_outline, color: AppColors.info, size: 20),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    l10n.documentsSubtitle,
+                    style: TextStyle(fontSize: 13, color: textColor),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUploadCard({
+    required String label,
+    required IconData icon,
+    required File? file,
+    required String? url,
+    required bool isUploading,
+    required VoidCallback onTap,
+    required Color textColor,
+    required Color secondaryColor,
+    required Color surfaceColor,
+    required AppLocalizations l10n,
+  }) {
+    final hasFile = file != null;
+    final isUploaded = url != null;
+
+    return GestureDetector(
+      onTap: isUploading ? null : onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isUploaded
+              ? AppColors.success.withValues(alpha: 0.05)
+              : surfaceColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isUploaded
+                ? AppColors.success
+                : hasFile
+                    ? AppColors.primary
+                    : Colors.transparent,
+            width: 2,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            // Icon or thumbnail
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: isUploaded
+                    ? AppColors.success.withValues(alpha: 0.15)
+                    : AppColors.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: hasFile && !kIsWeb
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.file(file, fit: BoxFit.cover),
+                    )
+                  : Icon(
+                      icon,
+                      color: isUploaded ? AppColors.success : AppColors.primary,
+                      size: 28,
+                    ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  if (isUploading)
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.uploadingFile,
+                          style: TextStyle(fontSize: 13, color: AppColors.primary),
+                        ),
+                      ],
+                    )
+                  else if (isUploaded)
+                    Row(
+                      children: [
+                        const Icon(Icons.check_circle, color: AppColors.success, size: 16),
+                        const SizedBox(width: 6),
+                        Text(
+                          l10n.uploaded,
+                          style: const TextStyle(fontSize: 13, color: AppColors.success),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '· ${l10n.changePhoto}',
+                          style: TextStyle(fontSize: 13, color: AppColors.primary),
+                        ),
+                      ],
+                    )
+                  else
+                    Text(
+                      l10n.tapToUpload,
+                      style: TextStyle(fontSize: 13, color: secondaryColor),
+                    ),
+                ],
+              ),
+            ),
+            Icon(
+              isUploaded ? Icons.check_circle : Icons.cloud_upload_outlined,
+              color: isUploaded ? AppColors.success : secondaryColor.withValues(alpha: 0.5),
+              size: 24,
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -119,7 +119,7 @@ abstract class AppLocalizations {
   /// The app name
   ///
   /// In en, this message translates to:
-  /// **'TybeToGo Driver'**
+  /// **'TaybGo Driver'**
   String get appName;
 
   /// No description provided for @welcome.
@@ -2497,6 +2497,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This ticket is closed'**
   String get supportTicketClosed;
+
+  /// No description provided for @enterAge.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your age'**
+  String get enterAge;
+
+  /// No description provided for @carSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Car Size'**
+  String get carSize;
+
+  /// No description provided for @selectCarSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Select car size'**
+  String get selectCarSize;
+
+  /// No description provided for @carSizeX.
+  ///
+  /// In en, this message translates to:
+  /// **'Standard (X)'**
+  String get carSizeX;
+
+  /// No description provided for @carSizeComfort.
+  ///
+  /// In en, this message translates to:
+  /// **'Comfort'**
+  String get carSizeComfort;
+
+  /// No description provided for @carSizeXL.
+  ///
+  /// In en, this message translates to:
+  /// **'XL'**
+  String get carSizeXL;
+
+  /// No description provided for @carSizeBlack.
+  ///
+  /// In en, this message translates to:
+  /// **'Black'**
+  String get carSizeBlack;
+
+  /// No description provided for @vehicleMake.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle Make'**
+  String get vehicleMake;
+
+  /// No description provided for @enterVehicleMake.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Toyota, BMW'**
+  String get enterVehicleMake;
+
+  /// No description provided for @enterVehicleModel.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Corolla, 3 Series'**
+  String get enterVehicleModel;
+
+  /// No description provided for @enterVehiclePlateNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. W-AB 1234'**
+  String get enterVehiclePlateNumber;
+
+  /// No description provided for @enterVehicleColor.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. White, Black'**
+  String get enterVehicleColor;
+
+  /// No description provided for @enterVehicleYear.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 2020'**
+  String get enterVehicleYear;
+
+  /// No description provided for @vehicleDetailsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle Details'**
+  String get vehicleDetailsTitle;
+
+  /// No description provided for @vehicleDetailsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tell us more about your vehicle'**
+  String get vehicleDetailsSubtitle;
+
+  /// No description provided for @stepDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get stepDetails;
+
+  /// No description provided for @stepDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Docs'**
+  String get stepDocuments;
+
+  /// No description provided for @documentsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload Documents'**
+  String get documentsTitle;
+
+  /// No description provided for @documentsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your documents (optional - you can add them later)'**
+  String get documentsSubtitle;
+
+  /// No description provided for @tapToUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to upload'**
+  String get tapToUpload;
+
+  /// No description provided for @uploadingFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading...'**
+  String get uploadingFile;
+
+  /// No description provided for @uploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Upload failed. Tap to retry.'**
+  String get uploadFailed;
+
+  /// No description provided for @uploaded.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploaded'**
+  String get uploaded;
+
+  /// No description provided for @changePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Change'**
+  String get changePhoto;
+
+  /// No description provided for @camera.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera'**
+  String get camera;
+
+  /// No description provided for @gallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Gallery'**
+  String get gallery;
+
+  /// No description provided for @pleaseEnterAge.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your age'**
+  String get pleaseEnterAge;
+
+  /// No description provided for @invalidAge.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid age (18-80)'**
+  String get invalidAge;
+
+  /// No description provided for @pleaseSelectCarSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a car size'**
+  String get pleaseSelectCarSize;
+
+  /// No description provided for @pleaseEnterPlateNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your vehicle plate number'**
+  String get pleaseEnterPlateNumber;
+
+  /// No description provided for @pleaseEnterVehicleColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your vehicle color'**
+  String get pleaseEnterVehicleColor;
+
+  /// No description provided for @pleaseEnterVehicleMake.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your vehicle make'**
+  String get pleaseEnterVehicleMake;
+
+  /// No description provided for @pleaseEnterVehicleModel.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your vehicle model'**
+  String get pleaseEnterVehicleModel;
+
+  /// No description provided for @pleaseEnterVehicleYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your vehicle year'**
+  String get pleaseEnterVehicleYear;
+
+  /// No description provided for @invalidVehicleYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid year'**
+  String get invalidVehicleYear;
 }
 
 class _AppLocalizationsDelegate

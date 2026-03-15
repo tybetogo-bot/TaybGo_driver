@@ -220,7 +220,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
               ClipRRect(
                 borderRadius: BorderRadius.circular(14),
                 child: Image.asset(
-                  'assets/icons/tybetogo.jpg',
+                  'assets/icons/TaybGo_green.png',
                   width: 60,
                   height: 60,
                   fit: BoxFit.contain,
