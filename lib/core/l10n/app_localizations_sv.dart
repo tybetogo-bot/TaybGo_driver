@@ -931,7 +931,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get tourDoneBtn => 'Klar';
 
   @override
-  String get tourWelcomeTitle => 'Välkommen till TypeToGo!';
+  String get tourWelcomeTitle => 'Välkommen till TaybGo!';
 
   @override
   String get tourWelcomeDesc =>
@@ -948,7 +948,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get tourCompleteDesc =>
-      'Du är redo att börja acceptera beställningar och tjäna med TypeToGo!';
+      'Du är redo att börja acceptera beställningar och tjäna med TaybGo!';
 
   @override
   String get tourBrowseKb => 'Bläddra i kunskapsbanken';
@@ -1039,6 +1039,12 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get pleaseSelectService => 'Välj minst en tjänstetyp';
+
+  @override
+  String get pleaseUploadDriversLicense => 'Ladda upp ditt körkort';
+
+  @override
+  String get pleaseUploadNationalId => 'Ladda upp ditt nationella ID';
 
   @override
   String get registrationFailed => 'Registrering misslyckades. Försök igen.';
@@ -1371,4 +1377,17 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get invalidVehicleYear => 'Please enter a valid year';
+
+  @override
+  String get orderAlreadyTaken =>
+      'This order was already taken by another driver';
+
+  @override
+  String get orderSuggestionExpired => 'This order suggestion has expired';
+
+  @override
+  String get failedToAcceptOrder => 'Failed to accept order. Please try again.';
+
+  @override
+  String get failedToRejectOrder => 'Failed to reject order';
 }

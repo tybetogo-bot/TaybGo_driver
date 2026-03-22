@@ -933,7 +933,7 @@ class AppLocalizationsFi extends AppLocalizations {
   String get tourDoneBtn => 'Valmis';
 
   @override
-  String get tourWelcomeTitle => 'Tervetuloa TypeToGo:hon!';
+  String get tourWelcomeTitle => 'Tervetuloa TaybGo:hon!';
 
   @override
   String get tourWelcomeDesc =>
@@ -950,7 +950,7 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get tourCompleteDesc =>
-      'Olet valmis aloittamaan tilausten vastaanottamisen ja ansaitsemisen TypeToGo:lla!';
+      'Olet valmis aloittamaan tilausten vastaanottamisen ja ansaitsemisen TaybGo:lla!';
 
   @override
   String get tourBrowseKb => 'Selaa tietopankkia';
@@ -1042,6 +1042,12 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get pleaseSelectService => 'Valitse vähintään yksi palvelutyyppi';
+
+  @override
+  String get pleaseUploadDriversLicense => 'Lataa ajokorttisi';
+
+  @override
+  String get pleaseUploadNationalId => 'Lataa henkilötodistuksesi';
 
   @override
   String get registrationFailed =>
@@ -1374,4 +1380,17 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get invalidVehicleYear => 'Please enter a valid year';
+
+  @override
+  String get orderAlreadyTaken =>
+      'This order was already taken by another driver';
+
+  @override
+  String get orderSuggestionExpired => 'This order suggestion has expired';
+
+  @override
+  String get failedToAcceptOrder => 'Failed to accept order. Please try again.';
+
+  @override
+  String get failedToRejectOrder => 'Failed to reject order';
 }

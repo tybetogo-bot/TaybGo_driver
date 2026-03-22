@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Minimal color palette for TybeToGo Driver
+/// Minimal color palette for TaybGo Driver
 class AppColors {
   AppColors._();
 

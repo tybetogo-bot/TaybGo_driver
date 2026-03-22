@@ -358,12 +358,12 @@
   "tourBackBtn": "Back",
   "tourNextBtn": "Next",
   "tourDoneBtn": "Done",
-  "tourWelcomeTitle": "Welcome to TypeToGo!",
+  "tourWelcomeTitle": "Welcome to TaybGo!",
   "tourWelcomeDesc": "Take a quick tour to learn how to use the app",
   "tourSkipForNow": "Skip for now",
   "tourStartBtn": "Take Tour",
   "tourCompleteTitle": "Tour Complete!",
-  "tourCompleteDesc": "You're all set to start accepting orders and earning with TypeToGo!",
+  "tourCompleteDesc": "You're all set to start accepting orders and earning with TaybGo!",
   "tourBrowseKb": "Browse Knowledge Base",
   "tourGetStarted": "Get Started",
 
@@ -398,6 +398,8 @@
   "completeRegistration": "Complete Registration",
   "pleaseEnterYourName": "Please enter your name",
   "pleaseSelectService": "Please select at least one service type",
+  "pleaseUploadDriversLicense": "Please upload your driver's license",
+  "pleaseUploadNationalId": "Please upload your national ID",
   "registrationFailed": "Registration failed. Please try again.",
   "stepPersonal": "Personal",
   "stepVehicle": "Vehicle",
@@ -531,5 +533,12 @@
   "pleaseEnterVehicleMake": "Please enter your vehicle make",
   "pleaseEnterVehicleModel": "Please enter your vehicle model",
   "pleaseEnterVehicleYear": "Please enter your vehicle year",
-  "invalidVehicleYear": "Please enter a valid year"
+  "invalidVehicleYear": "Please enter a valid year",
+
+  "orderAlreadyTaken": "This order was already taken by another driver",
+  "orderSuggestionExpired": "This order suggestion has expired",
+  "orderAccepted": "Order accepted!",
+  "orderRejected": "Order rejected",
+  "failedToAcceptOrder": "Failed to accept order. Please try again.",
+  "failedToRejectOrder": "Failed to reject order"
 }

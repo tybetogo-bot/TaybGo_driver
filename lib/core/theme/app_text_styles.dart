@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-/// Minimal typography for TybeToGo Driver
+/// Minimal typography for TaybGo Driver
 class AppTextStyles {
   AppTextStyles._();
 

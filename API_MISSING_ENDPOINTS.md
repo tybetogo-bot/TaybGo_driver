@@ -1,4 +1,4 @@
-# Missing API Endpoints - TybeToGo Driver App
+# Missing API Endpoints - TaybGo Driver App
 
 This document outlines all the missing API endpoints needed for the driver application to function properly.
 

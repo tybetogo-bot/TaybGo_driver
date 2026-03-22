@@ -35,11 +35,11 @@ android {
         create("dev") {
             dimension = "environment"
             applicationIdSuffix = ".dev"
-            resValue("string", "app_name", "Driver Dev")
+            resValue("string", "app_name", "TaybGo Driver Dev")
         }
         create("prod") {
             dimension = "environment"
-            resValue("string", "app_name", "Driver")
+            resValue("string", "app_name", "TaybGo Driver")
         }
     }
 

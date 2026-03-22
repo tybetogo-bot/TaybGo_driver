@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
+import 'core/config/app_config.dart';
 import 'core/l10n/app_localizations.dart';
 import 'core/theme/app_theme.dart';
 import 'core/providers/theme_provider.dart';
@@ -17,15 +18,18 @@ import 'core/providers/tour_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/services/fcm_service.dart';
 
-late final GoRouter _router;
+GoRouter? _router;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Default to dev if main.dart is launched directly (no flavor entry-point)
+  if (!AppConfig.isInitialized) {
+    AppConfig.init(env: Environment.dev);
+  }
+
   // Initialize Firebase
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   debugPrint('[Main] Firebase initialized');
 
   // Initialize FCM (permissions, channels, listeners)
@@ -50,27 +54,28 @@ void main() async {
   // Create router once with the auth provider
   _router = AppRouter.createRouter(authProvider);
 
-  runApp(TybeToGoDriverApp(
-    authProvider: authProvider,
-    tourProvider: tourProvider,
-  ));
+  runApp(
+    TaybGoDriverApp(authProvider: authProvider, tourProvider: tourProvider),
+  );
 }
 
-class TybeToGoDriverApp extends StatelessWidget {
+class TaybGoDriverApp extends StatelessWidget {
   final AuthProvider authProvider;
   final TourProvider tourProvider;
 
-  const TybeToGoDriverApp({
+  TaybGoDriverApp({
     super.key,
-    required this.authProvider,
-    required this.tourProvider,
-  });
+    AuthProvider? authProvider,
+    TourProvider? tourProvider,
+  }) : authProvider = authProvider ?? AuthProvider(),
+       tourProvider = tourProvider ?? TourProvider();
 
   @override
   Widget build(BuildContext context) {
     final orderProvider = OrderProvider();
     final driverProvider = DriverProvider();
     final notificationProvider = NotificationProvider();
+    final router = _router ??= AppRouter.createRouter(authProvider);
 
     // Wire up logout callback so all providers clear on any logout
     // (including forced logout from expired tokens)
@@ -94,7 +99,7 @@ class TybeToGoDriverApp extends StatelessWidget {
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, _) {
           return MaterialApp.router(
-            title: 'TaybGo Driver',
+            title: AppConfig.appName,
             debugShowCheckedModeBanner: false,
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,
@@ -107,7 +112,7 @@ class TybeToGoDriverApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            routerConfig: _router,
+            routerConfig: router,
           );
         },
       ),

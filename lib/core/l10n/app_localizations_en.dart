@@ -326,7 +326,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get orderAccepted => 'Order Accepted';
+  String get orderAccepted => 'Order accepted!';
 
   @override
   String get items => 'items';
@@ -335,7 +335,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get time => 'Time';
 
   @override
-  String get orderRejected => 'Order Rejected';
+  String get orderRejected => 'Order rejected';
 
   @override
   String get orderCompleted => 'Order Completed';
@@ -930,7 +930,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tourDoneBtn => 'Done';
 
   @override
-  String get tourWelcomeTitle => 'Welcome to TypeToGo!';
+  String get tourWelcomeTitle => 'Welcome to TaybGo!';
 
   @override
   String get tourWelcomeDesc => 'Take a quick tour to learn how to use the app';
@@ -946,7 +946,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourCompleteDesc =>
-      'You\'re all set to start accepting orders and earning with TypeToGo!';
+      'You\'re all set to start accepting orders and earning with TaybGo!';
 
   @override
   String get tourBrowseKb => 'Browse Knowledge Base';
@@ -1038,6 +1038,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get pleaseSelectService => 'Please select at least one service type';
+
+  @override
+  String get pleaseUploadDriversLicense =>
+      'Please upload your driver\'s license';
+
+  @override
+  String get pleaseUploadNationalId => 'Please upload your national ID';
 
   @override
   String get registrationFailed => 'Registration failed. Please try again.';
@@ -1369,4 +1376,17 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get invalidVehicleYear => 'Please enter a valid year';
+
+  @override
+  String get orderAlreadyTaken =>
+      'This order was already taken by another driver';
+
+  @override
+  String get orderSuggestionExpired => 'This order suggestion has expired';
+
+  @override
+  String get failedToAcceptOrder => 'Failed to accept order. Please try again.';
+
+  @override
+  String get failedToRejectOrder => 'Failed to reject order';
 }

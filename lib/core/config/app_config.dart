@@ -21,10 +21,10 @@ class AppConfig {
     switch (env) {
       case Environment.dev:
         baseUrl = 'https://dev.taybgo.com/api';
-        appName = 'Driver Dev';
+        appName = 'TaybGo Driver Dev';
       case Environment.prod:
         baseUrl = 'https://taybgo.com/api';
-        appName = 'Driver';
+        appName = 'TaybGo Driver';
     }
   }
 }

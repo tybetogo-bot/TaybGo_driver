@@ -737,7 +737,7 @@ abstract class AppLocalizations {
   /// No description provided for @orderAccepted.
   ///
   /// In en, this message translates to:
-  /// **'Order Accepted'**
+  /// **'Order accepted!'**
   String get orderAccepted;
 
   /// No description provided for @items.
@@ -755,7 +755,7 @@ abstract class AppLocalizations {
   /// No description provided for @orderRejected.
   ///
   /// In en, this message translates to:
-  /// **'Order Rejected'**
+  /// **'Order rejected'**
   String get orderRejected;
 
   /// No description provided for @orderCompleted.
@@ -1877,7 +1877,7 @@ abstract class AppLocalizations {
   /// No description provided for @tourWelcomeTitle.
   ///
   /// In en, this message translates to:
-  /// **'Welcome to TypeToGo!'**
+  /// **'Welcome to TaybGo!'**
   String get tourWelcomeTitle;
 
   /// No description provided for @tourWelcomeDesc.
@@ -1907,7 +1907,7 @@ abstract class AppLocalizations {
   /// No description provided for @tourCompleteDesc.
   ///
   /// In en, this message translates to:
-  /// **'You\'re all set to start accepting orders and earning with TypeToGo!'**
+  /// **'You\'re all set to start accepting orders and earning with TaybGo!'**
   String get tourCompleteDesc;
 
   /// No description provided for @tourBrowseKb.
@@ -2077,6 +2077,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please select at least one service type'**
   String get pleaseSelectService;
+
+  /// No description provided for @pleaseUploadDriversLicense.
+  ///
+  /// In en, this message translates to:
+  /// **'Please upload your driver\'s license'**
+  String get pleaseUploadDriversLicense;
+
+  /// No description provided for @pleaseUploadNationalId.
+  ///
+  /// In en, this message translates to:
+  /// **'Please upload your national ID'**
+  String get pleaseUploadNationalId;
 
   /// No description provided for @registrationFailed.
   ///
@@ -2707,6 +2719,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Please enter a valid year'**
   String get invalidVehicleYear;
+
+  /// No description provided for @orderAlreadyTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'This order was already taken by another driver'**
+  String get orderAlreadyTaken;
+
+  /// No description provided for @orderSuggestionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'This order suggestion has expired'**
+  String get orderSuggestionExpired;
+
+  /// No description provided for @failedToAcceptOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to accept order. Please try again.'**
+  String get failedToAcceptOrder;
+
+  /// No description provided for @failedToRejectOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to reject order'**
+  String get failedToRejectOrder;
 }
 
 class _AppLocalizationsDelegate

@@ -930,7 +930,7 @@ class AppLocalizationsNb extends AppLocalizations {
   String get tourDoneBtn => 'Ferdig';
 
   @override
-  String get tourWelcomeTitle => 'Velkommen til TypeToGo!';
+  String get tourWelcomeTitle => 'Velkommen til TaybGo!';
 
   @override
   String get tourWelcomeDesc =>
@@ -947,7 +947,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get tourCompleteDesc =>
-      'Du er klar til å begynne å akseptere bestillinger og tjene med TypeToGo!';
+      'Du er klar til å begynne å akseptere bestillinger og tjene med TaybGo!';
 
   @override
   String get tourBrowseKb => 'Bla i kunnskapsbasen';
@@ -1038,6 +1038,12 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get pleaseSelectService => 'Velg minst én tjenestetype';
+
+  @override
+  String get pleaseUploadDriversLicense => 'Last opp førerkortet ditt';
+
+  @override
+  String get pleaseUploadNationalId => 'Last opp ditt nasjonale ID';
 
   @override
   String get registrationFailed => 'Registrering mislyktes. Prøv igjen.';
@@ -1370,4 +1376,17 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get invalidVehicleYear => 'Please enter a valid year';
+
+  @override
+  String get orderAlreadyTaken =>
+      'This order was already taken by another driver';
+
+  @override
+  String get orderSuggestionExpired => 'This order suggestion has expired';
+
+  @override
+  String get failedToAcceptOrder => 'Failed to accept order. Please try again.';
+
+  @override
+  String get failedToRejectOrder => 'Failed to reject order';
 }

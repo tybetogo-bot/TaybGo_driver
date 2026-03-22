@@ -938,7 +938,7 @@ class AppLocalizationsLb extends AppLocalizations {
   String get tourDoneBtn => 'Fäerdeg';
 
   @override
-  String get tourWelcomeTitle => 'Wëllkomm bei TypeToGo!';
+  String get tourWelcomeTitle => 'Wëllkomm bei TaybGo!';
 
   @override
   String get tourWelcomeDesc =>
@@ -955,7 +955,7 @@ class AppLocalizationsLb extends AppLocalizations {
 
   @override
   String get tourCompleteDesc =>
-      'Dir sidd prett fir Bestellungen unzehuelen a mat TypeToGo ze verdéngen!';
+      'Dir sidd prett fir Bestellungen unzehuelen a mat TaybGo ze verdéngen!';
 
   @override
   String get tourBrowseKb => 'Wëssensdatenbank duerchsichen';
@@ -1049,6 +1049,12 @@ class AppLocalizationsLb extends AppLocalizations {
 
   @override
   String get pleaseSelectService => 'Wielt w.e.g. op d\'mannst eng Serviceart';
+
+  @override
+  String get pleaseUploadDriversLicense => 'Luet w.e.g. Äre Führerschäin erop';
+
+  @override
+  String get pleaseUploadNationalId => 'Luet w.e.g. Är Identitéitskaart erop';
 
   @override
   String get registrationFailed =>
@@ -1384,4 +1390,17 @@ class AppLocalizationsLb extends AppLocalizations {
 
   @override
   String get invalidVehicleYear => 'Please enter a valid year';
+
+  @override
+  String get orderAlreadyTaken =>
+      'This order was already taken by another driver';
+
+  @override
+  String get orderSuggestionExpired => 'This order suggestion has expired';
+
+  @override
+  String get failedToAcceptOrder => 'Failed to accept order. Please try again.';
+
+  @override
+  String get failedToRejectOrder => 'Failed to reject order';
 }
