@@ -103,17 +103,50 @@ class _AuthInterceptor extends QueuedInterceptor {
     handler.next(options);
   }
 
+  /// Check if the error response indicates a token/auth problem
+  bool _isTokenError(DioException err) {
+    final statusCode = err.response?.statusCode;
+
+    // 401 Unauthorized or 403 Forbidden
+    if (statusCode == 401 || statusCode == 403) {
+      return true;
+    }
+
+    // Check response body for token-related error messages
+    final data = err.response?.data;
+    if (data is Map) {
+      final detail = (data['detail'] ?? data['message'] ?? data['code'] ?? '').toString().toLowerCase();
+      const tokenErrors = [
+        'token_not_valid',
+        'token is invalid',
+        'token is expired',
+        'token has been blacklisted',
+        'token is blacklisted',
+        'invalid token',
+        'expired token',
+        'authentication credentials were not provided',
+      ];
+      if (tokenErrors.any((e) => detail.contains(e))) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     debugPrint('[AuthInterceptor] Error: ${err.response?.statusCode} - ${err.message}');
     debugPrint('[AuthInterceptor] Error Response: ${err.response?.data}');
 
-    // Skip refresh for token refresh endpoint itself to avoid infinite loop
-    final isRefreshRequest = err.requestOptions.path == ApiConstants.tokenRefresh ||
-        err.requestOptions.path.endsWith(ApiConstants.tokenRefresh);
+    // Skip refresh for auth endpoints to avoid infinite loops
+    final isAuthRequest = err.requestOptions.path == ApiConstants.tokenRefresh ||
+        err.requestOptions.path.endsWith(ApiConstants.tokenRefresh) ||
+        err.requestOptions.path == ApiConstants.tokenBlacklist ||
+        err.requestOptions.path.endsWith(ApiConstants.tokenBlacklist);
 
-    if (err.response?.statusCode == 401 && !_isRefreshing && !isRefreshRequest) {
-      debugPrint('[AuthInterceptor] Attempting token refresh...');
+    if (_isTokenError(err) && !_isRefreshing && !isAuthRequest) {
+      debugPrint('[AuthInterceptor] Token error detected, attempting refresh...');
       _isRefreshing = true;
 
       final refreshToken = await _tokenStorage.getRefreshToken();
@@ -122,8 +155,7 @@ class _AuthInterceptor extends QueuedInterceptor {
       if (refreshToken == null) {
         debugPrint('[AuthInterceptor] No refresh token, forcing logout');
         _isRefreshing = false;
-        await _tokenStorage.clearTokens();
-        _apiClient.onTokenRefreshFailed?.call();
+        await _forceLogout();
         return handler.next(err);
       }
 
@@ -160,52 +192,57 @@ class _AuthInterceptor extends QueuedInterceptor {
             return handler.resolve(retryResponse);
           } catch (retryError) {
             debugPrint('[AuthInterceptor] Retry request failed: $retryError');
+            _isRefreshing = false;
             if (retryError is DioException) {
               return handler.next(retryError);
             }
             return handler.next(err);
           }
+        } else {
+          // Non-200 refresh response — treat as failure
+          debugPrint('[AuthInterceptor] Refresh returned ${response.statusCode}, forcing logout');
+          _isRefreshing = false;
+          await _forceLogout();
+          return handler.next(_buildSessionExpiredError(err));
         }
       } catch (e) {
         debugPrint('[AuthInterceptor] Token refresh failed: $e');
-
-        // Clear tokens when refresh fails
-        await _tokenStorage.clearTokens();
-        debugPrint('[AuthInterceptor] Tokens cleared due to refresh failure');
-
-        // Notify the auth provider to handle logout
-        _apiClient.onTokenRefreshFailed?.call();
-        debugPrint('[AuthInterceptor] Token refresh failure callback invoked');
-
         _isRefreshing = false;
-
-        // Extract error message from the refresh failure
-        String errorMessage = 'Session expired. Please login again.';
-        if (e is DioException && e.response?.data is Map) {
-          final responseData = e.response!.data as Map;
-          errorMessage = responseData['detail']?.toString() ??
-                        responseData['message']?.toString() ??
-                        responseData['error']?.toString() ??
-                        errorMessage;
-        }
-
-        // Return a TokenRefreshException wrapped in DioException
-        final tokenRefreshError = DioException(
-          requestOptions: err.requestOptions,
-          error: TokenRefreshException(errorMessage),
-          type: DioExceptionType.badResponse,
-          response: Response(
-            requestOptions: err.requestOptions,
-            statusCode: 401,
-            data: {'detail': errorMessage},
-          ),
-        );
-
-        return handler.next(tokenRefreshError);
+        await _forceLogout();
+        return handler.next(_buildSessionExpiredError(err, exception: e));
       }
     }
 
     handler.next(err);
+  }
+
+  /// Clear tokens and notify auth provider to force logout
+  Future<void> _forceLogout() async {
+    await _tokenStorage.clearTokens();
+    debugPrint('[AuthInterceptor] Tokens cleared — forcing logout');
+    _apiClient.onTokenRefreshFailed?.call();
+  }
+
+  /// Build a DioException wrapping a TokenRefreshException with a user-friendly message
+  DioException _buildSessionExpiredError(DioException original, {dynamic exception}) {
+    String errorMessage = 'Session expired. Please login again.';
+    if (exception is DioException && exception.response?.data is Map) {
+      final responseData = exception.response!.data as Map;
+      errorMessage = responseData['detail']?.toString() ??
+          responseData['message']?.toString() ??
+          responseData['error']?.toString() ??
+          errorMessage;
+    }
+    return DioException(
+      requestOptions: original.requestOptions,
+      error: TokenRefreshException(errorMessage),
+      type: DioExceptionType.badResponse,
+      response: Response(
+        requestOptions: original.requestOptions,
+        statusCode: 401,
+        data: {'detail': errorMessage},
+      ),
+    );
   }
 }
 

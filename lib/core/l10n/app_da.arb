@@ -55,7 +55,7 @@
   "reviewSubmit": "Gennemse & Indsend",
 
   "fullName": "Fulde navn",
-  "age": "Alder",
+  "age": "Fødselsdato",
   "dateOfBirth": "Fødselsdato",
   "address": "Adresse",
   "city": "By",
@@ -132,6 +132,12 @@
   "orderRejected": "Ordre afvist",
   "orderCompleted": "Ordre afsluttet",
   "orderCancelled": "Ordre annulleret",
+  "pending": "Afventer",
+  "searchingForDriver": "Søger chauffør",
+  "driverNotificationSent": "Chaufførnotifikation sendt",
+  "rejected": "Afvist",
+  "cancelled": "Annulleret",
+  "delivered": "Leveret",
 
   "pickup": "Afhentning",
   "dropoff": "Levering",

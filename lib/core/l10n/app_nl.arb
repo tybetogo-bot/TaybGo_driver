@@ -55,7 +55,7 @@
   "reviewSubmit": "Controleren & Verzenden",
 
   "fullName": "Volledige naam",
-  "age": "Leeftijd",
+  "age": "Geboortedatum",
   "dateOfBirth": "Geboortedatum",
   "address": "Adres",
   "city": "Stad",
@@ -132,6 +132,12 @@
   "orderRejected": "Bestelling geweigerd",
   "orderCompleted": "Bestelling voltooid",
   "orderCancelled": "Bestelling geannuleerd",
+  "pending": "In afwachting",
+  "searchingForDriver": "Chauffeur wordt gezocht",
+  "driverNotificationSent": "Chauffeursmelding verzonden",
+  "rejected": "Geweigerd",
+  "cancelled": "Geannuleerd",
+  "delivered": "Bezorgd",
 
   "pickup": "Ophalen",
   "dropoff": "Afleveren",

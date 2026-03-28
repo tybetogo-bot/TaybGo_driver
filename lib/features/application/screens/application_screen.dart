@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
@@ -14,6 +15,7 @@ import '../../../core/providers/tour_provider.dart';
 import '../../../core/services/cloudinary_service.dart';
 import '../../../core/services/driver_registration_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/utils/birthdate_utils.dart';
 
 class ApplicationScreen extends StatefulWidget {
   const ApplicationScreen({super.key});
@@ -32,7 +34,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   // Text controllers
   final _nameController = TextEditingController();
-  final _ageController = TextEditingController();
+  final _birthdateController = TextEditingController();
   final _plateNumberController = TextEditingController();
   final _vehicleColorController = TextEditingController();
   final _vehicleMakeController = TextEditingController();
@@ -54,6 +56,18 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   String? _otherDocumentsUrl;
   bool _otherDocumentsUploading = false;
 
+  File? _healthInsuranceDocumentFile;
+  String? _healthInsuranceDocumentUrl;
+  bool _healthInsuranceDocumentUploading = false;
+
+  File? _addressDocumentFile;
+  String? _addressDocumentUrl;
+  bool _addressDocumentUploading = false;
+
+  File? _bankDocumentFile;
+  String? _bankDocumentUrl;
+  bool _bankDocumentUploading = false;
+
   // Form state
   String _selectedVehicle = 'CAR';
   String? _selectedCarSize;
@@ -64,12 +78,33 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   // Loading state
   bool _isLoading = false;
   String? _error;
+  DateTime? _selectedBirthdate;
 
   List<Map<String, dynamic>> _getVehicleTypes(AppLocalizations l10n) => [
-    {'value': 'BIKE', 'label': l10n.bicycle, 'icon': Icons.pedal_bike, 'description': l10n.ecoFriendlyOption},
-    {'value': 'MOTOR', 'label': l10n.motorcycle, 'icon': Icons.two_wheeler, 'description': l10n.fastAndAgile},
-    {'value': 'CAR', 'label': l10n.car, 'icon': Icons.directions_car, 'description': l10n.mostVersatile},
-    {'value': 'VAN', 'label': l10n.van, 'icon': Icons.airport_shuttle, 'description': l10n.largeDeliveries},
+    {
+      'value': 'BIKE',
+      'label': l10n.bicycle,
+      'icon': Icons.pedal_bike,
+      'description': l10n.ecoFriendlyOption,
+    },
+    {
+      'value': 'MOTOR',
+      'label': l10n.motorcycle,
+      'icon': Icons.two_wheeler,
+      'description': l10n.fastAndAgile,
+    },
+    {
+      'value': 'CAR',
+      'label': l10n.car,
+      'icon': Icons.directions_car,
+      'description': l10n.mostVersatile,
+    },
+    {
+      'value': 'VAN',
+      'label': l10n.van,
+      'icon': Icons.airport_shuttle,
+      'description': l10n.largeDeliveries,
+    },
   ];
 
   List<Map<String, String>> _getCarSizes(AppLocalizations l10n) => [
@@ -82,7 +117,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   @override
   void dispose() {
     _nameController.dispose();
-    _ageController.dispose();
+    _birthdateController.dispose();
     _plateNumberController.dispose();
     _vehicleColorController.dispose();
     _vehicleMakeController.dispose();
@@ -98,11 +133,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         if (_nameController.text.trim().isEmpty) {
           return l10n.pleaseEnterYourName;
         }
-        if (_ageController.text.trim().isEmpty) {
+        if (_selectedBirthdate == null) {
           return l10n.pleaseEnterAge;
         }
-        final age = int.tryParse(_ageController.text.trim());
-        if (age == null || age < 18 || age > 80) {
+        if (!BirthdateUtils.isWithinDriverAgeRange(_selectedBirthdate!)) {
           return l10n.invalidAge;
         }
         return null;
@@ -137,7 +171,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           return l10n.pleaseSelectService;
         }
         return null;
-      case 4: // Documents (optional)
+      case 4: // Documents
+        if (_drivingLicenseUrl == null) {
+          return l10n.pleaseUploadDriversLicense;
+        }
+        if (_idDocumentUrl == null) {
+          return l10n.pleaseUploadNationalId;
+        }
         return null;
       default:
         return null;
@@ -176,6 +216,40 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     }
   }
 
+  Future<void> _selectBirthdate() async {
+    final latestBirthdate = BirthdateUtils.latestEligibleBirthdate();
+    final earliestBirthdate = BirthdateUtils.earliestEligibleBirthdate();
+
+    var initialDate = _selectedBirthdate ?? latestBirthdate;
+    if (initialDate.isAfter(latestBirthdate)) {
+      initialDate = latestBirthdate;
+    }
+    if (initialDate.isBefore(earliestBirthdate)) {
+      initialDate = earliestBirthdate;
+    }
+
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: earliestBirthdate,
+      lastDate: latestBirthdate,
+    );
+
+    if (pickedDate == null || !mounted) return;
+
+    setState(() {
+      _selectedBirthdate = pickedDate;
+      _birthdateController.text = _formatBirthdateForDisplay(pickedDate);
+      _error = null;
+    });
+  }
+
+  String _formatBirthdateForDisplay(DateTime birthdate) {
+    return DateFormat.yMMMd(
+      Localizations.localeOf(context).toString(),
+    ).format(birthdate);
+  }
+
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context)!;
     final error = _validateCurrentStep(l10n);
@@ -209,7 +283,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
       final result = await registrationService.registerDriver(
         name: _nameController.text.trim(),
         phone: phone,
-        age: int.parse(_ageController.text.trim()),
+        birthdate: _selectedBirthdate!,
         vehicleType: _selectedVehicle,
         carSize: _selectedCarSize!,
         vehiclePlateNumber: _plateNumberController.text.trim(),
@@ -223,6 +297,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         drivingLicense: _drivingLicenseUrl,
         idDocument: _idDocumentUrl,
         otherDocuments: _otherDocumentsUrl,
+        healthInsuranceDocument: _healthInsuranceDocumentUrl,
+        addressDocument: _addressDocumentUrl,
+        bankDocument: _bankDocumentUrl,
       );
 
       if (!mounted) return;
@@ -254,8 +331,12 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final secondaryColor = isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final secondaryColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
     final backgroundColor = isDark ? AppColors.darkBg : AppColors.lightBg;
     final l10n = AppLocalizations.of(context)!;
 
@@ -304,11 +385,35 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                   controller: _pageController,
                   physics: const NeverScrollableScrollPhysics(),
                   children: [
-                    _buildPersonalInfoStep(textColor, secondaryColor, surfaceColor),
-                    _buildVehicleStep(textColor, secondaryColor, surfaceColor, l10n),
-                    _buildVehicleDetailsStep(textColor, secondaryColor, surfaceColor, l10n),
-                    _buildServicesStep(textColor, secondaryColor, surfaceColor, l10n),
-                    _buildDocumentsStep(textColor, secondaryColor, surfaceColor, l10n),
+                    _buildPersonalInfoStep(
+                      textColor,
+                      secondaryColor,
+                      surfaceColor,
+                    ),
+                    _buildVehicleStep(
+                      textColor,
+                      secondaryColor,
+                      surfaceColor,
+                      l10n,
+                    ),
+                    _buildVehicleDetailsStep(
+                      textColor,
+                      secondaryColor,
+                      surfaceColor,
+                      l10n,
+                    ),
+                    _buildServicesStep(
+                      textColor,
+                      secondaryColor,
+                      surfaceColor,
+                      l10n,
+                    ),
+                    _buildDocumentsStep(
+                      textColor,
+                      secondaryColor,
+                      surfaceColor,
+                      l10n,
+                    ),
                   ],
                 ),
               ),
@@ -326,12 +431,19 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.error_outline, color: AppColors.error, size: 20),
+                      const Icon(
+                        Icons.error_outline,
+                        color: AppColors.error,
+                        size: 20,
+                      ),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           _error!,
-                          style: const TextStyle(color: AppColors.error, fontSize: 14),
+                          style: const TextStyle(
+                            color: AppColors.error,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                     ],
@@ -352,7 +464,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   Widget _buildStepIndicator(Color textColor, Color secondaryColor) {
     final l10n = AppLocalizations.of(context)!;
-    final steps = [l10n.stepPersonal, l10n.stepVehicle, l10n.stepDetails, l10n.stepServices, l10n.stepDocuments];
+    final steps = [
+      l10n.stepPersonal,
+      l10n.stepVehicle,
+      l10n.stepDetails,
+      l10n.stepServices,
+      l10n.stepDocuments,
+    ];
 
     return Row(
       children: List.generate(steps.length, (index) {
@@ -419,7 +537,11 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     );
   }
 
-  Widget _buildPersonalInfoStep(Color textColor, Color secondaryColor, Color surfaceColor) {
+  Widget _buildPersonalInfoStep(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+  ) {
     final authPhone = context.watch<AuthProvider>().phoneNumber;
     final profilePhone = context.watch<DriverProvider>().profile?.phone;
     final phone = authPhone ?? profilePhone ?? '';
@@ -455,19 +577,26 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             surfaceColor: surfaceColor,
             textColor: textColor,
             secondaryColor: secondaryColor,
+            isRequired: true,
           ),
           const SizedBox(height: 20),
 
-          // Age field
+          // Birthdate field
           _buildTextField(
-            controller: _ageController,
+            controller: _birthdateController,
             label: l10n.age,
             hint: l10n.enterAge,
-            icon: Icons.cake_outlined,
+            icon: Icons.calendar_today_outlined,
             surfaceColor: surfaceColor,
             textColor: textColor,
             secondaryColor: secondaryColor,
-            keyboardType: TextInputType.number,
+            isRequired: true,
+            readOnly: true,
+            onTap: _selectBirthdate,
+            suffixIcon: const Icon(
+              Icons.calendar_month_outlined,
+              color: AppColors.primary,
+            ),
           ),
           const SizedBox(height: 20),
 
@@ -486,7 +615,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             decoration: BoxDecoration(
               color: surfaceColor,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.primary.withValues(alpha: 0.3)),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.3),
+              ),
             ),
             child: Row(
               children: [
@@ -496,7 +627,11 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.phone, color: AppColors.primary, size: 20),
+                  child: const Icon(
+                    Icons.phone,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -513,7 +648,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                       ),
                       Text(
                         l10n.verifiedViaOtp,
-                        style: const TextStyle(fontSize: 12, color: AppColors.success),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.success,
+                        ),
                       ),
                     ],
                   ),
@@ -527,7 +665,12 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     );
   }
 
-  Widget _buildVehicleStep(Color textColor, Color secondaryColor, Color surfaceColor, AppLocalizations l10n) {
+  Widget _buildVehicleStep(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    AppLocalizations l10n,
+  ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -559,7 +702,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               child: _buildVehicleCard(
                 vehicle: vehicle,
                 isSelected: isSelected,
-                onTap: () => setState(() => _selectedVehicle = vehicle['value']),
+                onTap: () =>
+                    setState(() => _selectedVehicle = vehicle['value']),
                 textColor: textColor,
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
@@ -571,7 +715,12 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     );
   }
 
-  Widget _buildVehicleDetailsStep(Color textColor, Color secondaryColor, Color surfaceColor, AppLocalizations l10n) {
+  Widget _buildVehicleDetailsStep(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    AppLocalizations l10n,
+  ) {
     final carSizes = _getCarSizes(l10n);
 
     return SingleChildScrollView(
@@ -596,13 +745,25 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           const SizedBox(height: 24),
 
           // Car size dropdown
-          Text(
-            l10n.carSize,
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-              color: secondaryColor,
-            ),
+          Row(
+            children: [
+              Text(
+                l10n.carSize,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: secondaryColor,
+                ),
+              ),
+              const Text(
+                ' *',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.error,
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 8),
           Container(
@@ -621,7 +782,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               initialValue: _selectedCarSize,
               decoration: InputDecoration(
                 hintText: l10n.selectCarSize,
-                hintStyle: TextStyle(color: secondaryColor.withValues(alpha: 0.6)),
+                hintStyle: TextStyle(
+                  color: secondaryColor.withValues(alpha: 0.6),
+                ),
                 prefixIcon: Container(
                   margin: const EdgeInsets.all(12),
                   padding: const EdgeInsets.all(8),
@@ -629,7 +792,11 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                     color: AppColors.primary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: const Icon(Icons.straighten, color: AppColors.primary, size: 20),
+                  child: const Icon(
+                    Icons.straighten,
+                    color: AppColors.primary,
+                    size: 20,
+                  ),
                 ),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -641,9 +808,15 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                  borderSide: const BorderSide(
+                    color: AppColors.primary,
+                    width: 2,
+                  ),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
               ),
               dropdownColor: surfaceColor,
               style: TextStyle(color: textColor, fontSize: 16),
@@ -667,6 +840,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             surfaceColor: surfaceColor,
             textColor: textColor,
             secondaryColor: secondaryColor,
+            isRequired: true,
           ),
           const SizedBox(height: 16),
 
@@ -679,6 +853,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             surfaceColor: surfaceColor,
             textColor: textColor,
             secondaryColor: secondaryColor,
+            isRequired: true,
           ),
           const SizedBox(height: 16),
 
@@ -692,6 +867,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             textColor: textColor,
             secondaryColor: secondaryColor,
             keyboardType: TextInputType.number,
+            isRequired: true,
           ),
           const SizedBox(height: 16),
 
@@ -704,6 +880,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             surfaceColor: surfaceColor,
             textColor: textColor,
             secondaryColor: secondaryColor,
+            isRequired: true,
           ),
           const SizedBox(height: 16),
 
@@ -716,6 +893,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             surfaceColor: surfaceColor,
             textColor: textColor,
             secondaryColor: secondaryColor,
+            isRequired: true,
           ),
           const SizedBox(height: 24),
         ],
@@ -723,7 +901,12 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     );
   }
 
-  Widget _buildServicesStep(Color textColor, Color secondaryColor, Color surfaceColor, AppLocalizations l10n) {
+  Widget _buildServicesStep(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    AppLocalizations l10n,
+  ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -828,7 +1011,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text(label, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: 20),
               Row(
                 children: [
@@ -837,7 +1026,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                       onPressed: () => Navigator.pop(ctx, ImageSource.camera),
                       icon: const Icon(Icons.camera_alt_outlined),
                       label: Text(l10n.camera),
-                      style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -846,7 +1037,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                       onPressed: () => Navigator.pop(ctx, ImageSource.gallery),
                       icon: const Icon(Icons.photo_library_outlined),
                       label: Text(l10n.gallery),
-                      style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 16)),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
                     ),
                   ),
                 ],
@@ -860,7 +1053,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
     if (source == null) return;
 
-    final picked = await _imagePicker.pickImage(source: source, imageQuality: 80);
+    final picked = await _imagePicker.pickImage(
+      source: source,
+      imageQuality: 80,
+    );
     if (picked == null) return;
 
     final file = File(picked.path);
@@ -883,7 +1079,12 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     });
   }
 
-  Widget _buildDocumentsStep(Color textColor, Color secondaryColor, Color surfaceColor, AppLocalizations l10n) {
+  Widget _buildDocumentsStep(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    AppLocalizations l10n,
+  ) {
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
@@ -923,6 +1124,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             secondaryColor: secondaryColor,
             surfaceColor: surfaceColor,
             l10n: l10n,
+            isRequired: true,
           ),
           const SizedBox(height: 16),
 
@@ -944,6 +1146,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             secondaryColor: secondaryColor,
             surfaceColor: surfaceColor,
             l10n: l10n,
+            isRequired: true,
           ),
           const SizedBox(height: 16),
 
@@ -960,6 +1163,66 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               setFile: (f) => _otherDocumentsFile = f,
               setUrl: (u) => _otherDocumentsUrl = u,
               setLoading: (l) => _otherDocumentsUploading = l,
+            ),
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            surfaceColor: surfaceColor,
+            l10n: l10n,
+          ),
+          const SizedBox(height: 16),
+
+          _buildUploadCard(
+            label: l10n.healthInsuranceDocument,
+            icon: Icons.health_and_safety_outlined,
+            file: _healthInsuranceDocumentFile,
+            url: _healthInsuranceDocumentUrl,
+            isUploading: _healthInsuranceDocumentUploading,
+            onTap: () => _pickAndUpload(
+              label: l10n.healthInsuranceDocument,
+              folder: 'health_insurance_documents',
+              setFile: (f) => _healthInsuranceDocumentFile = f,
+              setUrl: (u) => _healthInsuranceDocumentUrl = u,
+              setLoading: (l) => _healthInsuranceDocumentUploading = l,
+            ),
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            surfaceColor: surfaceColor,
+            l10n: l10n,
+          ),
+          const SizedBox(height: 16),
+
+          _buildUploadCard(
+            label: l10n.addressDocument,
+            icon: Icons.home_outlined,
+            file: _addressDocumentFile,
+            url: _addressDocumentUrl,
+            isUploading: _addressDocumentUploading,
+            onTap: () => _pickAndUpload(
+              label: l10n.addressDocument,
+              folder: 'address_documents',
+              setFile: (f) => _addressDocumentFile = f,
+              setUrl: (u) => _addressDocumentUrl = u,
+              setLoading: (l) => _addressDocumentUploading = l,
+            ),
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            surfaceColor: surfaceColor,
+            l10n: l10n,
+          ),
+          const SizedBox(height: 16),
+
+          _buildUploadCard(
+            label: l10n.bankDocument,
+            icon: Icons.account_balance_outlined,
+            file: _bankDocumentFile,
+            url: _bankDocumentUrl,
+            isUploading: _bankDocumentUploading,
+            onTap: () => _pickAndUpload(
+              label: l10n.bankDocument,
+              folder: 'bank_documents',
+              setFile: (f) => _bankDocumentFile = f,
+              setUrl: (u) => _bankDocumentUrl = u,
+              setLoading: (l) => _bankDocumentUploading = l,
             ),
             textColor: textColor,
             secondaryColor: secondaryColor,
@@ -1005,6 +1268,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     required Color secondaryColor,
     required Color surfaceColor,
     required AppLocalizations l10n,
+    bool isRequired = false,
   }) {
     final hasFile = file != null;
     final isUploaded = url != null;
@@ -1023,8 +1287,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             color: isUploaded
                 ? AppColors.success
                 : hasFile
-                    ? AppColors.primary
-                    : Colors.transparent,
+                ? AppColors.primary
+                : Colors.transparent,
             width: 2,
           ),
           boxShadow: [
@@ -1063,13 +1327,26 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: textColor,
-                    ),
+                  Row(
+                    children: [
+                      Text(
+                        label,
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: textColor,
+                        ),
+                      ),
+                      if (isRequired)
+                        const Text(
+                          ' *',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.error,
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   if (isUploading)
@@ -1078,28 +1355,44 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                         const SizedBox(
                           width: 14,
                           height: 14,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.primary,
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Text(
                           l10n.uploadingFile,
-                          style: TextStyle(fontSize: 13, color: AppColors.primary),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ],
                     )
                   else if (isUploaded)
                     Row(
                       children: [
-                        const Icon(Icons.check_circle, color: AppColors.success, size: 16),
+                        const Icon(
+                          Icons.check_circle,
+                          color: AppColors.success,
+                          size: 16,
+                        ),
                         const SizedBox(width: 6),
                         Text(
                           l10n.uploaded,
-                          style: const TextStyle(fontSize: 13, color: AppColors.success),
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.success,
+                          ),
                         ),
                         const SizedBox(width: 8),
                         Text(
                           '· ${l10n.changePhoto}',
-                          style: TextStyle(fontSize: 13, color: AppColors.primary),
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: AppColors.primary,
+                          ),
                         ),
                       ],
                     )
@@ -1113,7 +1406,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             ),
             Icon(
               isUploaded ? Icons.check_circle : Icons.cloud_upload_outlined,
-              color: isUploaded ? AppColors.success : secondaryColor.withValues(alpha: 0.5),
+              color: isUploaded
+                  ? AppColors.success
+                  : secondaryColor.withValues(alpha: 0.5),
               size: 24,
             ),
           ],
@@ -1131,17 +1426,34 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     required Color textColor,
     required Color secondaryColor,
     TextInputType keyboardType = TextInputType.text,
+    bool isRequired = false,
+    bool readOnly = false,
+    VoidCallback? onTap,
+    Widget? suffixIcon,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: secondaryColor,
-          ),
+        Row(
+          children: [
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: secondaryColor,
+              ),
+            ),
+            if (isRequired)
+              const Text(
+                ' *',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.error,
+                ),
+              ),
+          ],
         ),
         const SizedBox(height: 8),
         Container(
@@ -1159,10 +1471,14 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           child: TextFormField(
             controller: controller,
             keyboardType: keyboardType,
+            readOnly: readOnly,
+            onTap: onTap,
             style: TextStyle(color: textColor, fontSize: 16),
             decoration: InputDecoration(
               hintText: hint,
-              hintStyle: TextStyle(color: secondaryColor.withValues(alpha: 0.6)),
+              hintStyle: TextStyle(
+                color: secondaryColor.withValues(alpha: 0.6),
+              ),
               prefixIcon: Container(
                 margin: const EdgeInsets.all(12),
                 padding: const EdgeInsets.all(8),
@@ -1172,6 +1488,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                 ),
                 child: Icon(icon, color: AppColors.primary, size: 20),
               ),
+              suffixIcon: suffixIcon,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide.none,
@@ -1182,9 +1499,15 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                borderSide: const BorderSide(
+                  color: AppColors.primary,
+                  width: 2,
+                ),
               ),
-              contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
+              ),
             ),
           ),
         ),
@@ -1206,7 +1529,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : surfaceColor,
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.05)
+              : surfaceColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? AppColors.primary : Colors.transparent,
@@ -1230,11 +1555,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                     : AppColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                vehicle['icon'],
-                color: AppColors.primary,
-                size: 28,
-              ),
+              child: Icon(vehicle['icon'], color: AppColors.primary, size: 28),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -1252,10 +1573,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                   const SizedBox(height: 2),
                   Text(
                     vehicle['description'],
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: secondaryColor,
-                    ),
+                    style: TextStyle(fontSize: 13, color: secondaryColor),
                   ),
                 ],
               ),
@@ -1268,7 +1586,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                 color: isSelected ? AppColors.primary : Colors.transparent,
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : secondaryColor.withValues(alpha: 0.3),
+                  color: isSelected
+                      ? AppColors.primary
+                      : secondaryColor.withValues(alpha: 0.3),
                   width: 2,
                 ),
               ),
@@ -1298,7 +1618,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primary.withValues(alpha: 0.05) : surfaceColor,
+          color: isSelected
+              ? AppColors.primary.withValues(alpha: 0.05)
+              : surfaceColor,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? AppColors.primary : Colors.transparent,
@@ -1322,11 +1644,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                     : AppColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                icon,
-                color: AppColors.primary,
-                size: 24,
-              ),
+              child: Icon(icon, color: AppColors.primary, size: 24),
             ),
             const SizedBox(width: 16),
             Expanded(
@@ -1344,10 +1662,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                   const SizedBox(height: 2),
                   Text(
                     description,
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: secondaryColor,
-                    ),
+                    style: TextStyle(fontSize: 13, color: secondaryColor),
                   ),
                 ],
               ),
@@ -1360,7 +1675,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                 color: isSelected ? AppColors.primary : surfaceColor,
                 borderRadius: BorderRadius.circular(8),
                 border: Border.all(
-                  color: isSelected ? AppColors.primary : secondaryColor.withValues(alpha: 0.3),
+                  color: isSelected
+                      ? AppColors.primary
+                      : secondaryColor.withValues(alpha: 0.3),
                   width: 2,
                 ),
               ),
@@ -1402,10 +1719,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               ),
               child: Text(
                 AppLocalizations.of(context)!.cancel,
-                style: TextStyle(
-                  color: textColor,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -1422,10 +1736,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               ),
               child: Text(
                 AppLocalizations.of(context)!.back,
-                style: TextStyle(
-                  color: textColor,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: TextStyle(color: textColor, fontWeight: FontWeight.w600),
               ),
             ),
           ),
@@ -1458,7 +1769,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        isLastStep ? AppLocalizations.of(context)!.completeRegistration : AppLocalizations.of(context)!.continueText,
+                        isLastStep
+                            ? AppLocalizations.of(context)!.completeRegistration
+                            : AppLocalizations.of(context)!.continueText,
                         style: const TextStyle(
                           fontWeight: FontWeight.w600,
                           fontSize: 16,

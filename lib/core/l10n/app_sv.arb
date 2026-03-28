@@ -55,7 +55,7 @@
   "reviewSubmit": "Granska & Skicka",
 
   "fullName": "Fullständigt namn",
-  "age": "Ålder",
+  "age": "Födelsedatum",
   "dateOfBirth": "Födelsedatum",
   "address": "Adress",
   "city": "Stad",
@@ -132,6 +132,12 @@
   "orderRejected": "Beställning avvisad",
   "orderCompleted": "Beställning slutförd",
   "orderCancelled": "Beställning avbruten",
+  "pending": "Väntar",
+  "searchingForDriver": "Söker förare",
+  "driverNotificationSent": "Föraravisering skickad",
+  "rejected": "Avvisad",
+  "cancelled": "Avbruten",
+  "delivered": "Levererad",
 
   "pickup": "Upphämtning",
   "dropoff": "Avlämning",

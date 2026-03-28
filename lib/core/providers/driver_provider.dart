@@ -29,7 +29,8 @@ class DriverProvider extends ChangeNotifier {
   LocationPermissionStatus? _locationStatus;
   String? _currentPlaceName;
   DateTime? _lastLocationUpdate;
-  bool? _profileExists; // null = unknown, true = has profile, false = no profile (needs registration)
+  bool?
+  _profileExists; // null = unknown, true = has profile, false = no profile (needs registration)
 
   Timer? _forceLocationTimer;
   Timer? _locationPermissionCheckTimer;
@@ -39,10 +40,10 @@ class DriverProvider extends ChangeNotifier {
   bool Function()? _isTourActive;
 
   DriverProvider({DriverService? driverService, ApiClient? apiClient})
-      : _driverService = driverService ??
-            DriverService(apiClient: apiClient ?? ApiClient()),
-        _locationService = LocationService(),
-        _geocodingService = GeocodingService();
+    : _driverService =
+          driverService ?? DriverService(apiClient: apiClient ?? ApiClient()),
+      _locationService = LocationService(),
+      _geocodingService = GeocodingService();
 
   /// Set tour mode checker (called from tour integration)
   void setTourModeChecker(bool Function() checker) {
@@ -59,6 +60,7 @@ class DriverProvider extends ChangeNotifier {
   String? get currentPlaceName => _currentPlaceName;
   DateTime? get lastLocationUpdate => _lastLocationUpdate;
   bool get locationPermissionLost => _locationPermissionLost;
+
   /// Returns true if profile exists, false if no profile (403), null if unknown
   bool? get profileExists => _profileExists;
 
@@ -122,7 +124,7 @@ class DriverProvider extends ChangeNotifier {
   Future<bool> updateUserProfile({
     String? name,
     String? phone,
-    int? age,
+    DateTime? birthdate,
     String? vehicleType,
     String? carSize,
     String? vehiclePlateNumber,
@@ -136,6 +138,9 @@ class DriverProvider extends ChangeNotifier {
     String? drivingLicense,
     String? idDocument,
     String? otherDocuments,
+    String? healthInsuranceDocument,
+    String? addressDocument,
+    String? bankDocument,
   }) async {
     _isLoading = true;
     _error = null;
@@ -145,7 +150,7 @@ class DriverProvider extends ChangeNotifier {
       await _driverService.updateUserProfile(
         name: name,
         phone: phone,
-        age: age,
+        birthdate: birthdate,
         vehicleType: vehicleType,
         carSize: carSize,
         vehiclePlateNumber: vehiclePlateNumber,
@@ -159,6 +164,9 @@ class DriverProvider extends ChangeNotifier {
         drivingLicense: drivingLicense,
         idDocument: idDocument,
         otherDocuments: otherDocuments,
+        healthInsuranceDocument: healthInsuranceDocument,
+        addressDocument: addressDocument,
+        bankDocument: bankDocument,
       );
       // Refresh driver profile to reflect changes
       await fetchProfile();
@@ -206,7 +214,9 @@ class DriverProvider extends ChangeNotifier {
 
     // Optimistic update — UI flips immediately
     try {
-      final confirmedStatus = await _driverService.toggleOnlineStatus(newStatus);
+      final confirmedStatus = await _driverService.toggleOnlineStatus(
+        newStatus,
+      );
       _profile = _profile!.copyWith(isOnline: confirmedStatus);
       _isLoading = false;
       notifyListeners();
@@ -249,14 +259,16 @@ class DriverProvider extends ChangeNotifier {
         _locationStatus = failureStatus;
         final mappedResult = _mapPermissionStatusToToggleResult(failureStatus);
         if (mappedResult != ToggleOnlineResult.success) {
-          _error = locationResult.message ??
+          _error =
+              locationResult.message ??
               _locationService.getStatusMessage(failureStatus);
           notifyListeners();
           return mappedResult;
         }
       }
 
-      _error = locationResult.message ??
+      _error =
+          locationResult.message ??
           'Unable to get your current location. Please try again.';
       notifyListeners();
       return ToggleOnlineResult.locationUnavailable;
@@ -278,7 +290,8 @@ class DriverProvider extends ChangeNotifier {
   }
 
   ToggleOnlineResult _mapPermissionStatusToToggleResult(
-      LocationPermissionStatus status) {
+    LocationPermissionStatus status,
+  ) {
     switch (status) {
       case LocationPermissionStatus.granted:
         return ToggleOnlineResult.success;
@@ -330,7 +343,9 @@ class DriverProvider extends ChangeNotifier {
 
       // Force a location update every 5 minutes even if driver hasn't moved
       _forceLocationTimer?.cancel();
-      _forceLocationTimer = Timer.periodic(const Duration(minutes: 5), (_) async {
+      _forceLocationTimer = Timer.periodic(const Duration(minutes: 5), (
+        _,
+      ) async {
         if (!(_profile?.isOnline ?? false)) return;
         final lastUpdate = _lastLocationUpdate;
         if (lastUpdate != null &&
@@ -361,8 +376,9 @@ class DriverProvider extends ChangeNotifier {
   void _startLocationPermissionMonitoring() {
     _locationPermissionCheckTimer?.cancel();
     _locationPermissionLost = false;
-    _locationPermissionCheckTimer =
-        Timer.periodic(const Duration(seconds: 30), (_) async {
+    _locationPermissionCheckTimer = Timer.periodic(const Duration(seconds: 30), (
+      _,
+    ) async {
       if (!(_profile?.isOnline ?? false)) return;
       final status = await _locationService.checkPermission();
       _locationStatus = status;
@@ -370,7 +386,8 @@ class DriverProvider extends ChangeNotifier {
       _locationPermissionLost = status != LocationPermissionStatus.granted;
       if (_locationPermissionLost != wasLost) {
         debugPrint(
-            '[DriverProvider] Location permission changed: lost=$_locationPermissionLost, status=$status');
+          '[DriverProvider] Location permission changed: lost=$_locationPermissionLost, status=$status',
+        );
         notifyListeners();
       }
     });

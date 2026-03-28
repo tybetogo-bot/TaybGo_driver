@@ -2,19 +2,20 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../api/api_client.dart';
 import '../api/api_constants.dart';
+import '../utils/birthdate_utils.dart';
 
 class DriverRegistrationService {
   final ApiClient _apiClient;
 
   DriverRegistrationService({ApiClient? apiClient})
-      : _apiClient = apiClient ?? ApiClient();
+    : _apiClient = apiClient ?? ApiClient();
 
   /// Register a new driver
   /// POST /api/driver/profile/
   Future<DriverRegistrationResult> registerDriver({
     required String name,
     required String phone,
-    required int age,
+    required DateTime birthdate,
     required String vehicleType,
     required String carSize,
     required String vehiclePlateNumber,
@@ -28,12 +29,15 @@ class DriverRegistrationService {
     String? drivingLicense,
     String? idDocument,
     String? otherDocuments,
+    String? healthInsuranceDocument,
+    String? addressDocument,
+    String? bankDocument,
   }) async {
     try {
       final data = {
         'name': name,
         'phone': phone,
-        'age': age,
+        'birthdate': BirthdateUtils.formatForApi(birthdate),
         'vehicle_type': vehicleType,
         'car_size': carSize,
         'vehicle_plate_number': vehiclePlateNumber,
@@ -56,9 +60,20 @@ class DriverRegistrationService {
       if (otherDocuments != null) {
         data['other_documents'] = otherDocuments;
       }
+      if (healthInsuranceDocument != null) {
+        data['health_insurance_document'] = healthInsuranceDocument;
+      }
+      if (addressDocument != null) {
+        data['address_document'] = addressDocument;
+      }
+      if (bankDocument != null) {
+        data['bank_document'] = bankDocument;
+      }
 
       debugPrint('[DriverRegistrationService] === REGISTER DRIVER REQUEST ===');
-      debugPrint('[DriverRegistrationService] Endpoint: ${ApiConstants.driverCreate}');
+      debugPrint(
+        '[DriverRegistrationService] Endpoint: ${ApiConstants.driverCreate}',
+      );
       debugPrint('[DriverRegistrationService] Data: $data');
 
       final response = await _apiClient.post(
@@ -66,7 +81,9 @@ class DriverRegistrationService {
         data: data,
       );
 
-      debugPrint('[DriverRegistrationService] === REGISTER DRIVER RESPONSE ===');
+      debugPrint(
+        '[DriverRegistrationService] === REGISTER DRIVER RESPONSE ===',
+      );
       debugPrint('[DriverRegistrationService] Status: ${response.statusCode}');
       debugPrint('[DriverRegistrationService] Data: ${response.data}');
 
@@ -74,11 +91,16 @@ class DriverRegistrationService {
         success: true,
         message: response.data['message'] ?? 'Registration successful',
         driverId: response.data['id']?.toString(),
-        isVerified: response.data['is_verified'] ?? response.data['verified'] ?? false,
+        isVerified:
+            response.data['is_verified'] ?? response.data['verified'] ?? false,
       );
     } on DioException catch (e) {
-      debugPrint('[DriverRegistrationService] Register Driver Error: ${e.message}');
-      debugPrint('[DriverRegistrationService] Error Response: ${e.response?.data}');
+      debugPrint(
+        '[DriverRegistrationService] Register Driver Error: ${e.message}',
+      );
+      debugPrint(
+        '[DriverRegistrationService] Error Response: ${e.response?.data}',
+      );
 
       if (e.response?.statusCode == 400) {
         final errors = e.response?.data;
@@ -92,10 +114,7 @@ class DriverRegistrationService {
           }
         }
         debugPrint('[DriverRegistrationService] Validation Error: $message');
-        return DriverRegistrationResult(
-          success: false,
-          message: message,
-        );
+        return DriverRegistrationResult(success: false, message: message);
       }
       if (e.response?.statusCode == 409) {
         debugPrint('[DriverRegistrationService] Duplicate phone number');

@@ -55,7 +55,7 @@
   "reviewSubmit": "Rivedi e invia",
 
   "fullName": "Nome completo",
-  "age": "Età",
+  "age": "Data di nascita",
   "dateOfBirth": "Data di nascita",
   "address": "Indirizzo",
   "city": "Città",
@@ -132,6 +132,12 @@
   "orderRejected": "Ordine rifiutato",
   "orderCompleted": "Ordine completato",
   "orderCancelled": "Ordine annullato",
+  "pending": "In attesa",
+  "searchingForDriver": "Autista in ricerca",
+  "driverNotificationSent": "Notifica autista inviata",
+  "rejected": "Rifiutato",
+  "cancelled": "Annullato",
+  "delivered": "Consegnato",
 
   "pickup": "Ritiro",
   "dropoff": "Consegna",

@@ -50,7 +50,7 @@
   "reviewSubmit": "Überprüfen & Absenden",
 
   "fullName": "Vollständiger Name",
-  "age": "Alter",
+  "age": "Geburtsdatum",
   "dateOfBirth": "Geburtsdatum",
   "address": "Adresse",
   "city": "Stadt",
@@ -122,6 +122,12 @@
   "orderRejected": "Auftrag abgelehnt",
   "orderCompleted": "Auftrag abgeschlossen",
   "orderCancelled": "Auftrag storniert",
+  "pending": "Ausstehend",
+  "searchingForDriver": "Fahrer wird gesucht",
+  "driverNotificationSent": "Fahrerbenachrichtigung gesendet",
+  "rejected": "Abgelehnt",
+  "cancelled": "Storniert",
+  "delivered": "Geliefert",
 
   "pickup": "Abholung",
   "dropoff": "Lieferung",

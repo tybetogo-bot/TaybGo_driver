@@ -1,3 +1,5 @@
+import '../utils/birthdate_utils.dart';
+
 class DriverProfile {
   final int id;
   final String? firstName;
@@ -15,7 +17,7 @@ class DriverProfile {
   final String? vehicleType;
   final String? vehiclePlate;
   final String? carSize;
-  final int? age;
+  final DateTime? birthdate;
   final String? vehiclePlateNumber;
   final String? vehicleColor;
   final String? vehicleMake;
@@ -27,6 +29,9 @@ class DriverProfile {
   final String? drivingLicense;
   final String? idDocument;
   final String? otherDocuments;
+  final String? healthInsuranceDocument;
+  final String? addressDocument;
+  final String? bankDocument;
   final DateTime? createdAt;
 
   DriverProfile({
@@ -46,7 +51,7 @@ class DriverProfile {
     this.vehicleType,
     this.vehiclePlate,
     this.carSize,
-    this.age,
+    this.birthdate,
     this.vehiclePlateNumber,
     this.vehicleColor,
     this.vehicleMake,
@@ -58,6 +63,9 @@ class DriverProfile {
     this.drivingLicense,
     this.idDocument,
     this.otherDocuments,
+    this.healthInsuranceDocument,
+    this.addressDocument,
+    this.bankDocument,
     this.createdAt,
   });
 
@@ -67,6 +75,8 @@ class DriverProfile {
   }
 
   String get formattedRating => rating.toStringAsFixed(1);
+  int? get age =>
+      birthdate == null ? null : BirthdateUtils.calculateAge(birthdate!);
 
   String get formattedEarnings {
     if (totalEarnings >= 1000) {
@@ -77,7 +87,20 @@ class DriverProfile {
 
   String get memberSince {
     if (createdAt == null) return 'N/A';
-    final months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final months = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ];
     return '${months[createdAt!.month - 1]} ${createdAt!.year.toString().substring(2)}';
   }
 
@@ -89,7 +112,12 @@ class DriverProfile {
     String? firstName = user['first_name'] ?? json['first_name'];
     String? lastName = user['last_name'] ?? json['last_name'];
     if (firstName == null && lastName == null) {
-      final fullName = (user['name'] ?? json['name'] ?? json['full_name'] ?? user['full_name']) as String?;
+      final fullName =
+          (user['name'] ??
+                  json['name'] ??
+                  json['full_name'] ??
+                  user['full_name'])
+              as String?;
       if (fullName != null && fullName.trim().isNotEmpty) {
         final parts = fullName.trim().split(RegExp(r'\s+'));
         firstName = parts.first;
@@ -117,13 +145,16 @@ class DriverProfile {
       totalOrders: _parseInt(json['total_orders'] ?? json['orders_count']),
       totalEarnings: _parseDouble(json['total_earnings'] ?? json['earnings']),
       isOnline: json['is_online'] ?? false,
-      isVerified: json['is_verified'] ?? json['verified'] ?? json['status'] == 'APPROVED',
+      isVerified:
+          json['is_verified'] ??
+          json['verified'] ??
+          json['status'] == 'APPROVED',
       status: json['status'] as String?,
       roles: rolesList,
       vehicleType: json['vehicle_type'],
       vehiclePlate: json['vehicle_plate'] ?? json['license_plate'],
       carSize: json['car_size'] as String?,
-      age: _parseInt(json['age']),
+      birthdate: BirthdateUtils.parse(json['birthdate'] ?? user['birthdate']),
       vehiclePlateNumber: json['vehicle_plate_number'],
       vehicleColor: json['vehicle_color'],
       vehicleMake: json['vehicle_make'],
@@ -132,9 +163,14 @@ class DriverProfile {
       acceptsFood: json['accepts_food'] ?? false,
       acceptsShipping: json['accepts_shipping'] ?? false,
       acceptsTaxi: json['accepts_taxi'] ?? false,
-      drivingLicense: json['driving_license'] as String?,
-      idDocument: json['id_document'] as String?,
-      otherDocuments: json['other_documents'] as String?,
+      drivingLicense: _parseNullableUrl(json['driving_license']),
+      idDocument: _parseNullableUrl(json['id_document']),
+      otherDocuments: _parseNullableUrl(json['other_documents']),
+      healthInsuranceDocument: _parseNullableUrl(
+        json['health_insurance_document'],
+      ),
+      addressDocument: _parseNullableUrl(json['address_document']),
+      bankDocument: _parseNullableUrl(json['bank_document']),
       createdAt: _parseDateTime(json['created_at'] ?? user['date_joined']),
     );
   }
@@ -144,6 +180,9 @@ class DriverProfile {
       'first_name': firstName,
       'last_name': lastName,
       'email': email,
+      'birthdate': birthdate == null
+          ? null
+          : BirthdateUtils.formatForApi(birthdate!),
       'vehicle_type': vehicleType,
       'vehicle_plate': vehiclePlate,
     };
@@ -166,7 +205,7 @@ class DriverProfile {
     String? vehicleType,
     String? vehiclePlate,
     String? carSize,
-    int? age,
+    DateTime? birthdate,
     String? vehiclePlateNumber,
     String? vehicleColor,
     String? vehicleMake,
@@ -178,6 +217,9 @@ class DriverProfile {
     String? drivingLicense,
     String? idDocument,
     String? otherDocuments,
+    String? healthInsuranceDocument,
+    String? addressDocument,
+    String? bankDocument,
     DateTime? createdAt,
   }) {
     return DriverProfile(
@@ -197,7 +239,7 @@ class DriverProfile {
       vehicleType: vehicleType ?? this.vehicleType,
       vehiclePlate: vehiclePlate ?? this.vehiclePlate,
       carSize: carSize ?? this.carSize,
-      age: age ?? this.age,
+      birthdate: birthdate ?? this.birthdate,
       vehiclePlateNumber: vehiclePlateNumber ?? this.vehiclePlateNumber,
       vehicleColor: vehicleColor ?? this.vehicleColor,
       vehicleMake: vehicleMake ?? this.vehicleMake,
@@ -209,6 +251,10 @@ class DriverProfile {
       drivingLicense: drivingLicense ?? this.drivingLicense,
       idDocument: idDocument ?? this.idDocument,
       otherDocuments: otherDocuments ?? this.otherDocuments,
+      healthInsuranceDocument:
+          healthInsuranceDocument ?? this.healthInsuranceDocument,
+      addressDocument: addressDocument ?? this.addressDocument,
+      bankDocument: bankDocument ?? this.bankDocument,
       createdAt: createdAt ?? this.createdAt,
     );
   }
@@ -234,5 +280,13 @@ class DriverProfile {
     if (value is DateTime) return value.toLocal();
     if (value is String) return DateTime.tryParse(value)?.toLocal();
     return null;
+  }
+
+  /// Parse a URL string, returning null for empty/blank values
+  static String? _parseNullableUrl(dynamic value) {
+    if (value == null) return null;
+    final str = value.toString().trim();
+    if (str.isEmpty) return null;
+    return str;
   }
 }

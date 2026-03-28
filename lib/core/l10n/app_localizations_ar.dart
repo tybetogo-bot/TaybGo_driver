@@ -146,7 +146,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get fullName => 'الاسم الكامل';
 
   @override
-  String get age => 'العمر';
+  String get age => 'تاريخ الميلاد';
 
   @override
   String get dateOfBirth => 'تاريخ الميلاد';
@@ -212,6 +212,15 @@ class AppLocalizationsAr extends AppLocalizations {
   String get nationalId => 'الهوية الوطنية';
 
   @override
+  String get healthInsuranceDocument => 'وثيقة التأمين الصحي';
+
+  @override
+  String get addressDocument => 'وثيقة العنوان';
+
+  @override
+  String get bankDocument => 'الوثيقة البنكية';
+
+  @override
   String get vehicleRegistration => 'تسجيل المركبة';
 
   @override
@@ -247,6 +256,21 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get pendingApprovalMessage =>
       'نحن نراجع وثائقك. عادة ما يستغرق هذا 24-48 ساعة.';
+
+  @override
+  String get vehicleChangeWarningTitle =>
+      'تعديل بيانات المركبة يحتاج إلى موافقة';
+
+  @override
+  String get vehicleChangeWarningMessage =>
+      'سيؤدي تغيير بيانات المركبة إلى وضع حسابك قيد الإيقاف حتى تقوم الإدارة بمراجعة التحديث والموافقة عليه.';
+
+  @override
+  String get vehicleChangeWarningNote =>
+      'لن تتمكن من الاتصال أو استقبال طلبات جديدة أثناء فترة المراجعة.';
+
+  @override
+  String get vehicleChangeWarningConfirm => 'تأكيد وحفظ';
 
   @override
   String get home => 'الرئيسية';
@@ -342,6 +366,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get orderCancelled => 'تم إلغاء الطلب';
+
+  @override
+  String get pending => 'قيد الانتظار';
+
+  @override
+  String get searchingForDriver => 'جاري البحث عن سائق';
+
+  @override
+  String get driverNotificationSent => 'تم إرسال إشعار للسائق';
+
+  @override
+  String get rejected => 'مرفوض';
+
+  @override
+  String get cancelled => 'ملغى';
+
+  @override
+  String get delivered => 'تم التسليم';
 
   @override
   String get pickup => 'الاستلام';
@@ -1262,7 +1304,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get supportTicketClosed => 'هذه التذكرة مغلقة';
 
   @override
-  String get enterAge => 'أدخل عمرك';
+  String get enterAge => 'اختر تاريخ ميلادك';
 
   @override
   String get carSize => 'حجم السيارة';
@@ -1340,10 +1382,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gallery => 'المعرض';
 
   @override
-  String get pleaseEnterAge => 'يرجى إدخال عمرك';
+  String get pleaseEnterAge => 'يرجى اختيار تاريخ ميلادك';
 
   @override
-  String get invalidAge => 'يرجى إدخال عمر صحيح (18-80)';
+  String get invalidAge => 'يجب أن يكون عمر السائق بين 18 و80 عاماً';
 
   @override
   String get pleaseSelectCarSize => 'يرجى اختيار حجم السيارة';

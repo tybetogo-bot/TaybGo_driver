@@ -156,7 +156,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
                         ],
                       ),
-                      if (profile != null && profile.email != null && profile.email!.isNotEmpty) ...[
+                      if (profile != null &&
+                          profile.email != null &&
+                          profile.email!.isNotEmpty) ...[
                         const SizedBox(height: 4),
                         Row(
                           mainAxisSize: MainAxisSize.min,
@@ -500,26 +502,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Expanded(
                 child: ListView(
                   controller: scrollController,
-                  children: LocaleProvider.supportedLocales.map(
-                    (locale) => ListTile(
-                      onTap: () {
-                        localeProvider.setLocale(locale);
-                        Navigator.pop(ctx);
-                      },
-                      leading: Icon(
-                        localeProvider.locale.languageCode == locale.languageCode
-                            ? Icons.radio_button_checked
-                            : Icons.radio_button_off,
-                        color: AppColors.primary,
-                      ),
-                      title: Text(
-                        localeProvider.getLanguageName(locale.languageCode),
-                        style: TextStyle(
-                          color: isDark ? AppColors.darkText : AppColors.lightText,
+                  children: LocaleProvider.supportedLocales
+                      .map(
+                        (locale) => ListTile(
+                          onTap: () {
+                            localeProvider.setLocale(locale);
+                            Navigator.pop(ctx);
+                          },
+                          leading: Icon(
+                            localeProvider.locale.languageCode ==
+                                    locale.languageCode
+                                ? Icons.radio_button_checked
+                                : Icons.radio_button_off,
+                            color: AppColors.primary,
+                          ),
+                          title: Text(
+                            localeProvider.getLanguageName(locale.languageCode),
+                            style: TextStyle(
+                              color: isDark
+                                  ? AppColors.darkText
+                                  : AppColors.lightText,
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                  ).toList(),
+                      )
+                      .toList(),
                 ),
               ),
             ],

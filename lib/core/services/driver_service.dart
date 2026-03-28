@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../api/api_client.dart';
 import '../api/api_constants.dart';
 import '../models/driver_profile.dart';
+import '../utils/birthdate_utils.dart';
 
 class DriverService {
   final ApiClient _apiClient;
@@ -19,6 +20,27 @@ class DriverService {
       debugPrint('[DriverService] === GET PROFILE RESPONSE ===');
       debugPrint('[DriverService] Status: ${response.statusCode}');
       debugPrint('[DriverService] Data: ${response.data}');
+      // Debug document fields specifically
+      if (response.data is Map) {
+        debugPrint(
+          '[DriverService] driving_license: ${response.data['driving_license']}',
+        );
+        debugPrint(
+          '[DriverService] id_document: ${response.data['id_document']}',
+        );
+        debugPrint(
+          '[DriverService] other_documents: ${response.data['other_documents']}',
+        );
+        debugPrint(
+          '[DriverService] health_insurance_document: ${response.data['health_insurance_document']}',
+        );
+        debugPrint(
+          '[DriverService] address_document: ${response.data['address_document']}',
+        );
+        debugPrint(
+          '[DriverService] bank_document: ${response.data['bank_document']}',
+        );
+      }
 
       return DriverProfile.fromJson(response.data);
     } on DioException catch (e) {
@@ -67,7 +89,7 @@ class DriverService {
   Future<void> updateUserProfile({
     String? name,
     String? phone,
-    int? age,
+    DateTime? birthdate,
     String? vehicleType,
     String? carSize,
     String? vehiclePlateNumber,
@@ -81,25 +103,69 @@ class DriverService {
     String? drivingLicense,
     String? idDocument,
     String? otherDocuments,
+    String? healthInsuranceDocument,
+    String? addressDocument,
+    String? bankDocument,
   }) async {
     try {
       final data = <String, dynamic>{};
-      if (name != null) data['name'] = name;
-      if (phone != null) data['phone'] = phone;
-      if (age != null) data['age'] = age;
-      if (vehicleType != null) data['vehicle_type'] = vehicleType;
-      if (carSize != null) data['car_size'] = carSize;
-      if (vehiclePlateNumber != null) data['vehicle_plate_number'] = vehiclePlateNumber;
-      if (vehicleColor != null) data['vehicle_color'] = vehicleColor;
-      if (vehicleMake != null) data['vehicle_make'] = vehicleMake;
-      if (vehicleModel != null) data['vehicle_model'] = vehicleModel;
-      if (vehicleYear != null) data['vehicle_year'] = vehicleYear;
-      if (acceptsFood != null) data['accepts_food'] = acceptsFood;
-      if (acceptsShipping != null) data['accepts_shipping'] = acceptsShipping;
-      if (acceptsTaxi != null) data['accepts_taxi'] = acceptsTaxi;
-      if (drivingLicense != null) data['driving_license'] = drivingLicense;
-      if (idDocument != null) data['id_document'] = idDocument;
-      if (otherDocuments != null) data['other_documents'] = otherDocuments;
+      if (name != null) {
+        data['name'] = name;
+      }
+      if (phone != null) {
+        data['phone'] = phone;
+      }
+      if (birthdate != null) {
+        data['birthdate'] = BirthdateUtils.formatForApi(birthdate);
+      }
+      if (vehicleType != null) {
+        data['vehicle_type'] = vehicleType;
+      }
+      if (carSize != null) {
+        data['car_size'] = carSize;
+      }
+      if (vehiclePlateNumber != null) {
+        data['vehicle_plate_number'] = vehiclePlateNumber;
+      }
+      if (vehicleColor != null) {
+        data['vehicle_color'] = vehicleColor;
+      }
+      if (vehicleMake != null) {
+        data['vehicle_make'] = vehicleMake;
+      }
+      if (vehicleModel != null) {
+        data['vehicle_model'] = vehicleModel;
+      }
+      if (vehicleYear != null) {
+        data['vehicle_year'] = vehicleYear;
+      }
+      if (acceptsFood != null) {
+        data['accepts_food'] = acceptsFood;
+      }
+      if (acceptsShipping != null) {
+        data['accepts_shipping'] = acceptsShipping;
+      }
+      if (acceptsTaxi != null) {
+        data['accepts_taxi'] = acceptsTaxi;
+      }
+      if (drivingLicense != null) {
+        data['driving_license'] = drivingLicense;
+      }
+      if (idDocument != null) {
+        data['id_document'] = idDocument;
+      }
+      if (otherDocuments != null) {
+        data['other_documents'] = otherDocuments;
+      }
+      if (healthInsuranceDocument != null) {
+        data['health_insurance_document'] = healthInsuranceDocument;
+      }
+      if (addressDocument != null) {
+        data['address_document'] = addressDocument;
+      }
+      if (bankDocument != null) {
+        data['bank_document'] = bankDocument;
+      }
 
       debugPrint('[DriverService] === UPDATE USER PROFILE REQUEST ===');
       debugPrint('[DriverService] Endpoint: ${ApiConstants.driverProfile}');
@@ -113,6 +179,27 @@ class DriverService {
       debugPrint('[DriverService] === UPDATE USER PROFILE RESPONSE ===');
       debugPrint('[DriverService] Status: ${response.statusCode}');
       debugPrint('[DriverService] Data: ${response.data}');
+      // Debug document fields in response
+      if (response.data is Map) {
+        debugPrint(
+          '[DriverService] Response driving_license: ${response.data['driving_license']}',
+        );
+        debugPrint(
+          '[DriverService] Response id_document: ${response.data['id_document']}',
+        );
+        debugPrint(
+          '[DriverService] Response other_documents: ${response.data['other_documents']}',
+        );
+        debugPrint(
+          '[DriverService] Response health_insurance_document: ${response.data['health_insurance_document']}',
+        );
+        debugPrint(
+          '[DriverService] Response address_document: ${response.data['address_document']}',
+        );
+        debugPrint(
+          '[DriverService] Response bank_document: ${response.data['bank_document']}',
+        );
+      }
     } on DioException catch (e) {
       debugPrint('[DriverService] Update User Profile Error: ${e.message}');
       debugPrint('[DriverService] Error Response: ${e.response?.data}');
@@ -123,7 +210,9 @@ class DriverService {
   Future<bool> toggleOnlineStatus(bool isOnline) async {
     try {
       debugPrint('[DriverService] === TOGGLE ONLINE STATUS REQUEST ===');
-      debugPrint('[DriverService] Endpoint: ${ApiConstants.driverToggleOnline}');
+      debugPrint(
+        '[DriverService] Endpoint: ${ApiConstants.driverToggleOnline}',
+      );
       debugPrint('[DriverService] Data: {is_online: $isOnline}');
 
       final response = await _apiClient.post(
@@ -152,13 +241,12 @@ class DriverService {
       final lat = double.parse(latitude.toStringAsFixed(6));
       final lng = double.parse(longitude.toStringAsFixed(6));
 
-      final requestData = {
-        'lat': lat,
-        'lng': lng,
-      };
+      final requestData = {'lat': lat, 'lng': lng};
 
       debugPrint('[DriverService] === UPDATE LOCATION REQUEST ===');
-      debugPrint('[DriverService] Endpoint: ${ApiConstants.baseUrl}${ApiConstants.driverLocation}');
+      debugPrint(
+        '[DriverService] Endpoint: ${ApiConstants.baseUrl}${ApiConstants.driverLocation}',
+      );
       debugPrint('[DriverService] Method: POST');
       debugPrint('[DriverService] Request Body: $requestData');
 

@@ -50,7 +50,7 @@
   "reviewSubmit": "Vérifier et soumettre",
 
   "fullName": "Nom complet",
-  "age": "Âge",
+  "age": "Date de naissance",
   "dateOfBirth": "Date de naissance",
   "address": "Adresse",
   "city": "Ville",
@@ -122,6 +122,12 @@
   "orderRejected": "Commande refusée",
   "orderCompleted": "Commande terminée",
   "orderCancelled": "Commande annulée",
+  "pending": "En attente",
+  "searchingForDriver": "Recherche d'un chauffeur",
+  "driverNotificationSent": "Notification au chauffeur envoyée",
+  "rejected": "Refusé",
+  "cancelled": "Annulé",
+  "delivered": "Livré",
 
   "pickup": "Retrait",
   "dropoff": "Livraison",

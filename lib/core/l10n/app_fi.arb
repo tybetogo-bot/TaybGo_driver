@@ -55,7 +55,7 @@
   "reviewSubmit": "Tarkista & Lähetä",
 
   "fullName": "Koko nimi",
-  "age": "Ikä",
+  "age": "Syntymäaika",
   "dateOfBirth": "Syntymäaika",
   "address": "Osoite",
   "city": "Kaupunki",
@@ -132,6 +132,12 @@
   "orderRejected": "Tilaus hylätty",
   "orderCompleted": "Tilaus valmis",
   "orderCancelled": "Tilaus peruutettu",
+  "pending": "Odottaa",
+  "searchingForDriver": "Etsitään kuljettajaa",
+  "driverNotificationSent": "Kuljettajan ilmoitus lähetetty",
+  "rejected": "Hylätty",
+  "cancelled": "Peruutettu",
+  "delivered": "Toimitettu",
 
   "pickup": "Nouto",
   "dropoff": "Toimitus",

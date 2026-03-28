@@ -146,7 +146,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get fullName => 'Fullständigt namn';
 
   @override
-  String get age => 'Ålder';
+  String get age => 'Födelsedatum';
 
   @override
   String get dateOfBirth => 'Födelsedatum';
@@ -212,6 +212,15 @@ class AppLocalizationsSv extends AppLocalizations {
   String get nationalId => 'Identitetskort';
 
   @override
+  String get healthInsuranceDocument => 'Health Insurance Document';
+
+  @override
+  String get addressDocument => 'Address Document';
+
+  @override
+  String get bankDocument => 'Bank Document';
+
+  @override
   String get vehicleRegistration => 'Fordonsregistrering';
 
   @override
@@ -247,6 +256,20 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get pendingApprovalMessage =>
       'Vi granskar dina dokument. Det tar vanligtvis 24-48 timmar.';
+
+  @override
+  String get vehicleChangeWarningTitle => 'Vehicle changes need approval';
+
+  @override
+  String get vehicleChangeWarningMessage =>
+      'Changing your vehicle details will place your account on hold until the administration reviews and approves the update.';
+
+  @override
+  String get vehicleChangeWarningNote =>
+      'You won\'t be able to go online or receive new orders while this review is in progress.';
+
+  @override
+  String get vehicleChangeWarningConfirm => 'Confirm and save';
 
   @override
   String get home => 'Hem';
@@ -343,6 +366,24 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get orderCancelled => 'Beställning avbruten';
+
+  @override
+  String get pending => 'Väntar';
+
+  @override
+  String get searchingForDriver => 'Söker förare';
+
+  @override
+  String get driverNotificationSent => 'Föraravisering skickad';
+
+  @override
+  String get rejected => 'Avvisad';
+
+  @override
+  String get cancelled => 'Avbruten';
+
+  @override
+  String get delivered => 'Levererad';
 
   @override
   String get pickup => 'Upphämtning';
@@ -1273,7 +1314,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get supportTicketClosed => 'Detta ärende är stängt';
 
   @override
-  String get enterAge => 'Enter your age';
+  String get enterAge => 'Select your birthdate';
 
   @override
   String get carSize => 'Car Size';
@@ -1352,10 +1393,10 @@ class AppLocalizationsSv extends AppLocalizations {
   String get gallery => 'Gallery';
 
   @override
-  String get pleaseEnterAge => 'Please enter your age';
+  String get pleaseEnterAge => 'Please select your birthdate';
 
   @override
-  String get invalidAge => 'Please enter a valid age (18-80)';
+  String get invalidAge => 'Drivers must be between 18 and 80 years old';
 
   @override
   String get pleaseSelectCarSize => 'Please select a car size';

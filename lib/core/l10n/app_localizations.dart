@@ -383,7 +383,7 @@ abstract class AppLocalizations {
   /// No description provided for @age.
   ///
   /// In en, this message translates to:
-  /// **'Age'**
+  /// **'Birthdate'**
   String get age;
 
   /// No description provided for @dateOfBirth.
@@ -512,6 +512,24 @@ abstract class AppLocalizations {
   /// **'National ID'**
   String get nationalId;
 
+  /// No description provided for @healthInsuranceDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Health Insurance Document'**
+  String get healthInsuranceDocument;
+
+  /// No description provided for @addressDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Address Document'**
+  String get addressDocument;
+
+  /// No description provided for @bankDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Bank Document'**
+  String get bankDocument;
+
   /// No description provided for @vehicleRegistration.
   ///
   /// In en, this message translates to:
@@ -583,6 +601,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We\'re reviewing your documents. This usually takes 24-48 hours.'**
   String get pendingApprovalMessage;
+
+  /// No description provided for @vehicleChangeWarningTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle changes need approval'**
+  String get vehicleChangeWarningTitle;
+
+  /// No description provided for @vehicleChangeWarningMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Changing your vehicle details will place your account on hold until the administration reviews and approves the update.'**
+  String get vehicleChangeWarningMessage;
+
+  /// No description provided for @vehicleChangeWarningNote.
+  ///
+  /// In en, this message translates to:
+  /// **'You won\'t be able to go online or receive new orders while this review is in progress.'**
+  String get vehicleChangeWarningNote;
+
+  /// No description provided for @vehicleChangeWarningConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm and save'**
+  String get vehicleChangeWarningConfirm;
 
   /// No description provided for @home.
   ///
@@ -769,6 +811,42 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Order Cancelled'**
   String get orderCancelled;
+
+  /// No description provided for @pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// No description provided for @searchingForDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Searching for driver'**
+  String get searchingForDriver;
+
+  /// No description provided for @driverNotificationSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver notification sent'**
+  String get driverNotificationSent;
+
+  /// No description provided for @rejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get rejected;
+
+  /// No description provided for @cancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get cancelled;
+
+  /// No description provided for @delivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered'**
+  String get delivered;
 
   /// No description provided for @pickup.
   ///
@@ -2513,7 +2591,7 @@ abstract class AppLocalizations {
   /// No description provided for @enterAge.
   ///
   /// In en, this message translates to:
-  /// **'Enter your age'**
+  /// **'Select your birthdate'**
   String get enterAge;
 
   /// No description provided for @carSize.
@@ -2669,13 +2747,13 @@ abstract class AppLocalizations {
   /// No description provided for @pleaseEnterAge.
   ///
   /// In en, this message translates to:
-  /// **'Please enter your age'**
+  /// **'Please select your birthdate'**
   String get pleaseEnterAge;
 
   /// No description provided for @invalidAge.
   ///
   /// In en, this message translates to:
-  /// **'Please enter a valid age (18-80)'**
+  /// **'Drivers must be between 18 and 80 years old'**
   String get invalidAge;
 
   /// No description provided for @pleaseSelectCarSize.

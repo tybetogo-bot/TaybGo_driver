@@ -55,7 +55,7 @@
   "reviewSubmit": "Iwwerpréiwen & Aschécken",
 
   "fullName": "Vollstännegen Numm",
-  "age": "Alter",
+  "age": "Gebuertsdatum",
   "dateOfBirth": "Gebuertsdatum",
   "address": "Adress",
   "city": "Stad",
@@ -132,6 +132,12 @@
   "orderRejected": "Bestellung ofgeleent",
   "orderCompleted": "Bestellung ofgeschloss",
   "orderCancelled": "Bestellung annuléiert",
+  "pending": "Am Waarden",
+  "searchingForDriver": "Chauffeur gëtt gesicht",
+  "driverNotificationSent": "Chauffeur-Notifikatioun geschéckt",
+  "rejected": "Ofgeleent",
+  "cancelled": "Annuléiert",
+  "delivered": "Geliwwert",
 
   "pickup": "Ofhuelen",
   "dropoff": "Liwwerung",

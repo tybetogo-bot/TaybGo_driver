@@ -1,5 +1,7 @@
+import '../config/app_config.dart';
+
 class ApiConstants {
-  static const String baseUrl = 'https://taybat-backend-dev.onrender.com/api';
+  static String get baseUrl => AppConfig.baseUrl;
 
   // Auth endpoints
   static const String otpRequest = '/auth/otp/request/';
