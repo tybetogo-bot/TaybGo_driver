@@ -5,6 +5,15 @@ import '../services/order_service.dart';
 import '../mock/tour_mock_data.dart';
 import '../../features/orders/models/order_model.dart';
 
+/// Reason an accept/reject action failed, so the UI can show the right message.
+enum OrderActionError {
+  alreadyTaken,   // 409 — another driver got it
+  expired,        // 403 — suggestion timed out
+  notFound,       // 404 — order no longer exists
+  network,        // connection / timeout
+  unknown,        // anything else
+}
+
 class OrderProvider extends ChangeNotifier {
   final OrderService _orderService;
 
@@ -57,9 +66,12 @@ class OrderProvider extends ChangeNotifier {
   Timer? _pollingTimer;
   static const _pollingInterval = Duration(seconds: 15);
 
-  // Loading states
-  bool _isLoading = false;
-  bool get isLoading => _isLoading;
+  // Loading states — _isActionLoading is for accept/reject/status updates only
+  bool _isActionLoading = false;
+  bool get isLoading => _isActionLoading;
+
+  // Separate flag for background data fetches (never shown to UI)
+  bool _isFetchingHistory = false;
 
   String? _error;
   String? get error => _error;
@@ -93,17 +105,12 @@ class OrderProvider extends ChangeNotifier {
     _pollingTimer = null;
   }
 
-  /// Fetch suggested orders from API
+  /// Fetch suggested orders from API.
+  /// Always replaces pending order data with fresh API data.
   Future<void> _fetchSuggestedOrders() async {
     debugPrint('[OrderProvider] === FETCH SUGGESTED ORDERS ===');
     debugPrint('[OrderProvider] pendingOrder: ${_pendingOrder?.id}');
     debugPrint('[OrderProvider] activeOrder: ${_activeOrder?.id}');
-
-    // Don't fetch if we already have a pending order waiting for response
-    if (_pendingOrder != null) {
-      debugPrint('[OrderProvider] Skipping fetch - already have pending order');
-      return;
-    }
 
     try {
       debugPrint('[OrderProvider] Calling orderService.getSuggestedOrders()...');
@@ -111,22 +118,27 @@ class OrderProvider extends ChangeNotifier {
       debugPrint('[OrderProvider] Received ${orders.length} suggested orders');
 
       if (orders.isNotEmpty) {
-        _pendingOrder = orders.first;
-        debugPrint('[OrderProvider] Set pendingOrder: ${_pendingOrder?.id}');
-        debugPrint('[OrderProvider] Order details:');
-        debugPrint('[OrderProvider]   status: ${_pendingOrder?.status}');
-        debugPrint('[OrderProvider]   restaurant: ${_pendingOrder?.restaurantName}');
-        debugPrint('[OrderProvider]   customer: ${_pendingOrder?.customerName}');
-        debugPrint('[OrderProvider]   items: ${_pendingOrder?.items.length}');
-        debugPrint('[OrderProvider]   pickup: ${_pendingOrder?.pickupAddress}');
-        debugPrint('[OrderProvider]   dropoff: ${_pendingOrder?.dropoffAddress}');
-        debugPrint('[OrderProvider]   total: ${_pendingOrder?.total}');
+        final freshOrder = orders.first;
+        final isNewOrder = _pendingOrder == null || _pendingOrder!.id != freshOrder.id;
 
-        // Notify about new order (haptic handled in UI callback)
-        onNewOrderReceived?.call();
+        // Always update with fresh data
+        _pendingOrder = freshOrder;
+        debugPrint('[OrderProvider] Set pendingOrder: ${_pendingOrder?.id} (isNew: $isNewOrder)');
+
+        // Only trigger new-order animation/haptic for a genuinely new order
+        if (isNewOrder) {
+          onNewOrderReceived?.call();
+        }
 
         notifyListeners();
       } else {
+        // No suggested orders — clear stale pending order if the server
+        // no longer has it (e.g. it was assigned to another driver)
+        if (_pendingOrder != null) {
+          debugPrint('[OrderProvider] Clearing stale pending order ${_pendingOrder!.id}');
+          _pendingOrder = null;
+          notifyListeners();
+        }
         debugPrint('[OrderProvider] No suggested orders available');
       }
     } catch (e, stackTrace) {
@@ -135,73 +147,89 @@ class OrderProvider extends ChangeNotifier {
     }
   }
 
-  /// Accept pending order
-  Future<bool> acceptOrder() async {
-    if (_pendingOrder == null) return false;
+  /// Accept pending order.
+  /// Returns `null` on success, or an [OrderActionError] on failure.
+  Future<OrderActionError?> acceptOrder() async {
+    if (_pendingOrder == null) return OrderActionError.notFound;
 
     // Tour mode: Simulate acceptance without API call
-    // Do NOT inflate real stats — mock orders are for demonstration only
     if (_isTourActive?.call() == true && TourMockData.isMockOrder(_pendingOrder!.id)) {
       _activeOrder = _pendingOrder!.copyWith(
         status: OrderStatus.accepted,
         acceptedAt: DateTime.now(),
       );
-
       _pendingOrder = null;
       notifyListeners();
-      return true;
+      return null;
     }
 
-    _isLoading = true;
+    _isActionLoading = true;
     _error = null;
     notifyListeners();
 
     try {
       await _orderService.acceptOrder(_pendingOrder!.id);
 
-      // Use pending order data and update status locally
       _activeOrder = _pendingOrder!.copyWith(
         status: OrderStatus.accepted,
         acceptedAt: DateTime.now(),
       );
-
-      // Note: Stats are updated when order is COMPLETED, not accepted
-      // This ensures only finished deliveries count towards earnings
-
       _pendingOrder = null;
-      _isLoading = false;
+      _isActionLoading = false;
       notifyListeners();
-      return true;
+      return null;
     } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
+      _isActionLoading = false;
 
-      // If order was taken by someone else or suggestion expired, clear pending
-      if (e.toString().contains('already taken') ||
-          e.toString().contains('409') ||
-          e.toString().contains('suggestion expired') ||
-          e.toString().contains('403')) {
+      final errorMsg = e.toString().toLowerCase();
+      OrderActionError reason;
+
+      if (e is ApiException && e.statusCode == 409 || errorMsg.contains('already taken')) {
+        reason = OrderActionError.alreadyTaken;
+        _pendingOrder = null;
+      } else if (e is ApiException && e.statusCode == 403 || errorMsg.contains('suggestion expired') || errorMsg.contains('expired')) {
+        reason = OrderActionError.expired;
+        _pendingOrder = null;
+      } else if (e is ApiException && e.statusCode == 404 || errorMsg.contains('not found')) {
+        reason = OrderActionError.notFound;
+        _pendingOrder = null;
+      } else if (errorMsg.contains('connection') || errorMsg.contains('timeout') || errorMsg.contains('network')) {
+        reason = OrderActionError.network;
+        // Keep pending order — the driver can retry
+      } else {
+        reason = OrderActionError.unknown;
         _pendingOrder = null;
       }
 
+      _error = e.toString();
       notifyListeners();
-      return false;
+      return reason;
     }
   }
 
-  /// Reject/skip pending order
-  Future<void> rejectOrder() async {
-    if (_pendingOrder == null) return;
+  /// Reject/skip pending order.
+  /// Returns `null` on success, or an [OrderActionError] on failure.
+  Future<OrderActionError?> rejectOrder() async {
+    if (_pendingOrder == null) return null;
 
     final orderId = _pendingOrder!.id;
 
+    // Clear immediately for snappy UI
     _pendingOrder = null;
     notifyListeners();
 
     try {
       await _orderService.rejectOrder(orderId);
+      return null;
     } catch (e) {
-      debugPrint('Error rejecting order: $e');
+      debugPrint('[OrderProvider] Error rejecting order: $e');
+      // Order is already cleared from UI — just inform the user if it was a real problem
+      final errorMsg = e.toString().toLowerCase();
+      if (errorMsg.contains('connection') || errorMsg.contains('timeout') || errorMsg.contains('network')) {
+        return OrderActionError.network;
+      }
+      // For reject, most errors are harmless (order already gone, etc.)
+      return null;
     }
   }
 
@@ -217,7 +245,7 @@ class OrderProvider extends ChangeNotifier {
       return true;
     }
 
-    _isLoading = true;
+    _isActionLoading = true;
     notifyListeners();
 
     try {
@@ -226,12 +254,12 @@ class OrderProvider extends ChangeNotifier {
         OrderStatus.onTheWay,
       );
       _activeOrder = _activeOrder!.copyWith(status: newStatus);
-      _isLoading = false;
+      _isActionLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
       _error = e.toString();
-      _isLoading = false;
+      _isActionLoading = false;
       notifyListeners();
       return false;
     }
@@ -249,7 +277,7 @@ class OrderProvider extends ChangeNotifier {
       return true;
     }
 
-    _isLoading = true;
+    _isActionLoading = true;
     notifyListeners();
 
     try {
@@ -258,7 +286,7 @@ class OrderProvider extends ChangeNotifier {
         OrderStatus.delivered,
       );
       _activeOrder = _activeOrder!.copyWith(status: newStatus);
-      _isLoading = false;
+      _isActionLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
@@ -267,12 +295,12 @@ class OrderProvider extends ChangeNotifier {
       if (errorMsg.contains('cannot update status from delivered') ||
           errorMsg.contains('invalid status transition from delivered to delivered')) {
         _activeOrder = _activeOrder!.copyWith(status: OrderStatus.delivered);
-        _isLoading = false;
+        _isActionLoading = false;
         notifyListeners();
         return true;
       }
       _error = e.toString();
-      _isLoading = false;
+      _isActionLoading = false;
       notifyListeners();
       return false;
     }
@@ -296,7 +324,7 @@ class OrderProvider extends ChangeNotifier {
       return true;
     }
 
-    _isLoading = true;
+    _isActionLoading = true;
     notifyListeners();
 
     try {
@@ -321,7 +349,7 @@ class OrderProvider extends ChangeNotifier {
       _totalEarnings += completedOrder.deliveryFee + completedOrder.tip;
 
       _activeOrder = null;
-      _isLoading = false;
+      _isActionLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
@@ -342,55 +370,59 @@ class OrderProvider extends ChangeNotifier {
         _totalEarnings += completedOrder.deliveryFee + completedOrder.tip;
 
         _activeOrder = null;
-        _isLoading = false;
+        _isActionLoading = false;
         notifyListeners();
         return true;
       }
       _error = e.toString();
-      _isLoading = false;
+      _isActionLoading = false;
       notifyListeners();
       return false;
     }
   }
 
-  /// Fetch order history from /api/orders/ endpoint
-  /// This returns all orders for the driver and we categorize them locally
-  /// Only shows loading indicator on the first fetch (when history is empty).
-  /// Subsequent refreshes update data silently to avoid UI flicker.
+  /// Fetch order history from /api/orders/ endpoint.
+  /// Replaces all cached data with fresh API data on every call.
+  /// Never touches _isActionLoading so buttons remain interactive.
   Future<void> fetchOrderHistory() async {
-    final isFirstLoad = _orderHistory.isEmpty;
-    if (isFirstLoad) {
-      _isLoading = true;
-      notifyListeners();
-    }
+    if (_isFetchingHistory) return;
+    _isFetchingHistory = true;
 
     try {
-      _orderHistory = await _orderService.getOrderHistory();
+      final freshOrders = await _orderService.getOrderHistory();
 
-      // Check if there's an active order in the response
+      // Replace entire history with fresh data
+      _orderHistory = freshOrders;
+
+      // Sync active order with fresh data from the server
       final activeStatuses = [
         OrderStatus.accepted,
         OrderStatus.onTheWay,
         OrderStatus.delivered,
       ];
 
-      for (final order in _orderHistory) {
-        if (activeStatuses.contains(order.status)) {
-          // Set as active order if we don't have one
-          if (_activeOrder == null) {
-            _activeOrder = order;
-            debugPrint('[OrderProvider] Found active order from history: ${order.id} - ${order.status}');
-          }
-          break;
+      final freshActive = freshOrders.cast<OrderModel?>().firstWhere(
+        (o) => activeStatuses.contains(o!.status),
+        orElse: () => null,
+      );
+
+      if (freshActive != null) {
+        // Always update active order with latest server data
+        _activeOrder = freshActive;
+      } else if (_activeOrder != null) {
+        // Server says no active order — clear local stale one
+        // unless we just accepted it and the server hasn't caught up
+        final serverHasOurOrder = freshOrders.any((o) => o.id == _activeOrder!.id);
+        if (serverHasOurOrder) {
+          _activeOrder = null;
         }
       }
 
-      if (isFirstLoad) _isLoading = false;
       notifyListeners();
     } catch (e) {
-      _error = e.toString();
-      if (isFirstLoad) _isLoading = false;
-      notifyListeners();
+      debugPrint('[OrderProvider] Error fetching order history: $e');
+    } finally {
+      _isFetchingHistory = false;
     }
   }
 
@@ -489,7 +521,7 @@ class OrderProvider extends ChangeNotifier {
     _orderHistory = [];
     _totalOrders = 0;
     _totalEarnings = 0.0;
-    _isLoading = false;
+    _isActionLoading = false;
     _error = null;
     notifyListeners();
   }

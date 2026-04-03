@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/foundation.dart';
+import '../../../core/l10n/app_localizations.dart';
 
 enum OrderStatus {
   pending('PENDING', 'Pending'),
@@ -25,6 +26,31 @@ enum OrderStatus {
   }
 }
 
+extension OrderStatusLocalization on OrderStatus {
+  String localizedName(AppLocalizations l10n) {
+    switch (this) {
+      case OrderStatus.pending:
+        return l10n.pending;
+      case OrderStatus.searchingForDriver:
+        return l10n.searchingForDriver;
+      case OrderStatus.driverNotificationSent:
+        return l10n.driverNotificationSent;
+      case OrderStatus.accepted:
+        return l10n.accepted;
+      case OrderStatus.onTheWay:
+        return l10n.onTheWay;
+      case OrderStatus.delivered:
+        return l10n.delivered;
+      case OrderStatus.completed:
+        return l10n.completed;
+      case OrderStatus.rejected:
+        return l10n.rejected;
+      case OrderStatus.cancelled:
+        return l10n.cancelled;
+    }
+  }
+}
+
 enum OrderType {
   food('FOOD'),
   taxi('TAXI'),
@@ -38,6 +64,24 @@ enum OrderType {
     return OrderType.values.firstWhere(
       (t) => t.apiValue == value,
       orElse: () => OrderType.food,
+    );
+  }
+}
+
+enum PaymentType {
+  cash('CASH'),
+  card('CARD'),
+  other('OTHER');
+
+  final String apiValue;
+
+  const PaymentType(this.apiValue);
+
+  static PaymentType? fromApi(String? value) {
+    if (value == null || value.isEmpty) return null;
+    return PaymentType.values.cast<PaymentType?>().firstWhere(
+      (t) => t!.apiValue == value.toUpperCase(),
+      orElse: () => null,
     );
   }
 }
@@ -184,7 +228,8 @@ class OrderModel {
   final List<OrderItem> items;
 
   // Payment
-  final bool isPaid;
+  final PaymentType? paymentType;
+  final bool? isPaid;
 
   // Timestamps
   final DateTime createdAt;
@@ -216,12 +261,19 @@ class OrderModel {
     this.total = 0,
     required this.distance,
     required this.estimatedMinutes,
-    this.isPaid = false,
+    this.paymentType,
+    this.isPaid,
     this.items = const [],
     DateTime? createdAt,
     this.acceptedAt,
     this.completedAt,
   }) : createdAt = createdAt ?? DateTime.now();
+
+  /// Whether the payment banner should be shown (only when we have payment data)
+  bool get hasPaymentInfo => paymentType != null || isPaid != null;
+
+  /// Whether the driver needs to collect cash from the customer
+  bool get needsCashCollection => paymentType == PaymentType.cash && isPaid != true;
 
   // Computed properties for backward compatibility
   double get price => deliveryFee > 0 ? deliveryFee : total;
@@ -573,11 +625,14 @@ class OrderModel {
     debugPrint('[OrderModel]   Distance: ${distance.toStringAsFixed(1)} km | Time: $estimatedMinutes min');
     debugPrint('[OrderModel] ═══════════════════════════════════════════════════');
 
-    // Parse payment status
-    final isPaid = json['is_paid'] == true ||
-                   json['is_paid'] == 1 ||
-                   json['is_paid'] == '1' ||
-                   json['is_paid'] == 'true';
+    // Parse payment type and status
+    final paymentType = PaymentType.fromApi(json['payment_type']?.toString());
+    final bool? isPaid = json['is_paid'] != null
+        ? (json['is_paid'] == true ||
+           json['is_paid'] == 1 ||
+           json['is_paid'] == '1' ||
+           json['is_paid'] == 'true')
+        : null;
 
     return OrderModel(
       id: orderId,
@@ -604,6 +659,7 @@ class OrderModel {
       total: total,
       distance: distance,
       estimatedMinutes: estimatedMinutes,
+      paymentType: paymentType,
       isPaid: isPaid,
       items: orderItems,
       createdAt: _parseDateTime(json['created_at']) ?? DateTime.now(),
@@ -622,6 +678,7 @@ class OrderModel {
       'dropoff_address': dropoffAddress,
       'customer_name': customerName,
       'total': total,
+      'payment_type': paymentType?.apiValue,
       'is_paid': isPaid,
       'distance': distance,
       'estimated_minutes': estimatedMinutes,
@@ -653,6 +710,7 @@ class OrderModel {
     double? total,
     double? distance,
     int? estimatedMinutes,
+    PaymentType? paymentType,
     bool? isPaid,
     List<OrderItem>? items,
     DateTime? createdAt,
@@ -684,6 +742,7 @@ class OrderModel {
       total: total ?? this.total,
       distance: distance ?? this.distance,
       estimatedMinutes: estimatedMinutes ?? this.estimatedMinutes,
+      paymentType: paymentType ?? this.paymentType,
       isPaid: isPaid ?? this.isPaid,
       items: items ?? this.items,
       createdAt: createdAt ?? this.createdAt,

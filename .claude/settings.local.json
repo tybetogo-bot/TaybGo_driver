@@ -21,7 +21,25 @@
       "Bash(findstr:*)",
       "Bash(ls:*)",
       "Bash(test:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(python3:*)",
+      "Bash(dart run:*)",
+      "Bash(for:*)",
+      "Bash(do echo \"=== $f ===\")",
+      "Bash(python -c \"import json; json.load\\(open\\(''$f'', encoding=''utf-8''\\)\\); print\\(''  Valid JSON''\\)\")",
+      "Bash(done)",
+      "Bash(do echo -n \"$f: \")",
+      "Bash(node:*)",
+      "Bash(python:*)",
+      "Bash(du -sh \"c:/Users/abdul/teybatdriver/build/web\"/*/)",
+      "Bash(du -sh \"c:/Users/abdul/teybatdriver/build/web\"/*.js)",
+      "Bash(du -sh \"c:/Users/abdul/teybatdriver/build/web\"/*.wasm)",
+      "Bash(du -sh \"c:/Users/abdul/teybatdriver/build/web/canvaskit\"/*)",
+      "Bash(du -sh \"c:/Users/abdul/teybatdriver/build/web/assets\"/*/)",
+      "Bash(du -sh \"c:/Users/abdul/teybatdriver/build/web/assets\"/*)",
+      "Bash(du -sh \"c:/Users/abdul/teybatdriver/build/web/assets/packages\"/*/)",
+      "Bash(du -sh \"c:/Users/abdul/teybatdriver/assets\"/*/)",
+      "Bash(du -sh \"c:/Users/abdul/teybatdriver/build/web\"/*.html)"
     ]
   }
 }

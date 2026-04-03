@@ -95,120 +95,194 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
                 // Profile Card
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
                   decoration: BoxDecoration(
                     color: surfaceColor,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Column(
                     children: [
-                      Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          color: AppColors.primary.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: profile?.avatarUrl != null
-                            ? ClipOval(
-                                child: Image.network(
-                                  profile!.avatarUrl!,
-                                  fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) =>
-                                      const Icon(
-                                        Icons.person,
-                                        size: 36,
-                                        color: AppColors.primary,
-                                      ),
-                                ),
-                              )
-                            : const Icon(
-                                Icons.person,
-                                size: 36,
-                                color: AppColors.primary,
+                      // Avatar + Status
+                      Stack(
+                        children: [
+                          Container(
+                            width: 88,
+                            height: 88,
+                            decoration: BoxDecoration(
+                              color: AppColors.primary.withValues(alpha: 0.1),
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: AppColors.primary.withValues(alpha: 0.3),
+                                width: 2,
                               ),
+                            ),
+                            child: profile?.avatarUrl != null
+                                ? ClipOval(
+                                    child: Image.network(
+                                      profile!.avatarUrl!,
+                                      width: 88,
+                                      height: 88,
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) =>
+                                              const Icon(
+                                                Icons.person,
+                                                size: 40,
+                                                color: AppColors.primary,
+                                              ),
+                                    ),
+                                  )
+                                : const Icon(
+                                    Icons.person,
+                                    size: 40,
+                                    color: AppColors.primary,
+                                  ),
+                          ),
+                          if (profile != null)
+                            Positioned(
+                              bottom: 0,
+                              right: 0,
+                              child: Container(
+                                width: 24,
+                                height: 24,
+                                decoration: BoxDecoration(
+                                  color: profile.isOnline
+                                      ? AppColors.online
+                                      : AppColors.offline,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: surfaceColor,
+                                    width: 2.5,
+                                  ),
+                                ),
+                                child: Icon(
+                                  profile.isOnline
+                                      ? Icons.check
+                                      : Icons.remove,
+                                  size: 12,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
-                      const SizedBox(height: 14),
+                      const SizedBox(height: 16),
+                      // Name
                       Text(
                         profile?.fullName ?? l10n.driver,
                         style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
                           color: textColor,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.phone_android,
-                            size: 14,
-                            color: secondaryColor,
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            profile?.phone ?? '',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: secondaryColor,
-                            ),
-                          ),
-                        ],
-                      ),
+                      const SizedBox(height: 6),
+                      // Status badge
+                      _buildStatusBadge(profile?.status),
+                      const SizedBox(height: 12),
+                      // Contact info
+                      if (profile?.phone.isNotEmpty == true)
+                        _buildInfoChip(
+                          Icons.phone_outlined,
+                          profile!.phone,
+                          secondaryColor,
+                        ),
                       if (profile != null &&
                           profile.email != null &&
                           profile.email!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
-                        Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.email_outlined,
-                              size: 14,
-                              color: secondaryColor,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              profile.email!,
-                              style: TextStyle(
-                                fontSize: 14,
-                                color: secondaryColor,
-                              ),
-                            ),
-                          ],
+                        const SizedBox(height: 6),
+                        _buildInfoChip(
+                          Icons.email_outlined,
+                          profile.email!,
+                          secondaryColor,
                         ),
                       ],
-                      const SizedBox(height: 8),
-                      // Status badge
-                      _buildStatusBadge(profile?.status),
-                      const SizedBox(height: 20),
-                      // Stats Row
-                      Row(
-                        children: [
-                          Container(width: 1, height: 40, color: borderColor),
-                          Expanded(
-                            child: _buildStatItem(
-                              Icons.star_rounded,
-                              profile?.formattedRating ?? '0.0',
-                              l10n.rating,
-                              AppColors.warning,
-                              textColor,
-                              secondaryColor,
-                            ),
-                          ),
-                        ],
-                      ),
-                      if (profile?.memberSince != 'N/A') ...[
-                        const SizedBox(height: 12),
-                        Text(
-                          'Member since ${profile?.memberSince ?? ''}',
-                          style: TextStyle(fontSize: 12, color: secondaryColor),
+                      // Vehicle info
+                      if (profile?.vehicleMake != null ||
+                          profile?.vehicleModel != null) ...[
+                        const SizedBox(height: 6),
+                        _buildInfoChip(
+                          Icons.directions_car_outlined,
+                          [
+                            profile?.vehicleMake,
+                            profile?.vehicleModel,
+                            if (profile?.vehicleYear != null &&
+                                profile!.vehicleYear! > 0)
+                              '(${profile.vehicleYear})',
+                          ]
+                              .where((e) => e != null)
+                              .join(' '),
+                          secondaryColor,
+                        ),
+                      ],
+                      if (profile?.vehiclePlateNumber != null &&
+                          profile!.vehiclePlateNumber!.isNotEmpty) ...[
+                        const SizedBox(height: 6),
+                        _buildInfoChip(
+                          Icons.badge_outlined,
+                          profile.vehiclePlateNumber!,
+                          secondaryColor,
+                        ),
+                      ],
+                      if (profile?.memberSince != null &&
+                          profile!.memberSince != 'N/A') ...[
+                        const SizedBox(height: 6),
+                        _buildInfoChip(
+                          Icons.calendar_today_outlined,
+                          'Joined ${profile.memberSince}',
+                          secondaryColor,
                         ),
                       ],
                     ],
                   ),
                 ),
+
+                const SizedBox(height: 16),
+
+                // Stats Row
+                if (profile != null)
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildStatCard(
+                          Icons.star_rounded,
+                          profile.rating > 0
+                              ? profile.formattedRating
+                              : '--',
+                          l10n.rating,
+                          AppColors.warning,
+                          surfaceColor,
+                          textColor,
+                          secondaryColor,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _buildStatCard(
+                          Icons.receipt_long_outlined,
+                          profile.totalOrders.toString(),
+                          l10n.orders,
+                          AppColors.info,
+                          surfaceColor,
+                          textColor,
+                          secondaryColor,
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: _buildStatCard(
+                          Icons.account_balance_wallet_outlined,
+                          profile.formattedEarnings,
+                          l10n.earnings,
+                          AppColors.success,
+                          surfaceColor,
+                          textColor,
+                          secondaryColor,
+                        ),
+                      ),
+                    ],
+                  ),
 
                 const SizedBox(height: 24),
 
@@ -349,32 +423,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildStatItem(
-    IconData icon,
-    String value,
-    String label,
-    Color iconColor,
-    Color textColor,
-    Color secondaryColor,
-  ) {
-    return Column(
-      children: [
-        Icon(icon, size: 18, color: iconColor),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 17,
-            fontWeight: FontWeight.w600,
-            color: textColor,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(label, style: TextStyle(fontSize: 11, color: secondaryColor)),
-      ],
-    );
-  }
-
   Widget _buildStatusBadge(String? status) {
     if (status == null) return const SizedBox.shrink();
 
@@ -413,6 +461,60 @@ class _ProfileScreenState extends State<ProfileScreen> {
               fontWeight: FontWeight.w500,
               color: color,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoChip(IconData icon, String text, Color color) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 15, color: color),
+        const SizedBox(width: 6),
+        Flexible(
+          child: Text(
+            text,
+            style: TextStyle(fontSize: 14, color: color),
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatCard(
+    IconData icon,
+    String value,
+    String label,
+    Color accentColor,
+    Color surfaceColor,
+    Color textColor,
+    Color secondaryColor,
+  ) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        children: [
+          Icon(icon, size: 22, color: accentColor),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 18,
+              fontWeight: FontWeight.w700,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, color: secondaryColor),
           ),
         ],
       ),

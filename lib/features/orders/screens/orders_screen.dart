@@ -396,6 +396,7 @@ class _OrdersScreenState extends State<OrdersScreen>
     required Color surfaceColor,
     required Color borderColor,
   }) {
+    final l10n = AppLocalizations.of(context)!;
     Color statusColor;
     IconData statusIcon;
     String statusText;
@@ -404,38 +405,33 @@ class _OrdersScreenState extends State<OrdersScreen>
       case OrderStatus.completed:
         statusColor = AppColors.success;
         statusIcon = Icons.check_circle;
-        statusText = 'Completed';
         break;
       case OrderStatus.cancelled:
         statusColor = AppColors.error;
         statusIcon = Icons.cancel;
-        statusText = 'Cancelled';
         break;
       case OrderStatus.rejected:
         statusColor = AppColors.error;
         statusIcon = Icons.cancel;
-        statusText = 'Rejected';
         break;
       case OrderStatus.accepted:
         statusColor = AppColors.info;
         statusIcon = Icons.check;
-        statusText = 'Accepted';
         break;
       case OrderStatus.onTheWay:
         statusColor = AppColors.primary;
         statusIcon = Icons.local_shipping;
-        statusText = 'On The Way';
         break;
       case OrderStatus.delivered:
         statusColor = AppColors.success;
         statusIcon = Icons.inventory;
-        statusText = 'Delivered';
         break;
       default:
         statusColor = AppColors.warning;
         statusIcon = Icons.hourglass_empty;
-        statusText = order.status.displayName;
     }
+
+    statusText = order.status.localizedName(l10n);
 
     return GestureDetector(
       onTap: () => context.push(RouteConstants.orderDetailPath(order.id)),

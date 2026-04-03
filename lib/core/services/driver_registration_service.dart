@@ -17,12 +17,12 @@ class DriverRegistrationService {
     required String phone,
     required DateTime birthdate,
     required String vehicleType,
-    required String carSize,
-    required String vehiclePlateNumber,
-    required String vehicleColor,
-    required String vehicleMake,
-    required String vehicleModel,
-    required int vehicleYear,
+    String? carSize,
+    String? vehiclePlateNumber,
+    String? vehicleColor,
+    String? vehicleMake,
+    String? vehicleModel,
+    int? vehicleYear,
     required bool acceptsFood,
     required bool acceptsShipping,
     required bool acceptsTaxi,
@@ -34,21 +34,34 @@ class DriverRegistrationService {
     String? bankDocument,
   }) async {
     try {
-      final data = {
+      final data = <String, dynamic>{
         'name': name,
         'phone': phone,
         'birthdate': BirthdateUtils.formatForApi(birthdate),
         'vehicle_type': vehicleType,
-        'car_size': carSize,
-        'vehicle_plate_number': vehiclePlateNumber,
-        'vehicle_color': vehicleColor,
-        'vehicle_make': vehicleMake,
-        'vehicle_model': vehicleModel,
-        'vehicle_year': vehicleYear,
         'accepts_food': acceptsFood,
         'accepts_shipping': acceptsShipping,
         'accepts_taxi': acceptsTaxi,
       };
+
+      if (carSize != null && carSize.trim().isNotEmpty) {
+        data['car_size'] = carSize.trim();
+      }
+      if (vehiclePlateNumber != null && vehiclePlateNumber.trim().isNotEmpty) {
+        data['vehicle_plate_number'] = vehiclePlateNumber.trim();
+      }
+      if (vehicleColor != null && vehicleColor.trim().isNotEmpty) {
+        data['vehicle_color'] = vehicleColor.trim();
+      }
+      if (vehicleMake != null && vehicleMake.trim().isNotEmpty) {
+        data['vehicle_make'] = vehicleMake.trim();
+      }
+      if (vehicleModel != null && vehicleModel.trim().isNotEmpty) {
+        data['vehicle_model'] = vehicleModel.trim();
+      }
+      if (vehicleYear != null) {
+        data['vehicle_year'] = vehicleYear;
+      }
 
       // Add documents if provided
       if (drivingLicense != null) {

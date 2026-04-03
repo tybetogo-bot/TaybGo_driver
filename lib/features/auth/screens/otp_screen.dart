@@ -140,8 +140,10 @@ class _OtpScreenState extends State<OtpScreen> {
                         } else {
                           router.go(RouteConstants.home);
                         }
-                      } else if (authProvider.error != null) {
-                        authProvider.clearError();
+                      } else {
+                        debugPrint(
+                          '[OtpScreen] verifyOtp failed: ${authProvider.error}',
+                        );
                       }
                     },
                   ),

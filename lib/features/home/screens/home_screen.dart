@@ -370,6 +370,69 @@ class _HomeScreenState extends State<HomeScreen>
     await tourProvider.startTour();
   }
 
+  void _showOrderFeedback(OrderActionError? error, {bool isAccept = true}) {
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context)!;
+
+    String message;
+    Color bgColor;
+    IconData icon;
+
+    if (error == null) {
+      // Success
+      message = isAccept ? l10n.orderAccepted : l10n.orderRejected;
+      bgColor = isAccept ? AppColors.success : Colors.grey.shade700;
+      icon = isAccept ? Icons.check_circle : Icons.cancel;
+    } else {
+      bgColor = AppColors.error;
+      icon = Icons.error_outline;
+      switch (error) {
+        case OrderActionError.alreadyTaken:
+          message = l10n.orderAlreadyTaken;
+          icon = Icons.person;
+          break;
+        case OrderActionError.expired:
+          message = l10n.orderSuggestionExpired;
+          icon = Icons.timer_off;
+          break;
+        case OrderActionError.notFound:
+          message = l10n.orderNotFound;
+          icon = Icons.search_off;
+          break;
+        case OrderActionError.network:
+          message = l10n.networkError;
+          icon = Icons.wifi_off;
+          break;
+        case OrderActionError.unknown:
+          message = isAccept ? l10n.failedToAcceptOrder : l10n.failedToRejectOrder;
+          break;
+      }
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(icon, color: Colors.white, size: 20),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                message,
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+              ),
+            ),
+          ],
+        ),
+        backgroundColor: bgColor,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        margin: const EdgeInsets.only(left: 16, right: 16, bottom: 16),
+        duration: Duration(seconds: error == null ? 2 : 4),
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _refreshTimer?.cancel();
@@ -1302,7 +1365,9 @@ class _HomeScreenState extends State<HomeScreen>
                           TextButton(
                             onPressed: () {
                               Navigator.of(ctx).pop();
-                              orderProvider.rejectOrder();
+                              orderProvider.rejectOrder().then((error) {
+                                _showOrderFeedback(error, isAccept: false);
+                              });
                             },
                             style: TextButton.styleFrom(foregroundColor: AppColors.error),
                             child: Text(l10n.reject),
@@ -1332,7 +1397,10 @@ class _HomeScreenState extends State<HomeScreen>
               Expanded(
                 flex: 3,
                 child: ElevatedButton(
-                  onPressed: orderProvider.isLoading ? null : () => orderProvider.acceptOrder(),
+                  onPressed: orderProvider.isLoading ? null : () async {
+                    final error = await orderProvider.acceptOrder();
+                    _showOrderFeedback(error, isAccept: true);
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -1615,6 +1683,7 @@ class _HomeScreenState extends State<HomeScreen>
     Color surfaceColor,
     Color borderColor,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return GestureDetector(
       onTap: () => context.push(RouteConstants.orderDetailPath(order.id)),
       child: Container(
@@ -1669,7 +1738,7 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              order.status.displayName,
+                              order.status.localizedName(l10n),
                               style: const TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.w500),
                             ),
                           ],

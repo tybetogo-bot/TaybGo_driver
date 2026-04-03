@@ -17,6 +17,8 @@ import '../../../core/services/driver_registration_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/birthdate_utils.dart';
 
+enum _RegistrationStep { personal, vehicle, details, services, documents }
+
 class ApplicationScreen extends StatefulWidget {
   const ApplicationScreen({super.key});
 
@@ -30,7 +32,6 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   // Current step (0-indexed)
   int _currentStep = 0;
-  static const int _totalSteps = 5;
 
   // Text controllers
   final _nameController = TextEditingController();
@@ -74,6 +75,36 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   bool _acceptsFood = true;
   bool _acceptsShipping = false;
   bool _acceptsTaxi = false;
+
+  bool get _isBicycle => _selectedVehicle == 'BIKE';
+  bool get _isMotorcycle => _selectedVehicle == 'MOTOR';
+  bool get _requiresFullVehicleDetails =>
+      _selectedVehicle == 'CAR' || _selectedVehicle == 'VAN';
+  bool get _shouldShowPlateNumberField =>
+      _requiresFullVehicleDetails || _isMotorcycle;
+
+  List<_RegistrationStep> get _visibleSteps {
+    final steps = <_RegistrationStep>[
+      _RegistrationStep.personal,
+      _RegistrationStep.vehicle,
+    ];
+
+    if (_requiresFullVehicleDetails || _isMotorcycle) {
+      steps.add(_RegistrationStep.details);
+    }
+
+    steps.addAll([_RegistrationStep.services, _RegistrationStep.documents]);
+
+    return steps;
+  }
+
+  int get _totalSteps => _visibleSteps.length;
+
+  _RegistrationStep get _currentVisibleStep {
+    final steps = _visibleSteps;
+    final safeIndex = _currentStep.clamp(0, steps.length - 1).toInt();
+    return steps[safeIndex];
+  }
 
   // Loading state
   bool _isLoading = false;
@@ -128,8 +159,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   }
 
   String? _validateCurrentStep(AppLocalizations l10n) {
-    switch (_currentStep) {
-      case 0: // Personal info
+    switch (_currentVisibleStep) {
+      case _RegistrationStep.personal:
         if (_nameController.text.trim().isEmpty) {
           return l10n.pleaseEnterYourName;
         }
@@ -140,9 +171,18 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           return l10n.invalidAge;
         }
         return null;
-      case 1: // Vehicle type
+      case _RegistrationStep.vehicle:
         return null; // Always has a selection
-      case 2: // Vehicle details
+      case _RegistrationStep.details:
+        if (_isBicycle) {
+          return null;
+        }
+        if (_isMotorcycle) {
+          if (_plateNumberController.text.trim().isEmpty) {
+            return l10n.pleaseEnterPlateNumber;
+          }
+          return null;
+        }
         if (_selectedCarSize == null) {
           return l10n.pleaseSelectCarSize;
         }
@@ -166,20 +206,18 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           return l10n.invalidVehicleYear;
         }
         return null;
-      case 3: // Services
+      case _RegistrationStep.services:
         if (!_acceptsFood && !_acceptsShipping && !_acceptsTaxi) {
           return l10n.pleaseSelectService;
         }
         return null;
-      case 4: // Documents
+      case _RegistrationStep.documents:
         if (_drivingLicenseUrl == null) {
           return l10n.pleaseUploadDriversLicense;
         }
         if (_idDocumentUrl == null) {
           return l10n.pleaseUploadNationalId;
         }
-        return null;
-      default:
         return null;
     }
   }
@@ -250,6 +288,11 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     ).format(birthdate);
   }
 
+  String? _controllerValueOrNull(TextEditingController controller) {
+    final value = controller.text.trim();
+    return value.isEmpty ? null : value;
+  }
+
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context)!;
     final error = _validateCurrentStep(l10n);
@@ -271,6 +314,22 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
     // Use the shared ApiClient from AuthProvider to ensure tokens are included
     final apiClient = authProvider.authService.apiClient;
+    final carSize = _requiresFullVehicleDetails ? _selectedCarSize : null;
+    final plateNumber = _shouldShowPlateNumberField
+        ? _controllerValueOrNull(_plateNumberController)
+        : null;
+    final vehicleColor = _requiresFullVehicleDetails
+        ? _controllerValueOrNull(_vehicleColorController)
+        : null;
+    final vehicleMake = _requiresFullVehicleDetails
+        ? _controllerValueOrNull(_vehicleMakeController)
+        : null;
+    final vehicleModel = _requiresFullVehicleDetails
+        ? _controllerValueOrNull(_vehicleModelController)
+        : null;
+    final vehicleYear = _requiresFullVehicleDetails
+        ? int.tryParse(_vehicleYearController.text.trim())
+        : null;
 
     // Debug: Check if token is available
     final token = await apiClient.tokenStorage.getAccessToken();
@@ -285,12 +344,12 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         phone: phone,
         birthdate: _selectedBirthdate!,
         vehicleType: _selectedVehicle,
-        carSize: _selectedCarSize!,
-        vehiclePlateNumber: _plateNumberController.text.trim(),
-        vehicleColor: _vehicleColorController.text.trim(),
-        vehicleMake: _vehicleMakeController.text.trim(),
-        vehicleModel: _vehicleModelController.text.trim(),
-        vehicleYear: int.parse(_vehicleYearController.text.trim()),
+        carSize: carSize,
+        vehiclePlateNumber: plateNumber,
+        vehicleColor: vehicleColor,
+        vehicleMake: vehicleMake,
+        vehicleModel: vehicleModel,
+        vehicleYear: vehicleYear,
         acceptsFood: _acceptsFood,
         acceptsShipping: _acceptsShipping,
         acceptsTaxi: _acceptsTaxi,
@@ -384,37 +443,12 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                 child: PageView(
                   controller: _pageController,
                   physics: const NeverScrollableScrollPhysics(),
-                  children: [
-                    _buildPersonalInfoStep(
-                      textColor,
-                      secondaryColor,
-                      surfaceColor,
-                    ),
-                    _buildVehicleStep(
-                      textColor,
-                      secondaryColor,
-                      surfaceColor,
-                      l10n,
-                    ),
-                    _buildVehicleDetailsStep(
-                      textColor,
-                      secondaryColor,
-                      surfaceColor,
-                      l10n,
-                    ),
-                    _buildServicesStep(
-                      textColor,
-                      secondaryColor,
-                      surfaceColor,
-                      l10n,
-                    ),
-                    _buildDocumentsStep(
-                      textColor,
-                      secondaryColor,
-                      surfaceColor,
-                      l10n,
-                    ),
-                  ],
+                  children: _buildStepPages(
+                    textColor,
+                    secondaryColor,
+                    surfaceColor,
+                    l10n,
+                  ),
                 ),
               ),
             ),
@@ -464,18 +498,14 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   Widget _buildStepIndicator(Color textColor, Color secondaryColor) {
     final l10n = AppLocalizations.of(context)!;
-    final steps = [
-      l10n.stepPersonal,
-      l10n.stepVehicle,
-      l10n.stepDetails,
-      l10n.stepServices,
-      l10n.stepDocuments,
-    ];
+    final steps = _visibleSteps;
 
     return Row(
       children: List.generate(steps.length, (index) {
+        final step = steps[index];
         final isActive = index == _currentStep;
         final isCompleted = index < _currentStep;
+        final label = _stepLabel(step, l10n);
 
         return Expanded(
           child: Row(
@@ -507,7 +537,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               // Step label
               Flexible(
                 child: Text(
-                  steps[index],
+                  label,
                   style: TextStyle(
                     color: isActive ? textColor : secondaryColor,
                     fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
@@ -535,6 +565,67 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         );
       }),
     );
+  }
+
+  String _stepLabel(_RegistrationStep step, AppLocalizations l10n) {
+    switch (step) {
+      case _RegistrationStep.personal:
+        return l10n.stepPersonal;
+      case _RegistrationStep.vehicle:
+        return l10n.stepVehicle;
+      case _RegistrationStep.details:
+        return l10n.stepDetails;
+      case _RegistrationStep.services:
+        return l10n.stepServices;
+      case _RegistrationStep.documents:
+        return l10n.stepDocuments;
+    }
+  }
+
+  List<Widget> _buildStepPages(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    AppLocalizations l10n,
+  ) {
+    final pages = <Widget>[];
+
+    for (final step in _visibleSteps) {
+      switch (step) {
+        case _RegistrationStep.personal:
+          pages.add(
+            _buildPersonalInfoStep(textColor, secondaryColor, surfaceColor),
+          );
+          break;
+        case _RegistrationStep.vehicle:
+          pages.add(
+            _buildVehicleStep(textColor, secondaryColor, surfaceColor, l10n),
+          );
+          break;
+        case _RegistrationStep.details:
+          pages.add(
+            _buildVehicleDetailsStep(
+              textColor,
+              secondaryColor,
+              surfaceColor,
+              l10n,
+            ),
+          );
+          break;
+        case _RegistrationStep.services:
+          pages.add(
+            _buildServicesStep(textColor, secondaryColor, surfaceColor, l10n),
+          );
+          break;
+        case _RegistrationStep.documents:
+          pages.add(
+            _buildDocumentsStep(textColor, secondaryColor, surfaceColor, l10n),
+          );
+          break;
+      }
+    }
+
+    return pages;
   }
 
   Widget _buildPersonalInfoStep(
@@ -702,8 +793,24 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               child: _buildVehicleCard(
                 vehicle: vehicle,
                 isSelected: isSelected,
-                onTap: () =>
-                    setState(() => _selectedVehicle = vehicle['value']),
+                onTap: () => setState(() {
+                  _selectedVehicle = vehicle['value'];
+                  _error = null;
+                  if (_isBicycle) {
+                    _selectedCarSize = null;
+                    _plateNumberController.clear();
+                    _vehicleColorController.clear();
+                    _vehicleMakeController.clear();
+                    _vehicleModelController.clear();
+                    _vehicleYearController.clear();
+                  } else if (_isMotorcycle) {
+                    _selectedCarSize = null;
+                    _vehicleColorController.clear();
+                    _vehicleMakeController.clear();
+                    _vehicleModelController.clear();
+                    _vehicleYearController.clear();
+                  }
+                }),
                 textColor: textColor,
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
@@ -722,6 +829,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     AppLocalizations l10n,
   ) {
     final carSizes = _getCarSizes(l10n);
+    final showFullVehicleDetails = _requiresFullVehicleDetails;
+    final showPlateNumberField = _shouldShowPlateNumberField;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -744,158 +853,163 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           ),
           const SizedBox(height: 24),
 
-          // Car size dropdown
-          Row(
-            children: [
-              Text(
-                l10n.carSize,
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: secondaryColor,
+          if (showFullVehicleDetails) ...[
+            // Car size dropdown
+            Row(
+              children: [
+                Text(
+                  l10n.carSize,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: secondaryColor,
+                  ),
                 ),
-              ),
-              const Text(
-                ' *',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.error,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Container(
-            decoration: BoxDecoration(
-              color: surfaceColor,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.03),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
+                const Text(
+                  ' *',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.error,
+                  ),
                 ),
               ],
             ),
-            child: DropdownButtonFormField<String>(
-              initialValue: _selectedCarSize,
-              decoration: InputDecoration(
-                hintText: l10n.selectCarSize,
-                hintStyle: TextStyle(
-                  color: secondaryColor.withValues(alpha: 0.6),
-                ),
-                prefixIcon: Container(
-                  margin: const EdgeInsets.all(12),
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+            const SizedBox(height: 8),
+            Container(
+              decoration: BoxDecoration(
+                color: surfaceColor,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
                   ),
-                  child: const Icon(
-                    Icons.straighten,
-                    color: AppColors.primary,
-                    size: 20,
-                  ),
-                ),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(
-                    color: AppColors.primary,
-                    width: 2,
-                  ),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 16,
-                ),
+                ],
               ),
-              dropdownColor: surfaceColor,
-              style: TextStyle(color: textColor, fontSize: 16),
-              items: carSizes.map((size) {
-                return DropdownMenuItem<String>(
-                  value: size['value'],
-                  child: Text(size['label']!),
-                );
-              }).toList(),
-              onChanged: (value) => setState(() => _selectedCarSize = value),
+              child: DropdownButtonFormField<String>(
+                initialValue: _selectedCarSize,
+                decoration: InputDecoration(
+                  hintText: l10n.selectCarSize,
+                  hintStyle: TextStyle(
+                    color: secondaryColor.withValues(alpha: 0.6),
+                  ),
+                  prefixIcon: Container(
+                    margin: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Icon(
+                      Icons.straighten,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                  ),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide.none,
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: const BorderSide(
+                      color: AppColors.primary,
+                      width: 2,
+                    ),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 16,
+                  ),
+                ),
+                dropdownColor: surfaceColor,
+                style: TextStyle(color: textColor, fontSize: 16),
+                items: carSizes.map((size) {
+                  return DropdownMenuItem<String>(
+                    value: size['value'],
+                    child: Text(size['label']!),
+                  );
+                }).toList(),
+                onChanged: (value) => setState(() => _selectedCarSize = value),
+              ),
             ),
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          // Vehicle make
-          _buildTextField(
-            controller: _vehicleMakeController,
-            label: l10n.vehicleMake,
-            hint: l10n.enterVehicleMake,
-            icon: Icons.factory_outlined,
-            surfaceColor: surfaceColor,
-            textColor: textColor,
-            secondaryColor: secondaryColor,
-            isRequired: true,
-          ),
-          const SizedBox(height: 16),
+            // Vehicle make
+            _buildTextField(
+              controller: _vehicleMakeController,
+              label: l10n.vehicleMake,
+              hint: l10n.enterVehicleMake,
+              icon: Icons.factory_outlined,
+              surfaceColor: surfaceColor,
+              textColor: textColor,
+              secondaryColor: secondaryColor,
+              isRequired: true,
+            ),
+            const SizedBox(height: 16),
 
-          // Vehicle model
-          _buildTextField(
-            controller: _vehicleModelController,
-            label: l10n.vehicleModel,
-            hint: l10n.enterVehicleModel,
-            icon: Icons.directions_car_outlined,
-            surfaceColor: surfaceColor,
-            textColor: textColor,
-            secondaryColor: secondaryColor,
-            isRequired: true,
-          ),
-          const SizedBox(height: 16),
+            // Vehicle model
+            _buildTextField(
+              controller: _vehicleModelController,
+              label: l10n.vehicleModel,
+              hint: l10n.enterVehicleModel,
+              icon: Icons.directions_car_outlined,
+              surfaceColor: surfaceColor,
+              textColor: textColor,
+              secondaryColor: secondaryColor,
+              isRequired: true,
+            ),
+            const SizedBox(height: 16),
 
-          // Vehicle year
-          _buildTextField(
-            controller: _vehicleYearController,
-            label: l10n.vehicleYear,
-            hint: l10n.enterVehicleYear,
-            icon: Icons.calendar_today_outlined,
-            surfaceColor: surfaceColor,
-            textColor: textColor,
-            secondaryColor: secondaryColor,
-            keyboardType: TextInputType.number,
-            isRequired: true,
-          ),
-          const SizedBox(height: 16),
+            // Vehicle year
+            _buildTextField(
+              controller: _vehicleYearController,
+              label: l10n.vehicleYear,
+              hint: l10n.enterVehicleYear,
+              icon: Icons.calendar_today_outlined,
+              surfaceColor: surfaceColor,
+              textColor: textColor,
+              secondaryColor: secondaryColor,
+              keyboardType: TextInputType.number,
+              isRequired: true,
+            ),
+            const SizedBox(height: 16),
 
-          // Vehicle color
-          _buildTextField(
-            controller: _vehicleColorController,
-            label: l10n.vehicleColor,
-            hint: l10n.enterVehicleColor,
-            icon: Icons.palette_outlined,
-            surfaceColor: surfaceColor,
-            textColor: textColor,
-            secondaryColor: secondaryColor,
-            isRequired: true,
-          ),
-          const SizedBox(height: 16),
+            // Vehicle color
+            _buildTextField(
+              controller: _vehicleColorController,
+              label: l10n.vehicleColor,
+              hint: l10n.enterVehicleColor,
+              icon: Icons.palette_outlined,
+              surfaceColor: surfaceColor,
+              textColor: textColor,
+              secondaryColor: secondaryColor,
+              isRequired: true,
+            ),
+            const SizedBox(height: 16),
+          ],
 
-          // Plate number
-          _buildTextField(
-            controller: _plateNumberController,
-            label: l10n.licensePlate,
-            hint: l10n.enterVehiclePlateNumber,
-            icon: Icons.pin_outlined,
-            surfaceColor: surfaceColor,
-            textColor: textColor,
-            secondaryColor: secondaryColor,
-            isRequired: true,
-          ),
-          const SizedBox(height: 24),
+          if (showPlateNumberField) ...[
+            // Plate number
+            _buildTextField(
+              controller: _plateNumberController,
+              label: l10n.licensePlate,
+              hint: l10n.enterVehiclePlateNumber,
+              icon: Icons.pin_outlined,
+              surfaceColor: surfaceColor,
+              textColor: textColor,
+              secondaryColor: secondaryColor,
+              isRequired: true,
+            ),
+            const SizedBox(height: 24),
+          ] else
+            const SizedBox(height: 8),
         ],
       ),
     );

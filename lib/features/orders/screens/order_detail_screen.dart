@@ -267,24 +267,40 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     setState(() => _isUpdating = true);
 
     final orderProvider = context.read<OrderProvider>();
-    final success = await orderProvider.acceptOrder();
+    final error = await orderProvider.acceptOrder();
 
     if (mounted) {
       setState(() {
         _isUpdating = false;
-        if (success) {
+        if (error == null) {
           _order =
               orderProvider.activeOrder ??
               _order!.copyWith(status: OrderStatus.accepted);
         }
       });
 
-      if (!success) {
-        // Show error message
+      if (error != null) {
         final l10n = AppLocalizations.of(context)!;
-        final error = orderProvider.error ?? l10n.failedToUpdateStatus;
+        String message;
+        switch (error) {
+          case OrderActionError.alreadyTaken:
+            message = l10n.orderAlreadyTaken;
+            break;
+          case OrderActionError.expired:
+            message = l10n.orderSuggestionExpired;
+            break;
+          case OrderActionError.notFound:
+            message = l10n.orderNotFound;
+            break;
+          case OrderActionError.network:
+            message = l10n.networkError;
+            break;
+          case OrderActionError.unknown:
+            message = orderProvider.error ?? l10n.failedToAcceptOrder;
+            break;
+        }
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error), backgroundColor: AppColors.error),
+          SnackBar(content: Text(message), backgroundColor: AppColors.error),
         );
       }
     }
@@ -596,8 +612,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     Color secondaryColor,
     Color surfaceColor,
   ) {
-    final isPaid = order.isPaid;
-    final color = isPaid ? AppColors.success : AppColors.error;
+    if (!order.hasPaymentInfo) return const SizedBox.shrink();
+
+    final needsCash = order.needsCashCollection;
+    final color = needsCash ? AppColors.error : AppColors.success;
 
     return Container(
       width: double.infinity,
@@ -610,13 +628,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: Row(
         children: [
           Icon(
-            isPaid ? Icons.check_circle : Icons.payments,
+            needsCash ? Icons.payments : Icons.check_circle,
             size: 18,
             color: color,
           ),
           const SizedBox(width: 8),
           Text(
-            isPaid ? l10n.orderPaid : l10n.collectCash,
+            needsCash ? l10n.collectCash : l10n.orderPaid,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
@@ -1511,7 +1529,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         case OrderStatus.delivered:
           actionText = l10n.orderCompleted;
           confirmTitle = l10n.completeOrder;
-          confirmMessage = !order.isPaid
+          confirmMessage = order.needsCashCollection
               ? '${l10n.collectCashReminder}\n\n${l10n.completeOrderConfirmation}'
               : l10n.completeOrderConfirmation;
           actionIcon = Icons.check_circle;

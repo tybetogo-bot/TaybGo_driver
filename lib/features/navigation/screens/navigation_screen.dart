@@ -353,7 +353,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     final order = _order;
     if (order == null) return;
 
-    final message = !order.isPaid
+    final message = order.needsCashCollection
         ? '${l10n.collectCashReminder}\n\n${l10n.completeOrderConfirmation}'
         : l10n.completeOrderConfirmation;
 
@@ -839,20 +839,18 @@ class _NavigationScreenState extends State<NavigationScreen> {
     switch (status) {
       case OrderStatus.accepted:
         color = AppColors.info;
-        text = l10n.orderAccepted;
         break;
       case OrderStatus.onTheWay:
         color = AppColors.primary;
-        text = l10n.onTheWay;
         break;
       case OrderStatus.delivered:
         color = AppColors.success;
-        text = l10n.atDelivery;
         break;
       default:
         color = AppColors.warning;
-        text = status.displayName;
     }
+
+    text = status.localizedName(l10n);
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -872,8 +870,10 @@ class _NavigationScreenState extends State<NavigationScreen> {
   }
 
   Widget _buildPaymentBanner(OrderModel order, AppLocalizations l10n) {
-    final isPaid = order.isPaid;
-    final color = isPaid ? AppColors.success : AppColors.error;
+    if (!order.hasPaymentInfo) return const SizedBox.shrink();
+
+    final needsCash = order.needsCashCollection;
+    final color = needsCash ? AppColors.error : AppColors.success;
 
     return Container(
       width: double.infinity,
@@ -889,13 +889,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
       child: Row(
         children: [
           Icon(
-            isPaid ? Icons.check_circle : Icons.payments,
+            needsCash ? Icons.payments : Icons.check_circle,
             size: 18,
             color: color,
           ),
           const SizedBox(width: 8),
           Text(
-            isPaid ? l10n.orderPaid : l10n.collectCash,
+            needsCash ? l10n.collectCash : l10n.orderPaid,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,

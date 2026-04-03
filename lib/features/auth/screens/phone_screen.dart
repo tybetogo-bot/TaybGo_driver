@@ -321,9 +321,10 @@ class _PhoneScreenState extends State<PhoneScreen> {
                       if (success) {
                         debugPrint('[PhoneScreen] Navigating to OTP screen');
                         navigator.push(RouteConstants.otp, extra: fullNumber);
-                      } else if (authProvider.error != null) {
-                        debugPrint('[PhoneScreen] Error: ${authProvider.error}');
-                        authProvider.clearError();
+                      } else {
+                        debugPrint(
+                          '[PhoneScreen] requestOtp failed: ${authProvider.error}',
+                        );
                       }
                     },
                   );
