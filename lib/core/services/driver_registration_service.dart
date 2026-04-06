@@ -70,9 +70,6 @@ class DriverRegistrationService {
       if (idDocument != null) {
         data['id_document'] = idDocument;
       }
-      if (otherDocuments != null) {
-        data['other_documents'] = otherDocuments;
-      }
       if (healthInsuranceDocument != null) {
         data['health_insurance_document'] = healthInsuranceDocument;
       }
@@ -81,6 +78,9 @@ class DriverRegistrationService {
       }
       if (bankDocument != null) {
         data['bank_document'] = bankDocument;
+      }
+      if (otherDocuments != null) {
+        data['other_documents'] = otherDocuments;
       }
 
       debugPrint('[DriverRegistrationService] === REGISTER DRIVER REQUEST ===');

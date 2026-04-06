@@ -154,9 +154,6 @@ class DriverService {
       if (idDocument != null) {
         data['id_document'] = idDocument;
       }
-      if (otherDocuments != null) {
-        data['other_documents'] = otherDocuments;
-      }
       if (healthInsuranceDocument != null) {
         data['health_insurance_document'] = healthInsuranceDocument;
       }
@@ -165,6 +162,9 @@ class DriverService {
       }
       if (bankDocument != null) {
         data['bank_document'] = bankDocument;
+      }
+      if (otherDocuments != null) {
+        data['other_documents'] = otherDocuments;
       }
 
       debugPrint('[DriverService] === UPDATE USER PROFILE REQUEST ===');

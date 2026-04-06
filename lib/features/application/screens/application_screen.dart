@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -45,27 +45,27 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   final CloudinaryService _cloudinaryService = CloudinaryService();
   final ImagePicker _imagePicker = ImagePicker();
 
-  File? _drivingLicenseFile;
+  Uint8List? _drivingLicenseBytes;
   String? _drivingLicenseUrl;
   bool _drivingLicenseUploading = false;
 
-  File? _idDocumentFile;
+  Uint8List? _idDocumentBytes;
   String? _idDocumentUrl;
   bool _idDocumentUploading = false;
 
-  File? _otherDocumentsFile;
+  Uint8List? _otherDocumentsBytes;
   String? _otherDocumentsUrl;
   bool _otherDocumentsUploading = false;
 
-  File? _healthInsuranceDocumentFile;
+  Uint8List? _healthInsuranceDocumentBytes;
   String? _healthInsuranceDocumentUrl;
   bool _healthInsuranceDocumentUploading = false;
 
-  File? _addressDocumentFile;
+  Uint8List? _addressDocumentBytes;
   String? _addressDocumentUrl;
   bool _addressDocumentUploading = false;
 
-  File? _bankDocumentFile;
+  Uint8List? _bankDocumentBytes;
   String? _bankDocumentUrl;
   bool _bankDocumentUploading = false;
 
@@ -364,10 +364,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         acceptsTaxi: _acceptsTaxi,
         drivingLicense: _drivingLicenseUrl,
         idDocument: _idDocumentUrl,
-        otherDocuments: _otherDocumentsUrl,
         healthInsuranceDocument: _healthInsuranceDocumentUrl,
         addressDocument: _addressDocumentUrl,
         bankDocument: _bankDocumentUrl,
+        otherDocuments: _otherDocumentsUrl,
       );
 
       if (!mounted) return;
@@ -1112,15 +1112,15 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     );
   }
 
-  Future<void> _pickAndUpload({
-    required String label,
-    required String folder,
-    required void Function(File? file) setFile,
-    required void Function(String? url) setUrl,
-    required void Function(bool loading) setLoading,
-  }) async {
-    final l10n = AppLocalizations.of(context)!;
-    final source = await showModalBottomSheet<ImageSource>(
+  Future<ImageSource?> _selectImageSource(
+    AppLocalizations l10n,
+    String label,
+  ) async {
+    if (kIsWeb) {
+      return ImageSource.gallery;
+    }
+
+    return showModalBottomSheet<ImageSource>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -1173,6 +1173,17 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         );
       },
     );
+  }
+
+  Future<void> _pickAndUpload({
+    required String label,
+    required String folder,
+    required void Function(Uint8List? bytes) setBytes,
+    required void Function(String? url) setUrl,
+    required void Function(bool loading) setLoading,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+    final source = await _selectImageSource(l10n, label);
 
     if (source == null) return;
 
@@ -1182,14 +1193,18 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     );
     if (picked == null) return;
 
-    final file = File(picked.path);
+    final bytes = await picked.readAsBytes();
     setState(() {
-      setFile(file);
+      setBytes(bytes);
       setLoading(true);
       _error = null;
     });
 
-    final url = await _cloudinaryService.uploadImage(file, folder: folder);
+    final url = await _cloudinaryService.uploadImage(
+      bytes,
+      fileName: picked.name,
+      folder: folder,
+    );
 
     if (!mounted) return;
     setState(() {
@@ -1233,13 +1248,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           _buildUploadCard(
             label: l10n.driversLicense,
             icon: Icons.badge_outlined,
-            file: _drivingLicenseFile,
+            bytes: _drivingLicenseBytes,
             url: _drivingLicenseUrl,
             isUploading: _drivingLicenseUploading,
             onTap: () => _pickAndUpload(
               label: l10n.driversLicense,
               folder: 'driver_licenses',
-              setFile: (f) => _drivingLicenseFile = f,
+              setBytes: (b) => _drivingLicenseBytes = b,
               setUrl: (u) => _drivingLicenseUrl = u,
               setLoading: (l) => _drivingLicenseUploading = l,
             ),
@@ -1255,13 +1270,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           _buildUploadCard(
             label: l10n.nationalId,
             icon: Icons.credit_card_outlined,
-            file: _idDocumentFile,
+            bytes: _idDocumentBytes,
             url: _idDocumentUrl,
             isUploading: _idDocumentUploading,
             onTap: () => _pickAndUpload(
               label: l10n.nationalId,
               folder: 'id_documents',
-              setFile: (f) => _idDocumentFile = f,
+              setBytes: (b) => _idDocumentBytes = b,
               setUrl: (u) => _idDocumentUrl = u,
               setLoading: (l) => _idDocumentUploading = l,
             ),
@@ -1273,37 +1288,16 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           ),
           const SizedBox(height: 16),
 
-          // Other documents
-          _buildUploadCard(
-            label: l10n.otherDocuments,
-            icon: Icons.description_outlined,
-            file: _otherDocumentsFile,
-            url: _otherDocumentsUrl,
-            isUploading: _otherDocumentsUploading,
-            onTap: () => _pickAndUpload(
-              label: l10n.otherDocuments,
-              folder: 'other_documents',
-              setFile: (f) => _otherDocumentsFile = f,
-              setUrl: (u) => _otherDocumentsUrl = u,
-              setLoading: (l) => _otherDocumentsUploading = l,
-            ),
-            textColor: textColor,
-            secondaryColor: secondaryColor,
-            surfaceColor: surfaceColor,
-            l10n: l10n,
-          ),
-          const SizedBox(height: 16),
-
           _buildUploadCard(
             label: l10n.healthInsuranceDocument,
             icon: Icons.health_and_safety_outlined,
-            file: _healthInsuranceDocumentFile,
+            bytes: _healthInsuranceDocumentBytes,
             url: _healthInsuranceDocumentUrl,
             isUploading: _healthInsuranceDocumentUploading,
             onTap: () => _pickAndUpload(
               label: l10n.healthInsuranceDocument,
               folder: 'health_insurance_documents',
-              setFile: (f) => _healthInsuranceDocumentFile = f,
+              setBytes: (b) => _healthInsuranceDocumentBytes = b,
               setUrl: (u) => _healthInsuranceDocumentUrl = u,
               setLoading: (l) => _healthInsuranceDocumentUploading = l,
             ),
@@ -1318,13 +1312,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           _buildUploadCard(
             label: l10n.addressDocument,
             icon: Icons.home_outlined,
-            file: _addressDocumentFile,
+            bytes: _addressDocumentBytes,
             url: _addressDocumentUrl,
             isUploading: _addressDocumentUploading,
             onTap: () => _pickAndUpload(
               label: l10n.addressDocument,
               folder: 'address_documents',
-              setFile: (f) => _addressDocumentFile = f,
+              setBytes: (b) => _addressDocumentBytes = b,
               setUrl: (u) => _addressDocumentUrl = u,
               setLoading: (l) => _addressDocumentUploading = l,
             ),
@@ -1339,13 +1333,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           _buildUploadCard(
             label: l10n.bankDocument,
             icon: Icons.account_balance_outlined,
-            file: _bankDocumentFile,
+            bytes: _bankDocumentBytes,
             url: _bankDocumentUrl,
             isUploading: _bankDocumentUploading,
             onTap: () => _pickAndUpload(
               label: l10n.bankDocument,
               folder: 'bank_documents',
-              setFile: (f) => _bankDocumentFile = f,
+              setBytes: (b) => _bankDocumentBytes = b,
               setUrl: (u) => _bankDocumentUrl = u,
               setLoading: (l) => _bankDocumentUploading = l,
             ),
@@ -1356,6 +1350,27 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             isRequired: true,
           ),
           const SizedBox(height: 24),
+
+          // Other documents
+          _buildUploadCard(
+            label: l10n.otherDocuments,
+            icon: Icons.description_outlined,
+            bytes: _otherDocumentsBytes,
+            url: _otherDocumentsUrl,
+            isUploading: _otherDocumentsUploading,
+            onTap: () => _pickAndUpload(
+              label: l10n.otherDocuments,
+              folder: 'other_documents',
+              setBytes: (b) => _otherDocumentsBytes = b,
+              setUrl: (u) => _otherDocumentsUrl = u,
+              setLoading: (l) => _otherDocumentsUploading = l,
+            ),
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            surfaceColor: surfaceColor,
+            l10n: l10n,
+          ),
+          const SizedBox(height: 16),
 
           // Info card
           Container(
@@ -1386,7 +1401,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   Widget _buildUploadCard({
     required String label,
     required IconData icon,
-    required File? file,
+    required Uint8List? bytes,
     required String? url,
     required bool isUploading,
     required VoidCallback onTap,
@@ -1396,7 +1411,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     required AppLocalizations l10n,
     bool isRequired = false,
   }) {
-    final hasFile = file != null;
+    final hasBytes = bytes != null && bytes.isNotEmpty;
     final isUploaded = url != null;
 
     return GestureDetector(
@@ -1412,7 +1427,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           border: Border.all(
             color: isUploaded
                 ? AppColors.success
-                : hasFile
+                : hasBytes
                 ? AppColors.primary
                 : Colors.transparent,
             width: 2,
@@ -1437,10 +1452,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                     : AppColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: hasFile && !kIsWeb
+              child: hasBytes
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.file(file, fit: BoxFit.cover),
+                      child: Image.memory(bytes!, fit: BoxFit.cover),
                     )
                   : Icon(
                       icon,

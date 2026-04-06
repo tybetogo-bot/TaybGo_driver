@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../constants/cloudinary_constants.dart';
@@ -8,15 +8,19 @@ class CloudinaryService {
 
   /// Upload an image file to Cloudinary using unsigned upload.
   /// Returns the secure URL of the uploaded image, or null on failure.
-  Future<String?> uploadImage(File file, {String? folder}) async {
+  Future<String?> uploadImage(
+    Uint8List bytes, {
+    required String fileName,
+    String? folder,
+  }) async {
     try {
       final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(file.path),
+        'file': MultipartFile.fromBytes(bytes, filename: fileName),
         'upload_preset': CloudinaryConstants.uploadPreset,
         if (folder != null) 'folder': folder,
       });
 
-      debugPrint('[CloudinaryService] Uploading ${file.path}...');
+      debugPrint('[CloudinaryService] Uploading $fileName...');
 
       final response = await _dio.post(
         CloudinaryConstants.uploadUrl,
