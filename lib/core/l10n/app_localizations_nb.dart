@@ -140,6 +140,9 @@ class AppLocalizationsNb extends AppLocalizations {
   String get documents => 'Dokumenter';
 
   @override
+  String get otherDocuments => 'Other Documents';
+
+  @override
   String get reviewSubmit => 'Gjennomgå & Send';
 
   @override
@@ -1087,6 +1090,11 @@ class AppLocalizationsNb extends AppLocalizations {
   String get pleaseUploadNationalId => 'Last opp ditt nasjonale ID';
 
   @override
+  String pleaseUploadDocument(Object documentName) {
+    return 'Last opp $documentName';
+  }
+
+  @override
   String get registrationFailed => 'Registrering mislyktes. Prøv igjen.';
 
   @override
@@ -1368,7 +1376,7 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get documentsSubtitle =>
-      'Add your documents (optional - you can add them later)';
+      'Upload all required documents to complete your application';
 
   @override
   String get tapToUpload => 'Tap to upload';

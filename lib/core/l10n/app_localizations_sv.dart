@@ -140,6 +140,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get documents => 'Dokument';
 
   @override
+  String get otherDocuments => 'Other Documents';
+
+  @override
   String get reviewSubmit => 'Granska & Skicka';
 
   @override
@@ -1088,6 +1091,11 @@ class AppLocalizationsSv extends AppLocalizations {
   String get pleaseUploadNationalId => 'Ladda upp ditt nationella ID';
 
   @override
+  String pleaseUploadDocument(Object documentName) {
+    return 'Ladda upp $documentName';
+  }
+
+  @override
   String get registrationFailed => 'Registrering misslyckades. Försök igen.';
 
   @override
@@ -1369,7 +1377,7 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get documentsSubtitle =>
-      'Add your documents (optional - you can add them later)';
+      'Upload all required documents to complete your application';
 
   @override
   String get tapToUpload => 'Tap to upload';

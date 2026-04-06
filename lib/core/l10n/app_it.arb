@@ -404,6 +404,7 @@
   "pleaseSelectService": "Seleziona almeno un tipo di servizio",
   "pleaseUploadDriversLicense": "Carica la tua patente di guida",
   "pleaseUploadNationalId": "Carica il tuo documento d'identità",
+  "pleaseUploadDocument": "Carica {documentName}",
   "registrationFailed": "Registrazione fallita. Riprova.",
   "stepPersonal": "Personale",
   "stepVehicle": "Veicolo",

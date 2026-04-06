@@ -404,6 +404,7 @@
   "pleaseSelectService": "Vælg mindst én servicetype",
   "pleaseUploadDriversLicense": "Upload dit kørekort",
   "pleaseUploadNationalId": "Upload dit nationale ID",
+  "pleaseUploadDocument": "Upload {documentName}",
   "registrationFailed": "Registrering mislykkedes. Prøv igen.",
   "stepPersonal": "Personligt",
   "stepVehicle": "Køretøj",

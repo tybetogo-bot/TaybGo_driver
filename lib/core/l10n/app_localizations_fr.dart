@@ -140,6 +140,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get documents => 'Documents';
 
   @override
+  String get otherDocuments => 'Other Documents';
+
+  @override
   String get reviewSubmit => 'Vérifier et soumettre';
 
   @override
@@ -1098,6 +1101,11 @@ class AppLocalizationsFr extends AppLocalizations {
       'Veuillez télécharger votre pièce d\'identité';
 
   @override
+  String pleaseUploadDocument(Object documentName) {
+    return 'Veuillez télécharger $documentName';
+  }
+
+  @override
   String get registrationFailed =>
       'L\'inscription a échoué. Veuillez réessayer.';
 
@@ -1382,7 +1390,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get documentsSubtitle =>
-      'Add your documents (optional - you can add them later)';
+      'Upload all required documents to complete your application';
 
   @override
   String get tapToUpload => 'Tap to upload';

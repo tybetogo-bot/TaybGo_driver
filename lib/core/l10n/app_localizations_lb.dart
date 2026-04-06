@@ -140,6 +140,9 @@ class AppLocalizationsLb extends AppLocalizations {
   String get documents => 'Dokumenter';
 
   @override
+  String get otherDocuments => 'Other Documents';
+
+  @override
   String get reviewSubmit => 'Iwwerpréiwen & Aschécken';
 
   @override
@@ -1098,6 +1101,11 @@ class AppLocalizationsLb extends AppLocalizations {
   String get pleaseUploadNationalId => 'Luet w.e.g. Är Identitéitskaart erop';
 
   @override
+  String pleaseUploadDocument(Object documentName) {
+    return 'Luet w.e.g. $documentName erop';
+  }
+
+  @override
   String get registrationFailed =>
       'Registréierung fehlgeschloen. Probéiert w.e.g. nach eng Kéier.';
 
@@ -1382,7 +1390,7 @@ class AppLocalizationsLb extends AppLocalizations {
 
   @override
   String get documentsSubtitle =>
-      'Add your documents (optional - you can add them later)';
+      'Upload all required documents to complete your application';
 
   @override
   String get tapToUpload => 'Tap to upload';

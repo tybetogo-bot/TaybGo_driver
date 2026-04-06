@@ -404,6 +404,7 @@
   "pleaseSelectService": "Välj minst en tjänstetyp",
   "pleaseUploadDriversLicense": "Ladda upp ditt körkort",
   "pleaseUploadNationalId": "Ladda upp ditt nationella ID",
+  "pleaseUploadDocument": "Ladda upp {documentName}",
   "registrationFailed": "Registrering misslyckades. Försök igen.",
   "stepPersonal": "Personligt",
   "stepVehicle": "Fordon",

@@ -368,6 +368,12 @@ abstract class AppLocalizations {
   /// **'Documents'**
   String get documents;
 
+  /// No description provided for @otherDocuments.
+  ///
+  /// In en, this message translates to:
+  /// **'Other Documents'**
+  String get otherDocuments;
+
   /// No description provided for @reviewSubmit.
   ///
   /// In en, this message translates to:
@@ -2168,6 +2174,12 @@ abstract class AppLocalizations {
   /// **'Please upload your national ID'**
   String get pleaseUploadNationalId;
 
+  /// No description provided for @pleaseUploadDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Please upload {documentName}'**
+  String pleaseUploadDocument(Object documentName);
+
   /// No description provided for @registrationFailed.
   ///
   /// In en, this message translates to:
@@ -2699,7 +2711,7 @@ abstract class AppLocalizations {
   /// No description provided for @documentsSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Add your documents (optional - you can add them later)'**
+  /// **'Upload all required documents to complete your application'**
   String get documentsSubtitle;
 
   /// No description provided for @tapToUpload.

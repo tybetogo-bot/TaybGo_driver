@@ -212,11 +212,20 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         }
         return null;
       case _RegistrationStep.documents:
-        if (_drivingLicenseUrl == null) {
-          return l10n.pleaseUploadDriversLicense;
-        }
-        if (_idDocumentUrl == null) {
-          return l10n.pleaseUploadNationalId;
+        final requiredDocuments = <MapEntry<String, String?>>[
+          MapEntry(l10n.driversLicense, _drivingLicenseUrl),
+          MapEntry(l10n.nationalId, _idDocumentUrl),
+          MapEntry(
+            l10n.healthInsuranceDocument,
+            _healthInsuranceDocumentUrl,
+          ),
+          MapEntry(l10n.addressDocument, _addressDocumentUrl),
+          MapEntry(l10n.bankDocument, _bankDocumentUrl),
+        ];
+        for (final document in requiredDocuments) {
+          if (document.value == null) {
+            return l10n.pleaseUploadDocument(document.key);
+          }
         }
         return null;
     }
@@ -1266,13 +1275,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
           // Other documents
           _buildUploadCard(
-            label: l10n.documents,
+            label: l10n.otherDocuments,
             icon: Icons.description_outlined,
             file: _otherDocumentsFile,
             url: _otherDocumentsUrl,
             isUploading: _otherDocumentsUploading,
             onTap: () => _pickAndUpload(
-              label: l10n.documents,
+              label: l10n.otherDocuments,
               folder: 'other_documents',
               setFile: (f) => _otherDocumentsFile = f,
               setUrl: (u) => _otherDocumentsUrl = u,
@@ -1302,6 +1311,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             secondaryColor: secondaryColor,
             surfaceColor: surfaceColor,
             l10n: l10n,
+            isRequired: true,
           ),
           const SizedBox(height: 16),
 
@@ -1322,6 +1332,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             secondaryColor: secondaryColor,
             surfaceColor: surfaceColor,
             l10n: l10n,
+            isRequired: true,
           ),
           const SizedBox(height: 16),
 
@@ -1342,6 +1353,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             secondaryColor: secondaryColor,
             surfaceColor: surfaceColor,
             l10n: l10n,
+            isRequired: true,
           ),
           const SizedBox(height: 24),
 

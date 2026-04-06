@@ -404,6 +404,7 @@
   "pleaseSelectService": "Valitse vähintään yksi palvelutyyppi",
   "pleaseUploadDriversLicense": "Lataa ajokorttisi",
   "pleaseUploadNationalId": "Lataa henkilötodistuksesi",
+  "pleaseUploadDocument": "Lataa {documentName}",
   "registrationFailed": "Rekisteröinti epäonnistui. Yritä uudelleen.",
   "stepPersonal": "Henkilökohtainen",
   "stepVehicle": "Ajoneuvo",

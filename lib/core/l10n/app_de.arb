@@ -374,6 +374,7 @@
   "pleaseSelectService": "Bitte wählen Sie mindestens einen Diensttyp",
   "pleaseUploadDriversLicense": "Bitte laden Sie Ihren Führerschein hoch",
   "pleaseUploadNationalId": "Bitte laden Sie Ihren Personalausweis hoch",
+  "pleaseUploadDocument": "Bitte laden Sie {documentName} hoch",
   "registrationFailed": "Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.",
   "stepPersonal": "Persönlich",
   "stepVehicle": "Fahrzeug",

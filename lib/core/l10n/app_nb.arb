@@ -404,6 +404,7 @@
   "pleaseSelectService": "Velg minst én tjenestetype",
   "pleaseUploadDriversLicense": "Last opp førerkortet ditt",
   "pleaseUploadNationalId": "Last opp ditt nasjonale ID",
+  "pleaseUploadDocument": "Last opp {documentName}",
   "registrationFailed": "Registrering mislyktes. Prøv igjen.",
   "stepPersonal": "Personlig",
   "stepVehicle": "Kjøretøy",

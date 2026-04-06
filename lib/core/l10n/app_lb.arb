@@ -404,6 +404,7 @@
   "pleaseSelectService": "Wielt w.e.g. op d'mannst eng Serviceart",
   "pleaseUploadDriversLicense": "Luet w.e.g. Äre Führerschäin erop",
   "pleaseUploadNationalId": "Luet w.e.g. Är Identitéitskaart erop",
+  "pleaseUploadDocument": "Luet w.e.g. {documentName} erop",
   "registrationFailed": "Registréierung fehlgeschloen. Probéiert w.e.g. nach eng Kéier.",
   "stepPersonal": "Perséinlech",
   "stepVehicle": "Gefier",

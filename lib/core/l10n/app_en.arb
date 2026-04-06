@@ -54,6 +54,7 @@
   "personalInfo": "Personal Information",
   "vehicleInfo": "Vehicle Information",
   "documents": "Documents",
+  "otherDocuments": "Other Documents",
   "reviewSubmit": "Review & Submit",
 
   "fullName": "Full Name",
@@ -413,6 +414,12 @@
   "pleaseSelectService": "Please select at least one service type",
   "pleaseUploadDriversLicense": "Please upload your driver's license",
   "pleaseUploadNationalId": "Please upload your national ID",
+  "pleaseUploadDocument": "Please upload {documentName}",
+  "@pleaseUploadDocument": {
+    "placeholders": {
+      "documentName": {}
+    }
+  },
   "registrationFailed": "Registration failed. Please try again.",
   "stepPersonal": "Personal",
   "stepVehicle": "Vehicle",
@@ -530,7 +537,7 @@
   "stepDetails": "Details",
   "stepDocuments": "Docs",
   "documentsTitle": "Upload Documents",
-  "documentsSubtitle": "Add your documents (optional - you can add them later)",
+  "documentsSubtitle": "Upload all required documents to complete your application",
   "tapToUpload": "Tap to upload",
   "uploadingFile": "Uploading...",
   "uploadFailed": "Upload failed. Tap to retry.",

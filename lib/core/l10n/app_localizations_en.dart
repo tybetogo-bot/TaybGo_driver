@@ -140,6 +140,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get documents => 'Documents';
 
   @override
+  String get otherDocuments => 'Other Documents';
+
+  @override
   String get reviewSubmit => 'Review & Submit';
 
   @override
@@ -1088,6 +1091,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get pleaseUploadNationalId => 'Please upload your national ID';
 
   @override
+  String pleaseUploadDocument(Object documentName) {
+    return 'Please upload $documentName';
+  }
+
+  @override
   String get registrationFailed => 'Registration failed. Please try again.';
 
   @override
@@ -1368,7 +1376,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get documentsSubtitle =>
-      'Add your documents (optional - you can add them later)';
+      'Upload all required documents to complete your application';
 
   @override
   String get tapToUpload => 'Tap to upload';

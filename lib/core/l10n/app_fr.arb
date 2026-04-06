@@ -374,6 +374,7 @@
   "pleaseSelectService": "Veuillez sélectionner au moins un type de service",
   "pleaseUploadDriversLicense": "Veuillez télécharger votre permis de conduire",
   "pleaseUploadNationalId": "Veuillez télécharger votre pièce d'identité",
+  "pleaseUploadDocument": "Veuillez télécharger {documentName}",
   "registrationFailed": "L'inscription a échoué. Veuillez réessayer.",
   "stepPersonal": "Personnel",
   "stepVehicle": "Véhicule",

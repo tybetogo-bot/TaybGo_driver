@@ -404,6 +404,7 @@
   "pleaseSelectService": "Selecteer minimaal één servicetype",
   "pleaseUploadDriversLicense": "Upload uw rijbewijs",
   "pleaseUploadNationalId": "Upload uw identiteitsbewijs",
+  "pleaseUploadDocument": "Upload {documentName}",
   "registrationFailed": "Registratie mislukt. Probeer het opnieuw.",
   "stepPersonal": "Persoonlijk",
   "stepVehicle": "Voertuig",

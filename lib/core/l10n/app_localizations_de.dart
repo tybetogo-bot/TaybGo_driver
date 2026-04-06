@@ -140,6 +140,9 @@ class AppLocalizationsDe extends AppLocalizations {
   String get documents => 'Dokumente';
 
   @override
+  String get otherDocuments => 'Other Documents';
+
+  @override
   String get reviewSubmit => 'Überprüfen & Absenden';
 
   @override
@@ -1100,6 +1103,11 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bitte laden Sie Ihren Personalausweis hoch';
 
   @override
+  String pleaseUploadDocument(Object documentName) {
+    return 'Bitte laden Sie $documentName hoch';
+  }
+
+  @override
   String get registrationFailed =>
       'Registrierung fehlgeschlagen. Bitte versuchen Sie es erneut.';
 
@@ -1384,7 +1392,7 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get documentsSubtitle =>
-      'Add your documents (optional - you can add them later)';
+      'Upload all required documents to complete your application';
 
   @override
   String get tapToUpload => 'Tap to upload';

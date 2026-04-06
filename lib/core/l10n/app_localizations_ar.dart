@@ -140,6 +140,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get documents => 'الوثائق';
 
   @override
+  String get otherDocuments => 'وثائق أخرى';
+
+  @override
   String get reviewSubmit => 'المراجعة والإرسال';
 
   @override
@@ -1080,6 +1083,11 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pleaseUploadNationalId => 'يرجى تحميل بطاقة الهوية الوطنية';
 
   @override
+  String pleaseUploadDocument(Object documentName) {
+    return 'يرجى تحميل $documentName';
+  }
+
+  @override
   String get registrationFailed => 'فشل التسجيل. يرجى المحاولة مرة أخرى.';
 
   @override
@@ -1358,7 +1366,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get documentsTitle => 'رفع الوثائق';
 
   @override
-  String get documentsSubtitle => 'أضف وثائقك (اختياري - يمكنك إضافتها لاحقاً)';
+  String get documentsSubtitle => 'قم بتحميل جميع الوثائق المطلوبة لإكمال طلبك';
 
   @override
   String get tapToUpload => 'انقر للرفع';

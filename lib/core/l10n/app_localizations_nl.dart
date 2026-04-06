@@ -140,6 +140,9 @@ class AppLocalizationsNl extends AppLocalizations {
   String get documents => 'Documenten';
 
   @override
+  String get otherDocuments => 'Other Documents';
+
+  @override
   String get reviewSubmit => 'Controleren & Verzenden';
 
   @override
@@ -1090,6 +1093,11 @@ class AppLocalizationsNl extends AppLocalizations {
   String get pleaseUploadNationalId => 'Upload uw identiteitsbewijs';
 
   @override
+  String pleaseUploadDocument(Object documentName) {
+    return 'Upload $documentName';
+  }
+
+  @override
   String get registrationFailed => 'Registratie mislukt. Probeer het opnieuw.';
 
   @override
@@ -1372,7 +1380,7 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get documentsSubtitle =>
-      'Add your documents (optional - you can add them later)';
+      'Upload all required documents to complete your application';
 
   @override
   String get tapToUpload => 'Tap to upload';
