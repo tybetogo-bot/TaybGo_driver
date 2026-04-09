@@ -119,22 +119,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
       'description': l10n.ecoFriendlyOption,
     },
     {
-      'value': 'MOTOR',
-      'label': l10n.motorcycle,
-      'icon': Icons.two_wheeler,
-      'description': l10n.fastAndAgile,
-    },
-    {
       'value': 'CAR',
       'label': l10n.car,
       'icon': Icons.directions_car,
       'description': l10n.mostVersatile,
-    },
-    {
-      'value': 'VAN',
-      'label': l10n.van,
-      'icon': Icons.airport_shuttle,
-      'description': l10n.largeDeliveries,
     },
   ];
 
