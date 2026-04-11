@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "nl",
 
   "appName": "TaybGo Chauffeur",
@@ -500,5 +500,6 @@
   "supportTicketDetail": "Ticketdetails",
   "supportNoMessages": "Nog geen berichten",
   "supportTypeMessage": "Typ een bericht...",
-  "supportTicketClosed": "Dit ticket is gesloten"
+  "supportTicketClosed": "Dit ticket is gesloten",
+  "file": "Bestand"
 }

@@ -1414,6 +1414,9 @@ class AppLocalizationsLb extends AppLocalizations {
   String get gallery => 'Gallery';
 
   @override
+  String get file => 'Fichier';
+
+  @override
   String get pleaseEnterAge => 'Please select your birthdate';
 
   @override

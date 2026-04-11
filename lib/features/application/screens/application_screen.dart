@@ -1,6 +1,6 @@
 import 'dart:typed_data';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -16,8 +16,11 @@ import '../../../core/services/cloudinary_service.dart';
 import '../../../core/services/driver_registration_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/birthdate_utils.dart';
+import '../utils/document_picker.dart';
 
 enum _RegistrationStep { personal, vehicle, details, services, documents }
+
+enum _DocumentPickAction { camera, gallery, file }
 
 class ApplicationScreen extends StatefulWidget {
   const ApplicationScreen({super.key});
@@ -203,10 +206,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         final requiredDocuments = <MapEntry<String, String?>>[
           MapEntry(l10n.driversLicense, _drivingLicenseUrl),
           MapEntry(l10n.nationalId, _idDocumentUrl),
-          MapEntry(
-            l10n.healthInsuranceDocument,
-            _healthInsuranceDocumentUrl,
-          ),
+          MapEntry(l10n.healthInsuranceDocument, _healthInsuranceDocumentUrl),
           MapEntry(l10n.addressDocument, _addressDocumentUrl),
           MapEntry(l10n.bankDocument, _bankDocumentUrl),
         ];
@@ -1100,15 +1100,31 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     );
   }
 
-  Future<ImageSource?> _selectImageSource(
+  Future<PickedDocument?> _pickImageWithSource(ImageSource source) async {
+    final picked = await _imagePicker.pickImage(
+      source: source,
+      imageQuality: 80,
+    );
+    if (picked == null) return null;
+
+    final bytes = await picked.readAsBytes();
+    return PickedDocument(
+      bytes: bytes,
+      fileName: picked.name,
+      isImage: true,
+      previewBytes: bytes,
+    );
+  }
+
+  Future<PickedDocument?> _pickFile({required bool imagesOnly}) async {
+    return pickDocument(imagesOnly: imagesOnly);
+  }
+
+  Future<_DocumentPickAction?> _pickDocumentFromChooser(
     AppLocalizations l10n,
     String label,
   ) async {
-    if (kIsWeb) {
-      return ImageSource.gallery;
-    }
-
-    return showModalBottomSheet<ImageSource>(
+    return showModalBottomSheet<_DocumentPickAction>(
       context: context,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -1132,20 +1148,24 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               const SizedBox(height: 20),
               Row(
                 children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () => Navigator.pop(ctx, ImageSource.camera),
-                      icon: const Icon(Icons.camera_alt_outlined),
-                      label: Text(l10n.camera),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                  if (!kIsWeb) ...[
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () =>
+                            Navigator.pop(ctx, _DocumentPickAction.camera),
+                        icon: const Icon(Icons.camera_alt_outlined),
+                        label: Text(l10n.camera),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
+                    const SizedBox(width: 12),
+                  ],
                   Expanded(
                     child: OutlinedButton.icon(
-                      onPressed: () => Navigator.pop(ctx, ImageSource.gallery),
+                      onPressed: () =>
+                          Navigator.pop(ctx, _DocumentPickAction.gallery),
                       icon: const Icon(Icons.photo_library_outlined),
                       label: Text(l10n.gallery),
                       style: OutlinedButton.styleFrom(
@@ -1154,6 +1174,18 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                     ),
                   ),
                 ],
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pop(ctx, _DocumentPickAction.file),
+                  icon: const Icon(Icons.insert_drive_file_outlined),
+                  label: Text(l10n.file),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
               ),
               const SizedBox(height: 12),
             ],
@@ -1171,27 +1203,46 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     required void Function(bool loading) setLoading,
   }) async {
     final l10n = AppLocalizations.of(context)!;
-    final source = await _selectImageSource(l10n, label);
 
-    if (source == null) return;
+    // On web, skip the bottom sheet entirely and call the picker directly.
+    // Two reasons:
+    //  1. image_picker's camera source doesn't work on web.
+    //  2. Navigator.pop(context) before opening the picker breaks the
+    //     browser's user-activation chain (especially iOS Safari) and the
+    //     <input> click gets blocked silently. iOS Safari's native
+    //     <input type="file"> already shows Photo Library / Take Photo /
+    //     Browse in its own sheet, so we don't lose any UX.
+    final PickedDocument? picked;
+    if (kIsWeb) {
+      picked = await _pickFile(imagesOnly: false);
+    } else {
+      final action = await _pickDocumentFromChooser(l10n, label);
+      if (action == null) return;
 
-    final picked = await _imagePicker.pickImage(
-      source: source,
-      imageQuality: 80,
-    );
+      picked = switch (action) {
+        _DocumentPickAction.camera => await _pickImageWithSource(
+          ImageSource.camera,
+        ),
+        _DocumentPickAction.gallery => await _pickImageWithSource(
+          ImageSource.gallery,
+        ),
+        _DocumentPickAction.file => await _pickFile(imagesOnly: false),
+      };
+    }
     if (picked == null) return;
+    final document = picked;
 
-    final bytes = await picked.readAsBytes();
     setState(() {
-      setBytes(bytes);
+      setBytes(document.previewBytes);
       setLoading(true);
       _error = null;
     });
 
-    final url = await _cloudinaryService.uploadImage(
-      bytes,
-      fileName: picked.name,
+    final url = await _cloudinaryService.uploadFile(
+      document.bytes,
+      fileName: document.fileName,
       folder: folder,
+      resourceType: document.isImage ? 'auto' : 'raw',
     );
 
     if (!mounted) return;
@@ -1399,7 +1450,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     required AppLocalizations l10n,
     bool isRequired = false,
   }) {
-    final hasBytes = bytes != null && bytes.isNotEmpty;
+    final previewBytes = bytes;
+    final hasBytes = previewBytes != null && previewBytes.isNotEmpty;
     final isUploaded = url != null;
 
     return GestureDetector(
@@ -1443,7 +1495,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               child: hasBytes
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.memory(bytes!, fit: BoxFit.cover),
+                      child: Image.memory(previewBytes, fit: BoxFit.cover),
                     )
                   : Icon(
                       icon,

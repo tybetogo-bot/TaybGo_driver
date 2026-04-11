@@ -1390,6 +1390,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get gallery => 'المعرض';
 
   @override
+  String get file => 'ملف';
+
+  @override
   String get pleaseEnterAge => 'يرجى اختيار تاريخ ميلادك';
 
   @override

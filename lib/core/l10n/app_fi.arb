@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "fi",
 
   "appName": "TaybGo Kuljettaja",
@@ -500,5 +500,6 @@
   "supportTicketDetail": "Tukipyynnön tiedot",
   "supportNoMessages": "Ei viestejä vielä",
   "supportTypeMessage": "Kirjoita viesti...",
-  "supportTicketClosed": "Tämä tukipyyntö on suljettu"
+  "supportTicketClosed": "Tämä tukipyyntö on suljettu",
+  "file": "Tiedosto"
 }

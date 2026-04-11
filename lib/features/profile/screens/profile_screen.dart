@@ -157,9 +157,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   ),
                                 ),
                                 child: Icon(
-                                  profile.isOnline
-                                      ? Icons.check
-                                      : Icons.remove,
+                                  profile.isOnline ? Icons.check : Icons.remove,
                                   size: 12,
                                   color: Colors.white,
                                 ),
@@ -187,6 +185,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Icons.phone_outlined,
                           profile!.phone,
                           secondaryColor,
+                          textDirection: TextDirection.ltr,
                         ),
                       if (profile != null &&
                           profile.email != null &&
@@ -210,9 +209,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             if (profile?.vehicleYear != null &&
                                 profile!.vehicleYear! > 0)
                               '(${profile.vehicleYear})',
-                          ]
-                              .where((e) => e != null)
-                              .join(' '),
+                          ].where((e) => e != null).join(' '),
                           secondaryColor,
                         ),
                       ],
@@ -247,9 +244,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Expanded(
                         child: _buildStatCard(
                           Icons.star_rounded,
-                          profile.rating > 0
-                              ? profile.formattedRating
-                              : '--',
+                          profile.rating > 0 ? profile.formattedRating : '--',
                           l10n.rating,
                           AppColors.warning,
                           surfaceColor,
@@ -467,9 +462,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildInfoChip(IconData icon, String text, Color color) {
+  Widget _buildInfoChip(
+    IconData icon,
+    String text,
+    Color color, {
+    TextDirection? textDirection,
+  }) {
     return Row(
       mainAxisSize: MainAxisSize.min,
+      textDirection: textDirection,
       children: [
         Icon(icon, size: 15, color: color),
         const SizedBox(width: 6),
@@ -477,6 +478,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Text(
             text,
             style: TextStyle(fontSize: 14, color: color),
+            textDirection: textDirection,
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -512,10 +514,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           ),
           const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12, color: secondaryColor),
-          ),
+          Text(label, style: TextStyle(fontSize: 12, color: secondaryColor)),
         ],
       ),
     );

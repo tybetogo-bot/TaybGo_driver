@@ -545,6 +545,7 @@
   "changePhoto": "Change",
   "camera": "Camera",
   "gallery": "Gallery",
+  "file": "File",
   "pleaseEnterAge": "Please select your birthdate",
   "invalidAge": "Drivers must be between 18 and 80 years old",
   "pleaseSelectCarSize": "Please select a car size",

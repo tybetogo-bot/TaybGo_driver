@@ -2756,6 +2756,12 @@ abstract class AppLocalizations {
   /// **'Gallery'**
   String get gallery;
 
+  /// No description provided for @file.
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get file;
+
   /// No description provided for @pleaseEnterAge.
   ///
   /// In en, this message translates to:

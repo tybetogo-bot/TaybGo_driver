@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "de",
 
   "appName": "TaybGo Fahrer",
@@ -471,5 +471,6 @@
   "supportTicketDetail": "Ticket-Details",
   "supportNoMessages": "Noch keine Nachrichten",
   "supportTypeMessage": "Nachricht eingeben...",
-  "supportTicketClosed": "Dieses Ticket ist geschlossen"
+  "supportTicketClosed": "Dieses Ticket ist geschlossen",
+  "file": "Datei"
 }

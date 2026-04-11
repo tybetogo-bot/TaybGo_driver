@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "ar",
 
   "appName": "TaybGo سائق",
@@ -539,6 +539,7 @@
   "changePhoto": "تغيير",
   "camera": "الكاميرا",
   "gallery": "المعرض",
+  "file": "ملف",
   "pleaseEnterAge": "يرجى اختيار تاريخ ميلادك",
   "invalidAge": "يجب أن يكون عمر السائق بين 18 و80 عاماً",
   "pleaseSelectCarSize": "يرجى اختيار حجم السيارة",

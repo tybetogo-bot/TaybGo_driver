@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "lb",
 
   "appName": "TaybGo Chauffeur",
@@ -500,5 +500,6 @@
   "supportTicketDetail": "Ticket-Detailer",
   "supportNoMessages": "Nach keng Noriichten",
   "supportTypeMessage": "Eng Noriicht schreiwen...",
-  "supportTicketClosed": "Dësen Ticket ass zou"
+  "supportTicketClosed": "Dësen Ticket ass zou",
+  "file": "Fichier"
 }

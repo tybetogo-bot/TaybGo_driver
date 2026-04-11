@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:intl/intl.dart';
+import 'package:intl/intl.dart' as intl;
 import 'package:provider/provider.dart';
 import '../../../core/models/driver_profile.dart';
 import '../../../core/l10n/app_localizations.dart';
@@ -214,7 +214,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   String _formatBirthdateForDisplay(DateTime birthdate) {
-    return DateFormat.yMMMd(
+    return intl.DateFormat.yMMMd(
       Localizations.localeOf(context).toString(),
     ).format(birthdate);
   }
@@ -461,6 +461,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 controller: _phoneController,
                 hint: l10n.phoneHint,
                 keyboardType: TextInputType.phone,
+                textDirection: TextDirection.ltr,
                 surfaceColor: surfaceColor,
                 borderColor: borderColor,
                 textColor: textColor,
@@ -840,6 +841,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     bool readOnly = false,
     VoidCallback? onTap,
     Widget? suffixIcon,
+    TextDirection? textDirection,
   }) {
     return TextFormField(
       controller: controller,
@@ -848,6 +850,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       validator: validator,
       readOnly: readOnly,
       onTap: onTap,
+      textDirection: textDirection,
       style: TextStyle(fontSize: 15, color: textColor),
       decoration: InputDecoration(
         hintText: hint,

@@ -1,3 +1,7 @@
+# Release signing
+android/key.properties
+android/app/upload-keystore.jks
+
 # Miscellaneous
 *.class
 *.log

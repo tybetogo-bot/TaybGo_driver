@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "it",
 
   "appName": "TaybGo Autista",
@@ -500,5 +500,6 @@
   "supportTicketDetail": "Dettaglio ticket",
   "supportNoMessages": "Nessun messaggio ancora",
   "supportTypeMessage": "Scrivi un messaggio...",
-  "supportTicketClosed": "Questo ticket è chiuso"
+  "supportTicketClosed": "Questo ticket è chiuso",
+  "file": "File"
 }

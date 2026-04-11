@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "sv",
 
   "appName": "TaybGo Förare",
@@ -500,5 +500,6 @@
   "supportTicketDetail": "Ärendedetaljer",
   "supportNoMessages": "Inga meddelanden ännu",
   "supportTypeMessage": "Skriv ett meddelande...",
-  "supportTicketClosed": "Detta ärende är stängt"
+  "supportTicketClosed": "Detta ärende är stängt",
+  "file": "Fil"
 }

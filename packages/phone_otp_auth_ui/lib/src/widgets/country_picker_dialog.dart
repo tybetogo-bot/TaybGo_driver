@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import '../l10n/auth_ui_strings.dart';
 import '../models/country.dart';
@@ -72,20 +72,24 @@ class _CountryPickerDialogState extends State<CountryPickerDialog> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-              child: TextField(
-                controller: _searchController,
-                autofocus: true,
-                onChanged: _onSearch,
-                decoration: InputDecoration(
-                  hintText: widget.strings.searchCountryHint,
-                  prefixIcon: const Icon(Icons.search, size: 20),
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 10,
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
+              child: Directionality(
+                textDirection: TextDirection.ltr,
+                child: TextField(
+                  controller: _searchController,
+                  autofocus: true,
+                  onChanged: _onSearch,
+                  textDirection: TextDirection.ltr,
+                  decoration: InputDecoration(
+                    hintText: widget.strings.searchCountryHint,
+                    prefixIcon: const Icon(Icons.search, size: 20),
+                    isDense: true,
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 10,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                 ),
               ),
@@ -110,12 +114,14 @@ class _CountryPickerDialogState extends State<CountryPickerDialog> {
                       country.name,
                       style: TextStyle(
                         fontSize: 14,
-                        fontWeight:
-                            isSelected ? FontWeight.w600 : FontWeight.w400,
+                        fontWeight: isSelected
+                            ? FontWeight.w600
+                            : FontWeight.w400,
                       ),
                     ),
                     trailing: Text(
                       country.dialCode,
+                      textDirection: TextDirection.ltr,
                       style: TextStyle(
                         fontSize: 14,
                         color: theme.colorScheme.onSurface.withValues(

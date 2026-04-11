@@ -1,4 +1,4 @@
-{
+﻿{
   "@@locale": "nb",
 
   "appName": "TaybGo Sjåfør",
@@ -500,5 +500,6 @@
   "supportTicketDetail": "Henvendelsesdetaljer",
   "supportNoMessages": "Ingen meldinger ennå",
   "supportTypeMessage": "Skriv en melding...",
-  "supportTicketClosed": "Denne henvendelsen er lukket"
+  "supportTicketClosed": "Denne henvendelsen er lukket",
+  "file": "Fil"
 }

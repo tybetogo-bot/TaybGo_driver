@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../l10n/auth_ui_strings.dart';
@@ -30,51 +30,56 @@ class PhoneNumberField extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    return TextFormField(
-      controller: controller,
-      enabled: enabled,
-      autofocus: autofocus,
-      keyboardType: TextInputType.phone,
-      textInputAction: TextInputAction.done,
-      onFieldSubmitted: onSubmitted,
-      inputFormatters: [
-        FilteringTextInputFormatter.digitsOnly,
-      ],
-      decoration: InputDecoration(
-        hintText: strings.phoneHintText,
-        prefixIconConstraints: const BoxConstraints(minWidth: 0),
-        prefixIcon: InkWell(
-          onTap: enabled ? onCountryTap : null,
-          borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 12),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  selectedCountry.flag,
-                  style: const TextStyle(fontSize: 20),
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  selectedCountry.dialCode,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: theme.colorScheme.onSurface,
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: TextFormField(
+        controller: controller,
+        enabled: enabled,
+        autofocus: autofocus,
+        keyboardType: TextInputType.phone,
+        textInputAction: TextInputAction.done,
+        textDirection: TextDirection.ltr,
+        textAlign: TextAlign.left,
+        onFieldSubmitted: onSubmitted,
+        inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+        decoration: InputDecoration(
+          hintText: strings.phoneHintText,
+          prefixIconConstraints: const BoxConstraints(minWidth: 0),
+          prefixIcon: InkWell(
+            onTap: enabled ? onCountryTap : null,
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                textDirection: TextDirection.ltr,
+                children: [
+                  Text(
+                    selectedCountry.flag,
+                    style: const TextStyle(fontSize: 20),
                   ),
-                ),
-                Icon(
-                  Icons.arrow_drop_down,
-                  size: 18,
-                  color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
-                ),
-              ],
+                  const SizedBox(width: 6),
+                  Text(
+                    selectedCountry.dialCode,
+                    textDirection: TextDirection.ltr,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: theme.colorScheme.onSurface,
+                    ),
+                  ),
+                  Icon(
+                    Icons.arrow_drop_down,
+                    size: 18,
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
+        validator: validator,
       ),
-      validator: validator,
     );
   }
 }
