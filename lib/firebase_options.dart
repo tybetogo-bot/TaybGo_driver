@@ -3,7 +3,7 @@ import 'package:flutter/foundation.dart'
     show defaultTargetPlatform, kIsWeb, TargetPlatform;
 
 /// Firebase configuration generated from google-services.json and
-/// GoogleService-Info.plist for the tybetogodriver project.
+/// GoogleService-Info.plist for the drivertaybgo project.
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
@@ -22,13 +22,13 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyDa0R4NIDT7yFqzNmyedYpKQo3IXOeMjhc',
-    appId: '1:356779144732:web:25604849c62be4d2bdd1d9',
-    messagingSenderId: '356779144732',
-    projectId: 'tybetogodriver',
-    storageBucket: 'tybetogodriver.firebasestorage.app',
-    authDomain: 'tybetogodriver.firebaseapp.com',
-    measurementId: 'G-PXSLY985VL',
+    apiKey: 'AIzaSyACQ3YTugn8nEHpMLkYP6LDHPXWOpCv_B0',
+    appId: '1:527527512549:web:0730fc8535383822d1c70c',
+    messagingSenderId: '527527512549',
+    projectId: 'drivertaybgo',
+    storageBucket: 'drivertaybgo.firebasestorage.app',
+    authDomain: 'drivertaybgo.firebaseapp.com',
+    measurementId: 'G-GW9V84HBQ5',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
@@ -40,11 +40,11 @@ class DefaultFirebaseOptions {
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyAUiaZ2aHASy3O9OrVHWzYeBlvrKhvL1qU',
-    appId: '1:356779144732:ios:6a691394556249e1bdd1d9',
-    messagingSenderId: '356779144732',
-    projectId: 'tybetogodriver',
-    storageBucket: 'tybetogodriver.firebasestorage.app',
+    apiKey: 'AIzaSyCzOao6qpoVhY3mx27AyTroCm0P1qHK9xk',
+    appId: '1:527527512549:ios:00b7019ba2761a44d1c70c',
+    messagingSenderId: '527527512549',
+    projectId: 'drivertaybgo',
+    storageBucket: 'drivertaybgo.firebasestorage.app',
     iosBundleId: 'com.tybetogo.driver',
   );
 }

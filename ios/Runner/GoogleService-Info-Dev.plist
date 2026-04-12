@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.tybetogo.driver</string>
+	<string>com.tybetogo.driver.dev</string>
 	<key>PROJECT_ID</key>
 	<string>drivertaybgo</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:527527512549:ios:00b7019ba2761a44d1c70c</string>
+	<string>1:527527512549:ios:ca0656279d66d881d1c70c</string>
 </dict>
 </plist>
