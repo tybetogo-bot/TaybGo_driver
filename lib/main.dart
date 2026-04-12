@@ -3,10 +3,12 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'core/config/app_config.dart';
 import 'core/l10n/app_localizations.dart';
+import 'core/l10n/framework_locale_support.dart';
 import 'core/theme/app_theme.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/providers/locale_provider.dart';
@@ -27,6 +29,8 @@ void main() async {
   if (!AppConfig.isInitialized) {
     AppConfig.init(env: Environment.dev);
   }
+
+  await initializeDateFormatting();
 
   // Initialize Firebase
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -108,6 +112,9 @@ class TaybGoDriverApp extends StatelessWidget {
             supportedLocales: LocaleProvider.supportedLocales,
             localizationsDelegates: const [
               AppLocalizations.delegate,
+              FallbackMaterialLocalizationsDelegate(),
+              FallbackWidgetsLocalizationsDelegate(),
+              FallbackCupertinoLocalizationsDelegate(),
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,

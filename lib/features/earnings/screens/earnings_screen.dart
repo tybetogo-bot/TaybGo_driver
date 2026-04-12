@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../core/l10n/app_localizations.dart';
+import '../../../core/l10n/framework_locale_support.dart';
 import '../../../core/providers/order_provider.dart';
 import '../../../core/providers/tour_provider.dart';
 import '../../../core/theme/app_colors.dart';
@@ -44,8 +45,12 @@ class _EarningsScreenState extends State<EarningsScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final secondaryColor = isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final secondaryColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -58,7 +63,11 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 color: AppColors.success.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.account_balance_wallet, color: AppColors.success, size: 18),
+              child: const Icon(
+                Icons.account_balance_wallet,
+                color: AppColors.success,
+                size: 18,
+              ),
             ),
             const SizedBox(width: 10),
             Text(l10n.earnings_label),
@@ -116,17 +125,28 @@ class _EarningsScreenState extends State<EarningsScreen> {
                             Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.trending_up, size: 16, color: secondaryColor),
+                                Icon(
+                                  Icons.trending_up,
+                                  size: 16,
+                                  color: secondaryColor,
+                                ),
                                 const SizedBox(width: 6),
                                 Text(
                                   l10n.totalEarnings,
-                                  style: TextStyle(fontSize: 14, color: secondaryColor),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: secondaryColor,
+                                  ),
                                 ),
                               ],
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              DateFormat.MMMM(Localizations.localeOf(context).toString()).format(DateTime.now()),
+                              DateFormat.MMMM(
+                                FrameworkLocaleSupport.dateFormattingLocale(
+                                  Localizations.localeOf(context),
+                                ),
+                              ).format(DateTime.now()),
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w500,
@@ -288,10 +308,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
             ),
           ),
           const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(fontSize: 12, color: secondaryColor),
-          ),
+          Text(label, style: TextStyle(fontSize: 12, color: secondaryColor)),
         ],
       ),
     );
@@ -304,7 +321,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
 
     for (final order in orders) {
       // Include accepted, onTheWay, delivered, and completed orders in earnings
-      final isActiveOrCompleted = order.status == OrderStatus.accepted ||
+      final isActiveOrCompleted =
+          order.status == OrderStatus.accepted ||
           order.status == OrderStatus.onTheWay ||
           order.status == OrderStatus.delivered ||
           order.status == OrderStatus.completed;

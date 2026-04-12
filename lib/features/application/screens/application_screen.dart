@@ -7,6 +7,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
+import '../../../core/l10n/framework_locale_support.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/providers/notification_provider.dart';
@@ -281,7 +282,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   String _formatBirthdateForDisplay(DateTime birthdate) {
     return DateFormat.yMMMd(
-      Localizations.localeOf(context).toString(),
+      FrameworkLocaleSupport.dateFormattingLocale(
+        Localizations.localeOf(context),
+      ),
     ).format(birthdate);
   }
 

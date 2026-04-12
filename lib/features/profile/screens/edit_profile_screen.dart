@@ -5,6 +5,7 @@ import 'package:intl/intl.dart' as intl;
 import 'package:provider/provider.dart';
 import '../../../core/models/driver_profile.dart';
 import '../../../core/l10n/app_localizations.dart';
+import '../../../core/l10n/framework_locale_support.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/birthdate_utils.dart';
@@ -215,7 +216,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   String _formatBirthdateForDisplay(DateTime birthdate) {
     return intl.DateFormat.yMMMd(
-      Localizations.localeOf(context).toString(),
+      FrameworkLocaleSupport.dateFormattingLocale(
+        Localizations.localeOf(context),
+      ),
     ).format(birthdate);
   }
 
