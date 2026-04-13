@@ -1430,6 +1430,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get invalidVehicleYear => 'Please enter a valid year';
 
   @override
+  String get dropOrder => 'Drop Order';
+
+  @override
+  String get dropOrderDescription =>
+      'Return this accepted order to dispatch so another driver can take it.';
+
+  @override
+  String get dropOrderConfirmation =>
+      'Are you sure you want to drop this order? It will be removed from your active orders.';
+
+  @override
+  String get dropOrderWarning => 'This action is only available before pickup.';
+
+  @override
+  String get keepOrder => 'Keep Order';
+
+  @override
+  String get orderDroppedSuccessfully => 'Order returned to dispatch';
+
+  @override
+  String get failedToDropOrder => 'Failed to drop order. Please try again.';
+
+  @override
   String get orderAlreadyTaken =>
       'This order was already taken by another driver';
 

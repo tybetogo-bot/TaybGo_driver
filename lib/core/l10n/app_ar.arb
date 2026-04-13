@@ -548,5 +548,13 @@
   "pleaseEnterVehicleMake": "يرجى إدخال ماركة المركبة",
   "pleaseEnterVehicleModel": "يرجى إدخال موديل المركبة",
   "pleaseEnterVehicleYear": "يرجى إدخال سنة المركبة",
-  "invalidVehicleYear": "يرجى إدخال سنة صحيحة"
+  "invalidVehicleYear": "يرجى إدخال سنة صحيحة",
+
+  "dropOrder": "إرجاع الطلب",
+  "dropOrderDescription": "سيتم إعادة هذا الطلب المقبول إلى قسم التوزيع ليتم إسناده إلى سائق آخر.",
+  "dropOrderConfirmation": "هل أنت متأكد أنك تريد إرجاع هذا الطلب؟ سيختفي من طلباتك النشطة.",
+  "dropOrderWarning": "هذا الإجراء متاح فقط قبل استلام الطلب.",
+  "keepOrder": "الاحتفاظ بالطلب",
+  "orderDroppedSuccessfully": "تمت إعادة الطلب إلى قسم التوزيع",
+  "failedToDropOrder": "تعذر إرجاع الطلب. يرجى المحاولة مرة أخرى."
 }

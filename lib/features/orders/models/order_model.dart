@@ -269,11 +269,12 @@ class OrderModel {
     this.completedAt,
   }) : createdAt = createdAt ?? DateTime.now();
 
-  /// Whether the payment banner should be shown (only when we have payment data)
-  bool get hasPaymentInfo => paymentType != null || isPaid != null;
+  /// Whether we have a confirmed paid/unpaid value we can safely show.
+  bool get hasPaymentInfo => isPaid != null;
 
   /// Whether the driver needs to collect cash from the customer
-  bool get needsCashCollection => paymentType == PaymentType.cash && isPaid != true;
+  bool get needsCashCollection =>
+      paymentType == PaymentType.cash && isPaid == false;
 
   // Computed properties for backward compatibility
   double get price => deliveryFee > 0 ? deliveryFee : total;

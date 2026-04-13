@@ -10,9 +10,6 @@ import '../../../core/l10n/app_localizations.dart';
 import '../../../core/l10n/framework_locale_support.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/driver_provider.dart';
-import '../../../core/providers/notification_provider.dart';
-import '../../../core/providers/order_provider.dart';
-import '../../../core/providers/tour_provider.dart';
 import '../../../core/services/cloudinary_service.dart';
 import '../../../core/services/driver_registration_service.dart';
 import '../../../core/theme/app_colors.dart';
@@ -82,6 +79,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   bool get _isBicycle => _selectedVehicle == 'BIKE';
   bool get _isMotorcycle => _selectedVehicle == 'MOTOR';
+  bool get _requiresDrivingLicense => !_isBicycle;
   bool get _requiresFullVehicleDetails =>
       _selectedVehicle == 'CAR' || _selectedVehicle == 'VAN';
   bool get _shouldShowPlateNumberField =>
@@ -205,7 +203,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         return null;
       case _RegistrationStep.documents:
         final requiredDocuments = <MapEntry<String, String?>>[
-          MapEntry(l10n.driversLicense, _drivingLicenseUrl),
+          if (_requiresDrivingLicense)
+            MapEntry(l10n.driversLicense, _drivingLicenseUrl),
           MapEntry(l10n.nationalId, _idDocumentUrl),
           MapEntry(l10n.healthInsuranceDocument, _healthInsuranceDocumentUrl),
           MapEntry(l10n.addressDocument, _addressDocumentUrl),
@@ -353,7 +352,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         acceptsFood: _acceptsFood,
         acceptsShipping: _acceptsShipping,
         acceptsTaxi: _acceptsTaxi,
-        drivingLicense: _drivingLicenseUrl,
+        drivingLicense: _requiresDrivingLicense ? _drivingLicenseUrl : null,
         idDocument: _idDocumentUrl,
         healthInsuranceDocument: _healthInsuranceDocumentUrl,
         addressDocument: _addressDocumentUrl,
@@ -410,13 +409,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             if (_currentStep > 0) {
               _previousStep();
             } else {
-              context.read<DriverProvider>().clearProfile();
-              context.read<OrderProvider>().clearAll();
-              context.read<NotificationProvider>().clearAll();
-              context.read<TourProvider>().resetTour();
-              final auth = context.read<AuthProvider>();
               final router = GoRouter.of(context);
-              await auth.logout();
+              await _performLogout(context);
               router.go(RouteConstants.phone);
             }
           },
@@ -1286,27 +1280,28 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           ),
           const SizedBox(height: 24),
 
-          // Driving license
-          _buildUploadCard(
-            label: l10n.driversLicense,
-            icon: Icons.badge_outlined,
-            bytes: _drivingLicenseBytes,
-            url: _drivingLicenseUrl,
-            isUploading: _drivingLicenseUploading,
-            onTap: () => _pickAndUpload(
+          if (_requiresDrivingLicense) ...[
+            _buildUploadCard(
               label: l10n.driversLicense,
-              folder: 'driver_licenses',
-              setBytes: (b) => _drivingLicenseBytes = b,
-              setUrl: (u) => _drivingLicenseUrl = u,
-              setLoading: (l) => _drivingLicenseUploading = l,
+              icon: Icons.badge_outlined,
+              bytes: _drivingLicenseBytes,
+              url: _drivingLicenseUrl,
+              isUploading: _drivingLicenseUploading,
+              onTap: () => _pickAndUpload(
+                label: l10n.driversLicense,
+                folder: 'driver_licenses',
+                setBytes: (b) => _drivingLicenseBytes = b,
+                setUrl: (u) => _drivingLicenseUrl = u,
+                setLoading: (l) => _drivingLicenseUploading = l,
+              ),
+              textColor: textColor,
+              secondaryColor: secondaryColor,
+              surfaceColor: surfaceColor,
+              l10n: l10n,
+              isRequired: true,
             ),
-            textColor: textColor,
-            secondaryColor: secondaryColor,
-            surfaceColor: surfaceColor,
-            l10n: l10n,
-            isRequired: true,
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
+          ],
 
           // ID document
           _buildUploadCard(
@@ -1885,13 +1880,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           Expanded(
             child: OutlinedButton(
               onPressed: () async {
-                context.read<DriverProvider>().clearProfile();
-                context.read<OrderProvider>().clearAll();
-                context.read<NotificationProvider>().clearAll();
-                context.read<TourProvider>().resetTour();
-                final auth = context.read<AuthProvider>();
                 final router = GoRouter.of(context);
-                await auth.logout();
+                await _performLogout(context);
                 router.go(RouteConstants.phone);
               },
               style: OutlinedButton.styleFrom(
@@ -1971,5 +1961,42 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         ),
       ],
     );
+  }
+
+  Future<void> _performLogout(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    final authProvider = context.read<AuthProvider>();
+    NavigatorState? dialogNavigator;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        dialogNavigator = Navigator.of(ctx);
+        return Center(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n.loading),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    try {
+      await authProvider.logout();
+    } finally {
+      if (dialogNavigator?.mounted ?? false) {
+        dialogNavigator!.pop();
+      }
+    }
   }
 }

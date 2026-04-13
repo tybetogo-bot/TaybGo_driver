@@ -45,9 +45,13 @@ class OrderService {
       // Handle paginated response
       if (response.data is Map && response.data['results'] != null) {
         final results = response.data['results'] as List;
-        debugPrint('[OrderService] Found ${results.length} orders in "results"');
+        debugPrint(
+          '[OrderService] Found ${results.length} orders in "results"',
+        );
         if (results.isEmpty) {
-          debugPrint('[OrderService] Results array is EMPTY - no suggested orders available from API');
+          debugPrint(
+            '[OrderService] Results array is EMPTY - no suggested orders available from API',
+          );
         }
         for (int i = 0; i < results.length; i++) {
           final json = results[i];
@@ -61,7 +65,9 @@ class OrderService {
         final dataList = response.data as List;
         debugPrint('[OrderService] Found ${dataList.length} orders in array');
         if (dataList.isEmpty) {
-          debugPrint('[OrderService] Data array is EMPTY - no suggested orders available from API');
+          debugPrint(
+            '[OrderService] Data array is EMPTY - no suggested orders available from API',
+          );
         }
         for (int i = 0; i < dataList.length; i++) {
           final json = dataList[i];
@@ -71,10 +77,14 @@ class OrderService {
           orders.add(OrderModel.fromJson(json));
         }
       } else {
-        debugPrint('[OrderService] UNEXPECTED RESPONSE FORMAT: ${response.data}');
+        debugPrint(
+          '[OrderService] UNEXPECTED RESPONSE FORMAT: ${response.data}',
+        );
       }
 
-      debugPrint('[OrderService] === SUGGESTED ORDERS RESULT: ${orders.length} orders ===');
+      debugPrint(
+        '[OrderService] === SUGGESTED ORDERS RESULT: ${orders.length} orders ===',
+      );
       return orders;
     } on DioException catch (e) {
       debugPrint('[OrderService] Get Suggested Orders Error: ${e.message}');
@@ -86,7 +96,12 @@ class OrderService {
   /// Log items field specifically for debugging
   void _logItemsField(Map<String, dynamic> json, int orderIndex) {
     debugPrint('[OrderService] --- ORDER $orderIndex ITEMS DEBUG ---');
-    final possibleItemFields = ['items', 'order_items', 'line_items', 'products'];
+    final possibleItemFields = [
+      'items',
+      'order_items',
+      'line_items',
+      'products',
+    ];
     for (final field in possibleItemFields) {
       if (json[field] != null) {
         debugPrint('[OrderService] Found "$field" field:');
@@ -139,10 +154,7 @@ class OrderService {
         );
       }
       if (e.response?.statusCode == 404) {
-        throw ApiException(
-          message: 'Order not found',
-          statusCode: 404,
-        );
+        throw ApiException(message: 'Order not found', statusCode: 404);
       }
       throw ApiException.fromDioException(e);
     }
@@ -170,13 +182,49 @@ class OrderService {
     }
   }
 
+  /// Drop an accepted order and return it to dispatch.
+  Future<void> dropOrder(String orderId) async {
+    try {
+      debugPrint('[OrderService] === DROP ORDER REQUEST ===');
+      debugPrint('[OrderService] Endpoint: ${ApiConstants.dropOrder}');
+      debugPrint('[OrderService] Data: {order_id: $orderId}');
+
+      final response = await _apiClient.post(
+        ApiConstants.dropOrder,
+        data: {'order_id': int.tryParse(orderId) ?? orderId},
+      );
+
+      debugPrint('[OrderService] === DROP ORDER RESPONSE ===');
+      debugPrint('[OrderService] Status: ${response.statusCode}');
+      debugPrint('[OrderService] Data: ${response.data}');
+    } on DioException catch (e) {
+      debugPrint('[OrderService] Drop Order Error: ${e.message}');
+      debugPrint('[OrderService] Error Response: ${e.response?.data}');
+      if (e.response?.statusCode == 400) {
+        final detail = e.response?.data is Map
+            ? e.response?.data['detail']
+            : null;
+        throw ApiException(
+          message: detail?.toString() ?? 'Unable to drop order',
+          statusCode: 400,
+        );
+      }
+      throw ApiException.fromDioException(e);
+    }
+  }
+
   /// Update order status (ACCEPTED -> ON_THE_WAY -> DELIVERED -> COMPLETED)
   /// Returns the new status if successful, throws on error
-  Future<OrderStatus> updateOrderStatus(String orderId, OrderStatus newStatus) async {
+  Future<OrderStatus> updateOrderStatus(
+    String orderId,
+    OrderStatus newStatus,
+  ) async {
     try {
       debugPrint('[OrderService] === UPDATE ORDER STATUS REQUEST ===');
       debugPrint('[OrderService] Endpoint: ${ApiConstants.updateOrderStatus}');
-      debugPrint('[OrderService] Data: {order_id: $orderId, status: ${newStatus.apiValue}}');
+      debugPrint(
+        '[OrderService] Data: {order_id: $orderId, status: ${newStatus.apiValue}}',
+      );
 
       final response = await _apiClient.post(
         ApiConstants.updateOrderStatus,
@@ -201,7 +249,9 @@ class OrderService {
       debugPrint('[OrderService] Update Order Status Error: ${e.message}');
       debugPrint('[OrderService] Error Response: ${e.response?.data}');
       if (e.response?.statusCode == 400) {
-        final detail = e.response?.data is Map ? e.response?.data['detail'] : null;
+        final detail = e.response?.data is Map
+            ? e.response?.data['detail']
+            : null;
         throw ApiException(
           message: detail?.toString() ?? 'Invalid status transition',
           statusCode: 400,
@@ -257,7 +307,9 @@ class OrderService {
 
       if (response.data is Map && response.data['results'] != null) {
         final results = response.data['results'] as List;
-        debugPrint('[OrderService] Found ${results.length} orders in history "results"');
+        debugPrint(
+          '[OrderService] Found ${results.length} orders in history "results"',
+        );
         for (int i = 0; i < results.length; i++) {
           final json = results[i];
           debugPrint('[OrderService] *** HISTORY ORDER $i RAW DATA ***');
@@ -266,7 +318,9 @@ class OrderService {
         }
       } else if (response.data is List) {
         final dataList = response.data as List;
-        debugPrint('[OrderService] Found ${dataList.length} orders in history array');
+        debugPrint(
+          '[OrderService] Found ${dataList.length} orders in history array',
+        );
         for (int i = 0; i < dataList.length; i++) {
           final json = dataList[i];
           debugPrint('[OrderService] *** HISTORY ORDER $i RAW DATA ***');
@@ -299,7 +353,9 @@ class OrderService {
 
       for (final order in orders) {
         if (activeStatuses.contains(order.status)) {
-          debugPrint('[OrderService] Found active order: ${order.id} with status ${order.status}');
+          debugPrint(
+            '[OrderService] Found active order: ${order.id} with status ${order.status}',
+          );
           return order;
         }
       }

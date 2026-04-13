@@ -7,11 +7,11 @@ import '../../features/orders/models/order_model.dart';
 
 /// Reason an accept/reject action failed, so the UI can show the right message.
 enum OrderActionError {
-  alreadyTaken,   // 409 — another driver got it
-  expired,        // 403 — suggestion timed out
-  notFound,       // 404 — order no longer exists
-  network,        // connection / timeout
-  unknown,        // anything else
+  alreadyTaken, // 409 — another driver got it
+  expired, // 403 — suggestion timed out
+  notFound, // 404 — order no longer exists
+  network, // connection / timeout
+  unknown, // anything else
 }
 
 class OrderProvider extends ChangeNotifier {
@@ -21,8 +21,8 @@ class OrderProvider extends ChangeNotifier {
   bool Function()? _isTourActive;
 
   OrderProvider({OrderService? orderService, ApiClient? apiClient})
-      : _orderService = orderService ??
-            OrderService(apiClient: apiClient ?? ApiClient());
+    : _orderService =
+          orderService ?? OrderService(apiClient: apiClient ?? ApiClient());
 
   /// Set tour mode checker (called from tour integration)
   void setTourModeChecker(bool Function() checker) {
@@ -40,31 +40,37 @@ class OrderProvider extends ChangeNotifier {
   // Order history
   List<OrderModel> _orderHistory = [];
   List<OrderModel> get orderHistory => List.unmodifiable(
-      _orderHistory.where((o) => !TourMockData.isMockOrder(o.id)));
+    _orderHistory.where((o) => !TourMockData.isMockOrder(o.id)),
+  );
 
   // Recent completed orders for display (last 3)
   List<OrderModel> get recentOrders => completedOrders.take(3).toList();
 
   // Active orders (ACCEPTED, ON_THE_WAY, DELIVERED status)
   List<OrderModel> get activeOrders => _orderHistory
-      .where((order) =>
-          !TourMockData.isMockOrder(order.id) &&
-          (order.status == OrderStatus.accepted ||
-          order.status == OrderStatus.onTheWay ||
-          order.status == OrderStatus.delivered))
+      .where(
+        (order) =>
+            !TourMockData.isMockOrder(order.id) &&
+            (order.status == OrderStatus.accepted ||
+                order.status == OrderStatus.onTheWay ||
+                order.status == OrderStatus.delivered),
+      )
       .toList();
 
   // Completed orders (COMPLETED, CANCELLED status) for history
   List<OrderModel> get completedOrders => _orderHistory
-      .where((order) =>
-          !TourMockData.isMockOrder(order.id) &&
-          (order.status == OrderStatus.completed ||
-          order.status == OrderStatus.cancelled))
+      .where(
+        (order) =>
+            !TourMockData.isMockOrder(order.id) &&
+            (order.status == OrderStatus.completed ||
+                order.status == OrderStatus.cancelled),
+      )
       .toList();
 
   // Polling
   Timer? _pollingTimer;
-  static const _pollingInterval = Duration(seconds: 15);
+  static const _pollingInterval = Duration(seconds: 5);
+  bool _isFetchingSuggested = false;
 
   // Loading states — _isActionLoading is for accept/reject/status updates only
   bool _isActionLoading = false;
@@ -88,10 +94,16 @@ class OrderProvider extends ChangeNotifier {
   /// Start polling for orders when driver goes online
   void startPolling() {
     _stopPolling();
-    _pollingTimer = Timer.periodic(_pollingInterval, (_) => _fetchSuggestedOrders());
+    _pollingTimer = Timer.periodic(
+      _pollingInterval,
+      (_) => _fetchSuggestedOrders(),
+    );
     // Fetch immediately
     _fetchSuggestedOrders();
   }
+
+  /// Public entry point so screens can proactively reconcile stale suggestions.
+  Future<void> refreshSuggestedOrders() => _fetchSuggestedOrders();
 
   /// Stop polling when driver goes offline
   void stopPolling() {
@@ -108,22 +120,30 @@ class OrderProvider extends ChangeNotifier {
   /// Fetch suggested orders from API.
   /// Always replaces pending order data with fresh API data.
   Future<void> _fetchSuggestedOrders() async {
+    if (_isFetchingSuggested) return;
+    _isFetchingSuggested = true;
+
     debugPrint('[OrderProvider] === FETCH SUGGESTED ORDERS ===');
     debugPrint('[OrderProvider] pendingOrder: ${_pendingOrder?.id}');
     debugPrint('[OrderProvider] activeOrder: ${_activeOrder?.id}');
 
     try {
-      debugPrint('[OrderProvider] Calling orderService.getSuggestedOrders()...');
+      debugPrint(
+        '[OrderProvider] Calling orderService.getSuggestedOrders()...',
+      );
       final orders = await _orderService.getSuggestedOrders();
       debugPrint('[OrderProvider] Received ${orders.length} suggested orders');
 
       if (orders.isNotEmpty) {
         final freshOrder = orders.first;
-        final isNewOrder = _pendingOrder == null || _pendingOrder!.id != freshOrder.id;
+        final isNewOrder =
+            _pendingOrder == null || _pendingOrder!.id != freshOrder.id;
 
         // Always update with fresh data
         _pendingOrder = freshOrder;
-        debugPrint('[OrderProvider] Set pendingOrder: ${_pendingOrder?.id} (isNew: $isNewOrder)');
+        debugPrint(
+          '[OrderProvider] Set pendingOrder: ${_pendingOrder?.id} (isNew: $isNewOrder)',
+        );
 
         // Only trigger new-order animation/haptic for a genuinely new order
         if (isNewOrder) {
@@ -135,7 +155,9 @@ class OrderProvider extends ChangeNotifier {
         // No suggested orders — clear stale pending order if the server
         // no longer has it (e.g. it was assigned to another driver)
         if (_pendingOrder != null) {
-          debugPrint('[OrderProvider] Clearing stale pending order ${_pendingOrder!.id}');
+          debugPrint(
+            '[OrderProvider] Clearing stale pending order ${_pendingOrder!.id}',
+          );
           _pendingOrder = null;
           notifyListeners();
         }
@@ -144,21 +166,36 @@ class OrderProvider extends ChangeNotifier {
     } catch (e, stackTrace) {
       debugPrint('[OrderProvider] Error fetching suggested orders: $e');
       debugPrint('[OrderProvider] Stack trace: $stackTrace');
+    } finally {
+      _isFetchingSuggested = false;
     }
   }
 
   /// Accept pending order.
   /// Returns `null` on success, or an [OrderActionError] on failure.
-  Future<OrderActionError?> acceptOrder() async {
-    if (_pendingOrder == null) return OrderActionError.notFound;
+  Future<OrderActionError?> acceptOrder({
+    String? orderId,
+    OrderModel? orderSnapshot,
+  }) async {
+    final targetOrderId = orderId ?? _pendingOrder?.id;
+    if (targetOrderId == null) return OrderActionError.notFound;
+
+    final matchingPendingOrder = _pendingOrder?.id == targetOrderId
+        ? _pendingOrder
+        : null;
+    final orderForLocalUpdate = matchingPendingOrder ?? orderSnapshot;
 
     // Tour mode: Simulate acceptance without API call
-    if (_isTourActive?.call() == true && TourMockData.isMockOrder(_pendingOrder!.id)) {
-      _activeOrder = _pendingOrder!.copyWith(
+    if (_isTourActive?.call() == true &&
+        TourMockData.isMockOrder(targetOrderId) &&
+        orderForLocalUpdate != null) {
+      _activeOrder = orderForLocalUpdate.copyWith(
         status: OrderStatus.accepted,
         acceptedAt: DateTime.now(),
       );
-      _pendingOrder = null;
+      if (_pendingOrder?.id == targetOrderId) {
+        _pendingOrder = null;
+      }
       notifyListeners();
       return null;
     }
@@ -168,41 +205,71 @@ class OrderProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _orderService.acceptOrder(_pendingOrder!.id);
+      await _orderService.acceptOrder(targetOrderId);
 
-      _activeOrder = _pendingOrder!.copyWith(
-        status: OrderStatus.accepted,
-        acceptedAt: DateTime.now(),
-      );
-      _pendingOrder = null;
+      if (orderForLocalUpdate != null) {
+        _activeOrder = orderForLocalUpdate.copyWith(
+          status: OrderStatus.accepted,
+          acceptedAt: DateTime.now(),
+        );
+      }
+
+      if (_pendingOrder?.id == targetOrderId) {
+        _pendingOrder = null;
+      }
       _isActionLoading = false;
       notifyListeners();
+
+      if (_activeOrder == null) {
+        unawaited(checkActiveOrder());
+      }
+
       return null;
     } catch (e) {
       _isActionLoading = false;
 
       final errorMsg = e.toString().toLowerCase();
+      final isCurrentPendingOrder = _pendingOrder?.id == targetOrderId;
       OrderActionError reason;
 
-      if (e is ApiException && e.statusCode == 409 || errorMsg.contains('already taken')) {
+      if (e is ApiException && e.statusCode == 409 ||
+          errorMsg.contains('already taken')) {
         reason = OrderActionError.alreadyTaken;
-        _pendingOrder = null;
-      } else if (e is ApiException && e.statusCode == 403 || errorMsg.contains('suggestion expired') || errorMsg.contains('expired')) {
+        if (isCurrentPendingOrder) {
+          _pendingOrder = null;
+        }
+      } else if (e is ApiException && e.statusCode == 403 ||
+          errorMsg.contains('suggestion expired') ||
+          errorMsg.contains('expired')) {
         reason = OrderActionError.expired;
-        _pendingOrder = null;
-      } else if (e is ApiException && e.statusCode == 404 || errorMsg.contains('not found')) {
+        if (isCurrentPendingOrder) {
+          _pendingOrder = null;
+        }
+      } else if (e is ApiException && e.statusCode == 404 ||
+          errorMsg.contains('not found')) {
         reason = OrderActionError.notFound;
-        _pendingOrder = null;
-      } else if (errorMsg.contains('connection') || errorMsg.contains('timeout') || errorMsg.contains('network')) {
+        if (isCurrentPendingOrder) {
+          _pendingOrder = null;
+        }
+      } else if (errorMsg.contains('connection') ||
+          errorMsg.contains('timeout') ||
+          errorMsg.contains('network')) {
         reason = OrderActionError.network;
         // Keep pending order — the driver can retry
       } else {
         reason = OrderActionError.unknown;
-        _pendingOrder = null;
+        if (isCurrentPendingOrder) {
+          _pendingOrder = null;
+        }
       }
 
       _error = e.toString();
       notifyListeners();
+
+      if (reason != OrderActionError.network) {
+        unawaited(refreshSuggestedOrders());
+      }
+
       return reason;
     }
   }
@@ -220,16 +287,81 @@ class OrderProvider extends ChangeNotifier {
 
     try {
       await _orderService.rejectOrder(orderId);
+      unawaited(refreshSuggestedOrders());
       return null;
     } catch (e) {
       debugPrint('[OrderProvider] Error rejecting order: $e');
       // Order is already cleared from UI — just inform the user if it was a real problem
       final errorMsg = e.toString().toLowerCase();
-      if (errorMsg.contains('connection') || errorMsg.contains('timeout') || errorMsg.contains('network')) {
+      if (errorMsg.contains('connection') ||
+          errorMsg.contains('timeout') ||
+          errorMsg.contains('network')) {
         return OrderActionError.network;
       }
+      unawaited(refreshSuggestedOrders());
       // For reject, most errors are harmless (order already gone, etc.)
       return null;
+    }
+  }
+
+  /// Drop the current accepted order and return it to dispatch.
+  Future<bool> dropActiveOrder({
+    String? orderId,
+    OrderModel? orderSnapshot,
+  }) async {
+    final targetOrderId = orderId ?? _activeOrder?.id;
+    if (targetOrderId == null) return false;
+
+    final targetActiveOrder = _activeOrder?.id == targetOrderId
+        ? _activeOrder
+        : orderSnapshot;
+
+    if (_isTourActive?.call() == true &&
+        TourMockData.isMockOrder(targetOrderId)) {
+      if (_activeOrder?.id == targetOrderId) {
+        _activeOrder = null;
+      }
+      notifyListeners();
+      return true;
+    }
+
+    _isActionLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      await _orderService.dropOrder(targetOrderId);
+
+      if (_activeOrder?.id == targetOrderId) {
+        _activeOrder = null;
+      }
+
+      _orderHistory.removeWhere(
+        (order) =>
+            order.id == targetOrderId &&
+            (order.status == OrderStatus.accepted ||
+                order.status == OrderStatus.onTheWay ||
+                order.status == OrderStatus.delivered),
+      );
+
+      _isActionLoading = false;
+      notifyListeners();
+
+      unawaited(fetchOrderHistory());
+      unawaited(refreshSuggestedOrders());
+      return true;
+    } catch (e) {
+      _error = e.toString();
+      _isActionLoading = false;
+
+      // If the server already moved the order out of the active state,
+      // reconcile local state so the UI does not stay stale.
+      if (_activeOrder?.id == targetOrderId && targetActiveOrder != null) {
+        unawaited(fetchOrderHistory());
+      }
+
+      notifyListeners();
+      return false;
     }
   }
 
@@ -239,7 +371,8 @@ class OrderProvider extends ChangeNotifier {
     if (_activeOrder!.status == OrderStatus.onTheWay) return true;
 
     // Tour mode: Simulate status update without API call
-    if (_isTourActive?.call() == true && TourMockData.isMockOrder(_activeOrder!.id)) {
+    if (_isTourActive?.call() == true &&
+        TourMockData.isMockOrder(_activeOrder!.id)) {
       _activeOrder = _activeOrder!.copyWith(status: OrderStatus.onTheWay);
       notifyListeners();
       return true;
@@ -271,7 +404,8 @@ class OrderProvider extends ChangeNotifier {
     if (_activeOrder!.status == OrderStatus.delivered) return true;
 
     // Tour mode: Simulate status update without API call
-    if (_isTourActive?.call() == true && TourMockData.isMockOrder(_activeOrder!.id)) {
+    if (_isTourActive?.call() == true &&
+        TourMockData.isMockOrder(_activeOrder!.id)) {
       _activeOrder = _activeOrder!.copyWith(status: OrderStatus.delivered);
       notifyListeners();
       return true;
@@ -293,7 +427,9 @@ class OrderProvider extends ChangeNotifier {
       // If backend says order is already past DELIVERED, sync local state
       final errorMsg = e.toString().toLowerCase();
       if (errorMsg.contains('cannot update status from delivered') ||
-          errorMsg.contains('invalid status transition from delivered to delivered')) {
+          errorMsg.contains(
+            'invalid status transition from delivered to delivered',
+          )) {
         _activeOrder = _activeOrder!.copyWith(status: OrderStatus.delivered);
         _isActionLoading = false;
         notifyListeners();
@@ -313,7 +449,8 @@ class OrderProvider extends ChangeNotifier {
 
     // Tour mode: Simulate status update without API call
     // Do NOT add mock orders to history — they are cleaned up by clearMockOrder()
-    if (_isTourActive?.call() == true && TourMockData.isMockOrder(_activeOrder!.id)) {
+    if (_isTourActive?.call() == true &&
+        TourMockData.isMockOrder(_activeOrder!.id)) {
       _activeOrder = _activeOrder!.copyWith(
         status: OrderStatus.completed,
         completedAt: DateTime.now(),
@@ -412,7 +549,9 @@ class OrderProvider extends ChangeNotifier {
       } else if (_activeOrder != null) {
         // Server says no active order — clear local stale one
         // unless we just accepted it and the server hasn't caught up
-        final serverHasOurOrder = freshOrders.any((o) => o.id == _activeOrder!.id);
+        final serverHasOurOrder = freshOrders.any(
+          (o) => o.id == _activeOrder!.id,
+        );
         if (serverHasOurOrder) {
           _activeOrder = null;
         }

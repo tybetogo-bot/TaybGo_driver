@@ -7,12 +7,14 @@ import 'package:http/http.dart' as http;
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/order_provider.dart';
 import '../../../core/providers/tour_provider.dart';
 import '../../../core/services/location_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../orders/models/order_model.dart';
+import '../../orders/widgets/order_action_confirmation_sheet.dart';
 import '../../tour/tour_keys.dart';
 
 enum RouteTarget { pickup, dropoff }
@@ -43,6 +45,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   bool _locationError = false;
   String? _locationErrorMessage;
   bool _isTourMode = false;
+  bool _hasFreshOrderDetails = false;
 
   @override
   void initState() {
@@ -83,14 +86,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
       // Set initial route target based on order status:
       // - Before "on the way" (pending, accepted, etc.) → pickup
       // - "On the way" or later (delivered, completed) → dropoff
-      final status = _order!.status;
-      if (status == OrderStatus.onTheWay ||
-          status == OrderStatus.delivered ||
-          status == OrderStatus.completed) {
-        _routeTarget = RouteTarget.dropoff;
-      } else {
-        _routeTarget = RouteTarget.pickup;
-      }
+      _syncRouteTarget(_order!.status);
+      _hasFreshOrderDetails = false;
 
       if (_isTourMode) {
         // During tour, skip real GPS and route fetching — use mock static data
@@ -109,9 +106,35 @@ class _NavigationScreenState extends State<NavigationScreen> {
       } else {
         // Get real GPS location
         _initLocation();
+        _refreshOrderDetails(orderProvider);
       }
     } else {
       setState(() => _isLoading = false);
+    }
+  }
+
+  void _syncRouteTarget(OrderStatus status) {
+    if (status == OrderStatus.onTheWay ||
+        status == OrderStatus.delivered ||
+        status == OrderStatus.completed) {
+      _routeTarget = RouteTarget.dropoff;
+    } else {
+      _routeTarget = RouteTarget.pickup;
+    }
+  }
+
+  Future<void> _refreshOrderDetails(OrderProvider orderProvider) async {
+    final freshOrder = await orderProvider.fetchOrderDetails(widget.orderId);
+    if (!mounted || freshOrder == null) return;
+
+    setState(() {
+      _order = freshOrder;
+      _hasFreshOrderDetails = true;
+      _syncRouteTarget(freshOrder.status);
+    });
+
+    if (_currentLocation != null && !_isTourMode) {
+      _fetchRoute();
     }
   }
 
@@ -193,7 +216,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
   }
 
   LatLng? get _targetLocation {
-    return _routeTarget == RouteTarget.pickup ? _pickupLocation : _dropoffLocation;
+    return _routeTarget == RouteTarget.pickup
+        ? _pickupLocation
+        : _dropoffLocation;
   }
 
   Future<void> _fetchRoute() async {
@@ -269,10 +294,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     try {
       final bounds = LatLngBounds.fromPoints(_routePoints);
       _mapController.fitCamera(
-        CameraFit.bounds(
-          bounds: bounds,
-          padding: const EdgeInsets.all(60),
-        ),
+        CameraFit.bounds(bounds: bounds, padding: const EdgeInsets.all(60)),
       );
     } catch (_) {}
   }
@@ -353,38 +375,75 @@ class _NavigationScreenState extends State<NavigationScreen> {
     final order = _order;
     if (order == null) return;
 
-    final message = order.needsCashCollection
+    final message = _hasFreshOrderDetails && order.needsCashCollection
         ? '${l10n.collectCashReminder}\n\n${l10n.completeOrderConfirmation}'
         : l10n.completeOrderConfirmation;
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showOrderActionConfirmationSheet(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: isDark ? AppColors.darkSurface : AppColors.lightSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(l10n.completeOrder),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text(l10n.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(l10n.confirm),
-          ),
-        ],
-      ),
+      title: l10n.completeOrder,
+      message: message,
+      confirmLabel: l10n.completeOrder,
+      cancelLabel: l10n.cancel,
+      icon: Icons.check_circle_outline,
+      accentColor: AppColors.success,
+      badgeLabel: '${l10n.orderId} #${order.id}',
     );
 
-    if (confirmed == true) {
+    if (confirmed) {
       _updateOrderStatus(OrderStatus.completed);
     }
+  }
+
+  Future<void> _confirmDropOrder(AppLocalizations l10n) async {
+    final order = _order;
+    if (order == null || _isUpdating) return;
+
+    final confirmed = await showOrderActionConfirmationSheet(
+      context: context,
+      title: l10n.dropOrder,
+      message: '${l10n.dropOrderDescription}\n\n${l10n.dropOrderConfirmation}',
+      confirmLabel: l10n.dropOrder,
+      cancelLabel: l10n.keepOrder,
+      icon: Icons.assignment_return_outlined,
+      accentColor: AppColors.error,
+      badgeLabel: '${l10n.orderId} #${order.id}',
+      footnote: l10n.dropOrderWarning,
+    );
+
+    if (!confirmed) return;
+    if (!mounted) return;
+
+    setState(() => _isUpdating = true);
+
+    final orderProvider = context.read<OrderProvider>();
+    final success = await orderProvider.dropActiveOrder(
+      orderId: widget.orderId,
+      orderSnapshot: _order,
+    );
+
+    if (!mounted) return;
+
+    setState(() => _isUpdating = false);
+
+    final messenger = ScaffoldMessenger.of(context);
+    if (success) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.orderDroppedSuccessfully),
+          backgroundColor: AppColors.success,
+        ),
+      );
+      context.go(RouteConstants.orders);
+      return;
+    }
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(orderProvider.error ?? l10n.failedToDropOrder),
+        backgroundColor: AppColors.error,
+      ),
+    );
   }
 
   Future<void> _updateOrderStatus(OrderStatus newStatus) async {
@@ -413,7 +472,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
       setState(() {
         _isUpdating = false;
         if (success) {
-          _order = orderProvider.activeOrder ?? _order!.copyWith(status: newStatus);
+          _order =
+              orderProvider.activeOrder ?? _order!.copyWith(status: newStatus);
           // Auto switch to dropoff after starting delivery
           if (newStatus == OrderStatus.onTheWay) {
             _switchRoute(RouteTarget.dropoff);
@@ -437,8 +497,12 @@ class _NavigationScreenState extends State<NavigationScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final secondaryColor = isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final secondaryColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
     final l10n = AppLocalizations.of(context)!;
 
     if (_order == null) {
@@ -492,11 +556,23 @@ class _NavigationScreenState extends State<NavigationScreen> {
               MarkerLayer(
                 markers: [
                   if (_currentLocation != null)
-                    _buildMarker(_currentLocation!, Icons.navigation, AppColors.info),
+                    _buildMarker(
+                      _currentLocation!,
+                      Icons.navigation,
+                      AppColors.info,
+                    ),
                   if (_pickupLocation != null)
-                    _buildMarker(_pickupLocation!, Icons.store, AppColors.primary),
+                    _buildMarker(
+                      _pickupLocation!,
+                      Icons.store,
+                      AppColors.primary,
+                    ),
                   if (_dropoffLocation != null)
-                    _buildMarker(_dropoffLocation!, Icons.location_on, AppColors.error),
+                    _buildMarker(
+                      _dropoffLocation!,
+                      Icons.location_on,
+                      AppColors.error,
+                    ),
                 ],
               ),
             ],
@@ -542,10 +618,16 @@ class _NavigationScreenState extends State<NavigationScreen> {
           // Instruction card (below top buttons)
           Positioned(
             key: _isTourMode ? _tourKeys.navigationInstructionCardKey : null,
-            top: MediaQuery.of(context).padding.top + (_locationError ? 115 : 65),
+            top:
+                MediaQuery.of(context).padding.top +
+                (_locationError ? 115 : 65),
             left: 16,
             right: 16,
-            child: _buildInstructionCard(surfaceColor, textColor, secondaryColor),
+            child: _buildInstructionCard(
+              surfaceColor,
+              textColor,
+              secondaryColor,
+            ),
           ),
 
           // Bottom panel
@@ -601,7 +683,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
             const SizedBox(width: 8),
             Expanded(
               child: Text(
-                _locationErrorMessage ?? AppLocalizations.of(context)!.gpsUnavailableTapRetry,
+                _locationErrorMessage ??
+                    AppLocalizations.of(context)!.gpsUnavailableTapRetry,
                 style: const TextStyle(
                   fontSize: 12,
                   color: AppColors.warning,
@@ -678,7 +761,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       color: AppColors.primary,
                     ),
                   )
-                : Icon(_getInstructionIcon(), color: AppColors.primary, size: 22),
+                : Icon(
+                    _getInstructionIcon(),
+                    color: AppColors.primary,
+                    size: 22,
+                  ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -687,7 +774,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  _currentInstruction.isEmpty ? AppLocalizations.of(context)!.calculatingRoute : _currentInstruction,
+                  _currentInstruction.isEmpty
+                      ? AppLocalizations.of(context)!.calculatingRoute
+                      : _currentInstruction,
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,
@@ -870,10 +959,17 @@ class _NavigationScreenState extends State<NavigationScreen> {
   }
 
   Widget _buildPaymentBanner(OrderModel order, AppLocalizations l10n) {
-    if (!order.hasPaymentInfo) return const SizedBox.shrink();
+    if (!_hasFreshOrderDetails || !order.hasPaymentInfo) {
+      return const SizedBox.shrink();
+    }
 
     final needsCash = order.needsCashCollection;
-    final color = needsCash ? AppColors.error : AppColors.success;
+    final isPaid = order.isPaid == true;
+    if (!isPaid && !needsCash) {
+      return const SizedBox.shrink();
+    }
+
+    final color = isPaid ? AppColors.success : AppColors.error;
 
     return Container(
       width: double.infinity,
@@ -881,21 +977,18 @@ class _NavigationScreenState extends State<NavigationScreen> {
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(
-          color: color.withValues(alpha: 0.3),
-          width: 1,
-        ),
+        border: Border.all(color: color.withValues(alpha: 0.3), width: 1),
       ),
       child: Row(
         children: [
           Icon(
-            needsCash ? Icons.payments : Icons.check_circle,
+            isPaid ? Icons.check_circle : Icons.payments,
             size: 18,
             color: color,
           ),
           const SizedBox(width: 8),
           Text(
-            needsCash ? l10n.collectCash : l10n.orderPaid,
+            isPaid ? l10n.orderPaid : l10n.collectCash,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
@@ -908,31 +1001,58 @@ class _NavigationScreenState extends State<NavigationScreen> {
   }
 
   Widget _buildActionButtons(AppLocalizations l10n, bool isPickupPhase) {
-    return Row(
+    return Column(
       key: _isTourMode ? _tourKeys.navigationActionButtonKey : null,
       children: [
-        // Google Maps button
-        SizedBox(
-          height: 46,
-          width: 46,
-          child: OutlinedButton(
-            onPressed: _openInExternalMaps,
-            style: OutlinedButton.styleFrom(
-              foregroundColor: AppColors.info,
-              side: const BorderSide(color: AppColors.info),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+        Row(
+          children: [
+            // Google Maps button
+            SizedBox(
+              height: 46,
+              width: 46,
+              child: OutlinedButton(
+                onPressed: _openInExternalMaps,
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.info,
+                  side: const BorderSide(color: AppColors.info),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: EdgeInsets.zero,
+                ),
+                child: const Icon(Icons.map_outlined, size: 20),
               ),
-              padding: EdgeInsets.zero,
             ),
-            child: const Icon(Icons.map_outlined, size: 20),
+            const SizedBox(width: 10),
+            // Action button
+            Expanded(child: _buildActionButton(l10n, isPickupPhase)),
+          ],
+        ),
+        if (isPickupPhase) ...[
+          const SizedBox(height: 10),
+          SizedBox(
+            width: double.infinity,
+            height: 46,
+            child: OutlinedButton.icon(
+              onPressed: _isUpdating ? null : () => _confirmDropOrder(l10n),
+              icon: const Icon(Icons.assignment_return_outlined, size: 18),
+              label: Text(
+                l10n.dropOrder,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.error,
+                backgroundColor: AppColors.error.withValues(alpha: 0.04),
+                side: BorderSide(
+                  color: AppColors.error.withValues(alpha: 0.35),
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            ),
           ),
-        ),
-        const SizedBox(width: 10),
-        // Action button
-        Expanded(
-          child: _buildActionButton(l10n, isPickupPhase),
-        ),
+        ],
       ],
     );
   }
@@ -989,9 +1109,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
     required VoidCallback onTap,
   }) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final secondaryColor = isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
+    final secondaryColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
 
     return GestureDetector(
       onTap: onTap,
@@ -1001,7 +1125,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
         decoration: BoxDecoration(
           color: isSelected ? surfaceColor : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
-          border: isSelected ? Border.all(color: color.withValues(alpha: 0.3)) : null,
+          border: isSelected
+              ? Border.all(color: color.withValues(alpha: 0.3))
+              : null,
           boxShadow: isSelected
               ? [
                   BoxShadow(
@@ -1014,11 +1140,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              size: 18,
-              color: isSelected ? color : secondaryColor,
-            ),
+            Icon(icon, size: 18, color: isSelected ? color : secondaryColor),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
@@ -1103,7 +1225,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 2),
-                if (!isPickup && order.customerPhone != null && order.customerPhone!.isNotEmpty) ...[
+                if (!isPickup &&
+                    order.customerPhone != null &&
+                    order.customerPhone!.isNotEmpty) ...[
                   Text(
                     order.customerPhone!,
                     style: TextStyle(
@@ -1197,7 +1321,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
           backgroundColor: color,
           foregroundColor: Colors.white,
           elevation: 0,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         ),
       ),
     );

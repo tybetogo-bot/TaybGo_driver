@@ -7,16 +7,18 @@ class ApiConstants {
   static const String otpRequest = '/auth/otp/request/';
   static const String otpVerify = '/auth/otp/verify/';
   static const String tokenRefresh = '/auth/token/refresh/';
-  static const String tokenBlacklist = '/auth/token/blacklist/';
+  static const String logout = '/auth/logout/';
 
   // Driver endpoints
   static const String driverProfile = '/driver/profile/';
-  static const String driverCreate = '/driver/profile/'; // POST to same endpoint as GET
+  static const String driverCreate =
+      '/driver/profile/'; // POST to same endpoint as GET
   static const String driverToggleOnline = '/drivers/toggle-online/';
   static const String driverLocation = '/drivers/location/';
   static const String suggestedOrders = '/drivers/suggested-orders/';
   static const String acceptOrder = '/drivers/accept-order/';
   static const String rejectOrder = '/drivers/reject-order/';
+  static const String dropOrder = '/drivers/drop-order/';
   static const String updateOrderStatus = '/drivers/update-order-status/';
 
   // User endpoints
@@ -25,7 +27,8 @@ class ApiConstants {
   // Support
   static const String supportTickets = '/support/tickets/';
   static String supportTicketDetail(int id) => '/support/tickets/$id/';
-  static String supportTicketMessages(int id) => '/support/tickets/$id/messages/';
+  static String supportTicketMessages(int id) =>
+      '/support/tickets/$id/messages/';
 
   // Notifications
   static const String notifications = '/notifications';

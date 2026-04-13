@@ -27,6 +27,7 @@ class AuthProvider extends ChangeNotifier {
   /// Called when logout happens (including forced logout from token expiry)
   /// so other providers can clear their in-memory data.
   VoidCallback? onLogoutCallback;
+  Future<void> Function()? onBeforeLogoutCallback;
 
   AuthProvider({AuthService? authService})
       : _authService = authService ?? AuthService() {
@@ -147,6 +148,12 @@ class AuthProvider extends ChangeNotifier {
   Future<void> logout() async {
     _isLoading = true;
     notifyListeners();
+
+    try {
+      await onBeforeLogoutCallback?.call();
+    } catch (e) {
+      debugPrint('[AuthProvider] Error during pre-logout hook: $e');
+    }
 
     try {
       await _authService.logout();

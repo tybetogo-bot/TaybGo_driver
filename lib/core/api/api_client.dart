@@ -142,8 +142,8 @@ class _AuthInterceptor extends QueuedInterceptor {
     // Skip refresh for auth endpoints to avoid infinite loops
     final isAuthRequest = err.requestOptions.path == ApiConstants.tokenRefresh ||
         err.requestOptions.path.endsWith(ApiConstants.tokenRefresh) ||
-        err.requestOptions.path == ApiConstants.tokenBlacklist ||
-        err.requestOptions.path.endsWith(ApiConstants.tokenBlacklist);
+        err.requestOptions.path == ApiConstants.logout ||
+        err.requestOptions.path.endsWith(ApiConstants.logout);
 
     if (_isTokenError(err) && !_isRefreshing && !isAuthRequest) {
       debugPrint('[AuthInterceptor] Token error detected, attempting refresh...');

@@ -13,6 +13,7 @@ import '../../../core/services/location_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../tour/tour_keys.dart';
 import '../models/order_model.dart';
+import '../widgets/order_action_confirmation_sheet.dart';
 
 class OrderDetailScreen extends StatefulWidget {
   final String orderId;
@@ -28,6 +29,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   bool _isLoading = true;
   bool _isUpdating = false;
   String? _error;
+  bool _hasFreshOrderDetails = false;
 
   // Tour keys
   final _tourKeys = TourKeys.instance;
@@ -166,11 +168,48 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       setState(() {
         _order = cached;
         _isLoading = false;
+        _hasFreshOrderDetails = false;
       });
     }
 
     // Always try to refresh from the order details API for complete data
     _fetchOrderDetailsFromAPI(orderProvider, hasCachedData: cached != null);
+
+    // Suggested orders can disappear if another driver accepts them.
+    if (cached != null && _isSuggestedOrderStatus(cached.status)) {
+      _refreshSuggestedOrderAvailability(orderProvider);
+    }
+  }
+
+  bool _isSuggestedOrderStatus(OrderStatus status) {
+    return status == OrderStatus.pending ||
+        status == OrderStatus.searchingForDriver ||
+        status == OrderStatus.driverNotificationSent;
+  }
+
+  Future<void> _refreshSuggestedOrderAvailability(
+    OrderProvider orderProvider,
+  ) async {
+    await orderProvider.refreshSuggestedOrders();
+
+    if (!mounted ||
+        _order == null ||
+        !_isSuggestedOrderStatus(_order!.status)) {
+      return;
+    }
+
+    final stillPending = orderProvider.pendingOrder?.id == widget.orderId;
+    final becameActive = orderProvider.activeOrder?.id == widget.orderId;
+    final movedToHistory = orderProvider.orderHistory.any(
+      (order) => order.id == widget.orderId,
+    );
+
+    if (!stillPending && !becameActive && !movedToHistory) {
+      setState(() {
+        _order = null;
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _fetchOrderDetailsFromAPI(
@@ -183,6 +222,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         setState(() {
           _order = order;
           _isLoading = false;
+          _hasFreshOrderDetails = true;
         });
       }
     } catch (e) {
@@ -267,7 +307,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     setState(() => _isUpdating = true);
 
     final orderProvider = context.read<OrderProvider>();
-    final error = await orderProvider.acceptOrder();
+    final error = await orderProvider.acceptOrder(
+      orderId: widget.orderId,
+      orderSnapshot: _order,
+    );
 
     if (mounted) {
       setState(() {
@@ -302,8 +345,53 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(message), backgroundColor: AppColors.error),
         );
+
+        if (error == OrderActionError.alreadyTaken ||
+            error == OrderActionError.expired ||
+            error == OrderActionError.notFound) {
+          setState(() {
+            _order = null;
+          });
+        }
       }
     }
+  }
+
+  Future<void> _dropOrder() async {
+    if (_isUpdating || _order == null) return;
+
+    setState(() => _isUpdating = true);
+
+    final orderProvider = context.read<OrderProvider>();
+    final success = await orderProvider.dropActiveOrder(
+      orderId: widget.orderId,
+      orderSnapshot: _order,
+    );
+
+    if (!mounted) return;
+
+    setState(() => _isUpdating = false);
+
+    final l10n = AppLocalizations.of(context)!;
+    final messenger = ScaffoldMessenger.of(context);
+
+    if (success) {
+      messenger.showSnackBar(
+        SnackBar(
+          content: Text(l10n.orderDroppedSuccessfully),
+          backgroundColor: AppColors.success,
+        ),
+      );
+      context.go(RouteConstants.orders);
+      return;
+    }
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(orderProvider.error ?? l10n.failedToDropOrder),
+        backgroundColor: AppColors.error,
+      ),
+    );
   }
 
   @override
@@ -612,10 +700,17 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     Color secondaryColor,
     Color surfaceColor,
   ) {
-    if (!order.hasPaymentInfo) return const SizedBox.shrink();
+    if (!_hasFreshOrderDetails || !order.hasPaymentInfo) {
+      return const SizedBox.shrink();
+    }
 
     final needsCash = order.needsCashCollection;
-    final color = needsCash ? AppColors.error : AppColors.success;
+    final isPaid = order.isPaid == true;
+    if (!isPaid && !needsCash) {
+      return const SizedBox.shrink();
+    }
+
+    final color = isPaid ? AppColors.success : AppColors.error;
 
     return Container(
       width: double.infinity,
@@ -628,13 +723,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       child: Row(
         children: [
           Icon(
-            needsCash ? Icons.payments : Icons.check_circle,
+            isPaid ? Icons.check_circle : Icons.payments,
             size: 18,
             color: color,
           ),
           const SizedBox(width: 8),
           Text(
-            needsCash ? l10n.collectCash : l10n.orderPaid,
+            isPaid ? l10n.orderPaid : l10n.collectCash,
             style: TextStyle(
               fontSize: 13,
               fontWeight: FontWeight.w700,
@@ -1451,37 +1546,28 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     required String title,
     required String message,
     required VoidCallback onConfirm,
+    IconData icon = Icons.help_outline,
+    Color accentColor = AppColors.primary,
+    String? confirmLabel,
+    String? cancelLabel,
+    String? badgeLabel,
+    String? footnote,
   }) async {
     final l10n = AppLocalizations.of(context)!;
-    final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final confirmed = await showDialog<bool>(
+    final confirmed = await showOrderActionConfirmationSheet(
       context: context,
-      builder: (context) => AlertDialog(
-        backgroundColor: isDark
-            ? AppColors.darkSurface
-            : AppColors.lightSurface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(title),
-        content: Text(message),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: Text(l10n.cancel),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-            ),
-            child: Text(l10n.confirm),
-          ),
-        ],
-      ),
+      title: title,
+      message: message,
+      confirmLabel: confirmLabel ?? l10n.confirm,
+      cancelLabel: cancelLabel ?? l10n.cancel,
+      icon: icon,
+      accentColor: accentColor,
+      badgeLabel: badgeLabel,
+      footnote: footnote,
     );
 
-    if (confirmed == true) {
+    if (confirmed) {
       onConfirm();
     }
   }
@@ -1529,7 +1615,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         case OrderStatus.delivered:
           actionText = l10n.orderCompleted;
           confirmTitle = l10n.completeOrder;
-          confirmMessage = order.needsCashCollection
+          confirmMessage = _hasFreshOrderDetails && order.needsCashCollection
               ? '${l10n.collectCashReminder}\n\n${l10n.completeOrderConfirmation}'
               : l10n.completeOrderConfirmation;
           actionIcon = Icons.check_circle;
@@ -1649,6 +1735,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                           _showStatusConfirmation(
                             title: confirmTitle,
                             message: confirmMessage,
+                            icon: actionIcon,
+                            accentColor: actionColor,
+                            badgeLabel: '${l10n.orderId} #${order.id}',
                             onConfirm: () {
                               if (isAcceptAction) {
                                 _acceptOrder();
@@ -1682,6 +1771,49 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ),
                 ),
               ),
+              if (order.status == OrderStatus.accepted) ...[
+                const SizedBox(height: 10),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: OutlinedButton.icon(
+                    onPressed: _isUpdating
+                        ? null
+                        : () {
+                            _showStatusConfirmation(
+                              title: l10n.dropOrder,
+                              message:
+                                  '${l10n.dropOrderDescription}\n\n${l10n.dropOrderConfirmation}',
+                              icon: Icons.assignment_return_outlined,
+                              accentColor: AppColors.error,
+                              confirmLabel: l10n.dropOrder,
+                              cancelLabel: l10n.keepOrder,
+                              badgeLabel: '${l10n.orderId} #${order.id}',
+                              footnote: l10n.dropOrderWarning,
+                              onConfirm: _dropOrder,
+                            );
+                          },
+                    icon: const Icon(
+                      Icons.assignment_return_outlined,
+                      size: 18,
+                    ),
+                    label: Text(
+                      l10n.dropOrder,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.error,
+                      side: BorderSide(
+                        color: AppColors.error.withValues(alpha: 0.35),
+                      ),
+                      backgroundColor: AppColors.error.withValues(alpha: 0.04),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
             ],
           ),
         ),

@@ -454,6 +454,34 @@ class DriverProvider extends ChangeNotifier {
     }
   }
 
+  /// Best-effort offline sync before logout while auth tokens are still valid.
+  Future<void> markOfflineBeforeLogout() async {
+    if (_profile == null) return;
+
+    if (!(_profile?.isOnline ?? false)) {
+      _stopLocationTracking();
+      return;
+    }
+
+    if (_isTourActive?.call() == true) {
+      _profile = _profile!.copyWith(isOnline: false);
+      _stopLocationTracking();
+      notifyListeners();
+      return;
+    }
+
+    try {
+      final confirmedStatus = await _driverService.toggleOnlineStatus(false);
+      _profile = _profile!.copyWith(isOnline: confirmedStatus);
+      if (!confirmedStatus) {
+        _stopLocationTracking();
+      }
+      notifyListeners();
+    } catch (e) {
+      debugPrint('[DriverProvider] Failed to mark driver offline before logout: $e');
+    }
+  }
+
   void clearProfile() {
     _stopLocationTracking();
     _profile = null;

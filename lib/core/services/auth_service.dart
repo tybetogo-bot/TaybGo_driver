@@ -118,9 +118,9 @@ class AuthService {
       debugPrint('[AuthService] Has refresh token: ${refreshToken != null}');
 
       if (refreshToken != null) {
-        debugPrint('[AuthService] Endpoint: ${ApiConstants.tokenBlacklist}');
+        debugPrint('[AuthService] Endpoint: ${ApiConstants.logout}');
         final response = await _apiClient.post(
-          ApiConstants.tokenBlacklist,
+          ApiConstants.logout,
           data: {'refresh': refreshToken},
         );
         debugPrint('[AuthService] === LOGOUT RESPONSE ===');

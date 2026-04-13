@@ -556,6 +556,14 @@
   "pleaseEnterVehicleYear": "Please enter your vehicle year",
   "invalidVehicleYear": "Please enter a valid year",
 
+  "dropOrder": "Drop Order",
+  "dropOrderDescription": "Return this accepted order to dispatch so another driver can take it.",
+  "dropOrderConfirmation": "Are you sure you want to drop this order? It will be removed from your active orders.",
+  "dropOrderWarning": "This action is only available before pickup.",
+  "keepOrder": "Keep Order",
+  "orderDroppedSuccessfully": "Order returned to dispatch",
+  "failedToDropOrder": "Failed to drop order. Please try again.",
+
   "orderAlreadyTaken": "This order was already taken by another driver",
   "orderSuggestionExpired": "This order suggestion has expired",
   "orderAccepted": "Order accepted!",

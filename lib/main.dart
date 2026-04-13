@@ -83,6 +83,9 @@ class TaybGoDriverApp extends StatelessWidget {
 
     // Wire up logout callback so all providers clear on any logout
     // (including forced logout from expired tokens)
+    authProvider.onBeforeLogoutCallback = () async {
+      await driverProvider.markOfflineBeforeLogout();
+    };
     authProvider.onLogoutCallback = () {
       driverProvider.clearProfile();
       orderProvider.clearAll();

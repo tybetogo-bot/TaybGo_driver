@@ -6,10 +6,7 @@ import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/providers/locale_provider.dart';
-import '../../../core/providers/notification_provider.dart';
-import '../../../core/providers/order_provider.dart';
 import '../../../core/providers/theme_provider.dart';
-import '../../../core/providers/tour_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../tour/tour_keys.dart';
 
@@ -235,50 +232,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
 
-                const SizedBox(height: 16),
-
-                // Stats Row
-                if (profile != null)
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatCard(
-                          Icons.star_rounded,
-                          profile.rating > 0 ? profile.formattedRating : '--',
-                          l10n.rating,
-                          AppColors.warning,
-                          surfaceColor,
-                          textColor,
-                          secondaryColor,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _buildStatCard(
-                          Icons.receipt_long_outlined,
-                          profile.totalOrders.toString(),
-                          l10n.orders,
-                          AppColors.info,
-                          surfaceColor,
-                          textColor,
-                          secondaryColor,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: _buildStatCard(
-                          Icons.account_balance_wallet_outlined,
-                          profile.formattedEarnings,
-                          l10n.earnings,
-                          AppColors.success,
-                          surfaceColor,
-                          textColor,
-                          secondaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-
                 const SizedBox(height: 24),
 
                 // Account Section
@@ -486,40 +439,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildStatCard(
-    IconData icon,
-    String value,
-    String label,
-    Color accentColor,
-    Color surfaceColor,
-    Color textColor,
-    Color secondaryColor,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 10),
-      decoration: BoxDecoration(
-        color: surfaceColor,
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, size: 22, color: accentColor),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.w700,
-              color: textColor,
-            ),
-          ),
-          const SizedBox(height: 2),
-          Text(label, style: TextStyle(fontSize: 12, color: secondaryColor)),
-        ],
-      ),
-    );
-  }
-
   Widget _buildMenuItem(
     IconData icon,
     String title,
@@ -724,11 +643,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              context.read<DriverProvider>().clearProfile();
-              context.read<OrderProvider>().clearAll();
-              context.read<NotificationProvider>().clearAll();
-              context.read<TourProvider>().resetTour();
-              await context.read<AuthProvider>().logout();
+              await _performLogout(context, l10n);
             },
             child: Text(
               l10n.logout,
@@ -738,6 +653,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> _performLogout(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) async {
+    final authProvider = context.read<AuthProvider>();
+    NavigatorState? dialogNavigator;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) {
+        dialogNavigator = Navigator.of(ctx);
+        return Center(
+          child: Card(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n.loading),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    try {
+      await authProvider.logout();
+    } finally {
+      if (dialogNavigator?.mounted ?? false) {
+        dialogNavigator!.pop();
+      }
+    }
   }
 
   void _showDeleteAccountDialog(BuildContext context, AppLocalizations l10n) {

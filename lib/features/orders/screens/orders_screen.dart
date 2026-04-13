@@ -60,8 +60,12 @@ class _OrdersScreenState extends State<OrdersScreen>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final secondaryColor = isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final secondaryColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final l10n = AppLocalizations.of(context)!;
 
@@ -75,7 +79,11 @@ class _OrdersScreenState extends State<OrdersScreen>
                 color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.receipt_long, color: AppColors.primary, size: 18),
+              child: const Icon(
+                Icons.receipt_long,
+                color: AppColors.primary,
+                size: 18,
+              ),
             ),
             const SizedBox(width: 10),
             Text(l10n.orders),
@@ -134,14 +142,34 @@ class _OrdersScreenState extends State<OrdersScreen>
       body: TabBarView(
         controller: _tabController,
         children: [
-          _buildActiveOrders(isDark, textColor, secondaryColor, surfaceColor, borderColor, l10n),
-          _buildHistory(isDark, textColor, secondaryColor, surfaceColor, borderColor, l10n),
+          _buildActiveOrders(
+            isDark,
+            textColor,
+            secondaryColor,
+            surfaceColor,
+            borderColor,
+            l10n,
+          ),
+          _buildHistory(
+            textColor,
+            secondaryColor,
+            surfaceColor,
+            borderColor,
+            l10n,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildActiveOrders(bool isDark, Color textColor, Color secondaryColor, Color surfaceColor, Color borderColor, AppLocalizations l10n) {
+  Widget _buildActiveOrders(
+    bool isDark,
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    Color borderColor,
+    AppLocalizations l10n,
+  ) {
     return Consumer<OrderProvider>(
       builder: (context, orderProvider, _) {
         final activeOrder = orderProvider.activeOrder;
@@ -157,16 +185,27 @@ class _OrdersScreenState extends State<OrdersScreen>
                     color: AppColors.primary.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
-                  child: const Icon(Icons.delivery_dining, size: 48, color: AppColors.primary),
+                  child: const Icon(
+                    Icons.delivery_dining,
+                    size: 48,
+                    color: AppColors.primary,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 Text(
                   l10n.noActiveOrders,
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: textColor),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   decoration: BoxDecoration(
                     color: context.watch<DriverProvider>().isOnline
                         ? AppColors.success.withValues(alpha: 0.1)
@@ -177,16 +216,24 @@ class _OrdersScreenState extends State<OrdersScreen>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(
-                        context.watch<DriverProvider>().isOnline ? Icons.wifi : Icons.wifi_off,
+                        context.watch<DriverProvider>().isOnline
+                            ? Icons.wifi
+                            : Icons.wifi_off,
                         size: 14,
-                        color: context.watch<DriverProvider>().isOnline ? AppColors.success : secondaryColor,
+                        color: context.watch<DriverProvider>().isOnline
+                            ? AppColors.success
+                            : secondaryColor,
                       ),
                       const SizedBox(width: 6),
                       Text(
-                        context.watch<DriverProvider>().isOnline ? l10n.waitingForOrders : l10n.youAreOffline,
+                        context.watch<DriverProvider>().isOnline
+                            ? l10n.waitingForOrders
+                            : l10n.youAreOffline,
                         style: TextStyle(
                           fontSize: 13,
-                          color: context.watch<DriverProvider>().isOnline ? AppColors.success : secondaryColor,
+                          color: context.watch<DriverProvider>().isOnline
+                              ? AppColors.success
+                              : secondaryColor,
                         ),
                       ),
                     ],
@@ -213,107 +260,20 @@ class _OrdersScreenState extends State<OrdersScreen>
     );
   }
 
-  Widget _buildHistory(bool isDark, Color textColor, Color secondaryColor, Color surfaceColor, Color borderColor, AppLocalizations l10n) {
+  Widget _buildHistory(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    Color borderColor,
+    AppLocalizations l10n,
+  ) {
     return Consumer<OrderProvider>(
       builder: (context, orderProvider, _) {
         final history = orderProvider.orderHistory;
 
-        // Calculate stats from completed orders only
-        final completedOrders = history.where((o) => o.status == OrderStatus.completed).toList();
-        final completedCount = completedOrders.length;
-        final totalDeliveryFees = completedOrders.fold<double>(
-          0.0,
-          (sum, order) => sum + order.deliveryFee,
-        );
-        final totalTips = completedOrders.fold<double>(
-          0.0,
-          (sum, order) => sum + order.tip,
-        );
-        final totalEarnings = totalDeliveryFees + totalTips;
-
         return ListView(
           padding: const EdgeInsets.all(20),
           children: [
-            // Summary card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: surfaceColor,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildStatItem(
-                          Icons.receipt_long,
-                          '$completedCount',
-                          l10n.orders,
-                          AppColors.primary,
-                          textColor,
-                          secondaryColor,
-                        ),
-                      ),
-                      Container(width: 1, height: 48, color: borderColor),
-                      Expanded(
-                        child: _buildStatItem(
-                          Icons.local_shipping_outlined,
-                          '\$${totalDeliveryFees.toStringAsFixed(2)}',
-                          l10n.deliveryFee,
-                          AppColors.info,
-                          textColor,
-                          secondaryColor,
-                        ),
-                      ),
-                      Container(width: 1, height: 48, color: borderColor),
-                      Expanded(
-                        child: _buildStatItem(
-                          Icons.volunteer_activism,
-                          '\$${totalTips.toStringAsFixed(2)}',
-                          l10n.tip,
-                          AppColors.warning,
-                          textColor,
-                          secondaryColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: AppColors.success.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          l10n.total,
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                            color: textColor,
-                          ),
-                        ),
-                        Text(
-                          '\$${totalEarnings.toStringAsFixed(2)}',
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: AppColors.success,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
             if (history.isEmpty) ...[
               const SizedBox(height: 40),
               Center(
@@ -325,16 +285,24 @@ class _OrdersScreenState extends State<OrdersScreen>
                         color: surfaceColor,
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(Icons.history, size: 40, color: secondaryColor),
+                      child: Icon(
+                        Icons.history,
+                        size: 40,
+                        color: secondaryColor,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
                       l10n.noOrdersYet,
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: textColor),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        color: textColor,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Your completed orders will appear here',
+                      'Your orders will appear here',
                       style: TextStyle(fontSize: 13, color: secondaryColor),
                     ),
                   ],
@@ -357,35 +325,22 @@ class _OrdersScreenState extends State<OrdersScreen>
               ),
               const SizedBox(height: 12),
 
-              ...history.map((order) => Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _buildOrderCard(
-                  order: order,
-                  textColor: textColor,
-                  secondaryColor: secondaryColor,
-                  surfaceColor: surfaceColor,
-                  borderColor: borderColor,
+              ...history.map(
+                (order) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _buildOrderCard(
+                    order: order,
+                    textColor: textColor,
+                    secondaryColor: secondaryColor,
+                    surfaceColor: surfaceColor,
+                    borderColor: borderColor,
+                  ),
                 ),
-              )),
+              ),
             ],
           ],
         );
       },
-    );
-  }
-
-  Widget _buildStatItem(IconData icon, String value, String label, Color iconColor, Color textColor, Color secondaryColor) {
-    return Column(
-      children: [
-        Icon(icon, size: 20, color: iconColor),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: textColor),
-        ),
-        const SizedBox(height: 2),
-        Text(label, style: TextStyle(fontSize: 11, color: secondaryColor)),
-      ],
     );
   }
 
@@ -447,10 +402,16 @@ class _OrdersScreenState extends State<OrdersScreen>
             // Header
             Row(
               children: [
-                Text(order.id, style: TextStyle(fontSize: 12, color: secondaryColor)),
+                Text(
+                  order.id,
+                  style: TextStyle(fontSize: 12, color: secondaryColor),
+                ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: statusColor.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
@@ -462,7 +423,11 @@ class _OrdersScreenState extends State<OrdersScreen>
                       const SizedBox(width: 4),
                       Text(
                         statusText,
-                        style: TextStyle(fontSize: 11, fontWeight: FontWeight.w500, color: statusColor),
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                          color: statusColor,
+                        ),
                       ),
                     ],
                   ),
@@ -503,7 +468,11 @@ class _OrdersScreenState extends State<OrdersScreen>
                     children: [
                       Text(
                         order.pickupName,
-                        style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: textColor),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: textColor,
+                        ),
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 12),
@@ -532,7 +501,10 @@ class _OrdersScreenState extends State<OrdersScreen>
                 ),
                 const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.info.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(4),
@@ -543,7 +515,10 @@ class _OrdersScreenState extends State<OrdersScreen>
                       const SizedBox(width: 4),
                       Text(
                         order.formattedDistance,
-                        style: const TextStyle(fontSize: 12, color: AppColors.info),
+                        style: const TextStyle(
+                          fontSize: 12,
+                          color: AppColors.info,
+                        ),
                       ),
                     ],
                   ),

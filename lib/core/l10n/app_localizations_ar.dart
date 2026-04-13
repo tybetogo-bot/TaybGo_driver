@@ -1420,6 +1420,29 @@ class AppLocalizationsAr extends AppLocalizations {
   String get invalidVehicleYear => 'يرجى إدخال سنة صحيحة';
 
   @override
+  String get dropOrder => 'إرجاع الطلب';
+
+  @override
+  String get dropOrderDescription =>
+      'سيتم إعادة هذا الطلب المقبول إلى قسم التوزيع ليتم إسناده إلى سائق آخر.';
+
+  @override
+  String get dropOrderConfirmation =>
+      'هل أنت متأكد أنك تريد إرجاع هذا الطلب؟ سيختفي من طلباتك النشطة.';
+
+  @override
+  String get dropOrderWarning => 'هذا الإجراء متاح فقط قبل استلام الطلب.';
+
+  @override
+  String get keepOrder => 'الاحتفاظ بالطلب';
+
+  @override
+  String get orderDroppedSuccessfully => 'تمت إعادة الطلب إلى قسم التوزيع';
+
+  @override
+  String get failedToDropOrder => 'تعذر إرجاع الطلب. يرجى المحاولة مرة أخرى.';
+
+  @override
   String get orderAlreadyTaken =>
       'This order was already taken by another driver';
 

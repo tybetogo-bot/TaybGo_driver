@@ -2816,6 +2816,48 @@ abstract class AppLocalizations {
   /// **'Please enter a valid year'**
   String get invalidVehicleYear;
 
+  /// No description provided for @dropOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop Order'**
+  String get dropOrder;
+
+  /// No description provided for @dropOrderDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Return this accepted order to dispatch so another driver can take it.'**
+  String get dropOrderDescription;
+
+  /// No description provided for @dropOrderConfirmation.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to drop this order? It will be removed from your active orders.'**
+  String get dropOrderConfirmation;
+
+  /// No description provided for @dropOrderWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'This action is only available before pickup.'**
+  String get dropOrderWarning;
+
+  /// No description provided for @keepOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep Order'**
+  String get keepOrder;
+
+  /// No description provided for @orderDroppedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Order returned to dispatch'**
+  String get orderDroppedSuccessfully;
+
+  /// No description provided for @failedToDropOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to drop order. Please try again.'**
+  String get failedToDropOrder;
+
   /// No description provided for @orderAlreadyTaken.
   ///
   /// In en, this message translates to:
