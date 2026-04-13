@@ -24,8 +24,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
-    with TickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   // Slide-in + fade entrance animation
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -52,13 +51,10 @@ class _HomeScreenState extends State<HomeScreen>
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
-    _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 0.3),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(
-      parent: _slideController,
-      curve: Curves.easeOutCubic,
-    ));
+    _slideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(parent: _slideController, curve: Curves.easeOutCubic),
+        );
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _slideController,
@@ -131,7 +127,9 @@ class _HomeScreenState extends State<HomeScreen>
 
   void _onNewOrder() {
     debugPrint('[HomeScreen] === NEW ORDER RECEIVED ===');
-    debugPrint('[HomeScreen] pendingOrder: ${_orderProvider?.pendingOrder?.id}');
+    debugPrint(
+      '[HomeScreen] pendingOrder: ${_orderProvider?.pendingOrder?.id}',
+    );
     debugPrint('[HomeScreen] Starting order animation and haptic feedback');
 
     // Double-tap haptic pattern
@@ -174,7 +172,11 @@ class _HomeScreenState extends State<HomeScreen>
                 color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(Icons.local_shipping, color: Colors.white, size: 18),
+              child: const Icon(
+                Icons.local_shipping,
+                color: Colors.white,
+                size: 18,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -246,7 +248,10 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  Future<void> _toggleOnline(DriverProvider driverProvider, OrderProvider orderProvider) async {
+  Future<void> _toggleOnline(
+    DriverProvider driverProvider,
+    OrderProvider orderProvider,
+  ) async {
     final result = await driverProvider.toggleOnline();
 
     if (!mounted) return;
@@ -268,7 +273,7 @@ class _HomeScreenState extends State<HomeScreen>
         final l10n = AppLocalizations.of(context)!;
         _showLocationPermissionDialog(
           title: l10n.locationRequired,
-          message: l10n.enableLocationAccess,
+          message: driverProvider.error ?? l10n.enableLocationAccess,
           actionLabel: l10n.enable,
           onAction: () => _toggleOnline(driverProvider, orderProvider),
         );
@@ -278,7 +283,7 @@ class _HomeScreenState extends State<HomeScreen>
         final l10n = AppLocalizations.of(context)!;
         _showLocationPermissionDialog(
           title: l10n.locationPermissionDenied,
-          message: l10n.pleaseEnableLocationInSettings,
+          message: driverProvider.error ?? l10n.pleaseEnableLocationInSettings,
           actionLabel: l10n.settings,
           onAction: () => driverProvider.openAppSettings(),
         );
@@ -325,10 +330,7 @@ class _HomeScreenState extends State<HomeScreen>
         title: Text(l10n.accountUnderReview),
         content: Text(l10n.accountBeingVerified),
         actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text(l10n.ok),
-          ),
+          TextButton(onPressed: () => Navigator.pop(ctx), child: Text(l10n.ok)),
         ],
       ),
     );
@@ -404,7 +406,9 @@ class _HomeScreenState extends State<HomeScreen>
           icon = Icons.wifi_off;
           break;
         case OrderActionError.unknown:
-          message = isAccept ? l10n.failedToAcceptOrder : l10n.failedToRejectOrder;
+          message = isAccept
+              ? l10n.failedToAcceptOrder
+              : l10n.failedToRejectOrder;
           break;
       }
     }
@@ -419,7 +423,10 @@ class _HomeScreenState extends State<HomeScreen>
             Expanded(
               child: Text(
                 message,
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
           ],
@@ -446,8 +453,12 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final secondaryColor = isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final secondaryColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final l10n = AppLocalizations.of(context)!;
 
@@ -462,7 +473,10 @@ class _HomeScreenState extends State<HomeScreen>
           body: SafeArea(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20,
+                  vertical: 16,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -476,7 +490,11 @@ class _HomeScreenState extends State<HomeScreen>
                             color: AppColors.primary.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
                           ),
-                          child: const Icon(Icons.person, color: AppColors.primary, size: 22),
+                          child: const Icon(
+                            Icons.person,
+                            color: AppColors.primary,
+                            size: 22,
+                          ),
                         ),
                         const SizedBox(width: 12),
                         Expanded(
@@ -485,7 +503,10 @@ class _HomeScreenState extends State<HomeScreen>
                             children: [
                               Text(
                                 _getGreeting(l10n),
-                                style: TextStyle(fontSize: 13, color: secondaryColor),
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: secondaryColor,
+                                ),
                               ),
                               Text(
                                 profile?.fullName ?? l10n.driver,
@@ -514,7 +535,11 @@ class _HomeScreenState extends State<HomeScreen>
                                   ),
                                 )
                               : IconButton(
-                                  icon: Icon(Icons.refresh, color: secondaryColor, size: 22),
+                                  icon: Icon(
+                                    Icons.refresh,
+                                    color: secondaryColor,
+                                    size: 22,
+                                  ),
                                   onPressed: _refreshData,
                                 ),
                         ),
@@ -527,8 +552,13 @@ class _HomeScreenState extends State<HomeScreen>
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: IconButton(
-                            icon: Icon(Icons.notifications_none, color: secondaryColor, size: 22),
-                            onPressed: () => context.push(RouteConstants.notifications),
+                            icon: Icon(
+                              Icons.notifications_none,
+                              color: secondaryColor,
+                              size: 22,
+                            ),
+                            onPressed: () =>
+                                context.push(RouteConstants.notifications),
                           ),
                         ),
                       ],
@@ -554,7 +584,9 @@ class _HomeScreenState extends State<HomeScreen>
                             Container(
                               padding: const EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: AppColors.warning.withValues(alpha: 0.15),
+                                color: AppColors.warning.withValues(
+                                  alpha: 0.15,
+                                ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
                               child: const Icon(
@@ -645,14 +677,18 @@ class _HomeScreenState extends State<HomeScreen>
                             GestureDetector(
                               onTap: () async {
                                 final status = driverProvider.locationStatus;
-                                if (status == LocationPermissionStatus.serviceDisabled) {
+                                if (status ==
+                                    LocationPermissionStatus.serviceDisabled) {
                                   await driverProvider.openLocationSettings();
                                 } else {
                                   await driverProvider.openAppSettings();
                                 }
                               },
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppColors.error,
                                   borderRadius: BorderRadius.circular(8),
@@ -696,16 +732,22 @@ class _HomeScreenState extends State<HomeScreen>
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: isOnlineWithLocation ? AppColors.primary : surfaceColor,
+                          color: isOnlineWithLocation
+                              ? AppColors.primary
+                              : surfaceColor,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: isOnlineWithLocation ? AppColors.primary : borderColor,
+                            color: isOnlineWithLocation
+                                ? AppColors.primary
+                                : borderColor,
                             width: isOnlineWithLocation ? 0 : 1,
                           ),
                           boxShadow: isOnlineWithLocation
                               ? [
                                   BoxShadow(
-                                    color: AppColors.primary.withValues(alpha: 0.3),
+                                    color: AppColors.primary.withValues(
+                                      alpha: 0.3,
+                                    ),
                                     blurRadius: 12,
                                     offset: const Offset(0, 4),
                                   ),
@@ -733,7 +775,9 @@ class _HomeScreenState extends State<HomeScreen>
                                     )
                                   : Icon(
                                       Icons.power_settings_new,
-                                      color: isOnlineWithLocation ? Colors.white : secondaryColor,
+                                      color: isOnlineWithLocation
+                                          ? Colors.white
+                                          : secondaryColor,
                                       size: 22,
                                     ),
                             ),
@@ -743,11 +787,15 @@ class _HomeScreenState extends State<HomeScreen>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    isOnlineWithLocation ? l10n.online : l10n.offline,
+                                    isOnlineWithLocation
+                                        ? l10n.online
+                                        : l10n.offline,
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w700,
-                                      color: isOnlineWithLocation ? Colors.white : textColor,
+                                      color: isOnlineWithLocation
+                                          ? Colors.white
+                                          : textColor,
                                     ),
                                   ),
                                   if (isOnline && !hasLocation) ...[
@@ -780,27 +828,39 @@ class _HomeScreenState extends State<HomeScreen>
                                         Icon(
                                           Icons.location_on,
                                           size: 12,
-                                          color: Colors.white.withValues(alpha: 0.8),
+                                          color: Colors.white.withValues(
+                                            alpha: 0.8,
+                                          ),
                                         ),
                                         const SizedBox(width: 4),
                                         Expanded(
                                           child: Text(
-                                            driverProvider.currentPlaceName ?? l10n.fetchingLocation,
+                                            driverProvider.currentPlaceName ??
+                                                l10n.fetchingLocation,
                                             style: TextStyle(
                                               fontSize: 12,
-                                              color: Colors.white.withValues(alpha: 0.8),
+                                              color: Colors.white.withValues(
+                                                alpha: 0.8,
+                                              ),
                                             ),
                                             maxLines: 1,
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
-                                        if (driverProvider.lastLocationUpdate != null) ...[
+                                        if (driverProvider.lastLocationUpdate !=
+                                            null) ...[
                                           const SizedBox(width: 6),
                                           Text(
-                                            _formatLastUpdate(driverProvider.lastLocationUpdate!, l10n),
+                                            _formatLastUpdate(
+                                              driverProvider
+                                                  .lastLocationUpdate!,
+                                              l10n,
+                                            ),
                                             style: TextStyle(
                                               fontSize: 10,
-                                              color: Colors.white.withValues(alpha: 0.6),
+                                              color: Colors.white.withValues(
+                                                alpha: 0.6,
+                                              ),
                                             ),
                                           ),
                                         ],
@@ -883,7 +943,11 @@ class _HomeScreenState extends State<HomeScreen>
                             children: [
                               Row(
                                 children: [
-                                  Icon(Icons.insert_chart_outlined, size: 16, color: secondaryColor),
+                                  Icon(
+                                    Icons.insert_chart_outlined,
+                                    size: 16,
+                                    color: secondaryColor,
+                                  ),
                                   const SizedBox(width: 6),
                                   Text(
                                     l10n.todayEarnings,
@@ -908,7 +972,11 @@ class _HomeScreenState extends State<HomeScreen>
                                       secondaryColor,
                                     ),
                                   ),
-                                  Container(width: 1, height: 40, color: borderColor),
+                                  Container(
+                                    width: 1,
+                                    height: 40,
+                                    color: borderColor,
+                                  ),
                                   Expanded(
                                     child: _buildStatItem(
                                       Icons.local_shipping_outlined,
@@ -919,7 +987,11 @@ class _HomeScreenState extends State<HomeScreen>
                                       secondaryColor,
                                     ),
                                   ),
-                                  Container(width: 1, height: 40, color: borderColor),
+                                  Container(
+                                    width: 1,
+                                    height: 40,
+                                    color: borderColor,
+                                  ),
                                   Expanded(
                                     child: _buildStatItem(
                                       Icons.volunteer_activism,
@@ -935,13 +1007,19 @@ class _HomeScreenState extends State<HomeScreen>
                               const SizedBox(height: 16),
                               Container(
                                 width: double.infinity,
-                                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                  horizontal: 16,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.success.withValues(alpha: 0.1),
+                                  color: AppColors.success.withValues(
+                                    alpha: 0.1,
+                                  ),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       l10n.total,
@@ -977,7 +1055,11 @@ class _HomeScreenState extends State<HomeScreen>
                         children: [
                           Row(
                             children: [
-                              Icon(Icons.local_shipping, size: 16, color: AppColors.primary),
+                              Icon(
+                                Icons.local_shipping,
+                                size: 16,
+                                color: AppColors.primary,
+                              ),
                               const SizedBox(width: 6),
                               Text(
                                 l10n.currentOrders,
@@ -995,10 +1077,17 @@ class _HomeScreenState extends State<HomeScreen>
                               children: [
                                 Text(
                                   l10n.seeAll,
-                                  style: const TextStyle(fontSize: 13, color: AppColors.primary),
+                                  style: const TextStyle(
+                                    fontSize: 13,
+                                    color: AppColors.primary,
+                                  ),
                                 ),
                                 const SizedBox(width: 2),
-                                const Icon(Icons.arrow_forward_ios, size: 12, color: AppColors.primary),
+                                const Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 12,
+                                  color: AppColors.primary,
+                                ),
                               ],
                             ),
                           ),
@@ -1007,13 +1096,15 @@ class _HomeScreenState extends State<HomeScreen>
                       const SizedBox(height: 12),
 
                       // Active Orders List
-                      ...orderProvider.activeOrders.map((order) => _buildActiveOrderListItem(
-                        order,
-                        textColor,
-                        secondaryColor,
-                        surfaceColor,
-                        borderColor,
-                      )),
+                      ...orderProvider.activeOrders.map(
+                        (order) => _buildActiveOrderListItem(
+                          order,
+                          textColor,
+                          secondaryColor,
+                          surfaceColor,
+                          borderColor,
+                        ),
+                      ),
                     ],
 
                     const SizedBox(height: 20),
@@ -1049,7 +1140,11 @@ class _HomeScreenState extends State<HomeScreen>
         const SizedBox(height: 6),
         Text(
           value,
-          style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: textColor),
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: textColor,
+          ),
         ),
         const SizedBox(height: 2),
         Text(label, style: TextStyle(fontSize: 11, color: secondaryColor)),
@@ -1068,44 +1163,48 @@ class _HomeScreenState extends State<HomeScreen>
   ) {
     final glowValue = _showNewOrderAnimation ? _glowAnimation.value : 0.0;
     final glowOpacity = 0.15 + (glowValue * 0.25); // 0.15 → 0.40
-    final borderWidth = 1.5 + (glowValue * 0.5);   // 1.5 → 2.0
+    final borderWidth = 1.5 + (glowValue * 0.5); // 1.5 → 2.0
 
     return Container(
-        key: _tourKeys.newOrderCardKey,
-        margin: const EdgeInsets.only(bottom: 20),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: surfaceColor,
-          border: Border.all(
-            color: AppColors.primary,
-            width: borderWidth,
-          ),
-          borderRadius: BorderRadius.circular(14),
-          boxShadow: _showNewOrderAnimation
-              ? [
-                  BoxShadow(
-                    color: AppColors.primary.withValues(alpha: glowOpacity),
-                    blurRadius: 12 + (glowValue * 8),
-                    spreadRadius: glowValue * 2,
-                  ),
-                ]
-              : null,
-        ),
-        child: Column(
+      key: _tourKeys.newOrderCardKey,
+      margin: const EdgeInsets.only(bottom: 20),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        border: Border.all(color: AppColors.primary, width: borderWidth),
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: _showNewOrderAnimation
+            ? [
+                BoxShadow(
+                  color: AppColors.primary.withValues(alpha: glowOpacity),
+                  blurRadius: 12 + (glowValue * 8),
+                  spreadRadius: glowValue * 2,
+                ),
+              ]
+            : null,
+      ),
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.local_shipping, size: 14, color: AppColors.primary),
+                    const Icon(
+                      Icons.local_shipping,
+                      size: 14,
+                      color: AppColors.primary,
+                    ),
                     const SizedBox(width: 5),
                     Text(
                       l10n.newOrderTitle,
@@ -1131,80 +1230,119 @@ class _HomeScreenState extends State<HomeScreen>
           const SizedBox(height: 14),
 
           // Route info
-          Builder(builder: (context) {
-            // Calculate driver-to-pickup distance
-            final driverPos = LocationService().lastPosition;
-            String? driverToPickup;
-            if (driverPos != null && order.pickupLat != null && order.pickupLng != null) {
-              final meters = Geolocator.distanceBetween(
-                driverPos.latitude, driverPos.longitude,
-                order.pickupLat!, order.pickupLng!,
-              );
-              driverToPickup = '${(meters / 1000).toStringAsFixed(1)} km';
-            }
+          Builder(
+            builder: (context) {
+              // Calculate driver-to-pickup distance
+              final driverPos = LocationService().lastPosition;
+              String? driverToPickup;
+              if (driverPos != null &&
+                  order.pickupLat != null &&
+                  order.pickupLng != null) {
+                final meters = Geolocator.distanceBetween(
+                  driverPos.latitude,
+                  driverPos.longitude,
+                  order.pickupLat!,
+                  order.pickupLng!,
+                );
+                driverToPickup = '${(meters / 1000).toStringAsFixed(1)} km';
+              }
 
-            return Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                if (driverToPickup != null)
+              return Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: [
+                  if (driverToPickup != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(
+                            Icons.my_location,
+                            size: 12,
+                            color: AppColors.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            driverToPickup,
+                            style: const TextStyle(
+                              fontSize: 12,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: AppColors.info.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.my_location, size: 12, color: AppColors.primary),
+                        const Icon(
+                          Icons.route,
+                          size: 12,
+                          color: AppColors.info,
+                        ),
                         const SizedBox(width: 4),
                         Text(
-                          driverToPickup,
-                          style: const TextStyle(fontSize: 12, color: AppColors.primary, fontWeight: FontWeight.w500),
+                          order.formattedDistance,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.info,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.info.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(4),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.warning.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(
+                          Icons.schedule,
+                          size: 12,
+                          color: AppColors.warning,
+                        ),
+                        const SizedBox(width: 4),
+                        Text(
+                          '~${order.estimatedMinutes} min',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: AppColors.warning,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.route, size: 12, color: AppColors.info),
-                      const SizedBox(width: 4),
-                      Text(
-                        order.formattedDistance,
-                        style: const TextStyle(fontSize: 12, color: AppColors.info, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: AppColors.warning.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(4),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.schedule, size: 12, color: AppColors.warning),
-                      const SizedBox(width: 4),
-                      Text(
-                        '~${order.estimatedMinutes} min',
-                        style: const TextStyle(fontSize: 12, color: AppColors.warning, fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            );
-          }),
+                ],
+              );
+            },
+          ),
           const SizedBox(height: 14),
 
           // Locations
@@ -1240,13 +1378,20 @@ class _HomeScreenState extends State<HomeScreen>
                     // Pickup info
                     Text(
                       order.pickupName,
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: textColor),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: textColor,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (order.pickupStreet != null || order.pickupCity != null)
                       Text(
-                        [order.pickupStreet, order.pickupCity].where((e) => e != null).join(', '),
+                        [
+                          order.pickupStreet,
+                          order.pickupCity,
+                        ].where((e) => e != null).join(', '),
                         style: TextStyle(fontSize: 11, color: secondaryColor),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -1255,7 +1400,11 @@ class _HomeScreenState extends State<HomeScreen>
                     // Dropoff info - show address only, not customer name
                     Text(
                       order.dropoffAddress,
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: textColor),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: textColor,
+                      ),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1280,29 +1429,39 @@ class _HomeScreenState extends State<HomeScreen>
                 children: [
                   Text(
                     l10n.itemsOrdered,
-                    style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: secondaryColor),
+                    style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: secondaryColor,
+                    ),
                   ),
                   const SizedBox(height: 6),
-                  ...order.items.map((item) => Padding(
-                    padding: const EdgeInsets.only(bottom: 3),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            '${item.quantity}x ${item.name}',
-                            style: TextStyle(fontSize: 13, color: textColor),
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
+                  ...order.items.map(
+                    (item) => Padding(
+                      padding: const EdgeInsets.only(bottom: 3),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              '${item.quantity}x ${item.name}',
+                              style: TextStyle(fontSize: 13, color: textColor),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
                           ),
-                        ),
-                        Text(
-                          '\$${(item.price * item.quantity).toStringAsFixed(2)}',
-                          style: TextStyle(fontSize: 13, color: textColor, fontWeight: FontWeight.w500),
-                        ),
-                      ],
+                          Text(
+                            '\$${(item.price * item.quantity).toStringAsFixed(2)}',
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: textColor,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  )),
+                  ),
                 ],
               ),
             ),
@@ -1320,8 +1479,16 @@ class _HomeScreenState extends State<HomeScreen>
             child: Column(
               children: [
                 if (order.subtotal > 0)
-                  _buildPriceRow(l10n.subtotal, order.formattedSubtotal, secondaryColor),
-                _buildPriceRow(l10n.deliveryFee, order.formattedDeliveryFee, secondaryColor),
+                  _buildPriceRow(
+                    l10n.subtotal,
+                    order.formattedSubtotal,
+                    secondaryColor,
+                  ),
+                _buildPriceRow(
+                  l10n.deliveryFee,
+                  order.formattedDeliveryFee,
+                  secondaryColor,
+                ),
                 if (order.tip > 0)
                   _buildPriceRow(l10n.tip, order.formattedTip, secondaryColor),
                 const Divider(height: 12),
@@ -1330,11 +1497,19 @@ class _HomeScreenState extends State<HomeScreen>
                   children: [
                     Text(
                       l10n.total,
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: textColor),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: textColor,
+                      ),
                     ),
                     Text(
                       order.formattedTotal,
-                      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.primary),
+                      style: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
                     ),
                   ],
                 ),
@@ -1351,43 +1526,55 @@ class _HomeScreenState extends State<HomeScreen>
               Expanded(
                 flex: 2,
                 child: OutlinedButton(
-                  onPressed: orderProvider.isLoading ? null : () {
-                    showDialog(
-                      context: context,
-                      builder: (ctx) => AlertDialog(
-                        title: Text(l10n.rejectOrder),
-                        content: Text(l10n.rejectOrderConfirmation),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(ctx).pop(),
-                            child: Text(l10n.cancel),
-                          ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(ctx).pop();
-                              orderProvider.rejectOrder().then((error) {
-                                _showOrderFeedback(error, isAccept: false);
-                              });
-                            },
-                            style: TextButton.styleFrom(foregroundColor: AppColors.error),
-                            child: Text(l10n.reject),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
+                  onPressed: orderProvider.isLoading
+                      ? null
+                      : () {
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: Text(l10n.rejectOrder),
+                              content: Text(l10n.rejectOrderConfirmation),
+                              actions: [
+                                TextButton(
+                                  onPressed: () => Navigator.of(ctx).pop(),
+                                  child: Text(l10n.cancel),
+                                ),
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(ctx).pop();
+                                    orderProvider.rejectOrder().then((error) {
+                                      _showOrderFeedback(
+                                        error,
+                                        isAccept: false,
+                                      );
+                                    });
+                                  },
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: AppColors.error,
+                                  ),
+                                  child: Text(l10n.reject),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.error,
                     side: const BorderSide(color: AppColors.error),
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(Icons.close, size: 18),
                       const SizedBox(width: 6),
-                      Text(l10n.reject, style: const TextStyle(fontWeight: FontWeight.w600)),
+                      Text(
+                        l10n.reject,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
+                      ),
                     ],
                   ),
                 ),
@@ -1397,18 +1584,24 @@ class _HomeScreenState extends State<HomeScreen>
               Expanded(
                 flex: 3,
                 child: ElevatedButton(
-                  onPressed: orderProvider.isLoading ? null : () async {
-                    final error = await orderProvider.acceptOrder();
-                    _showOrderFeedback(error, isAccept: true);
-                  },
+                  onPressed: orderProvider.isLoading
+                      ? null
+                      : () async {
+                          final error = await orderProvider.acceptOrder();
+                          _showOrderFeedback(error, isAccept: true);
+                        },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
+                    disabledBackgroundColor: AppColors.primary.withValues(
+                      alpha: 0.6,
+                    ),
                     disabledForegroundColor: Colors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   child: orderProvider.isLoading
                       ? const SizedBox(
@@ -1424,7 +1617,12 @@ class _HomeScreenState extends State<HomeScreen>
                           children: [
                             const Icon(Icons.check_circle_outline, size: 18),
                             const SizedBox(width: 8),
-                            Text(l10n.accept, style: const TextStyle(fontWeight: FontWeight.w600)),
+                            Text(
+                              l10n.accept,
+                              style: const TextStyle(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ],
                         ),
                 ),
@@ -1443,7 +1641,14 @@ class _HomeScreenState extends State<HomeScreen>
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(label, style: TextStyle(fontSize: 13, color: color)),
-          Text(value, style: TextStyle(fontSize: 13, color: color, fontWeight: FontWeight.w500)),
+          Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              color: color,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ],
       ),
     );
@@ -1507,7 +1712,10 @@ class _HomeScreenState extends State<HomeScreen>
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
@@ -1585,7 +1793,11 @@ class _HomeScreenState extends State<HomeScreen>
                   children: [
                     Text(
                       order.pickupName,
-                      style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: textColor),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: textColor,
+                      ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -1609,28 +1821,34 @@ class _HomeScreenState extends State<HomeScreen>
             children: [
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => context.push(RouteConstants.navigationPath(order.id)),
+                  onPressed: () =>
+                      context.push(RouteConstants.navigationPath(order.id)),
                   icon: const Icon(Icons.navigation_outlined, size: 16),
                   label: Text(l10n.navigate),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.info,
                     side: const BorderSide(color: AppColors.info),
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ),
               const SizedBox(width: 8),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: () => context.push(RouteConstants.orderDetailPath(order.id)),
+                  onPressed: () =>
+                      context.push(RouteConstants.orderDetailPath(order.id)),
                   icon: const Icon(Icons.receipt_long_outlined, size: 16),
                   label: Text(l10n.details),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: secondaryColor,
                     side: BorderSide(color: borderColor),
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
               ),
@@ -1645,11 +1863,15 @@ class _HomeScreenState extends State<HomeScreen>
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   foregroundColor: Colors.white,
-                  disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.6),
+                  disabledBackgroundColor: AppColors.primary.withValues(
+                    alpha: 0.6,
+                  ),
                   disabledForegroundColor: Colors.white,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(vertical: 14),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
                 ),
                 child: orderProvider.isLoading
                     ? const SizedBox(
@@ -1665,7 +1887,10 @@ class _HomeScreenState extends State<HomeScreen>
                         children: [
                           Icon(buttonIcon, size: 18),
                           const SizedBox(width: 8),
-                          Text(buttonText, style: const TextStyle(fontWeight: FontWeight.w600)),
+                          Text(
+                            buttonText,
+                            style: const TextStyle(fontWeight: FontWeight.w600),
+                          ),
                         ],
                       ),
               ),
@@ -1703,7 +1928,11 @@ class _HomeScreenState extends State<HomeScreen>
                 color: AppColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: const Icon(Icons.local_shipping, size: 20, color: AppColors.primary),
+              child: const Icon(
+                Icons.local_shipping,
+                size: 20,
+                color: AppColors.primary,
+              ),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -1712,7 +1941,11 @@ class _HomeScreenState extends State<HomeScreen>
                 children: [
                   Text(
                     order.pickupName,
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: textColor),
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: textColor,
+                    ),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                   ),
@@ -1720,7 +1953,10 @@ class _HomeScreenState extends State<HomeScreen>
                   Row(
                     children: [
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
@@ -1739,7 +1975,11 @@ class _HomeScreenState extends State<HomeScreen>
                             const SizedBox(width: 4),
                             Text(
                               order.status.localizedName(l10n),
-                              style: const TextStyle(fontSize: 11, color: AppColors.primary, fontWeight: FontWeight.w500),
+                              style: const TextStyle(
+                                fontSize: 11,
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
                           ],
                         ),

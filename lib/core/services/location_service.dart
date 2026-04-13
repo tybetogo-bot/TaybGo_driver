@@ -1,12 +1,23 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:geolocator/geolocator.dart';
 
 enum LocationPermissionStatus {
-  granted,
+  grantedForegroundOnly,
+  grantedAlways,
   denied,
   deniedForever,
   serviceDisabled,
+}
+
+extension LocationPermissionStatusX on LocationPermissionStatus {
+  bool get hasForegroundAccess =>
+      this == LocationPermissionStatus.grantedForegroundOnly ||
+      this == LocationPermissionStatus.grantedAlways;
+
+  bool get hasBackgroundAccess =>
+      this == LocationPermissionStatus.grantedAlways;
 }
 
 class LocationResult {
@@ -25,6 +36,10 @@ class LocationResult {
 
 class LocationService {
   static final LocationService _instance = LocationService._internal();
+  static const MethodChannel _permissionChannel = MethodChannel(
+    'com.taybgo.driver/location_permissions',
+  );
+
   factory LocationService() => _instance;
   LocationService._internal();
 
@@ -35,52 +50,56 @@ class LocationService {
 
   /// Check if location services are enabled and we have permission
   Future<LocationPermissionStatus> checkPermission() async {
-    // Check permission status first
-    LocationPermission permission = await Geolocator.checkPermission();
-
-    switch (permission) {
-      case LocationPermission.denied:
-        return LocationPermissionStatus.denied;
-      case LocationPermission.deniedForever:
-        return LocationPermissionStatus.deniedForever;
-      case LocationPermission.whileInUse:
-      case LocationPermission.always:
-        // Permission granted, now check if location services are enabled
-        bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-        if (!serviceEnabled) {
-          return LocationPermissionStatus.serviceDisabled;
-        }
-        return LocationPermissionStatus.granted;
-      case LocationPermission.unableToDetermine:
-        return LocationPermissionStatus.denied;
-    }
+    final permission = await Geolocator.checkPermission();
+    return _mapPermission(permission);
   }
 
   /// Request location permission
   Future<LocationPermissionStatus> requestPermission() async {
-    // Request permission first (so iOS shows Location in Settings)
-    LocationPermission permission = await Geolocator.requestPermission();
+    final permission = await Geolocator.requestPermission();
+    return _mapPermission(permission);
+  }
 
-    // If permission granted, check if location services are enabled
-    if (permission == LocationPermission.whileInUse ||
-        permission == LocationPermission.always) {
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        return LocationPermissionStatus.serviceDisabled;
+  /// Request background-capable location permission.
+  ///
+  /// On Android this tries to upgrade from "While in use" to background
+  /// location. On iOS this escalates from "When In Use" to "Always".
+  Future<LocationPermissionStatus> requestBackgroundPermission() async {
+    var status = await checkPermission();
+
+    if (!status.hasForegroundAccess) {
+      status = await requestPermission();
+      if (!status.hasForegroundAccess) {
+        return status;
       }
     }
 
-    switch (permission) {
-      case LocationPermission.denied:
-        return LocationPermissionStatus.denied;
-      case LocationPermission.deniedForever:
-        return LocationPermissionStatus.deniedForever;
-      case LocationPermission.whileInUse:
-      case LocationPermission.always:
-        return LocationPermissionStatus.granted;
-      case LocationPermission.unableToDetermine:
-        return LocationPermissionStatus.denied;
+    if (status.hasBackgroundAccess ||
+        kIsWeb ||
+        (defaultTargetPlatform != TargetPlatform.android &&
+            defaultTargetPlatform != TargetPlatform.iOS)) {
+      return status;
     }
+
+    try {
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        await Geolocator.requestPermission();
+      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+        await _permissionChannel.invokeMethod<String>(
+          'requestAlwaysPermission',
+        );
+      }
+    } on PlatformException catch (e) {
+      debugPrint(
+        '[LocationService] Failed to request background permission: ${e.code} ${e.message}',
+      );
+    } on MissingPluginException {
+      debugPrint(
+        '[LocationService] Background permission bridge is unavailable on this platform build.',
+      );
+    }
+
+    return checkPermission();
   }
 
   /// Get current location (with permission check)
@@ -88,10 +107,10 @@ class LocationService {
     // Check permission first
     final status = await checkPermission();
 
-    if (status != LocationPermissionStatus.granted) {
+    if (!status.hasForegroundAccess) {
       // Try to request permission
       final requestStatus = await requestPermission();
-      if (requestStatus != LocationPermissionStatus.granted) {
+      if (!requestStatus.hasForegroundAccess) {
         return LocationResult(
           success: false,
           status: requestStatus,
@@ -104,9 +123,13 @@ class LocationService {
       // On web, use low accuracy for faster response
       // On mobile, use medium accuracy (network + GPS)
       final accuracy = kIsWeb ? LocationAccuracy.low : LocationAccuracy.medium;
-      final timeout = kIsWeb ? const Duration(seconds: 30) : const Duration(seconds: 10);
+      final timeout = kIsWeb
+          ? const Duration(seconds: 30)
+          : const Duration(seconds: 10);
 
-      debugPrint('Getting location with accuracy: $accuracy, timeout: $timeout, isWeb: $kIsWeb');
+      debugPrint(
+        'Getting location with accuracy: $accuracy, timeout: $timeout, isWeb: $kIsWeb',
+      );
 
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: accuracy,
@@ -119,7 +142,7 @@ class LocationService {
       return LocationResult(
         success: true,
         position: position,
-        status: LocationPermissionStatus.granted,
+        status: await checkPermission(),
       );
     } on TimeoutException {
       debugPrint('Location timeout');
@@ -131,7 +154,7 @@ class LocationService {
           return LocationResult(
             success: true,
             position: lastKnown,
-            status: LocationPermissionStatus.granted,
+            status: await checkPermission(),
           );
         }
       }
@@ -155,39 +178,73 @@ class LocationService {
   }) {
     stopLocationUpdates();
 
-    const locationSettings = LocationSettings(
-      accuracy: LocationAccuracy.high,
-      distanceFilter: 50, // Update every 50 meters
-    );
+    late final LocationSettings locationSettings;
+
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      locationSettings = AndroidSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+        distanceFilter: 25,
+        intervalDuration: const Duration(seconds: 10),
+        foregroundNotificationConfig: const ForegroundNotificationConfig(
+          notificationTitle: 'TaybGo Driver is online',
+          notificationText:
+              'Live location sharing stays active while you are online.',
+          notificationChannelName: 'Driver live location',
+          notificationIcon: AndroidResource(name: 'ic_notification'),
+          enableWakeLock: true,
+          setOngoing: true,
+        ),
+      );
+    } else if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
+      locationSettings = AppleSettings(
+        accuracy: LocationAccuracy.bestForNavigation,
+        activityType: ActivityType.automotiveNavigation,
+        distanceFilter: 25,
+        pauseLocationUpdatesAutomatically: false,
+        allowBackgroundLocationUpdates: true,
+        showBackgroundLocationIndicator: false,
+      );
+    } else {
+      locationSettings = const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 25,
+      );
+    }
 
     debugPrint('[LocationService] === STARTING LOCATION STREAM ===');
-    debugPrint('[LocationService] Accuracy: high, Distance filter: 50m');
+    debugPrint('[LocationService] Accuracy: navigation, Distance filter: 25m');
 
-    _positionStream = Geolocator.getPositionStream(
-      locationSettings: locationSettings,
-    ).listen(
-      (Position position) {
-        debugPrint('[LocationService] === POSITION STREAM EVENT ===');
-        debugPrint('[LocationService] New position: ${position.latitude}, ${position.longitude}');
-        debugPrint('[LocationService] Accuracy: ${position.accuracy}m, Speed: ${position.speed}m/s');
-        if (_lastPosition != null) {
-          final distance = Geolocator.distanceBetween(
-            _lastPosition!.latitude,
-            _lastPosition!.longitude,
-            position.latitude,
-            position.longitude,
-          );
-          debugPrint('[LocationService] Distance from last: ${distance.toStringAsFixed(1)}m');
-        }
-        _lastPosition = position;
-        onLocationUpdate(position);
-      },
-      onError: (error) {
-        debugPrint('[LocationService] === LOCATION STREAM ERROR ===');
-        debugPrint('[LocationService] Error: $error');
-        onError?.call('Location tracking error');
-      },
-    );
+    _positionStream =
+        Geolocator.getPositionStream(locationSettings: locationSettings).listen(
+          (Position position) {
+            debugPrint('[LocationService] === POSITION STREAM EVENT ===');
+            debugPrint(
+              '[LocationService] New position: ${position.latitude}, ${position.longitude}',
+            );
+            debugPrint(
+              '[LocationService] Accuracy: ${position.accuracy}m, Speed: ${position.speed}m/s',
+            );
+            if (_lastPosition != null) {
+              final distance = Geolocator.distanceBetween(
+                _lastPosition!.latitude,
+                _lastPosition!.longitude,
+                position.latitude,
+                position.longitude,
+              );
+              debugPrint(
+                '[LocationService] Distance from last: ${distance.toStringAsFixed(1)}m',
+              );
+            }
+            _lastPosition = position;
+            onLocationUpdate(position);
+          },
+          onError: (error) {
+            debugPrint('[LocationService] === LOCATION STREAM ERROR ===');
+            debugPrint('[LocationService] Error: $error');
+            onError?.call('Location tracking error');
+          },
+        );
     debugPrint('[LocationService] Location stream started');
   }
 
@@ -211,25 +268,64 @@ class LocationService {
   }
 
   String _getStatusMessage(LocationPermissionStatus status) {
+    return _getPermissionMessage(status, requireBackgroundAccess: false);
+  }
+
+  String _getPermissionMessage(
+    LocationPermissionStatus status, {
+    required bool requireBackgroundAccess,
+  }) {
     switch (status) {
+      case LocationPermissionStatus.grantedForegroundOnly:
+        return requireBackgroundAccess
+            ? 'Allow background location ("Always") so TaybGo Driver can keep sending your live location while the app is in the background.'
+            : '';
       case LocationPermissionStatus.denied:
         return 'Location permission denied. Please allow location access to go online.';
       case LocationPermissionStatus.deniedForever:
         return 'Location permission permanently denied. Please enable it in app settings.';
       case LocationPermissionStatus.serviceDisabled:
         return 'Location services are disabled. Please enable GPS to go online.';
-      case LocationPermissionStatus.granted:
+      case LocationPermissionStatus.grantedAlways:
         return '';
     }
   }
 
   /// Get user-friendly message for location status
-  String getStatusMessage(LocationPermissionStatus status) {
-    return _getStatusMessage(status);
+  String getStatusMessage(
+    LocationPermissionStatus status, {
+    bool requireBackgroundAccess = false,
+  }) {
+    return _getPermissionMessage(
+      status,
+      requireBackgroundAccess: requireBackgroundAccess,
+    );
   }
 
   /// Dispose resources
   void dispose() {
     stopLocationUpdates();
+  }
+
+  Future<LocationPermissionStatus> _mapPermission(
+    LocationPermission permission,
+  ) async {
+    switch (permission) {
+      case LocationPermission.denied:
+        return LocationPermissionStatus.denied;
+      case LocationPermission.deniedForever:
+        return LocationPermissionStatus.deniedForever;
+      case LocationPermission.whileInUse:
+      case LocationPermission.always:
+        final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+        if (!serviceEnabled) {
+          return LocationPermissionStatus.serviceDisabled;
+        }
+        return permission == LocationPermission.always
+            ? LocationPermissionStatus.grantedAlways
+            : LocationPermissionStatus.grantedForegroundOnly;
+      case LocationPermission.unableToDetermine:
+        return LocationPermissionStatus.denied;
+    }
   }
 }
