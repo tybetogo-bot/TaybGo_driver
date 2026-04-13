@@ -261,6 +261,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     final driverProvider = context.read<DriverProvider>();
     final l10n = AppLocalizations.of(context)!;
+    final isCarType = _isCarVehicleType(_selectedVehicleType);
 
     final success = await driverProvider.updateUserProfile(
       name: _nameController.text.trim().isNotEmpty
@@ -271,20 +272,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           : null,
       birthdate: _selectedBirthdate,
       vehicleType: _selectedVehicleType,
-      carSize: _selectedCarSize,
-      vehiclePlateNumber: _vehiclePlateNumberController.text.trim().isNotEmpty
+      clearCarDetails: !isCarType,
+      carSize: isCarType ? _selectedCarSize : null,
+      vehiclePlateNumber:
+          isCarType && _vehiclePlateNumberController.text.trim().isNotEmpty
           ? _vehiclePlateNumberController.text.trim()
           : null,
-      vehicleColor: _vehicleColorController.text.trim().isNotEmpty
+      vehicleColor: isCarType && _vehicleColorController.text.trim().isNotEmpty
           ? _vehicleColorController.text.trim()
           : null,
-      vehicleMake: _vehicleMakeController.text.trim().isNotEmpty
+      vehicleMake: isCarType && _vehicleMakeController.text.trim().isNotEmpty
           ? _vehicleMakeController.text.trim()
           : null,
-      vehicleModel: _vehicleModelController.text.trim().isNotEmpty
+      vehicleModel: isCarType && _vehicleModelController.text.trim().isNotEmpty
           ? _vehicleModelController.text.trim()
           : null,
-      vehicleYear: _vehicleYearController.text.trim().isNotEmpty
+      vehicleYear: isCarType && _vehicleYearController.text.trim().isNotEmpty
           ? int.tryParse(_vehicleYearController.text.trim())
           : null,
       acceptsFood: _acceptsFood,
@@ -525,111 +528,121 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 hintColor: hintColor,
               ),
 
-              const SizedBox(height: 16),
+              if (_isCarVehicleType(_selectedVehicleType)) ...[
+                const SizedBox(height: 16),
 
-              // Car Size Dropdown
-              _buildFieldLabel(
-                Icons.straighten_outlined,
-                'Car Size',
-                secondaryColor,
-              ),
-              const SizedBox(height: 8),
-              _buildDropdown(
-                value: _selectedCarSize,
-                items: ['X', 'S', 'M', 'L', 'XL'],
-                hint: 'Select car size',
-                onChanged: (value) {
-                  setState(() => _selectedCarSize = value);
-                },
-                surfaceColor: surfaceColor,
-                borderColor: borderColor,
-                textColor: textColor,
-                hintColor: hintColor,
-              ),
+                // Car Size Dropdown
+                _buildFieldLabel(
+                  Icons.straighten_outlined,
+                  'Car Size',
+                  secondaryColor,
+                ),
+                const SizedBox(height: 8),
+                _buildDropdown(
+                  value: _selectedCarSize,
+                  items: ['X', 'S', 'M', 'L', 'XL'],
+                  hint: 'Select car size',
+                  onChanged: (value) {
+                    setState(() => _selectedCarSize = value);
+                  },
+                  surfaceColor: surfaceColor,
+                  borderColor: borderColor,
+                  textColor: textColor,
+                  hintColor: hintColor,
+                ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Vehicle Plate Number
-              _buildFieldLabel(
-                Icons.pin_outlined,
-                'Plate Number',
-                secondaryColor,
-              ),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _vehiclePlateNumberController,
-                hint: 'Enter plate number',
-                surfaceColor: surfaceColor,
-                borderColor: borderColor,
-                textColor: textColor,
-                hintColor: hintColor,
-              ),
+                // Vehicle Plate Number
+                _buildFieldLabel(
+                  Icons.pin_outlined,
+                  'Plate Number',
+                  secondaryColor,
+                ),
+                const SizedBox(height: 8),
+                _buildTextField(
+                  controller: _vehiclePlateNumberController,
+                  hint: 'Enter plate number',
+                  surfaceColor: surfaceColor,
+                  borderColor: borderColor,
+                  textColor: textColor,
+                  hintColor: hintColor,
+                ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Vehicle Color
-              _buildFieldLabel(Icons.palette_outlined, 'Color', secondaryColor),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _vehicleColorController,
-                hint: 'Enter vehicle color',
-                surfaceColor: surfaceColor,
-                borderColor: borderColor,
-                textColor: textColor,
-                hintColor: hintColor,
-              ),
+                // Vehicle Color
+                _buildFieldLabel(
+                  Icons.palette_outlined,
+                  'Color',
+                  secondaryColor,
+                ),
+                const SizedBox(height: 8),
+                _buildTextField(
+                  controller: _vehicleColorController,
+                  hint: 'Enter vehicle color',
+                  surfaceColor: surfaceColor,
+                  borderColor: borderColor,
+                  textColor: textColor,
+                  hintColor: hintColor,
+                ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Vehicle Make
-              _buildFieldLabel(Icons.factory_outlined, 'Make', secondaryColor),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _vehicleMakeController,
-                hint: 'Enter vehicle make (e.g., Toyota)',
-                surfaceColor: surfaceColor,
-                borderColor: borderColor,
-                textColor: textColor,
-                hintColor: hintColor,
-              ),
+                // Vehicle Make
+                _buildFieldLabel(
+                  Icons.factory_outlined,
+                  'Make',
+                  secondaryColor,
+                ),
+                const SizedBox(height: 8),
+                _buildTextField(
+                  controller: _vehicleMakeController,
+                  hint: 'Enter vehicle make (e.g., Toyota)',
+                  surfaceColor: surfaceColor,
+                  borderColor: borderColor,
+                  textColor: textColor,
+                  hintColor: hintColor,
+                ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Vehicle Model
-              _buildFieldLabel(
-                Icons.car_rental_outlined,
-                'Model',
-                secondaryColor,
-              ),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _vehicleModelController,
-                hint: 'Enter vehicle model (e.g., Camry)',
-                surfaceColor: surfaceColor,
-                borderColor: borderColor,
-                textColor: textColor,
-                hintColor: hintColor,
-              ),
+                // Vehicle Model
+                _buildFieldLabel(
+                  Icons.car_rental_outlined,
+                  'Model',
+                  secondaryColor,
+                ),
+                const SizedBox(height: 8),
+                _buildTextField(
+                  controller: _vehicleModelController,
+                  hint: 'Enter vehicle model (e.g., Camry)',
+                  surfaceColor: surfaceColor,
+                  borderColor: borderColor,
+                  textColor: textColor,
+                  hintColor: hintColor,
+                ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              // Vehicle Year
-              _buildFieldLabel(
-                Icons.calendar_today_outlined,
-                'Year',
-                secondaryColor,
-              ),
-              const SizedBox(height: 8),
-              _buildTextField(
-                controller: _vehicleYearController,
-                hint: 'Enter vehicle year',
-                keyboardType: TextInputType.number,
-                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-                surfaceColor: surfaceColor,
-                borderColor: borderColor,
-                textColor: textColor,
-                hintColor: hintColor,
-              ),
+                // Vehicle Year
+                _buildFieldLabel(
+                  Icons.calendar_today_outlined,
+                  'Year',
+                  secondaryColor,
+                ),
+                const SizedBox(height: 8),
+                _buildTextField(
+                  controller: _vehicleYearController,
+                  hint: 'Enter vehicle year',
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  surfaceColor: surfaceColor,
+                  borderColor: borderColor,
+                  textColor: textColor,
+                  hintColor: hintColor,
+                ),
+              ],
 
               const SizedBox(height: 28),
 
@@ -959,6 +972,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (normalized == null || normalized.isEmpty) return null;
     return normalized.toLowerCase();
   }
+
+  bool _isCarVehicleType(String? value) =>
+      _normalizeVehicleText(value) == 'car';
 
   int? _normalizeVehicleYear(int? value) {
     if (value == null || value <= 0) return null;

@@ -30,6 +30,9 @@ class ApiConstants {
   static String supportTicketMessages(int id) =>
       '/support/tickets/$id/messages/';
 
+  // Earnings
+  static const String driverEarnings = '/drivers/earnings/';
+
   // Notifications
   static const String notifications = '/notifications';
   static const String deviceToken = '/notifications/device';

@@ -17,6 +17,7 @@ import 'core/providers/auth_provider.dart';
 import 'core/providers/driver_provider.dart';
 import 'core/providers/notification_provider.dart';
 import 'core/providers/tour_provider.dart';
+import 'core/providers/earnings_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/services/fcm_service.dart';
 
@@ -79,6 +80,7 @@ class TaybGoDriverApp extends StatelessWidget {
     final orderProvider = OrderProvider();
     final driverProvider = DriverProvider();
     final notificationProvider = NotificationProvider();
+    final earningsProvider = EarningsProvider();
     final router = _router ??= AppRouter.createRouter(authProvider);
 
     // Wire up logout callback so all providers clear on any logout
@@ -89,6 +91,7 @@ class TaybGoDriverApp extends StatelessWidget {
     authProvider.onLogoutCallback = () {
       driverProvider.clearProfile();
       orderProvider.clearAll();
+      earningsProvider.clearAll();
       notificationProvider.clearAll();
       tourProvider.resetTour();
     };
@@ -101,6 +104,7 @@ class TaybGoDriverApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider.value(value: driverProvider),
         ChangeNotifierProvider.value(value: notificationProvider),
+        ChangeNotifierProvider.value(value: earningsProvider),
         ChangeNotifierProvider.value(value: tourProvider),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(

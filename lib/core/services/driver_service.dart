@@ -91,6 +91,7 @@ class DriverService {
     String? phone,
     DateTime? birthdate,
     String? vehicleType,
+    bool clearCarDetails = false,
     String? carSize,
     String? vehiclePlateNumber,
     String? vehicleColor,
@@ -121,22 +122,29 @@ class DriverService {
       if (vehicleType != null) {
         data['vehicle_type'] = vehicleType;
       }
-      if (carSize != null) {
+      if (clearCarDetails) {
+        data['car_size'] = null;
+        data['vehicle_plate_number'] = null;
+        data['vehicle_color'] = null;
+        data['vehicle_make'] = null;
+        data['vehicle_model'] = null;
+        data['vehicle_year'] = null;
+      } else if (carSize != null) {
         data['car_size'] = carSize;
       }
-      if (vehiclePlateNumber != null) {
+      if (!clearCarDetails && vehiclePlateNumber != null) {
         data['vehicle_plate_number'] = vehiclePlateNumber;
       }
-      if (vehicleColor != null) {
+      if (!clearCarDetails && vehicleColor != null) {
         data['vehicle_color'] = vehicleColor;
       }
-      if (vehicleMake != null) {
+      if (!clearCarDetails && vehicleMake != null) {
         data['vehicle_make'] = vehicleMake;
       }
-      if (vehicleModel != null) {
+      if (!clearCarDetails && vehicleModel != null) {
         data['vehicle_model'] = vehicleModel;
       }
-      if (vehicleYear != null) {
+      if (!clearCarDetails && vehicleYear != null) {
         data['vehicle_year'] = vehicleYear;
       }
       if (acceptsFood != null) {

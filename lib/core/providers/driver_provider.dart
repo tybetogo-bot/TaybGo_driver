@@ -126,6 +126,7 @@ class DriverProvider extends ChangeNotifier {
     String? phone,
     DateTime? birthdate,
     String? vehicleType,
+    bool clearCarDetails = false,
     String? carSize,
     String? vehiclePlateNumber,
     String? vehicleColor,
@@ -152,6 +153,7 @@ class DriverProvider extends ChangeNotifier {
         phone: phone,
         birthdate: birthdate,
         vehicleType: vehicleType,
+        clearCarDetails: clearCarDetails,
         carSize: carSize,
         vehiclePlateNumber: vehiclePlateNumber,
         vehicleColor: vehicleColor,
@@ -478,7 +480,9 @@ class DriverProvider extends ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      debugPrint('[DriverProvider] Failed to mark driver offline before logout: $e');
+      debugPrint(
+        '[DriverProvider] Failed to mark driver offline before logout: $e',
+      );
     }
   }
 
