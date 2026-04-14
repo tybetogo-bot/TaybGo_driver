@@ -244,34 +244,30 @@ class DriverService {
     required double latitude,
     required double longitude,
   }) async {
+    final lat = double.parse(latitude.toStringAsFixed(6));
+    final lng = double.parse(longitude.toStringAsFixed(6));
+
+    final sentAt = DateTime.now();
+    final sentAtIso = sentAt.toIso8601String();
+    debugPrint(
+      '[LocationPing] → POST ${ApiConstants.driverLocation} lat=$lat lng=$lng at $sentAtIso',
+    );
+
     try {
-      // Round to 6 decimal places (backend requirement)
-      final lat = double.parse(latitude.toStringAsFixed(6));
-      final lng = double.parse(longitude.toStringAsFixed(6));
-
-      final requestData = {'lat': lat, 'lng': lng};
-
-      debugPrint('[DriverService] === UPDATE LOCATION REQUEST ===');
-      debugPrint(
-        '[DriverService] Endpoint: ${ApiConstants.baseUrl}${ApiConstants.driverLocation}',
-      );
-      debugPrint('[DriverService] Method: POST');
-      debugPrint('[DriverService] Request Body: $requestData');
-
       final response = await _apiClient.post(
         ApiConstants.driverLocation,
-        data: requestData,
+        data: {'lat': lat, 'lng': lng},
       );
-
-      debugPrint('[DriverService] === UPDATE LOCATION RESPONSE ===');
-      debugPrint('[DriverService] Status Code: ${response.statusCode}');
-      debugPrint('[DriverService] Status Message: ${response.statusMessage}');
-      debugPrint('[DriverService] Headers: ${response.headers.map}');
-      debugPrint('[DriverService] Raw Data Type: ${response.data.runtimeType}');
-      debugPrint('[DriverService] Raw Data: ${response.data}');
+      final elapsed = DateTime.now().difference(sentAt).inMilliseconds;
+      debugPrint(
+        '[LocationPing] ← ${response.statusCode} in ${elapsed}ms (sent at $sentAtIso)',
+      );
     } on DioException catch (e) {
-      debugPrint('[DriverService] Update Location Error: ${e.message}');
-      debugPrint('[DriverService] Error Response: ${e.response?.data}');
+      final elapsed = DateTime.now().difference(sentAt).inMilliseconds;
+      debugPrint(
+        '[LocationPing] ✗ FAILED in ${elapsed}ms (sent at $sentAtIso) '
+        'status=${e.response?.statusCode} error=${e.message}',
+      );
       throw ApiException.fromDioException(e);
     }
   }

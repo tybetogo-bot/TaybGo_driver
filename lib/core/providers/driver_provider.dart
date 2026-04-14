@@ -335,17 +335,16 @@ class DriverProvider extends ChangeNotifier {
         return;
       }
 
-      // Start continuous updates
+      // Keep the position stream running — this keeps the Android foreground
+      // service alive and refreshes `locationService.lastPosition` on every fix.
       _locationService.startLocationUpdates(
-        onLocationUpdate: (position) async {
-          await updateLocation(position.latitude, position.longitude);
-        },
+        onLocationUpdate: (_) {},
         onError: (error) {
           debugPrint('[DriverProvider] Location update error: $error');
         },
       );
 
-      // Also get an immediate fix
+      // Immediate first POST so the server sees us as soon as we go online.
       final result = await _locationService.getCurrentLocation();
       if (result.success && result.position != null) {
         await updateLocation(
@@ -354,22 +353,17 @@ class DriverProvider extends ChangeNotifier {
         );
       }
 
-      // Force a location update every 5 minutes even if driver hasn't moved
+      // Fixed 10-second heartbeat — POSTs the latest known position whether
+      // or not the driver is moving. Works in foreground and background
+      // (background requires "Always" permission + active foreground service).
       _forceLocationTimer?.cancel();
-      _forceLocationTimer = Timer.periodic(const Duration(minutes: 5), (
+      _forceLocationTimer = Timer.periodic(const Duration(seconds: 60), (
         _,
       ) async {
         if (!(_profile?.isOnline ?? false)) return;
-        final lastUpdate = _lastLocationUpdate;
-        if (lastUpdate != null &&
-            DateTime.now().difference(lastUpdate).inMinutes < 5) {
-          return; // Already updated recently via movement
-        }
-        debugPrint('[DriverProvider] === FORCED 5-MIN LOCATION UPDATE ===');
-        final loc = await _locationService.getCurrentLocation();
-        if (loc.success && loc.position != null) {
-          await updateLocation(loc.position!.latitude, loc.position!.longitude);
-        }
+        final pos = _locationService.lastPosition;
+        if (pos == null) return;
+        await updateLocation(pos.latitude, pos.longitude);
       });
 
       notifyListeners();

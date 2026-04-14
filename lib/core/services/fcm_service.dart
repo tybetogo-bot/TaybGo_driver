@@ -23,6 +23,7 @@ class FcmService {
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
   FirebaseMessaging? _messaging;
+  bool _initialized = false;
 
   FirebaseMessaging get _messagingInstance =>
       _messaging ??= FirebaseMessaging.instance;
@@ -53,9 +54,19 @@ class FcmService {
 
   /// Initialize FCM — call once after Firebase.initializeApp()
   Future<void> initialize() async {
+    if (_initialized) {
+      debugPrint('[FCM] initialize() skipped: already initialized');
+      return;
+    }
+
     if (!kIsWeb) {
       // Background handler and local notifications are not supported on web
       FirebaseMessaging.onBackgroundMessage(firebaseMessagingBackgroundHandler);
+
+      // Avoid background token bootstrap before the authenticated flow
+      // explicitly asks for a device token.
+      await _messagingInstance.setAutoInitEnabled(false);
+      debugPrint('[FCM] Auto-init disabled until push registration is needed');
     }
 
     // Request permission (iOS + Android 13+ + web)
@@ -97,12 +108,18 @@ class FcmService {
       );
     }
 
+    _initialized = true;
     debugPrint('[FCM] Initialization complete');
   }
 
   /// Get the current FCM token. Returns null if unavailable.
   Future<String?> getToken() async {
     try {
+      if (!kIsWeb) {
+        await _messagingInstance.setAutoInitEnabled(true);
+        debugPrint('[FCM] Auto-init enabled for token retrieval');
+      }
+
       final token = await _messagingInstance.getToken();
       debugPrint('[FCM] Token: ${token?.substring(0, 20)}...');
       return token;
