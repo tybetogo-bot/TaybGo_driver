@@ -26,6 +26,18 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  static const List<Map<String, String>> _vehicleTypeOptions = [
+    {'value': 'CAR', 'labelKey': 'car'},
+    {'value': 'BIKE', 'labelKey': 'bicycle'},
+  ];
+
+  static const List<Map<String, String>> _carSizeOptions = [
+    {'value': 'X', 'labelKey': 'carSizeX'},
+    {'value': 'COMFORT', 'labelKey': 'carSizeComfort'},
+    {'value': 'XL', 'labelKey': 'carSizeXL'},
+    {'value': 'BLACK', 'labelKey': 'carSizeBlack'},
+  ];
+
   // Personal info controllers
   late TextEditingController _nameController;
   late TextEditingController _phoneController;
@@ -234,6 +246,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         : _formatBirthdateForDisplay(_selectedBirthdate!);
   }
 
+  String _localizedOptionLabel(AppLocalizations l10n, String labelKey) {
+    switch (labelKey) {
+      case 'car':
+        return l10n.car;
+      case 'bicycle':
+        return l10n.bicycle;
+      case 'carSizeX':
+        return l10n.carSizeX;
+      case 'carSizeComfort':
+        return l10n.carSizeComfort;
+      case 'carSizeXL':
+        return l10n.carSizeXL;
+      case 'carSizeBlack':
+        return l10n.carSizeBlack;
+      default:
+        return labelKey;
+    }
+  }
+
+  List<DropdownMenuItem<String>> _buildDropdownItems(
+    AppLocalizations l10n,
+    List<Map<String, String>> options,
+  ) {
+    return options.map((option) {
+      final value = option['value']!;
+      final label = _localizedOptionLabel(l10n, option['labelKey']!);
+      return DropdownMenuItem<String>(value: value, child: Text(label));
+    }).toList();
+  }
+
   String _formatBirthdateForDisplay(DateTime birthdate) {
     return intl.DateFormat.yMMMd(
       FrameworkLocaleSupport.dateFormattingLocale(
@@ -364,6 +406,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final hintColor = isDark ? AppColors.darkTextHint : AppColors.lightTextHint;
     final l10n = AppLocalizations.of(context)!;
+    final vehicleTypeItems = _buildDropdownItems(l10n, _vehicleTypeOptions);
+    final carSizeItems = _buildDropdownItems(l10n, _carSizeOptions);
 
     return Scaffold(
       appBar: AppBar(
@@ -452,11 +496,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const SizedBox(height: 28),
 
               // Personal Information Section
-              _buildSectionHeader(
-                'Personal Information',
-                Icons.person,
-                textColor,
-              ),
+              _buildSectionHeader(l10n.personalInfo, Icons.person, textColor),
               const SizedBox(height: 16),
 
               // Name
@@ -529,7 +569,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               // Vehicle Information Section
               _buildSectionHeader(
-                'Vehicle Information',
+                l10n.vehicleInfo,
                 Icons.directions_car,
                 textColor,
               ),
@@ -538,14 +578,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               // Vehicle Type Dropdown
               _buildFieldLabel(
                 Icons.category_outlined,
-                'Vehicle Type',
+                l10n.vehicleType,
                 secondaryColor,
               ),
               const SizedBox(height: 8),
               _buildDropdown(
                 value: _selectedVehicleType,
-                items: ['CAR', 'BIKE'],
-                hint: 'Select vehicle type',
+                items: vehicleTypeItems,
+                hint: l10n.selectVehicleType,
                 onChanged: (value) {
                   setState(() => _selectedVehicleType = value);
                 },
@@ -561,14 +601,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 // Car Size Dropdown
                 _buildFieldLabel(
                   Icons.straighten_outlined,
-                  'Car Size',
+                  l10n.carSize,
                   secondaryColor,
                 ),
                 const SizedBox(height: 8),
                 _buildDropdown(
                   value: _selectedCarSize,
-                  items: ['X', 'S', 'M', 'L', 'XL'],
-                  hint: 'Select car size',
+                  items: carSizeItems,
+                  hint: l10n.selectCarSize,
                   onChanged: (value) {
                     setState(() => _selectedCarSize = value);
                   },
@@ -583,13 +623,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 // Vehicle Plate Number
                 _buildFieldLabel(
                   Icons.pin_outlined,
-                  'Plate Number',
+                  l10n.licensePlate,
                   secondaryColor,
                 ),
                 const SizedBox(height: 8),
                 _buildTextField(
                   controller: _vehiclePlateNumberController,
-                  hint: 'Enter plate number',
+                  hint: l10n.enterVehiclePlateNumber,
                   surfaceColor: surfaceColor,
                   borderColor: borderColor,
                   textColor: textColor,
@@ -601,13 +641,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 // Vehicle Color
                 _buildFieldLabel(
                   Icons.palette_outlined,
-                  'Color',
+                  l10n.vehicleColor,
                   secondaryColor,
                 ),
                 const SizedBox(height: 8),
                 _buildTextField(
                   controller: _vehicleColorController,
-                  hint: 'Enter vehicle color',
+                  hint: l10n.enterVehicleColor,
                   surfaceColor: surfaceColor,
                   borderColor: borderColor,
                   textColor: textColor,
@@ -619,13 +659,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 // Vehicle Make
                 _buildFieldLabel(
                   Icons.factory_outlined,
-                  'Make',
+                  l10n.vehicleMake,
                   secondaryColor,
                 ),
                 const SizedBox(height: 8),
                 _buildTextField(
                   controller: _vehicleMakeController,
-                  hint: 'Enter vehicle make (e.g., Toyota)',
+                  hint: l10n.enterVehicleMake,
                   surfaceColor: surfaceColor,
                   borderColor: borderColor,
                   textColor: textColor,
@@ -637,13 +677,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 // Vehicle Model
                 _buildFieldLabel(
                   Icons.car_rental_outlined,
-                  'Model',
+                  l10n.vehicleModel,
                   secondaryColor,
                 ),
                 const SizedBox(height: 8),
                 _buildTextField(
                   controller: _vehicleModelController,
-                  hint: 'Enter vehicle model (e.g., Camry)',
+                  hint: l10n.enterVehicleModel,
                   surfaceColor: surfaceColor,
                   borderColor: borderColor,
                   textColor: textColor,
@@ -655,13 +695,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 // Vehicle Year
                 _buildFieldLabel(
                   Icons.calendar_today_outlined,
-                  'Year',
+                  l10n.vehicleYear,
                   secondaryColor,
                 ),
                 const SizedBox(height: 8),
                 _buildTextField(
                   controller: _vehicleYearController,
-                  hint: 'Enter vehicle year',
+                  hint: l10n.enterVehicleYear,
                   keyboardType: TextInputType.number,
                   inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                   surfaceColor: surfaceColor,
@@ -675,7 +715,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               // Services Section
               _buildSectionHeader(
-                'Services Offered',
+                l10n.chooseYourServices,
                 Icons.local_shipping_outlined,
                 textColor,
               ),
@@ -683,7 +723,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               // Service Toggles
               _buildServiceToggle(
-                'Food Delivery',
+                l10n.foodDelivery,
                 Icons.restaurant_outlined,
                 _acceptsFood,
                 (value) => setState(() => _acceptsFood = value),
@@ -693,7 +733,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const SizedBox(height: 12),
 
               _buildServiceToggle(
-                'Shipping',
+                l10n.shipping,
                 Icons.inventory_2_outlined,
                 _acceptsShipping,
                 (value) => setState(() => _acceptsShipping = value),
@@ -703,7 +743,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               const SizedBox(height: 12),
 
               _buildServiceToggle(
-                'Taxi Service',
+                l10n.taxi,
                 Icons.local_taxi_outlined,
                 _acceptsTaxi,
                 (value) => setState(() => _acceptsTaxi = value),
@@ -986,7 +1026,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Widget _buildDropdown({
     required String? value,
-    required List<String> items,
+    required List<DropdownMenuItem<String>> items,
     required String hint,
     required void Function(String?) onChanged,
     required Color surfaceColor,
@@ -1020,9 +1060,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       ),
       dropdownColor: surfaceColor,
       style: TextStyle(fontSize: 15, color: textColor),
-      items: items.map((item) {
-        return DropdownMenuItem(value: item, child: Text(item));
-      }).toList(),
+      items: items,
       onChanged: onChanged,
     );
   }
