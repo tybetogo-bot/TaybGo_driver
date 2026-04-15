@@ -2414,6 +2414,24 @@ abstract class AppLocalizations {
   /// **'Location access is disabled. You won\'t receive orders until it\'s enabled.'**
   String get locationPermissionLostWhileOnline;
 
+  /// No description provided for @batteryOptimizationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Disable battery optimization'**
+  String get batteryOptimizationTitle;
+
+  /// No description provided for @batteryOptimizationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'To keep live location active in the background, set TaybGo Driver to unrestricted battery use in Android settings.'**
+  String get batteryOptimizationMessage;
+
+  /// No description provided for @batteryOptimizationBannerMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Battery optimization can pause live location while you\'re online. Set TaybGo Driver to unrestricted battery use.'**
+  String get batteryOptimizationBannerMessage;
+
   /// No description provided for @profileUpdatedSuccessfully.
   ///
   /// In en, this message translates to:

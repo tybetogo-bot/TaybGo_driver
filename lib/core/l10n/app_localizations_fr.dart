@@ -1241,6 +1241,18 @@ class AppLocalizationsFr extends AppLocalizations {
       'L\'accès à la localisation est désactivé. Vous ne recevrez pas de commandes tant qu\'il ne sera pas activé.';
 
   @override
+  String get batteryOptimizationTitle =>
+      'Desactiver l\'optimisation de la batterie';
+
+  @override
+  String get batteryOptimizationMessage =>
+      'Pour garder la localisation en direct active en arrière-plan, définissez TaybGo Driver sur une utilisation de batterie sans restriction dans les paramètres Android.';
+
+  @override
+  String get batteryOptimizationBannerMessage =>
+      'L\'optimisation de la batterie peut mettre en pause la localisation en direct lorsque vous êtes en ligne. Définissez TaybGo Driver sur une utilisation de batterie sans restriction.';
+
+  @override
   String get profileUpdatedSuccessfully => 'Profil mis à jour avec succès';
 
   @override

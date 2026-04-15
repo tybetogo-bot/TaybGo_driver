@@ -1219,6 +1219,17 @@ class AppLocalizationsAr extends AppLocalizations {
       'الوصول إلى الموقع معطل. لن تتلقى طلبات حتى يتم تفعيله.';
 
   @override
+  String get batteryOptimizationTitle => 'إيقاف تحسين البطارية';
+
+  @override
+  String get batteryOptimizationMessage =>
+      'للحفاظ على عمل الموقع المباشر في الخلفية، اضبط TaybGo Driver على استخدام بطارية غير مقيّد من إعدادات Android.';
+
+  @override
+  String get batteryOptimizationBannerMessage =>
+      'قد يؤدي تحسين البطارية إلى إيقاف الموقع المباشر أثناء اتصالك. اضبط TaybGo Driver على استخدام بطارية غير مقيّد.';
+
+  @override
   String get profileUpdatedSuccessfully => 'تم تحديث الملف الشخصي بنجاح';
 
   @override

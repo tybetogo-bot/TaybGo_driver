@@ -469,6 +469,9 @@
   "collectCash": "Contant innen",
   "collectCashReminder": "Vergeet niet de betaling van de klant te innen",
   "locationPermissionLostWhileOnline": "Locatietoegang is uitgeschakeld. U ontvangt geen bestellingen totdat dit is ingeschakeld.",
+  "batteryOptimizationTitle": "Batterijoptimalisatie uitschakelen",
+  "batteryOptimizationMessage": "Om live locatie op de achtergrond actief te houden, stel TaybGo Driver in de Android-instellingen in op onbeperkt batterijgebruik.",
+  "batteryOptimizationBannerMessage": "Batterijoptimalisatie kan live locatie pauzeren terwijl u online bent. Stel TaybGo Driver in op onbeperkt batterijgebruik.",
 
   "profileUpdatedSuccessfully": "Profiel succesvol bijgewerkt",
   "failedToUpdateProfile": "Profiel bijwerken mislukt",

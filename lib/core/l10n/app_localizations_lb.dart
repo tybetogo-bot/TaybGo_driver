@@ -1241,6 +1241,17 @@ class AppLocalizationsLb extends AppLocalizations {
       'Den Zougang zum Standuert ass desaktivéiert. Dir kritt keng Bestellungen bis en ageschalt ass.';
 
   @override
+  String get batteryOptimizationTitle => 'Batterieoptimisatioun ausschalten';
+
+  @override
+  String get batteryOptimizationMessage =>
+      'Fir de Live-Standuert am Hannergrond aktiv ze halen, setzt TaybGo Driver an den Android-Astellungen op onlimitéiert Batteriebenzung.';
+
+  @override
+  String get batteryOptimizationBannerMessage =>
+      'Batterieoptimisatioun kann de Live-Standuert pauséieren, wann Dir online sidd. Setzt TaybGo Driver op onlimitéiert Batteriebenzung.';
+
+  @override
   String get profileUpdatedSuccessfully => 'Profil erfollegräich aktualiséiert';
 
   @override

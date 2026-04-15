@@ -485,6 +485,9 @@
   "collectCashReminder": "Remember to collect payment from the customer",
 
   "locationPermissionLostWhileOnline": "Location access is disabled. You won't receive orders until it's enabled.",
+  "batteryOptimizationTitle": "Disable battery optimization",
+  "batteryOptimizationMessage": "To keep live location active in the background, set TaybGo Driver to unrestricted battery use in Android settings.",
+  "batteryOptimizationBannerMessage": "Battery optimization can pause live location while you're online. Set TaybGo Driver to unrestricted battery use.",
 
   "profileUpdatedSuccessfully": "Profile updated successfully",
   "failedToUpdateProfile": "Failed to update profile",

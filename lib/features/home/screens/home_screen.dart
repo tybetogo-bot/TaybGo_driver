@@ -11,6 +11,7 @@ import '../../../core/providers/driver_provider.dart';
 import '../../../core/providers/notification_provider.dart';
 import '../../../core/providers/order_provider.dart';
 import '../../../core/providers/tour_provider.dart';
+import '../../../core/services/battery_optimization_service.dart';
 import '../../../core/services/location_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../orders/models/order_model.dart';
@@ -24,7 +25,8 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+class _HomeScreenState extends State<HomeScreen>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
   // Slide-in + fade entrance animation
   late AnimationController _slideController;
   late Animation<Offset> _slideAnimation;
@@ -36,8 +38,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   bool _showNewOrderAnimation = false;
   bool _isRefreshing = false;
+  bool _showBatteryOptimizationBanner = false;
   OrderProvider? _orderProvider;
   Timer? _refreshTimer;
+  final BatteryOptimizationService _batteryOptimizationService =
+      BatteryOptimizationService();
 
   // Tour keys from singleton
   final _tourKeys = TourKeys.instance;
@@ -45,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
 
     // Slide-in from bottom + fade
     _slideController = AnimationController(
@@ -121,8 +127,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             driverProvider.resumeLocationTrackingIfOnline();
           }
         }
+
+        unawaited(_refreshBatteryOptimizationWarning(showDialog: true));
       });
     });
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_refreshBatteryOptimizationWarning(showDialog: false));
+    }
   }
 
   void _onNewOrder() {
@@ -242,6 +258,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         }
       }),
     ]);
+
+    await _refreshBatteryOptimizationWarning(showDialog: false);
 
     if (mounted) {
       setState(() => _isRefreshing = false);
@@ -366,6 +384,65 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
+  Future<void> _refreshBatteryOptimizationWarning({
+    required bool showDialog,
+  }) async {
+    final enabled = await _batteryOptimizationService
+        .isBatteryOptimizationEnabled();
+
+    if (!mounted) return;
+
+    if (_showBatteryOptimizationBanner != enabled) {
+      setState(() => _showBatteryOptimizationBanner = enabled);
+    }
+
+    if (!enabled || !showDialog) {
+      return;
+    }
+
+    final driverProvider = context.read<DriverProvider>();
+    final profile = driverProvider.profile;
+    if (profile == null || !profile.isVerified) {
+      return;
+    }
+
+    final shouldShowReminder = await _batteryOptimizationService
+        .shouldShowReminder();
+    if (!mounted || !shouldShowReminder) {
+      return;
+    }
+
+    await _batteryOptimizationService.markReminderShown();
+    await _showBatteryOptimizationDialog();
+  }
+
+  Future<void> _showBatteryOptimizationDialog() async {
+    final l10n = AppLocalizations.of(context)!;
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        title: Text(l10n.batteryOptimizationTitle),
+        content: Text(l10n.batteryOptimizationMessage),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: Text(l10n.cancel),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await _batteryOptimizationService
+                  .openBatteryOptimizationSettings();
+            },
+            child: Text(l10n.settings),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _startTour(TourProvider tourProvider) async {
     // Start the tour in the provider — ShellScaffold's listener
     // will create the TourCoordinator and run the visual tour.
@@ -442,6 +519,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _refreshTimer?.cancel();
     _orderProvider?.onNewOrderReceived = null;
     _slideController.dispose();
@@ -695,6 +773,88 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 ),
                                 child: Text(
                                   l10n.enable,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+
+                    if (_showBatteryOptimizationBanner &&
+                        profile != null &&
+                        profile.isVerified)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: AppColors.warning.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                          border: Border.all(
+                            color: AppColors.warning.withValues(alpha: 0.3),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppColors.warning.withValues(
+                                  alpha: 0.15,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Icon(
+                                Icons.battery_alert_rounded,
+                                color: AppColors.warning,
+                                size: 20,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    l10n.batteryOptimizationTitle,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w600,
+                                      color: textColor,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    l10n.batteryOptimizationBannerMessage,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: secondaryColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            GestureDetector(
+                              onTap: () async {
+                                await _batteryOptimizationService
+                                    .openBatteryOptimizationSettings();
+                              },
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: AppColors.warning,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Text(
+                                  l10n.settings,
                                   style: const TextStyle(
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600,

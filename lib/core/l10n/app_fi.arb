@@ -469,6 +469,9 @@
   "collectCash": "Kerää käteinen",
   "collectCashReminder": "Muista kerätä maksu asiakkaalta",
   "locationPermissionLostWhileOnline": "Sijaintioikeus on poistettu käytöstä. Et vastaanota tilauksia ennen kuin se on otettu käyttöön.",
+  "batteryOptimizationTitle": "Poista akun optimointi",
+  "batteryOptimizationMessage": "Jotta reaaliaikainen sijainti pysyy aktiivisena taustalla, aseta TaybGo Driver rajoittamattomaan akun käyttöön Android-asetuksissa.",
+  "batteryOptimizationBannerMessage": "Akun optimointi voi keskeyttää reaaliaikaisen sijainnin, kun olet online-tilassa. Aseta TaybGo Driver rajoittamattomaan akun käyttöön.",
 
   "profileUpdatedSuccessfully": "Profiili päivitetty onnistuneesti",
   "failedToUpdateProfile": "Profiilin päivitys epäonnistui",

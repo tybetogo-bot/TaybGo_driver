@@ -1231,6 +1231,17 @@ class AppLocalizationsNl extends AppLocalizations {
       'Locatietoegang is uitgeschakeld. U ontvangt geen bestellingen totdat dit is ingeschakeld.';
 
   @override
+  String get batteryOptimizationTitle => 'Batterijoptimalisatie uitschakelen';
+
+  @override
+  String get batteryOptimizationMessage =>
+      'Om live locatie op de achtergrond actief te houden, stel TaybGo Driver in de Android-instellingen in op onbeperkt batterijgebruik.';
+
+  @override
+  String get batteryOptimizationBannerMessage =>
+      'Batterijoptimalisatie kan live locatie pauzeren terwijl u online bent. Stel TaybGo Driver in op onbeperkt batterijgebruik.';
+
+  @override
   String get profileUpdatedSuccessfully => 'Profiel succesvol bijgewerkt';
 
   @override

@@ -469,6 +469,9 @@
   "collectCash": "Samle inn kontanter",
   "collectCashReminder": "Husk å samle inn betalingen fra kunden",
   "locationPermissionLostWhileOnline": "Posisjonstilgang er deaktivert. Du vil ikke motta bestillinger før den er aktivert.",
+  "batteryOptimizationTitle": "Slå av batterioptimalisering",
+  "batteryOptimizationMessage": "For å holde live-posisjon aktiv i bakgrunnen, sett TaybGo Driver til ubegrenset batteribruk i Android-innstillingene.",
+  "batteryOptimizationBannerMessage": "Batterioptimalisering kan sette live-posisjon på pause mens du er online. Sett TaybGo Driver til ubegrenset batteribruk.",
 
   "profileUpdatedSuccessfully": "Profil oppdatert",
   "failedToUpdateProfile": "Kunne ikke oppdatere profil",

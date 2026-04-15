@@ -440,6 +440,9 @@
   "collectCashReminder": "N'oubliez pas d'encaisser le paiement du client",
 
   "locationPermissionLostWhileOnline": "L'accès à la localisation est désactivé. Vous ne recevrez pas de commandes tant qu'il ne sera pas activé.",
+  "batteryOptimizationTitle": "Desactiver l'optimisation de la batterie",
+  "batteryOptimizationMessage": "Pour garder la localisation en direct active en arrière-plan, définissez TaybGo Driver sur une utilisation de batterie sans restriction dans les paramètres Android.",
+  "batteryOptimizationBannerMessage": "L'optimisation de la batterie peut mettre en pause la localisation en direct lorsque vous êtes en ligne. Définissez TaybGo Driver sur une utilisation de batterie sans restriction.",
 
   "profileUpdatedSuccessfully": "Profil mis à jour avec succès",
   "failedToUpdateProfile": "Échec de la mise à jour du profil",

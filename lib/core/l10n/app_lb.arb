@@ -469,6 +469,9 @@
   "collectCash": "Boergeld asammelen",
   "collectCashReminder": "Vergiesst net d'Bezuelung vum Client anzezéien",
   "locationPermissionLostWhileOnline": "Den Zougang zum Standuert ass desaktivéiert. Dir kritt keng Bestellungen bis en ageschalt ass.",
+  "batteryOptimizationTitle": "Batterieoptimisatioun ausschalten",
+  "batteryOptimizationMessage": "Fir de Live-Standuert am Hannergrond aktiv ze halen, setzt TaybGo Driver an den Android-Astellungen op onlimitéiert Batteriebenzung.",
+  "batteryOptimizationBannerMessage": "Batterieoptimisatioun kann de Live-Standuert pauséieren, wann Dir online sidd. Setzt TaybGo Driver op onlimitéiert Batteriebenzung.",
 
   "profileUpdatedSuccessfully": "Profil erfollegräich aktualiséiert",
   "failedToUpdateProfile": "Profil konnt net aktualiséiert ginn",

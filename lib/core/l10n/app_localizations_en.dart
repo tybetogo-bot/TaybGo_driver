@@ -1228,6 +1228,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'Location access is disabled. You won\'t receive orders until it\'s enabled.';
 
   @override
+  String get batteryOptimizationTitle => 'Disable battery optimization';
+
+  @override
+  String get batteryOptimizationMessage =>
+      'To keep live location active in the background, set TaybGo Driver to unrestricted battery use in Android settings.';
+
+  @override
+  String get batteryOptimizationBannerMessage =>
+      'Battery optimization can pause live location while you\'re online. Set TaybGo Driver to unrestricted battery use.';
+
+  @override
   String get profileUpdatedSuccessfully => 'Profile updated successfully';
 
   @override

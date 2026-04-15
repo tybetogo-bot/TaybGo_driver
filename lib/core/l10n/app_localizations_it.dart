@@ -1229,6 +1229,17 @@ class AppLocalizationsIt extends AppLocalizations {
       'L\'accesso alla posizione è disabilitato. Non riceverai ordini finché non sarà abilitato.';
 
   @override
+  String get batteryOptimizationTitle => 'Disattiva ottimizzazione batteria';
+
+  @override
+  String get batteryOptimizationMessage =>
+      'Per mantenere attiva la posizione in tempo reale in background, imposta TaybGo Driver su utilizzo della batteria senza restrizioni nelle impostazioni Android.';
+
+  @override
+  String get batteryOptimizationBannerMessage =>
+      'L\'ottimizzazione della batteria può mettere in pausa la posizione in tempo reale mentre sei online. Imposta TaybGo Driver su utilizzo della batteria senza restrizioni.';
+
+  @override
   String get profileUpdatedSuccessfully => 'Profilo aggiornato con successo';
 
   @override

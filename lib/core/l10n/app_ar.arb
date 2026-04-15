@@ -480,6 +480,9 @@
   "collectCashReminder": "تذكّر تحصيل المبلغ من العميل",
 
   "locationPermissionLostWhileOnline": "الوصول إلى الموقع معطل. لن تتلقى طلبات حتى يتم تفعيله.",
+  "batteryOptimizationTitle": "إيقاف تحسين البطارية",
+  "batteryOptimizationMessage": "للحفاظ على عمل الموقع المباشر في الخلفية، اضبط TaybGo Driver على استخدام بطارية غير مقيّد من إعدادات Android.",
+  "batteryOptimizationBannerMessage": "قد يؤدي تحسين البطارية إلى إيقاف الموقع المباشر أثناء اتصالك. اضبط TaybGo Driver على استخدام بطارية غير مقيّد.",
 
   "profileUpdatedSuccessfully": "تم تحديث الملف الشخصي بنجاح",
   "failedToUpdateProfile": "فشل تحديث الملف الشخصي",

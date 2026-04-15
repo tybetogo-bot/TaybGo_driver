@@ -56,7 +56,9 @@ class AuthService {
 
   Future<OtpRequestResponse> requestOtp(String phoneNumber) async {
     try {
-      debugPrint('[AuthService] Sending OTP request to: ${ApiConstants.otpRequest}');
+      debugPrint(
+        '[AuthService] Sending OTP request to: ${ApiConstants.otpRequest}',
+      );
       final response = await _apiClient.post(
         ApiConstants.otpRequest,
         data: {'phone': phoneNumber},
@@ -66,7 +68,9 @@ class AuthService {
       debugPrint('[AuthService] OTP response data: ${response.data}');
       return OtpRequestResponse.fromJson(response.data);
     } on DioException catch (e) {
-      debugPrint('[AuthService] DioException: ${e.message}, response: ${e.response?.data}');
+      debugPrint(
+        '[AuthService] DioException: ${e.message}, response: ${e.response?.data}',
+      );
       throw ApiException.fromDioException(e);
     }
   }
@@ -82,10 +86,7 @@ class AuthService {
 
       final response = await _apiClient.post(
         ApiConstants.otpVerify,
-        data: {
-          'phone': phoneNumber,
-          'code': otp,
-        },
+        data: {'phone': phoneNumber, 'code': otp},
       );
 
       debugPrint('[AuthService] === OTP VERIFY RESPONSE ===');
@@ -158,6 +159,6 @@ class AuthService {
   }
 
   Future<bool> isAuthenticated() async {
-    return _apiClient.tokenStorage.hasTokens();
+    return _apiClient.hasValidSession();
   }
 }

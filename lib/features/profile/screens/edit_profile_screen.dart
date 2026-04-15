@@ -1,14 +1,20 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:provider/provider.dart';
 import '../../../core/models/driver_profile.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/l10n/framework_locale_support.dart';
 import '../../../core/providers/driver_provider.dart';
+import '../../../core/services/cloudinary_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/birthdate_utils.dart';
+import '../../application/utils/document_picker.dart';
+
+enum _DocumentPickAction { camera, gallery, file }
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -33,12 +39,24 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _vehicleYearController;
 
   // Document status
+  Uint8List? _drivingLicenseBytes;
   String? _drivingLicenseUrl;
+  bool _drivingLicenseUploading = false;
+  Uint8List? _idDocumentBytes;
   String? _idDocumentUrl;
+  bool _idDocumentUploading = false;
+  Uint8List? _otherDocumentsBytes;
   String? _otherDocumentsUrl;
+  bool _otherDocumentsUploading = false;
+  Uint8List? _healthInsuranceDocumentBytes;
   String? _healthInsuranceDocumentUrl;
+  bool _healthInsuranceDocumentUploading = false;
+  Uint8List? _addressDocumentBytes;
   String? _addressDocumentUrl;
+  bool _addressDocumentUploading = false;
+  Uint8List? _bankDocumentBytes;
   String? _bankDocumentUrl;
+  bool _bankDocumentUploading = false;
 
   // Service toggles
   late bool _acceptsFood;
@@ -50,6 +68,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   String? _selectedCarSize;
 
   late final DriverProvider _driverProvider;
+  final CloudinaryService _cloudinaryService = CloudinaryService();
+  final ImagePicker _imagePicker = ImagePicker();
   bool _profileInitialized = false;
 
   bool _isSaving = false;
@@ -252,8 +272,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
 
-    if (_hasVehicleDataChanges()) {
-      final confirmed = await _showVehicleChangeWarningDialog();
+    final requiresApproval = _hasVehicleDataChanges() || _hasDocumentChanges();
+    if (requiresApproval) {
+      final confirmed = await _showProfileApprovalWarningDialog();
       if (!confirmed || !mounted) return;
     }
 
@@ -293,6 +314,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       acceptsFood: _acceptsFood,
       acceptsShipping: _acceptsShipping,
       acceptsTaxi: _acceptsTaxi,
+      drivingLicense: _drivingLicenseUrl,
+      idDocument: _idDocumentUrl,
+      otherDocuments: _otherDocumentsUrl,
+      healthInsuranceDocument: _healthInsuranceDocumentUrl,
+      addressDocument: _addressDocumentUrl,
+      bankDocument: _bankDocumentUrl,
     );
 
     if (!mounted) return;
@@ -694,10 +721,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               ),
               const SizedBox(height: 16),
 
-              _buildDocumentStatusCard(
+              _buildDocumentUploadCard(
                 label: l10n.driversLicense,
                 icon: Icons.badge_outlined,
+                bytes: _drivingLicenseBytes,
                 url: _drivingLicenseUrl,
+                isUploading: _drivingLicenseUploading,
+                onTap: () => _pickAndUpload(
+                  label: l10n.driversLicense,
+                  folder: 'driver_licenses',
+                  setBytes: (bytes) => _drivingLicenseBytes = bytes,
+                  setUrl: (url) => _drivingLicenseUrl = url,
+                  setLoading: (loading) => _drivingLicenseUploading = loading,
+                ),
                 textColor: textColor,
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
@@ -706,10 +742,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               const SizedBox(height: 12),
 
-              _buildDocumentStatusCard(
+              _buildDocumentUploadCard(
                 label: l10n.nationalId,
                 icon: Icons.credit_card_outlined,
+                bytes: _idDocumentBytes,
                 url: _idDocumentUrl,
+                isUploading: _idDocumentUploading,
+                onTap: () => _pickAndUpload(
+                  label: l10n.nationalId,
+                  folder: 'id_documents',
+                  setBytes: (bytes) => _idDocumentBytes = bytes,
+                  setUrl: (url) => _idDocumentUrl = url,
+                  setLoading: (loading) => _idDocumentUploading = loading,
+                ),
                 textColor: textColor,
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
@@ -718,10 +763,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               const SizedBox(height: 12),
 
-              _buildDocumentStatusCard(
-                label: l10n.documents,
+              _buildDocumentUploadCard(
+                label: l10n.otherDocuments,
                 icon: Icons.description_outlined,
+                bytes: _otherDocumentsBytes,
                 url: _otherDocumentsUrl,
+                isUploading: _otherDocumentsUploading,
+                onTap: () => _pickAndUpload(
+                  label: l10n.otherDocuments,
+                  folder: 'other_documents',
+                  setBytes: (bytes) => _otherDocumentsBytes = bytes,
+                  setUrl: (url) => _otherDocumentsUrl = url,
+                  setLoading: (loading) => _otherDocumentsUploading = loading,
+                ),
                 textColor: textColor,
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
@@ -730,10 +784,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               const SizedBox(height: 12),
 
-              _buildDocumentStatusCard(
+              _buildDocumentUploadCard(
                 label: l10n.healthInsuranceDocument,
                 icon: Icons.health_and_safety_outlined,
+                bytes: _healthInsuranceDocumentBytes,
                 url: _healthInsuranceDocumentUrl,
+                isUploading: _healthInsuranceDocumentUploading,
+                onTap: () => _pickAndUpload(
+                  label: l10n.healthInsuranceDocument,
+                  folder: 'health_insurance_documents',
+                  setBytes: (bytes) => _healthInsuranceDocumentBytes = bytes,
+                  setUrl: (url) => _healthInsuranceDocumentUrl = url,
+                  setLoading: (loading) =>
+                      _healthInsuranceDocumentUploading = loading,
+                ),
                 textColor: textColor,
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
@@ -742,10 +806,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               const SizedBox(height: 12),
 
-              _buildDocumentStatusCard(
+              _buildDocumentUploadCard(
                 label: l10n.addressDocument,
                 icon: Icons.home_outlined,
+                bytes: _addressDocumentBytes,
                 url: _addressDocumentUrl,
+                isUploading: _addressDocumentUploading,
+                onTap: () => _pickAndUpload(
+                  label: l10n.addressDocument,
+                  folder: 'address_documents',
+                  setBytes: (bytes) => _addressDocumentBytes = bytes,
+                  setUrl: (url) => _addressDocumentUrl = url,
+                  setLoading: (loading) => _addressDocumentUploading = loading,
+                ),
                 textColor: textColor,
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
@@ -754,10 +827,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               const SizedBox(height: 12),
 
-              _buildDocumentStatusCard(
+              _buildDocumentUploadCard(
                 label: l10n.bankDocument,
                 icon: Icons.account_balance_outlined,
+                bytes: _bankDocumentBytes,
                 url: _bankDocumentUrl,
+                isUploading: _bankDocumentUploading,
+                onTap: () => _pickAndUpload(
+                  label: l10n.bankDocument,
+                  folder: 'bank_documents',
+                  setBytes: (bytes) => _bankDocumentBytes = bytes,
+                  setUrl: (url) => _bankDocumentUrl = url,
+                  setLoading: (loading) => _bankDocumentUploading = loading,
+                ),
                 textColor: textColor,
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
@@ -771,7 +853,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: _isSaving ? null : _saveProfile,
+                  onPressed: _isSaveActionDisabled ? null : _saveProfile,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
@@ -945,6 +1027,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  bool get _isAnyDocumentUploading =>
+      _drivingLicenseUploading ||
+      _idDocumentUploading ||
+      _otherDocumentsUploading ||
+      _healthInsuranceDocumentUploading ||
+      _addressDocumentUploading ||
+      _bankDocumentUploading;
+
+  bool get _isSaveActionDisabled => _isSaving || _isAnyDocumentUploading;
+
   bool _hasVehicleDataChanges() {
     final profile = _driverProvider.profile;
     if (profile == null) return false;
@@ -967,6 +1059,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _normalizeVehicleYear(profile.vehicleYear);
   }
 
+  bool _hasDocumentChanges() {
+    final profile = _driverProvider.profile;
+    if (profile == null) return false;
+
+    return _normalizeDocumentUrl(_drivingLicenseUrl) !=
+            _normalizeDocumentUrl(profile.drivingLicense) ||
+        _normalizeDocumentUrl(_idDocumentUrl) !=
+            _normalizeDocumentUrl(profile.idDocument) ||
+        _normalizeDocumentUrl(_otherDocumentsUrl) !=
+            _normalizeDocumentUrl(profile.otherDocuments) ||
+        _normalizeDocumentUrl(_healthInsuranceDocumentUrl) !=
+            _normalizeDocumentUrl(profile.healthInsuranceDocument) ||
+        _normalizeDocumentUrl(_addressDocumentUrl) !=
+            _normalizeDocumentUrl(profile.addressDocument) ||
+        _normalizeDocumentUrl(_bankDocumentUrl) !=
+            _normalizeDocumentUrl(profile.bankDocument);
+  }
+
+  String? _normalizeDocumentUrl(String? value) {
+    final normalized = value?.trim();
+    if (normalized == null || normalized.isEmpty) return null;
+    return normalized;
+  }
+
   String? _normalizeVehicleText(String? value) {
     final normalized = value?.trim();
     if (normalized == null || normalized.isEmpty) return null;
@@ -981,7 +1097,164 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return value;
   }
 
-  Future<bool> _showVehicleChangeWarningDialog() async {
+  Future<PickedDocument?> _pickImageWithSource(ImageSource source) async {
+    final picked = await _imagePicker.pickImage(
+      source: source,
+      imageQuality: 80,
+    );
+    if (picked == null) return null;
+
+    final bytes = await picked.readAsBytes();
+    return PickedDocument(
+      bytes: bytes,
+      fileName: picked.name,
+      isImage: true,
+      previewBytes: bytes,
+    );
+  }
+
+  Future<PickedDocument?> _pickFile({required bool imagesOnly}) async {
+    return pickDocument(imagesOnly: imagesOnly);
+  }
+
+  Future<_DocumentPickAction?> _pickDocumentFromChooser(
+    AppLocalizations l10n,
+    String label,
+  ) async {
+    return showModalBottomSheet<_DocumentPickAction>(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        final isDark = Theme.of(ctx).brightness == Brightness.dark;
+        final sheetBg = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+        return Container(
+          color: sheetBg,
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  if (!kIsWeb) ...[
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () =>
+                            Navigator.pop(ctx, _DocumentPickAction.camera),
+                        icon: const Icon(Icons.camera_alt_outlined),
+                        label: Text(l10n.camera),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                  ],
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () =>
+                          Navigator.pop(ctx, _DocumentPickAction.gallery),
+                      icon: const Icon(Icons.photo_library_outlined),
+                      label: Text(l10n.gallery),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: () => Navigator.pop(ctx, _DocumentPickAction.file),
+                  icon: const Icon(Icons.insert_drive_file_outlined),
+                  label: Text(l10n.file),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _pickAndUpload({
+    required String label,
+    required String folder,
+    required void Function(Uint8List? bytes) setBytes,
+    required void Function(String? url) setUrl,
+    required void Function(bool loading) setLoading,
+  }) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    final PickedDocument? picked;
+    if (kIsWeb) {
+      picked = await _pickFile(imagesOnly: false);
+    } else {
+      final action = await _pickDocumentFromChooser(l10n, label);
+      if (action == null) return;
+
+      picked = switch (action) {
+        _DocumentPickAction.camera => await _pickImageWithSource(
+          ImageSource.camera,
+        ),
+        _DocumentPickAction.gallery => await _pickImageWithSource(
+          ImageSource.gallery,
+        ),
+        _DocumentPickAction.file => await _pickFile(imagesOnly: false),
+      };
+    }
+
+    if (picked == null || !mounted) return;
+    final document = picked;
+
+    setState(() {
+      setBytes(document.previewBytes);
+      setLoading(true);
+    });
+
+    final url = await _cloudinaryService.uploadFile(
+      document.bytes,
+      fileName: document.fileName,
+      folder: folder,
+      resourceType: document.isImage ? 'auto' : 'raw',
+    );
+
+    if (!mounted) return;
+    setState(() {
+      setLoading(false);
+      if (url != null) {
+        setUrl(url);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(l10n.uploadFailed),
+            backgroundColor: AppColors.error,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        );
+      }
+    });
+  }
+
+  Future<bool> _showProfileApprovalWarningDialog() async {
     final l10n = AppLocalizations.of(context)!;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final backgroundColor = isDark ? AppColors.darkSurface : AppColors.lightBg;
@@ -1207,86 +1480,148 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
-  Widget _buildDocumentStatusCard({
+  Widget _buildDocumentUploadCard({
     required String label,
     required IconData icon,
+    required Uint8List? bytes,
     required String? url,
+    required bool isUploading,
+    required VoidCallback onTap,
     required Color textColor,
     required Color secondaryColor,
     required Color surfaceColor,
     required AppLocalizations l10n,
   }) {
+    final previewBytes = bytes;
+    final hasBytes = previewBytes != null && previewBytes.isNotEmpty;
     final isUploaded = url != null && url.isNotEmpty;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 150),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: isUploaded
-            ? AppColors.success.withValues(alpha: 0.04)
-            : surfaceColor,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
+    return GestureDetector(
+      onTap: isUploading || _isSaving ? null : onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
           color: isUploaded
-              ? AppColors.success.withValues(alpha: 0.65)
-              : secondaryColor.withValues(alpha: 0.14),
+              ? AppColors.success.withValues(alpha: 0.05)
+              : surfaceColor,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isUploaded
+                ? AppColors.success
+                : hasBytes
+                ? AppColors.primary
+                : secondaryColor.withValues(alpha: 0.14),
+            width: isUploaded || hasBytes ? 2 : 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.03),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 34,
-            height: 34,
-            decoration: BoxDecoration(
+        child: Row(
+          children: [
+            Container(
+              width: 56,
+              height: 56,
+              decoration: BoxDecoration(
+                color: isUploaded
+                    ? AppColors.success.withValues(alpha: 0.15)
+                    : AppColors.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: hasBytes
+                  ? ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: Image.memory(previewBytes, fit: BoxFit.cover),
+                    )
+                  : Icon(
+                      icon,
+                      color: isUploaded ? AppColors.success : AppColors.primary,
+                      size: 28,
+                    ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    label,
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  if (isUploading)
+                    Row(
+                      children: [
+                        const SizedBox(
+                          width: 14,
+                          height: 14,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.uploadingFile,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    )
+                  else if (isUploaded)
+                    Row(
+                      children: [
+                        const Icon(
+                          Icons.check_circle,
+                          color: AppColors.success,
+                          size: 16,
+                        ),
+                        const SizedBox(width: 6),
+                        Text(
+                          l10n.uploaded,
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.success,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          '· ${l10n.changePhoto}',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    Text(
+                      l10n.tapToUpload,
+                      style: TextStyle(fontSize: 13, color: secondaryColor),
+                    ),
+                ],
+              ),
+            ),
+            Icon(
+              isUploaded ? Icons.check_circle : Icons.cloud_upload_outlined,
               color: isUploaded
-                  ? AppColors.success.withValues(alpha: 0.1)
-                  : AppColors.primary.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(10),
+                  ? AppColors.success
+                  : secondaryColor.withValues(alpha: 0.5),
+              size: 24,
             ),
-            child: Icon(
-              isUploaded ? Icons.check_circle_outline : icon,
-              color: isUploaded ? AppColors.success : AppColors.primary,
-              size: 18,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  label,
-                  style: TextStyle(
-                    fontSize: 14.5,
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  isUploaded ? l10n.uploaded : l10n.notAvailable,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: isUploaded ? AppColors.success : secondaryColor,
-                  ),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Icon(
-            isUploaded
-                ? Icons.verified_rounded
-                : Icons.remove_circle_outline_rounded,
-            color: isUploaded ? AppColors.success : secondaryColor,
-            size: 18,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

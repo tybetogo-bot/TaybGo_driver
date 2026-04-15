@@ -1243,6 +1243,17 @@ class AppLocalizationsDe extends AppLocalizations {
       'Standortzugriff ist deaktiviert. Sie erhalten keine Bestellungen, bis er aktiviert ist.';
 
   @override
+  String get batteryOptimizationTitle => 'Akkuoptimierung deaktivieren';
+
+  @override
+  String get batteryOptimizationMessage =>
+      'Damit der Live-Standort im Hintergrund aktiv bleibt, stellen Sie TaybGo Driver in den Android-Einstellungen auf uneingeschränkte Akkunutzung.';
+
+  @override
+  String get batteryOptimizationBannerMessage =>
+      'Die Akkuoptimierung kann den Live-Standort pausieren, wenn Sie online sind. Stellen Sie TaybGo Driver auf uneingeschränkte Akkunutzung.';
+
+  @override
   String get profileUpdatedSuccessfully => 'Profil erfolgreich aktualisiert';
 
   @override

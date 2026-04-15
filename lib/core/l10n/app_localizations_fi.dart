@@ -1232,6 +1232,17 @@ class AppLocalizationsFi extends AppLocalizations {
       'Sijaintioikeus on poistettu käytöstä. Et vastaanota tilauksia ennen kuin se on otettu käyttöön.';
 
   @override
+  String get batteryOptimizationTitle => 'Poista akun optimointi';
+
+  @override
+  String get batteryOptimizationMessage =>
+      'Jotta reaaliaikainen sijainti pysyy aktiivisena taustalla, aseta TaybGo Driver rajoittamattomaan akun käyttöön Android-asetuksissa.';
+
+  @override
+  String get batteryOptimizationBannerMessage =>
+      'Akun optimointi voi keskeyttää reaaliaikaisen sijainnin, kun olet online-tilassa. Aseta TaybGo Driver rajoittamattomaan akun käyttöön.';
+
+  @override
   String get profileUpdatedSuccessfully => 'Profiili päivitetty onnistuneesti';
 
   @override

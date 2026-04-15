@@ -440,6 +440,9 @@
   "collectCashReminder": "Vergessen Sie nicht, die Zahlung vom Kunden einzuziehen",
 
   "locationPermissionLostWhileOnline": "Standortzugriff ist deaktiviert. Sie erhalten keine Bestellungen, bis er aktiviert ist.",
+  "batteryOptimizationTitle": "Akkuoptimierung deaktivieren",
+  "batteryOptimizationMessage": "Damit der Live-Standort im Hintergrund aktiv bleibt, stellen Sie TaybGo Driver in den Android-Einstellungen auf uneingeschränkte Akkunutzung.",
+  "batteryOptimizationBannerMessage": "Die Akkuoptimierung kann den Live-Standort pausieren, wenn Sie online sind. Stellen Sie TaybGo Driver auf uneingeschränkte Akkunutzung.",
 
   "profileUpdatedSuccessfully": "Profil erfolgreich aktualisiert",
   "failedToUpdateProfile": "Profil konnte nicht aktualisiert werden",

@@ -1227,6 +1227,17 @@ class AppLocalizationsNb extends AppLocalizations {
       'Posisjonstilgang er deaktivert. Du vil ikke motta bestillinger før den er aktivert.';
 
   @override
+  String get batteryOptimizationTitle => 'Slå av batterioptimalisering';
+
+  @override
+  String get batteryOptimizationMessage =>
+      'For å holde live-posisjon aktiv i bakgrunnen, sett TaybGo Driver til ubegrenset batteribruk i Android-innstillingene.';
+
+  @override
+  String get batteryOptimizationBannerMessage =>
+      'Batterioptimalisering kan sette live-posisjon på pause mens du er online. Sett TaybGo Driver til ubegrenset batteribruk.';
+
+  @override
   String get profileUpdatedSuccessfully => 'Profil oppdatert';
 
   @override

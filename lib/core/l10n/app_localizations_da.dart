@@ -1228,6 +1228,17 @@ class AppLocalizationsDa extends AppLocalizations {
       'Placeringsadgang er deaktiveret. Du modtager ikke ordrer, før den er aktiveret.';
 
   @override
+  String get batteryOptimizationTitle => 'Slå batterioptimering fra';
+
+  @override
+  String get batteryOptimizationMessage =>
+      'For at holde liveplacering aktiv i baggrunden skal du sætte TaybGo Driver til ubegrænset batteribrug i Android-indstillingerne.';
+
+  @override
+  String get batteryOptimizationBannerMessage =>
+      'Batterioptimering kan sætte liveplacering på pause, mens du er online. Sæt TaybGo Driver til ubegrænset batteribrug.';
+
+  @override
   String get profileUpdatedSuccessfully => 'Profil opdateret';
 
   @override

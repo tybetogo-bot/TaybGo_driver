@@ -469,6 +469,9 @@
   "collectCash": "Opkræv kontant",
   "collectCashReminder": "Husk at opkræve betaling fra kunden",
   "locationPermissionLostWhileOnline": "Placeringsadgang er deaktiveret. Du modtager ikke ordrer, før den er aktiveret.",
+  "batteryOptimizationTitle": "Slå batterioptimering fra",
+  "batteryOptimizationMessage": "For at holde liveplacering aktiv i baggrunden skal du sætte TaybGo Driver til ubegrænset batteribrug i Android-indstillingerne.",
+  "batteryOptimizationBannerMessage": "Batterioptimering kan sætte liveplacering på pause, mens du er online. Sæt TaybGo Driver til ubegrænset batteribrug.",
 
   "profileUpdatedSuccessfully": "Profil opdateret",
   "failedToUpdateProfile": "Kunne ikke opdatere profil",

@@ -469,6 +469,9 @@
   "collectCash": "Incassa contante",
   "collectCashReminder": "Ricorda di riscuotere il pagamento dal cliente",
   "locationPermissionLostWhileOnline": "L'accesso alla posizione è disabilitato. Non riceverai ordini finché non sarà abilitato.",
+  "batteryOptimizationTitle": "Disattiva ottimizzazione batteria",
+  "batteryOptimizationMessage": "Per mantenere attiva la posizione in tempo reale in background, imposta TaybGo Driver su utilizzo della batteria senza restrizioni nelle impostazioni Android.",
+  "batteryOptimizationBannerMessage": "L'ottimizzazione della batteria può mettere in pausa la posizione in tempo reale mentre sei online. Imposta TaybGo Driver su utilizzo della batteria senza restrizioni.",
 
   "profileUpdatedSuccessfully": "Profilo aggiornato con successo",
   "failedToUpdateProfile": "Aggiornamento profilo fallito",

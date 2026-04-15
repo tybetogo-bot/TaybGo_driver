@@ -469,6 +469,9 @@
   "collectCash": "Samla in kontanter",
   "collectCashReminder": "Kom ihåg att samla in betalningen från kunden",
   "locationPermissionLostWhileOnline": "Platsåtkomst är inaktiverad. Du kommer inte att ta emot beställningar förrän den är aktiverad.",
+  "batteryOptimizationTitle": "Stäng av batterioptimering",
+  "batteryOptimizationMessage": "För att hålla liveplats aktiv i bakgrunden, ställ in TaybGo Driver på obegränsad batterianvändning i Android-inställningarna.",
+  "batteryOptimizationBannerMessage": "Batterioptimering kan pausa liveplats medan du är online. Ställ in TaybGo Driver på obegränsad batterianvändning.",
 
   "profileUpdatedSuccessfully": "Profil uppdaterad",
   "failedToUpdateProfile": "Kunde inte uppdatera profil",

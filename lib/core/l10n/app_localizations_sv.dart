@@ -1229,6 +1229,17 @@ class AppLocalizationsSv extends AppLocalizations {
       'Platsåtkomst är inaktiverad. Du kommer inte att ta emot beställningar förrän den är aktiverad.';
 
   @override
+  String get batteryOptimizationTitle => 'Stäng av batterioptimering';
+
+  @override
+  String get batteryOptimizationMessage =>
+      'För att hålla liveplats aktiv i bakgrunden, ställ in TaybGo Driver på obegränsad batterianvändning i Android-inställningarna.';
+
+  @override
+  String get batteryOptimizationBannerMessage =>
+      'Batterioptimering kan pausa liveplats medan du är online. Ställ in TaybGo Driver på obegränsad batterianvändning.';
+
+  @override
   String get profileUpdatedSuccessfully => 'Profil uppdaterad';
 
   @override
