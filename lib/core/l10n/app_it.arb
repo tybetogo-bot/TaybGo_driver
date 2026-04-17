@@ -41,6 +41,7 @@
   },
   "invalidOtp": "Codice di verifica non valido",
   "otpSent": "Codice di verifica inviato",
+  "errorsAuthPhoneAlreadyRegistered": "Questo numero è già registrato.",
 
   "email": "Email",
   "enterEmail": "Inserisci la tua email",

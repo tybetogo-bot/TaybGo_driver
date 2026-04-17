@@ -41,6 +41,7 @@
   },
   "invalidOtp": "Ongeldige verificatiecode",
   "otpSent": "Verificatiecode verstuurd",
+  "errorsAuthPhoneAlreadyRegistered": "Dit nummer is al geregistreerd.",
 
   "email": "E-mail",
   "enterEmail": "Voer je e-mail in",

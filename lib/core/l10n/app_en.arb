@@ -43,6 +43,10 @@
   },
   "invalidOtp": "Invalid verification code",
   "otpSent": "Verification code sent",
+  "errorsAuthPhoneAlreadyRegistered": "This number is already registered.",
+  "@errorsAuthPhoneAlreadyRegistered": {
+    "description": "Generic OTP conflict message shown when the phone number is already registered for another account or role."
+  },
 
   "email": "Email",
   "enterEmail": "Enter your email",

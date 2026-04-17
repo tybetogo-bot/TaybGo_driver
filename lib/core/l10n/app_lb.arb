@@ -41,6 +41,7 @@
   },
   "invalidOtp": "Ongëltege Verifizéierungscode",
   "otpSent": "Verifizéierungscode geschéckt",
+  "errorsAuthPhoneAlreadyRegistered": "Dës Nummer ass schonn registréiert.",
 
   "email": "E-Mail",
   "enterEmail": "Gitt Är E-Mail an",

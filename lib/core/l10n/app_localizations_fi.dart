@@ -113,6 +113,10 @@ class AppLocalizationsFi extends AppLocalizations {
   String get otpSent => 'Vahvistuskoodi lähetetty';
 
   @override
+  String get errorsAuthPhoneAlreadyRegistered =>
+      'Tämä numero on jo rekisteröity.';
+
+  @override
   String get email => 'Sähköposti';
 
   @override

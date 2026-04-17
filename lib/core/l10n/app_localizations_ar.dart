@@ -113,6 +113,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get otpSent => 'تم إرسال رمز التحقق';
 
   @override
+  String get errorsAuthPhoneAlreadyRegistered => 'هذا الرقم مسجل بالفعل.';
+
+  @override
   String get email => 'البريد الإلكتروني';
 
   @override

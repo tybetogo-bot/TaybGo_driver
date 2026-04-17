@@ -314,6 +314,12 @@ abstract class AppLocalizations {
   /// **'Verification code sent'**
   String get otpSent;
 
+  /// Generic OTP conflict message shown when the phone number is already registered for another account or role.
+  ///
+  /// In en, this message translates to:
+  /// **'This number is already registered.'**
+  String get errorsAuthPhoneAlreadyRegistered;
+
   /// No description provided for @email.
   ///
   /// In en, this message translates to:

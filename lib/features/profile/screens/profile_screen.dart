@@ -360,7 +360,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     children: [
                       Text(
-                        l10n.version('1.0.4'),
+                        l10n.version('1.0.5'),
                         style: TextStyle(fontSize: 12, color: secondaryColor),
                       ),
                       const SizedBox(height: 2),

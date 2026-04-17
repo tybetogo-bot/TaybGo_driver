@@ -36,6 +36,7 @@
   "resendOtpIn": "Renvoyer le code dans {seconds}s",
   "invalidOtp": "Code de vérification invalide",
   "otpSent": "Code de vérification envoyé",
+  "errorsAuthPhoneAlreadyRegistered": "Ce numéro est déjà enregistré.",
 
   "email": "E-mail",
   "enterEmail": "Entrez votre e-mail",

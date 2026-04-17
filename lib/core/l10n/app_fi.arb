@@ -41,6 +41,7 @@
   },
   "invalidOtp": "Virheellinen vahvistuskoodi",
   "otpSent": "Vahvistuskoodi lähetetty",
+  "errorsAuthPhoneAlreadyRegistered": "Tämä numero on jo rekisteröity.",
 
   "email": "Sähköposti",
   "enterEmail": "Syötä sähköpostisi",

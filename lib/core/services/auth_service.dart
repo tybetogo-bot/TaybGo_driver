@@ -44,7 +44,6 @@ class OtpVerifyResponse {
 
 class AuthService {
   final ApiClient _apiClient;
-  static const String _targetRole = 'driver';
 
   AuthService({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
 
@@ -55,17 +54,30 @@ class AuthService {
     _apiClient.onTokenRefreshFailed = callback;
   }
 
-  Map<String, dynamic> _buildOtpRequestData(String phoneNumber) {
-    return {'phone': phoneNumber, 'target_role': _targetRole};
+  Map<String, dynamic> _buildOtpRequestData({
+    required String phoneNumber,
+    required String targetRole,
+  }) {
+    return {'phone': phoneNumber, 'target_role': targetRole};
   }
 
-  Map<String, dynamic> _buildOtpVerifyData(String phoneNumber, String otp) {
-    return {'phone': phoneNumber, 'code': otp, 'target_role': _targetRole};
+  Map<String, dynamic> _buildOtpVerifyData({
+    required String phoneNumber,
+    required String otp,
+    required String targetRole,
+  }) {
+    return {'phone': phoneNumber, 'code': otp, 'target_role': targetRole};
   }
 
-  Future<OtpRequestResponse> requestOtp(String phoneNumber) async {
+  Future<OtpRequestResponse> requestOtp({
+    required String phoneNumber,
+    required String targetRole,
+  }) async {
     try {
-      final data = _buildOtpRequestData(phoneNumber);
+      final data = _buildOtpRequestData(
+        phoneNumber: phoneNumber,
+        targetRole: targetRole,
+      );
       debugPrint(
         '[AuthService] Sending OTP request to: ${ApiConstants.otpRequest}',
       );
@@ -88,9 +100,14 @@ class AuthService {
   Future<OtpVerifyResponse> verifyOtp({
     required String phoneNumber,
     required String otp,
+    required String targetRole,
   }) async {
     try {
-      final data = _buildOtpVerifyData(phoneNumber, otp);
+      final data = _buildOtpVerifyData(
+        phoneNumber: phoneNumber,
+        otp: otp,
+        targetRole: targetRole,
+      );
       debugPrint('[AuthService] === OTP VERIFY REQUEST ===');
       debugPrint('[AuthService] Endpoint: ${ApiConstants.otpVerify}');
       debugPrint('[AuthService] Data: $data');

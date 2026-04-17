@@ -41,6 +41,7 @@
   },
   "invalidOtp": "Ogiltig verifieringskod",
   "otpSent": "Verifieringskod skickad",
+  "errorsAuthPhoneAlreadyRegistered": "Det här numret är redan registrerat.",
 
   "email": "E-post",
   "enterEmail": "Ange din e-post",

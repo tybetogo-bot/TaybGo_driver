@@ -48,21 +48,22 @@ class _OtpScreenState extends State<OtpScreen> {
   Future<void> _resendOtp() async {
     final authProvider = context.read<AuthProvider>();
     final success = await authProvider.requestOtp(widget.phoneNumber);
+    if (!mounted) return;
 
-    if (mounted && success) {
+    final l10n = AppLocalizations.of(context)!;
+    final errorText = authProvider.localizedError(l10n);
+
+    if (success) {
       _startTimer();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(AppLocalizations.of(context)!.otpSentSuccessfully),
+          content: Text(l10n.otpSentSuccessfully),
           backgroundColor: AppColors.success,
         ),
       );
-    } else if (mounted && authProvider.error != null) {
+    } else if (errorText != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(authProvider.error!),
-          backgroundColor: AppColors.error,
-        ),
+        SnackBar(content: Text(errorText), backgroundColor: AppColors.error),
       );
       authProvider.clearError();
     }
@@ -83,8 +84,12 @@ class _OtpScreenState extends State<OtpScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final secondaryColor = isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final secondaryColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -106,6 +111,8 @@ class _OtpScreenState extends State<OtpScreen> {
           padding: const EdgeInsets.all(24),
           child: Consumer<AuthProvider>(
             builder: (context, authProvider, _) {
+              final errorText = authProvider.localizedError(l10n);
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -118,7 +125,11 @@ class _OtpScreenState extends State<OtpScreen> {
                       color: AppColors.info.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(14),
                     ),
-                    child: const Icon(Icons.sms_outlined, color: AppColors.info, size: 28),
+                    child: const Icon(
+                      Icons.sms_outlined,
+                      color: AppColors.info,
+                      size: 28,
+                    ),
                   ),
                   const SizedBox(height: 24),
 
@@ -127,12 +138,15 @@ class _OtpScreenState extends State<OtpScreen> {
                     phone: widget.phoneNumber,
                     strings: _buildStrings(l10n),
                     isLoading: authProvider.isLoading,
-                    errorText: authProvider.error,
+                    errorText: errorText,
                     testOtp: authProvider.debugOtp,
                     onChangePhoneNumber: () => context.pop(),
                     onSubmit: (code) async {
                       final router = GoRouter.of(context);
                       final success = await authProvider.verifyOtp(code);
+                      final updatedErrorText = authProvider.localizedError(
+                        l10n,
+                      );
 
                       if (success) {
                         if (authProvider.isNewUser) {
@@ -142,7 +156,7 @@ class _OtpScreenState extends State<OtpScreen> {
                         }
                       } else {
                         debugPrint(
-                          '[OtpScreen] verifyOtp failed: ${authProvider.error}',
+                          '[OtpScreen] verifyOtp failed: $updatedErrorText',
                         );
                       }
                     },
@@ -154,7 +168,10 @@ class _OtpScreenState extends State<OtpScreen> {
                   Center(
                     child: _resendSeconds > 0
                         ? Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 10,
+                            ),
                             decoration: BoxDecoration(
                               color: surfaceColor,
                               borderRadius: BorderRadius.circular(20),
@@ -162,18 +179,29 @@ class _OtpScreenState extends State<OtpScreen> {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(Icons.timer, size: 16, color: secondaryColor),
+                                Icon(
+                                  Icons.timer,
+                                  size: 16,
+                                  color: secondaryColor,
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
                                   l10n.resendIn(_resendSeconds),
-                                  style: TextStyle(fontSize: 14, color: secondaryColor),
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: secondaryColor,
+                                  ),
                                 ),
                               ],
                             ),
                           )
                         : TextButton.icon(
                             onPressed: _resendOtp,
-                            icon: const Icon(Icons.refresh, size: 18, color: AppColors.primary),
+                            icon: const Icon(
+                              Icons.refresh,
+                              size: 18,
+                              color: AppColors.primary,
+                            ),
                             label: Text(
                               l10n.resendCode,
                               style: const TextStyle(

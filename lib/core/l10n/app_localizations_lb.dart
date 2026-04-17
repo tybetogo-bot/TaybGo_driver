@@ -113,6 +113,10 @@ class AppLocalizationsLb extends AppLocalizations {
   String get otpSent => 'Verifizéierungscode geschéckt';
 
   @override
+  String get errorsAuthPhoneAlreadyRegistered =>
+      'Dës Nummer ass schonn registréiert.';
+
+  @override
   String get email => 'E-Mail';
 
   @override

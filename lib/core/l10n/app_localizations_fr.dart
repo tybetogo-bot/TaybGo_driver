@@ -113,6 +113,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get otpSent => 'Code de vérification envoyé';
 
   @override
+  String get errorsAuthPhoneAlreadyRegistered =>
+      'Ce numéro est déjà enregistré.';
+
+  @override
   String get email => 'E-mail';
 
   @override

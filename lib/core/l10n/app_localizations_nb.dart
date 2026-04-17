@@ -113,6 +113,10 @@ class AppLocalizationsNb extends AppLocalizations {
   String get otpSent => 'Bekreftelseskode sendt';
 
   @override
+  String get errorsAuthPhoneAlreadyRegistered =>
+      'Dette nummeret er allerede registrert.';
+
+  @override
   String get email => 'E-post';
 
   @override

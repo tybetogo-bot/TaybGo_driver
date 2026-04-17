@@ -1,24 +1,28 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
 import '../services/cache_service.dart';
 import '../api/api_client.dart';
 
 const _onboardingCompleteKey = 'onboarding_complete';
 
-enum AuthStatus {
-  initial,
-  authenticated,
-  unauthenticated,
-}
+enum AuthStatus { initial, authenticated, unauthenticated }
+
+enum AuthErrorCode { phoneAlreadyRegistered }
 
 class AuthProvider extends ChangeNotifier {
+  static const String driverTargetRole = 'driver';
+
   final AuthService _authService;
+  final String _appTargetRole;
 
   AuthStatus _status = AuthStatus.initial;
   bool _isLoading = false;
   String? _error;
+  AuthErrorCode? _errorCode;
   String? _phoneNumber;
+  String? _otpTargetRole;
   bool _isNewUser = false;
   bool _onboardingComplete = false;
   bool _initialized = false;
@@ -29,11 +33,16 @@ class AuthProvider extends ChangeNotifier {
   VoidCallback? onLogoutCallback;
   Future<void> Function()? onBeforeLogoutCallback;
 
-  AuthProvider({AuthService? authService})
-      : _authService = authService ?? AuthService() {
+  AuthProvider({
+    AuthService? authService,
+    String appTargetRole = driverTargetRole,
+  }) : _authService = authService ?? AuthService(),
+       _appTargetRole = appTargetRole {
     // Set up callback for token refresh failures
     _authService.setTokenRefreshFailedCallback(() {
-      debugPrint('[AuthProvider] Token refresh failed callback - forcing logout');
+      debugPrint(
+        '[AuthProvider] Token refresh failed callback - forcing logout',
+      );
       onLogoutCallback?.call();
       _status = AuthStatus.unauthenticated;
       _phoneNumber = null;
@@ -45,14 +54,24 @@ class AuthProvider extends ChangeNotifier {
   AuthStatus get status => _status;
   bool get isLoading => _isLoading;
   String? get error => _error;
+  AuthErrorCode? get errorCode => _errorCode;
   String? get phoneNumber => _phoneNumber;
   bool get isNewUser => _isNewUser;
   bool get isAuthenticated => _status == AuthStatus.authenticated;
   bool get onboardingComplete => _onboardingComplete;
   bool get initialized => _initialized;
   String? get debugOtp => _debugOtp;
+  String get otpTargetRole => _otpTargetRole ?? _appTargetRole;
 
   AuthService get authService => _authService;
+
+  String? localizedError(AppLocalizations l10n) {
+    return switch (_errorCode) {
+      AuthErrorCode.phoneAlreadyRegistered =>
+        l10n.errorsAuthPhoneAlreadyRegistered,
+      null => _error,
+    };
+  }
 
   Future<void> initialize() async {
     if (_initialized) return;
@@ -81,29 +100,39 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> requestOtp(String phoneNumber) async {
+    final targetRole = _otpTargetRole ?? _appTargetRole;
+
     _isLoading = true;
     _error = null;
+    _errorCode = null;
     _phoneNumber = phoneNumber;
+    _otpTargetRole = targetRole;
     _debugOtp = null;
     notifyListeners();
 
     try {
       debugPrint('[AuthProvider] Requesting OTP for: $phoneNumber');
-      final response = await _authService.requestOtp(phoneNumber);
-      debugPrint('[AuthProvider] OTP response received - debugOtp: ${response.debugOtp}');
+      final response = await _authService.requestOtp(
+        phoneNumber: phoneNumber,
+        targetRole: targetRole,
+      );
+      debugPrint(
+        '[AuthProvider] OTP response received - debugOtp: ${response.debugOtp}',
+      );
       _debugOtp = response.debugOtp;
       _isLoading = false;
       notifyListeners();
       return true;
     } on ApiException catch (e) {
       debugPrint('[AuthProvider] ApiException: ${e.message}');
-      _error = e.message;
+      _setOtpError(e);
       _isLoading = false;
       notifyListeners();
       return false;
     } catch (e) {
       debugPrint('[AuthProvider] Unknown error: $e');
       _error = 'Failed to send OTP. Please try again.';
+      _errorCode = null;
       _isLoading = false;
       notifyListeners();
       return false;
@@ -119,12 +148,15 @@ class AuthProvider extends ChangeNotifier {
 
     _isLoading = true;
     _error = null;
+    _errorCode = null;
     notifyListeners();
 
     try {
+      final targetRole = _otpTargetRole ?? _appTargetRole;
       final response = await _authService.verifyOtp(
         phoneNumber: _phoneNumber!,
         otp: otp,
+        targetRole: targetRole,
       );
 
       _isNewUser = response.isNewUser;
@@ -133,12 +165,13 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } on ApiException catch (e) {
-      _error = e.message;
+      _setOtpError(e);
       _isLoading = false;
       notifyListeners();
       return false;
     } catch (e) {
       _error = 'Failed to verify OTP. Please try again.';
+      _errorCode = null;
       _isLoading = false;
       notifyListeners();
       return false;
@@ -173,6 +206,7 @@ class AuthProvider extends ChangeNotifier {
 
     _status = AuthStatus.unauthenticated;
     _phoneNumber = null;
+    _otpTargetRole = null;
     _isNewUser = false;
     _isLoading = false;
     notifyListeners();
@@ -190,6 +224,7 @@ class AuthProvider extends ChangeNotifier {
       // Clear all user state
       _status = AuthStatus.unauthenticated;
       _phoneNumber = null;
+      _otpTargetRole = null;
       _isNewUser = false;
       _onboardingComplete = false;
 
@@ -219,6 +254,7 @@ class AuthProvider extends ChangeNotifier {
 
   void clearError() {
     _error = null;
+    _errorCode = null;
     notifyListeners();
   }
 
@@ -233,5 +269,51 @@ class AuthProvider extends ChangeNotifier {
   Future<void> handleAuthenticationError() async {
     debugPrint('[AuthProvider] Handling authentication error - forcing logout');
     await logout();
+  }
+
+  void _setOtpError(ApiException exception) {
+    if (_isPhoneAlreadyRegisteredConflict(exception)) {
+      _error = null;
+      _errorCode = AuthErrorCode.phoneAlreadyRegistered;
+      return;
+    }
+
+    _error = exception.message;
+    _errorCode = null;
+  }
+
+  bool _isPhoneAlreadyRegisteredConflict(ApiException exception) {
+    if (exception.statusCode == 409) {
+      return true;
+    }
+
+    final normalizedText = _extractErrorText(exception).toLowerCase();
+    const conflictMarkers = [
+      'already registered',
+      'already exists',
+      'already in use',
+      'registered as',
+      'role conflict',
+      'belongs to another',
+      'associated with another',
+    ];
+
+    return conflictMarkers.any(normalizedText.contains);
+  }
+
+  String _extractErrorText(ApiException exception) {
+    final buffer = StringBuffer(exception.message);
+    final data = exception.data;
+
+    if (data is Map) {
+      for (final key in const ['detail', 'message', 'error']) {
+        final value = data[key];
+        if (value != null) {
+          buffer.write(' ${value.toString()}');
+        }
+      }
+    }
+
+    return buffer.toString();
   }
 }

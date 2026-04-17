@@ -43,6 +43,7 @@
   },
   "invalidOtp": "رمز التحقق غير صحيح",
   "otpSent": "تم إرسال رمز التحقق",
+  "errorsAuthPhoneAlreadyRegistered": "هذا الرقم مسجل بالفعل.",
 
   "email": "البريد الإلكتروني",
   "enterEmail": "أدخل بريدك الإلكتروني",

@@ -113,6 +113,10 @@ class AppLocalizationsNl extends AppLocalizations {
   String get otpSent => 'Verificatiecode verstuurd';
 
   @override
+  String get errorsAuthPhoneAlreadyRegistered =>
+      'Dit nummer is al geregistreerd.';
+
+  @override
   String get email => 'E-mail';
 
   @override

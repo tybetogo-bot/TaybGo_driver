@@ -19,7 +19,9 @@ class _PhoneScreenState extends State<PhoneScreen> {
   void _showLanguagePicker() {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
     final localeProvider = context.read<LocaleProvider>();
     final currentLocale = localeProvider.locale.languageCode;
 
@@ -178,7 +180,10 @@ class _PhoneScreenState extends State<PhoneScreen> {
                       onTap: _showLanguagePicker,
                       borderRadius: BorderRadius.circular(12),
                       child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 8,
+                        ),
                         decoration: BoxDecoration(
                           color: surfaceColor,
                           borderRadius: BorderRadius.circular(12),
@@ -188,12 +193,16 @@ class _PhoneScreenState extends State<PhoneScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
-                              _getLanguageFlag(localeProvider.locale.languageCode),
+                              _getLanguageFlag(
+                                localeProvider.locale.languageCode,
+                              ),
                               style: const TextStyle(fontSize: 20),
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              localeProvider.getLanguageName(localeProvider.locale.languageCode),
+                              localeProvider.getLanguageName(
+                                localeProvider.locale.languageCode,
+                              ),
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w600,
@@ -246,10 +255,12 @@ class _PhoneScreenState extends State<PhoneScreen> {
               // Phone sign-in form from package
               Consumer<AuthProvider>(
                 builder: (context, authProvider, _) {
+                  final errorText = authProvider.localizedError(l10n);
+
                   return PhoneSignInForm(
                     strings: _buildStrings(l10n),
                     isLoading: authProvider.isLoading,
-                    errorText: authProvider.error,
+                    errorText: errorText,
                     initialCountry: Country.all.firstWhere(
                       (c) => c.code == 'AT',
                       orElse: () => Country.defaultCountry,
@@ -302,7 +313,10 @@ class _PhoneScreenState extends State<PhoneScreen> {
                             const SizedBox(width: 8),
                             Text(
                               l10n.wellSendVerificationCode,
-                              style: TextStyle(fontSize: 14, color: secondaryColor),
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: secondaryColor,
+                              ),
                             ),
                           ],
                         ),
@@ -312,10 +326,15 @@ class _PhoneScreenState extends State<PhoneScreen> {
                     onSubmit: (phoneValue) async {
                       final fullNumber = phoneValue.fullNumber;
                       final navigator = GoRouter.of(context);
-                      debugPrint('[PhoneScreen] Calling requestOtp for: $fullNumber');
-                      final success = await authProvider.requestOtp(fullNumber);
                       debugPrint(
-                        '[PhoneScreen] requestOtp returned: $success, error: ${authProvider.error}',
+                        '[PhoneScreen] Calling requestOtp for: $fullNumber',
+                      );
+                      final success = await authProvider.requestOtp(fullNumber);
+                      final updatedErrorText = authProvider.localizedError(
+                        l10n,
+                      );
+                      debugPrint(
+                        '[PhoneScreen] requestOtp returned: $success, error: $updatedErrorText',
                       );
 
                       if (success) {
@@ -323,7 +342,7 @@ class _PhoneScreenState extends State<PhoneScreen> {
                         navigator.push(RouteConstants.otp, extra: fullNumber);
                       } else {
                         debugPrint(
-                          '[PhoneScreen] requestOtp failed: ${authProvider.error}',
+                          '[PhoneScreen] requestOtp failed: $updatedErrorText',
                         );
                       }
                     },

@@ -41,6 +41,7 @@
   },
   "invalidOtp": "Ugyldig bekreftelseskode",
   "otpSent": "Bekreftelseskode sendt",
+  "errorsAuthPhoneAlreadyRegistered": "Dette nummeret er allerede registrert.",
 
   "email": "E-post",
   "enterEmail": "Skriv inn e-posten din",
