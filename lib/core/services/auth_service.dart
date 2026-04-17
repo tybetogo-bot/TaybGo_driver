@@ -44,6 +44,7 @@ class OtpVerifyResponse {
 
 class AuthService {
   final ApiClient _apiClient;
+  static const String _targetRole = 'driver';
 
   AuthService({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
 
@@ -54,14 +55,23 @@ class AuthService {
     _apiClient.onTokenRefreshFailed = callback;
   }
 
+  Map<String, dynamic> _buildOtpRequestData(String phoneNumber) {
+    return {'phone': phoneNumber, 'target_role': _targetRole};
+  }
+
+  Map<String, dynamic> _buildOtpVerifyData(String phoneNumber, String otp) {
+    return {'phone': phoneNumber, 'code': otp, 'target_role': _targetRole};
+  }
+
   Future<OtpRequestResponse> requestOtp(String phoneNumber) async {
     try {
+      final data = _buildOtpRequestData(phoneNumber);
       debugPrint(
         '[AuthService] Sending OTP request to: ${ApiConstants.otpRequest}',
       );
       final response = await _apiClient.post(
         ApiConstants.otpRequest,
-        data: {'phone': phoneNumber},
+        data: data,
       );
 
       debugPrint('[AuthService] OTP response status: ${response.statusCode}');
@@ -80,13 +90,14 @@ class AuthService {
     required String otp,
   }) async {
     try {
+      final data = _buildOtpVerifyData(phoneNumber, otp);
       debugPrint('[AuthService] === OTP VERIFY REQUEST ===');
       debugPrint('[AuthService] Endpoint: ${ApiConstants.otpVerify}');
-      debugPrint('[AuthService] Data: {phone: $phoneNumber, otp: $otp}');
+      debugPrint('[AuthService] Data: $data');
 
       final response = await _apiClient.post(
         ApiConstants.otpVerify,
-        data: {'phone': phoneNumber, 'code': otp},
+        data: data,
       );
 
       debugPrint('[AuthService] === OTP VERIFY RESPONSE ===');

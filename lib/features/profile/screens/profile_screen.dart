@@ -360,12 +360,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     children: [
                       Text(
-                        l10n.version('1.0.3'),
+                        l10n.version('1.0.4'),
                         style: TextStyle(fontSize: 12, color: secondaryColor),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '16 April 2026',
+                        '17 April 2026',
                         style: TextStyle(fontSize: 11, color: secondaryColor),
                       ),
                     ],

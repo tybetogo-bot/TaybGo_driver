@@ -260,7 +260,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 const SizedBox(height: 12),
                 Text(l10n.appName, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600, color: textColor)),
                 const SizedBox(height: 4),
-                Text(l10n.version('1.0.3'), style: TextStyle(fontSize: 12, color: secondaryColor)),
+                Text(l10n.version('1.0.4'), style: TextStyle(fontSize: 12, color: secondaryColor)),
               ],
             ),
           ),
