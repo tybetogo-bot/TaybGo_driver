@@ -1,7 +1,7 @@
 name: teybatdriver
 description: "TaybGo Driver - Driver partner application"
 publish_to: 'none'
-version: 1.0.5+6
+version: 1.0.6+7
 
 environment:
   sdk: ^3.10.4
@@ -85,6 +85,7 @@ flutter_launcher_icons:
     generate: false
 
 flutter:
+  default-flavor: prod
   uses-material-design: true
   generate: true
 
