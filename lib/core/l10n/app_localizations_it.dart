@@ -734,6 +734,13 @@ class AppLocalizationsIt extends AppLocalizations {
       'Attiva la posizione nelle impostazioni.';
 
   @override
+  String get backgroundLocationTitle => 'Consenti posizione in background';
+
+  @override
+  String get backgroundLocationMessage =>
+      'Per consentire a TaybGo di inviare la tua posizione quando l\'app è in background, apri le impostazioni e seleziona «Consenti sempre».';
+
+  @override
   String get gpsDisabled => 'GPS disattivato';
 
   @override

@@ -266,6 +266,8 @@
   "enableLocationAccess": "Schakel locatietoegang in om bestellingen te ontvangen.",
   "enable": "Inschakelen",
   "pleaseEnableLocationInSettings": "Schakel locatie in bij instellingen.",
+  "backgroundLocationTitle": "Achtergrondlocatie toestaan",
+  "backgroundLocationMessage": "Zodat TaybGo je locatie kan blijven versturen wanneer de app op de achtergrond draait, open de instellingen en kies „Altijd toestaan“.",
   "gpsDisabled": "GPS uitgeschakeld",
   "pleaseEnableGps": "Schakel GPS in om bestellingen te ontvangen.",
   "failedToUpdateStatus": "Status bijwerken mislukt",

@@ -734,6 +734,13 @@ class AppLocalizationsSv extends AppLocalizations {
       'Aktivera plats i inställningarna.';
 
   @override
+  String get backgroundLocationTitle => 'Tillåt plats i bakgrunden';
+
+  @override
+  String get backgroundLocationMessage =>
+      'För att TaybGo ska kunna skicka din plats när appen är i bakgrunden, öppna inställningarna och välj ”Tillåt alltid”.';
+
+  @override
   String get gpsDisabled => 'GPS inaktiverad';
 
   @override

@@ -1520,6 +1520,18 @@ abstract class AppLocalizations {
   /// **'Please enable location in settings.'**
   String get pleaseEnableLocationInSettings;
 
+  /// No description provided for @backgroundLocationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Allow background location'**
+  String get backgroundLocationTitle;
+
+  /// No description provided for @backgroundLocationMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'So TaybGo can keep sending your location when the app is in the background, please open settings and select \"Allow all the time\".'**
+  String get backgroundLocationMessage;
+
   /// No description provided for @gpsDisabled.
   ///
   /// In en, this message translates to:

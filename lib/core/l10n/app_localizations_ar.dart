@@ -729,6 +729,13 @@ class AppLocalizationsAr extends AppLocalizations {
       'يرجى تمكين الموقع في الإعدادات.';
 
   @override
+  String get backgroundLocationTitle => 'السماح بالموقع في الخلفية';
+
+  @override
+  String get backgroundLocationMessage =>
+      'لكي يتمكن تايبجو من إرسال موقعك عندما يكون التطبيق في الخلفية، يرجى فتح الإعدادات واختيار «السماح دائمًا».';
+
+  @override
   String get gpsDisabled => 'GPS معطل';
 
   @override

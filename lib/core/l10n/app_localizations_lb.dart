@@ -739,6 +739,13 @@ class AppLocalizationsLb extends AppLocalizations {
       'Aktivéiert w.e.g. de Standuert an den Astellungen.';
 
   @override
+  String get backgroundLocationTitle => 'Standuert am Hannergrond erlaben';
+
+  @override
+  String get backgroundLocationMessage =>
+      'Fir datt TaybGo Äre Standuert och am Hannergrond ka schécken, maacht w.e.g. d\'Astellungen op a wielt „Ëmmer erlaben“.';
+
+  @override
   String get gpsDisabled => 'GPS desaktivéiert';
 
   @override

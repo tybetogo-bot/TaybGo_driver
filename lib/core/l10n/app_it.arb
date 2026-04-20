@@ -266,6 +266,8 @@
   "enableLocationAccess": "Attiva l'accesso alla posizione per ricevere ordini.",
   "enable": "Attiva",
   "pleaseEnableLocationInSettings": "Attiva la posizione nelle impostazioni.",
+  "backgroundLocationTitle": "Consenti posizione in background",
+  "backgroundLocationMessage": "Per consentire a TaybGo di inviare la tua posizione quando l'app è in background, apri le impostazioni e seleziona «Consenti sempre».",
   "gpsDisabled": "GPS disattivato",
   "pleaseEnableGps": "Attiva il GPS per ricevere ordini.",
   "failedToUpdateStatus": "Aggiornamento stato fallito",

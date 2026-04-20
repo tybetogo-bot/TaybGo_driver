@@ -266,6 +266,8 @@
   "enableLocationAccess": "Aktiver stedstilgang for å motta bestillinger.",
   "enable": "Aktiver",
   "pleaseEnableLocationInSettings": "Aktiver sted i innstillingene.",
+  "backgroundLocationTitle": "Tillat posisjon i bakgrunnen",
+  "backgroundLocationMessage": "For at TaybGo skal kunne sende posisjonen din når appen er i bakgrunnen, åpne innstillingene og velg «Tillat alltid».",
   "gpsDisabled": "GPS deaktivert",
   "pleaseEnableGps": "Aktiver GPS for å motta bestillinger.",
   "failedToUpdateStatus": "Kunne ikke oppdatere status",

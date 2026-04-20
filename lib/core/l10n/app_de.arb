@@ -251,6 +251,8 @@
   "enableLocationAccess": "Aktivieren Sie den Standortzugriff, um Bestellungen zu erhalten.",
   "enable": "Aktivieren",
   "pleaseEnableLocationInSettings": "Bitte aktivieren Sie den Standort in den Einstellungen.",
+  "backgroundLocationTitle": "Standort im Hintergrund zulassen",
+  "backgroundLocationMessage": "Damit TaybGo Ihren Standort auch im Hintergrund senden kann, öffnen Sie bitte die Einstellungen und wählen Sie „Immer zulassen“.",
   "gpsDisabled": "GPS deaktiviert",
   "pleaseEnableGps": "Bitte aktivieren Sie GPS, um Bestellungen zu erhalten.",
   "failedToUpdateStatus": "Status konnte nicht aktualisiert werden",

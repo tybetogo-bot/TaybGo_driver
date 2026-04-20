@@ -251,6 +251,8 @@
   "enableLocationAccess": "Activez l'accès à la localisation pour recevoir des commandes.",
   "enable": "Activer",
   "pleaseEnableLocationInSettings": "Veuillez activer la localisation dans les paramètres.",
+  "backgroundLocationTitle": "Autoriser la localisation en arrière-plan",
+  "backgroundLocationMessage": "Pour que TaybGo puisse envoyer votre position lorsque l'application est en arrière-plan, veuillez ouvrir les paramètres et sélectionner « Toujours autoriser ».",
   "gpsDisabled": "GPS désactivé",
   "pleaseEnableGps": "Veuillez activer le GPS pour recevoir des commandes.",
   "failedToUpdateStatus": "Échec de la mise à jour du statut",

@@ -737,6 +737,14 @@ class AppLocalizationsFr extends AppLocalizations {
       'Veuillez activer la localisation dans les paramètres.';
 
   @override
+  String get backgroundLocationTitle =>
+      'Autoriser la localisation en arrière-plan';
+
+  @override
+  String get backgroundLocationMessage =>
+      'Pour que TaybGo puisse envoyer votre position lorsque l\'application est en arrière-plan, veuillez ouvrir les paramètres et sélectionner « Toujours autoriser ».';
+
+  @override
   String get gpsDisabled => 'GPS désactivé';
 
   @override

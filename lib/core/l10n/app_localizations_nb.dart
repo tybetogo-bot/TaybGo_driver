@@ -732,6 +732,13 @@ class AppLocalizationsNb extends AppLocalizations {
   String get pleaseEnableLocationInSettings => 'Aktiver sted i innstillingene.';
 
   @override
+  String get backgroundLocationTitle => 'Tillat posisjon i bakgrunnen';
+
+  @override
+  String get backgroundLocationMessage =>
+      'For at TaybGo skal kunne sende posisjonen din når appen er i bakgrunnen, åpne innstillingene og velg «Tillat alltid».';
+
+  @override
   String get gpsDisabled => 'GPS deaktivert';
 
   @override

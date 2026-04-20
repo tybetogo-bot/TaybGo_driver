@@ -276,6 +276,8 @@
   "enableLocationAccess": "قم بتمكين الوصول إلى الموقع لاستقبال الطلبات.",
   "enable": "تفعيل",
   "pleaseEnableLocationInSettings": "يرجى تمكين الموقع في الإعدادات.",
+  "backgroundLocationTitle": "السماح بالموقع في الخلفية",
+  "backgroundLocationMessage": "لكي يتمكن تايبجو من إرسال موقعك عندما يكون التطبيق في الخلفية، يرجى فتح الإعدادات واختيار «السماح دائمًا».",
   "gpsDisabled": "GPS معطل",
   "pleaseEnableGps": "يرجى تمكين GPS لاستقبال الطلبات.",
   "failedToUpdateStatus": "فشل تحديث الحالة",

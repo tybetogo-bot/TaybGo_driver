@@ -733,6 +733,13 @@ class AppLocalizationsDa extends AppLocalizations {
       'Aktivér placering i indstillingerne.';
 
   @override
+  String get backgroundLocationTitle => 'Tillad placering i baggrunden';
+
+  @override
+  String get backgroundLocationMessage =>
+      'For at TaybGo kan sende din placering, når appen er i baggrunden, skal du åbne indstillingerne og vælge „Tillad altid“.';
+
+  @override
   String get gpsDisabled => 'GPS deaktiveret';
 
   @override

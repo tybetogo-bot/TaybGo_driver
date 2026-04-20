@@ -279,6 +279,8 @@
   "enableLocationAccess": "Enable location access to receive orders.",
   "enable": "Enable",
   "pleaseEnableLocationInSettings": "Please enable location in settings.",
+  "backgroundLocationTitle": "Allow background location",
+  "backgroundLocationMessage": "So TaybGo can keep sending your location when the app is in the background, please open settings and select \"Allow all the time\".",
   "gpsDisabled": "GPS Disabled",
   "pleaseEnableGps": "Please enable GPS to receive orders.",
   "failedToUpdateStatus": "Failed to update status",

@@ -735,6 +735,13 @@ class AppLocalizationsNl extends AppLocalizations {
       'Schakel locatie in bij instellingen.';
 
   @override
+  String get backgroundLocationTitle => 'Achtergrondlocatie toestaan';
+
+  @override
+  String get backgroundLocationMessage =>
+      'Zodat TaybGo je locatie kan blijven versturen wanneer de app op de achtergrond draait, open de instellingen en kies „Altijd toestaan“.';
+
+  @override
   String get gpsDisabled => 'GPS uitgeschakeld';
 
   @override

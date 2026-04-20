@@ -299,9 +299,18 @@ class _HomeScreenState extends State<HomeScreen>
 
       case ToggleOnlineResult.locationDeniedForever:
         final l10n = AppLocalizations.of(context)!;
+        final status = driverProvider.locationStatus;
+        final needsBackgroundOnly =
+            status != null &&
+            status.hasForegroundAccess &&
+            !status.hasBackgroundAccess;
         _showLocationPermissionDialog(
-          title: l10n.locationPermissionDenied,
-          message: driverProvider.error ?? l10n.pleaseEnableLocationInSettings,
+          title: needsBackgroundOnly
+              ? l10n.backgroundLocationTitle
+              : l10n.locationPermissionDenied,
+          message: needsBackgroundOnly
+              ? l10n.backgroundLocationMessage
+              : (driverProvider.error ?? l10n.pleaseEnableLocationInSettings),
           actionLabel: l10n.settings,
           onAction: () => driverProvider.openAppSettings(),
         );
@@ -387,33 +396,7 @@ class _HomeScreenState extends State<HomeScreen>
   Future<void> _refreshBatteryOptimizationWarning({
     required bool showDialog,
   }) async {
-    final enabled = await _batteryOptimizationService
-        .isBatteryOptimizationEnabled();
-
-    if (!mounted) return;
-
-    if (_showBatteryOptimizationBanner != enabled) {
-      setState(() => _showBatteryOptimizationBanner = enabled);
-    }
-
-    if (!enabled || !showDialog) {
-      return;
-    }
-
-    final driverProvider = context.read<DriverProvider>();
-    final profile = driverProvider.profile;
-    if (profile == null || !profile.isVerified) {
-      return;
-    }
-
-    final shouldShowReminder = await _batteryOptimizationService
-        .shouldShowReminder();
-    if (!mounted || !shouldShowReminder) {
-      return;
-    }
-
-    await _batteryOptimizationService.markReminderShown();
-    await _showBatteryOptimizationDialog();
+    return;
   }
 
   Future<void> _showBatteryOptimizationDialog() async {

@@ -266,6 +266,8 @@
   "enableLocationAccess": "Ota sijainnin käyttöoikeus käyttöön vastaanottaaksesi tilauksia.",
   "enable": "Ota käyttöön",
   "pleaseEnableLocationInSettings": "Ota sijainti käyttöön asetuksissa.",
+  "backgroundLocationTitle": "Salli sijainti taustalla",
+  "backgroundLocationMessage": "Jotta TaybGo voi lähettää sijaintisi myös taustalla, avaa asetukset ja valitse ”Salli aina”.",
   "gpsDisabled": "GPS pois käytöstä",
   "pleaseEnableGps": "Ota GPS käyttöön vastaanottaaksesi tilauksia.",
   "failedToUpdateStatus": "Tilan päivitys epäonnistui",

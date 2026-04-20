@@ -735,6 +735,13 @@ class AppLocalizationsFi extends AppLocalizations {
       'Ota sijainti käyttöön asetuksissa.';
 
   @override
+  String get backgroundLocationTitle => 'Salli sijainti taustalla';
+
+  @override
+  String get backgroundLocationMessage =>
+      'Jotta TaybGo voi lähettää sijaintisi myös taustalla, avaa asetukset ja valitse ”Salli aina”.';
+
+  @override
   String get gpsDisabled => 'GPS pois käytöstä';
 
   @override

@@ -733,6 +733,13 @@ class AppLocalizationsEn extends AppLocalizations {
       'Please enable location in settings.';
 
   @override
+  String get backgroundLocationTitle => 'Allow background location';
+
+  @override
+  String get backgroundLocationMessage =>
+      'So TaybGo can keep sending your location when the app is in the background, please open settings and select \"Allow all the time\".';
+
+  @override
   String get gpsDisabled => 'GPS Disabled';
 
   @override

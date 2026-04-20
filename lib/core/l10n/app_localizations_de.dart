@@ -740,6 +740,13 @@ class AppLocalizationsDe extends AppLocalizations {
       'Bitte aktivieren Sie den Standort in den Einstellungen.';
 
   @override
+  String get backgroundLocationTitle => 'Standort im Hintergrund zulassen';
+
+  @override
+  String get backgroundLocationMessage =>
+      'Damit TaybGo Ihren Standort auch im Hintergrund senden kann, öffnen Sie bitte die Einstellungen und wählen Sie „Immer zulassen“.';
+
+  @override
   String get gpsDisabled => 'GPS deaktiviert';
 
   @override

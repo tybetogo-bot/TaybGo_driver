@@ -266,6 +266,8 @@
   "enableLocationAccess": "Aktivéiert den Zougang zum Standuert fir Bestellungen ze kréien.",
   "enable": "Aktivéieren",
   "pleaseEnableLocationInSettings": "Aktivéiert w.e.g. de Standuert an den Astellungen.",
+  "backgroundLocationTitle": "Standuert am Hannergrond erlaben",
+  "backgroundLocationMessage": "Fir datt TaybGo Äre Standuert och am Hannergrond ka schécken, maacht w.e.g. d'Astellungen op a wielt „Ëmmer erlaben“.",
   "gpsDisabled": "GPS desaktivéiert",
   "pleaseEnableGps": "Aktivéiert w.e.g. GPS fir Bestellungen ze kréien.",
   "failedToUpdateStatus": "Status konnt net aktualiséiert ginn",
