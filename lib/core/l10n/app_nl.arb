@@ -1,6 +1,5 @@
-﻿{
+{
   "@@locale": "nl",
-
   "appName": "TaybGo Chauffeur",
   "welcome": "Welkom",
   "getStarted": "Aan de slag",
@@ -18,14 +17,12 @@
   "success": "Succes",
   "seeAll": "Alles bekijken",
   "or": "OF",
-
   "onboardingTitle1": "Begin vandaag met verdienen",
   "onboardingDesc1": "Sluit je aan bij duizenden chauffeurs die verdienen op hun eigen schema",
   "onboardingTitle2": "Accepteer bestellingen eenvoudig",
   "onboardingDesc2": "Ontvang meldingen voor nieuwe bestellingen en accepteer met één tik",
   "onboardingTitle3": "Navigeer & Bezorg",
   "onboardingDesc3": "Ingebouwde navigatie helpt je bestemmingen sneller te bereiken",
-
   "phoneNumber": "Telefoonnummer",
   "enterPhoneNumber": "Voer je telefoonnummer in",
   "phoneHint": "+31 6 12345678",
@@ -36,31 +33,29 @@
   "resendOtpIn": "Code opnieuw versturen over {seconds}s",
   "@resendOtpIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "invalidOtp": "Ongeldige verificatiecode",
   "otpSent": "Verificatiecode verstuurd",
   "errorsAuthPhoneAlreadyRegistered": "Dit nummer is al geregistreerd.",
-
   "email": "E-mail",
   "enterEmail": "Voer je e-mail in",
   "signUpWithApple": "Registreren met Apple",
   "signUpWithGoogle": "Registreren met Google",
   "forgotPassword": "Wachtwoord vergeten",
-
   "driverApplication": "Chauffeur aanmelding",
   "personalInfo": "Persoonlijke informatie",
   "vehicleInfo": "Voertuiginformatie",
   "documents": "Documenten",
   "reviewSubmit": "Controleren & Verzenden",
-
   "fullName": "Volledige naam",
   "age": "Geboortedatum",
   "dateOfBirth": "Geboortedatum",
   "address": "Adres",
   "city": "Stad",
-
   "vehicleType": "Voertuigtype",
   "selectVehicleType": "Selecteer voertuigtype",
   "car": "Auto",
@@ -71,13 +66,11 @@
   "vehicleModel": "Voertuigmodel",
   "vehicleYear": "Voertuigjaar",
   "vehicleColor": "Voertuigkleur",
-
   "serviceType": "Servicetype",
   "selectServiceType": "Welke diensten bied je aan?",
   "foodDelivery": "Maaltijdbezorging",
   "shipping": "Pakketbezorging",
   "taxi": "Taxi",
-
   "uploadDocuments": "Documenten uploaden",
   "driversLicense": "Rijbewijs",
   "nationalId": "Identiteitskaart",
@@ -87,21 +80,18 @@
   "uploadPhoto": "Foto uploaden",
   "takePhoto": "Foto maken",
   "chooseFromGallery": "Kies uit galerij",
-
   "submitApplication": "Aanmelding verzenden",
   "applicationSubmitted": "Aanmelding verzonden",
   "applicationPending": "Je aanmelding wordt beoordeeld",
   "applicationApproved": "Aanmelding goedgekeurd",
   "applicationRejected": "Aanmelding afgewezen",
   "pendingApprovalMessage": "We beoordelen je documenten. Dit duurt meestal 24-48 uur.",
-
   "home": "Home",
   "orders": "Bestellingen",
   "recentOrders": "Recente bestellingen",
   "earnings": "Verdiensten",
   "profile": "Profiel",
   "search": "Zoeken",
-
   "online": "Online",
   "offline": "Offline",
   "goOnline": "Online gaan",
@@ -110,7 +100,6 @@
   "tapToGoOffline": "Tik om offline te gaan",
   "youAreOnline": "Je bent online en klaar om bestellingen te ontvangen",
   "youAreOffline": "Je bent offline. Ga online om bestellingen te ontvangen",
-
   "newOrder": "Nieuwe bestelling",
   "newOrderTitle": "Nieuwe bestelling!",
   "newOrderSubtitle": "Accepteer voordat de tijd afloopt",
@@ -124,7 +113,9 @@
   "acceptIn": "Accepteren over {seconds}s",
   "@acceptIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "orderAccepted": "Bestelling geaccepteerd",
@@ -139,7 +130,6 @@
   "rejected": "Geweigerd",
   "cancelled": "Geannuleerd",
   "delivered": "Bezorgd",
-
   "pickup": "Ophalen",
   "dropoff": "Afleveren",
   "pickupLocation": "Ophaallocatie",
@@ -159,7 +149,6 @@
   "yourDistanceTo": "Jouw afstand tot",
   "km": "km",
   "min": "min",
-
   "startNavigation": "Navigatie starten",
   "arrivedAtPickup": "Aangekomen bij ophaallocatie",
   "startDelivery": "Bezorging starten",
@@ -172,31 +161,26 @@
   "arrivedAtDropoffConfirmation": "Bevestig dat je bent aangekomen bij de afleverlocatie?",
   "completeOrderConfirmation": "Bevestig dat je deze bezorging hebt voltooid?",
   "updatingStatus": "Status bijwerken...",
-
   "tip": "Fooi",
   "earnings_label": "Verdiensten",
   "deliveryFee": "Bezorgkosten",
   "total": "Totaal",
-
   "currentOrders": "Huidige bestellingen",
   "orderHistory": "Bestelgeschiedenis",
   "noOrdersYet": "Nog geen bestellingen",
   "noActiveOrders": "Geen actieve bestellingen",
   "waitingForOrders": "Wachten op nieuwe bestellingen...",
-
   "totalOrders": "Totaal bestellingen",
   "totalEarnings": "Totale verdiensten",
   "avgTripTime": "Gem. rijtijd",
   "completionRate": "Voltooiingspercentage",
   "rating": "Beoordeling",
-
   "todayEarnings": "Verdiensten vandaag",
   "weeklyEarnings": "Wekelijkse verdiensten",
   "monthlyEarnings": "Maandelijkse verdiensten",
   "lastMonthEarnings": "Verdiensten vorige maand",
   "viewPayslips": "Loonstroken bekijken",
   "payslipsSentEmail": "Loonstroken worden per e-mail verzonden",
-
   "settings": "Instellingen",
   "language": "Taal",
   "english": "Engels",
@@ -219,6 +203,26 @@
   "promotionalNotifications": "Promotiemeldingen",
   "soundEnabled": "Geluid aan",
   "vibrationEnabled": "Trillen aan",
+  "notificationSoundRepeats": "Meldingsgeluid herhalen",
+  "notificationSoundRepeatsEnabledDesc": "Speel het signaalgeluid {count} keer af voor elke melding.",
+  "@notificationSoundRepeatsEnabledDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSoundRepeatsDisabledDesc": "Schakel eerst geluid in om te kiezen hoe vaak het signaal wordt herhaald.",
+  "notificationSoundRepeatsPickerDesc": "Kies hoe vaak het signaalgeluid voor elke melding moet worden herhaald.",
+  "notificationRepeatTime": "1 keer",
+  "notificationRepeatTimes": "{count} keer",
+  "@notificationRepeatTimes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noNotifications": "Nog geen meldingen",
   "noNotificationsDesc": "Je meldingen verschijnen hier",
   "today": "Vandaag",
@@ -232,7 +236,6 @@
   "earningsReceived": "Verdiensten ontvangen",
   "weeklyReportReady": "Wekelijks rapport is klaar",
   "accountUpdated": "Account bijgewerkt",
-
   "account": "Account",
   "editProfile": "Profiel bewerken",
   "changePassword": "Wachtwoord wijzigen",
@@ -244,24 +247,22 @@
   "logoutConfirm": "Weet je zeker dat je wilt uitloggen?",
   "deleteAccount": "Account verwijderen",
   "deleteAccountConfirm": "Weet je zeker dat je je account wilt verwijderen? Deze actie kan niet ongedaan worden gemaakt.",
-
   "networkError": "Netwerkfout. Controleer je verbinding.",
   "somethingWentWrong": "Er is iets misgegaan. Probeer het opnieuw.",
   "sessionExpired": "Sessie verlopen. Log opnieuw in.",
   "locationPermissionDenied": "Locatietoestemming geweigerd",
   "enableLocationServices": "Schakel locatieservices in om door te gaan",
-
   "version": "Versie {version}",
   "@version": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
-
   "goodMorning": "Goedemorgen",
   "goodAfternoon": "Goedemiddag",
   "goodEvening": "Goedenavond",
-
   "locationRequired": "Locatie vereist",
   "enableLocationAccess": "Schakel locatietoegang in om bestellingen te ontvangen.",
   "enable": "Inschakelen",
@@ -272,29 +273,23 @@
   "pleaseEnableGps": "Schakel GPS in om bestellingen te ontvangen.",
   "failedToUpdateStatus": "Status bijwerken mislukt",
   "ok": "OK",
-
   "accountUnderReview": "Account wordt beoordeeld",
   "accountBeingVerified": "Je account wordt geverifieerd. Je wordt op de hoogte gesteld wanneer goedgekeurd.",
-
   "receivingOrders": "Bestellingen ontvangen",
   "goOnlineToStart": "Ga online om te starten",
   "noRecentOrders": "Geen recente bestellingen",
-
   "headToPickup": "Ga naar ophaallocatie",
   "onTheWay": "Onderweg",
   "atDelivery": "Bij bezorging",
   "continueText": "Doorgaan",
-
   "week": "Week",
   "month": "Maand",
   "avgPerOrder": "Gem./Bestelling",
   "allTime": "Totaal",
   "noEarningsData": "Geen verdienstengegevens",
   "completeOrdersToSeeEarnings": "Voltooi bestellingen om je verdiensten te zien",
-
   "verified": "Geverifieerd",
   "driver": "Chauffeur",
-
   "knowledgeBase": "Kennisbank",
   "searchForHelp": "Zoek hulp...",
   "noArticlesFound": "Geen artikelen gevonden",
@@ -303,7 +298,9 @@
   "articlesCount": "{count} artikelen",
   "@articlesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "articleNotFound": "Artikel niet gevonden",
@@ -320,16 +317,19 @@
   "sectionsCount": "{count} secties",
   "@sectionsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "minRead": "{count} min leestijd",
   "@minRead": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "tourAccountUnderReviewTitle": "Account wordt beoordeeld",
   "tourAccountUnderReviewDesc": "Je account wordt geverifieerd. Je kunt de app verkennen terwijl je wacht op goedkeuring.",
   "tourGoOnlineTitle": "Ga online om bestellingen te ontvangen",
@@ -360,7 +360,6 @@
   "tourAppSettingsDesc": "Wijzig je taal, thema en ga naar de kennisbank voor hulp.",
   "tourKnowledgeBaseTitle": "Kennisbank",
   "tourKnowledgeBaseDesc": "Doorzoek stap-voor-stap handleidingen, tips en antwoorden op veelgestelde vragen.",
-
   "tourSkipBtn": "Overslaan",
   "tourBackBtn": "Terug",
   "tourNextBtn": "Volgende",
@@ -373,7 +372,6 @@
   "tourCompleteDesc": "Je bent helemaal klaar om bestellingen te accepteren en te verdienen met TaybGo!",
   "tourBrowseKb": "Kennisbank doorzoeken",
   "tourGetStarted": "Aan de slag",
-
   "selectCountry": "Selecteer land",
   "searchCountry": "Zoek land...",
   "secure": "Beveiligd",
@@ -383,7 +381,9 @@
   "resendIn": "Opnieuw versturen over {seconds}s",
   "@resendIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "resendCode": "Code opnieuw versturen",
@@ -426,26 +426,34 @@
   "failedToDeleteAccount": "Account verwijderen mislukt: {error}",
   "@failedToDeleteAccount": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "justNow": "Zojuist",
   "minutesAgo": "{minutes}m geleden",
   "@minutesAgo": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "hoursAgo": "{hours}u geleden",
   "@hoursAgo": {
     "placeholders": {
-      "hours": {"type": "int"}
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "daysAgo": "{days}d geleden",
   "@daysAgo": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "clearAllNotificationsConfirm": "Weet je zeker dat je alle meldingen wilt wissen?",
@@ -459,7 +467,9 @@
   "secondsAgo": "{seconds}s geleden",
   "@secondsAgo": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "subtotal": "Subtotaal",
@@ -475,7 +485,6 @@
   "batteryOptimizationTitle": "Batterijoptimalisatie uitschakelen",
   "batteryOptimizationMessage": "Om live locatie op de achtergrond actief te houden, stel TaybGo Driver in de Android-instellingen in op onbeperkt batterijgebruik.",
   "batteryOptimizationBannerMessage": "Batterijoptimalisatie kan live locatie pauzeren terwijl u online bent. Stel TaybGo Driver in op onbeperkt batterijgebruik.",
-
   "profileUpdatedSuccessfully": "Profiel succesvol bijgewerkt",
   "failedToUpdateProfile": "Profiel bijwerken mislukt",
   "supportTickets": "Supporttickets",

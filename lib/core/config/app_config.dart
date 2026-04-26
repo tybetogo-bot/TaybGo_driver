@@ -1,3 +1,5 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 /// Application environment configuration.
 ///
 /// Each flavor (dev / prod) calls [AppConfig.init] once from its
@@ -5,6 +7,7 @@
 enum Environment { dev, prod }
 
 class AppConfig {
+  static const _environmentStorageKey = 'app_environment';
   static Environment? _environment;
 
   static Environment get environment => _environment!;
@@ -26,5 +29,25 @@ class AppConfig {
         baseUrl = 'https://taybgo.com/api';
         appName = 'TaybGo Driver';
     }
+  }
+
+  static Future<void> persistEnvironment() async {
+    if (!isInitialized) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_environmentStorageKey, environment.name);
+  }
+
+  static Future<void> ensureInitializedFromStorage() async {
+    if (isInitialized) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final storedValue = prefs.getString(_environmentStorageKey);
+    final env = Environment.values.cast<Environment?>().firstWhere(
+      (candidate) => candidate?.name == storedValue,
+      orElse: () => null,
+    );
+
+    init(env: env ?? Environment.dev);
   }
 }

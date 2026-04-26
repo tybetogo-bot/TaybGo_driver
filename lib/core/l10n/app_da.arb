@@ -1,6 +1,5 @@
-﻿{
+{
   "@@locale": "da",
-
   "appName": "TaybGo Chauffør",
   "welcome": "Velkommen",
   "getStarted": "Kom i gang",
@@ -18,14 +17,12 @@
   "success": "Succes",
   "seeAll": "Se alle",
   "or": "ELLER",
-
   "onboardingTitle1": "Begynd at tjene i dag",
   "onboardingDesc1": "Slut dig til tusindvis af chauffører, der tjener efter deres egen tidsplan",
   "onboardingTitle2": "Accepter ordrer nemt",
   "onboardingDesc2": "Bliv underrettet om nye ordrer og accepter med et tryk",
   "onboardingTitle3": "Naviger & Lever",
   "onboardingDesc3": "Indbygget navigation hjælper dig med at nå destinationer hurtigere",
-
   "phoneNumber": "Telefonnummer",
   "enterPhoneNumber": "Indtast dit telefonnummer",
   "phoneHint": "+45 12 34 56 78",
@@ -36,31 +33,29 @@
   "resendOtpIn": "Gensend kode om {seconds}s",
   "@resendOtpIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "invalidOtp": "Ugyldig bekræftelseskode",
   "otpSent": "Bekræftelseskode sendt",
   "errorsAuthPhoneAlreadyRegistered": "Dette nummer er allerede registreret.",
-
   "email": "E-mail",
   "enterEmail": "Indtast din e-mail",
   "signUpWithApple": "Tilmeld med Apple",
   "signUpWithGoogle": "Tilmeld med Google",
   "forgotPassword": "Glemt adgangskode",
-
   "driverApplication": "Chauffør ansøgning",
   "personalInfo": "Personlige oplysninger",
   "vehicleInfo": "Køretøjsoplysninger",
   "documents": "Dokumenter",
   "reviewSubmit": "Gennemse & Indsend",
-
   "fullName": "Fulde navn",
   "age": "Fødselsdato",
   "dateOfBirth": "Fødselsdato",
   "address": "Adresse",
   "city": "By",
-
   "vehicleType": "Køretøjstype",
   "selectVehicleType": "Vælg køretøjstype",
   "car": "Bil",
@@ -71,13 +66,11 @@
   "vehicleModel": "Køretøjsmodel",
   "vehicleYear": "Køretøjsår",
   "vehicleColor": "Køretøjsfarve",
-
   "serviceType": "Servicetype",
   "selectServiceType": "Hvilke tjenester vil du tilbyde?",
   "foodDelivery": "Madlevering",
   "shipping": "Fragt",
   "taxi": "Taxa",
-
   "uploadDocuments": "Upload dokumenter",
   "driversLicense": "Kørekort",
   "nationalId": "Identitetskort",
@@ -87,21 +80,18 @@
   "uploadPhoto": "Upload billede",
   "takePhoto": "Tag billede",
   "chooseFromGallery": "Vælg fra galleri",
-
   "submitApplication": "Indsend ansøgning",
   "applicationSubmitted": "Ansøgning indsendt",
   "applicationPending": "Din ansøgning er under gennemgang",
   "applicationApproved": "Ansøgning godkendt",
   "applicationRejected": "Ansøgning afvist",
   "pendingApprovalMessage": "Vi gennemgår dine dokumenter. Det tager normalt 24-48 timer.",
-
   "home": "Hjem",
   "orders": "Ordrer",
   "recentOrders": "Seneste ordrer",
   "earnings": "Indtjening",
   "profile": "Profil",
   "search": "Søg",
-
   "online": "Online",
   "offline": "Offline",
   "goOnline": "Gå online",
@@ -110,7 +100,6 @@
   "tapToGoOffline": "Tryk for at gå offline",
   "youAreOnline": "Du er online og klar til at modtage ordrer",
   "youAreOffline": "Du er offline. Gå online for at modtage ordrer",
-
   "newOrder": "Ny ordre",
   "newOrderTitle": "Ny ordre!",
   "newOrderSubtitle": "Accepter før tiden løber ud",
@@ -124,7 +113,9 @@
   "acceptIn": "Accepter om {seconds}s",
   "@acceptIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "orderAccepted": "Ordre accepteret",
@@ -139,7 +130,6 @@
   "rejected": "Afvist",
   "cancelled": "Annulleret",
   "delivered": "Leveret",
-
   "pickup": "Afhentning",
   "dropoff": "Levering",
   "pickupLocation": "Afhentningssted",
@@ -159,7 +149,6 @@
   "yourDistanceTo": "Din afstand til",
   "km": "km",
   "min": "min",
-
   "startNavigation": "Start navigation",
   "arrivedAtPickup": "Ankommet til afhentning",
   "startDelivery": "Start levering",
@@ -172,31 +161,26 @@
   "arrivedAtDropoffConfirmation": "Bekræft at du er ankommet til leveringsstedet?",
   "completeOrderConfirmation": "Bekræft at du har afsluttet denne levering?",
   "updatingStatus": "Opdaterer status...",
-
   "tip": "Drikkepenge",
   "earnings_label": "Indtjening",
   "deliveryFee": "Leveringsgebyr",
   "total": "Total",
-
   "currentOrders": "Aktuelle ordrer",
   "orderHistory": "Ordrehistorik",
   "noOrdersYet": "Ingen ordrer endnu",
   "noActiveOrders": "Ingen aktive ordrer",
   "waitingForOrders": "Venter på nye ordrer...",
-
   "totalOrders": "Samlede ordrer",
   "totalEarnings": "Samlet indtjening",
   "avgTripTime": "Gns. rejsetid",
   "completionRate": "Fuldførelsesrate",
   "rating": "Bedømmelse",
-
   "todayEarnings": "Dagens indtjening",
   "weeklyEarnings": "Ugentlig indtjening",
   "monthlyEarnings": "Månedlig indtjening",
   "lastMonthEarnings": "Sidste måneds indtjening",
   "viewPayslips": "Se lønsedler",
   "payslipsSentEmail": "Lønsedler sendes til din e-mail",
-
   "settings": "Indstillinger",
   "language": "Sprog",
   "english": "Engelsk",
@@ -219,6 +203,26 @@
   "promotionalNotifications": "Kampagnenotifikationer",
   "soundEnabled": "Lyd aktiveret",
   "vibrationEnabled": "Vibration aktiveret",
+  "notificationSoundRepeats": "Gentagelser af notifikationslyd",
+  "notificationSoundRepeatsEnabledDesc": "Afspil signallyden {count} gang(e) for hver notifikation.",
+  "@notificationSoundRepeatsEnabledDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSoundRepeatsDisabledDesc": "Aktiv?r lyd f?rst for at v?lge, hvor mange gange signalet skal gentages.",
+  "notificationSoundRepeatsPickerDesc": "V?lg, hvor mange gange signallyden skal gentages for hver notifikation.",
+  "notificationRepeatTime": "1 gang",
+  "notificationRepeatTimes": "{count} gange",
+  "@notificationRepeatTimes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noNotifications": "Ingen notifikationer endnu",
   "noNotificationsDesc": "Dine notifikationer vises her",
   "today": "I dag",
@@ -232,7 +236,6 @@
   "earningsReceived": "Indtjening modtaget",
   "weeklyReportReady": "Ugerapporten er klar",
   "accountUpdated": "Konto opdateret",
-
   "account": "Konto",
   "editProfile": "Rediger profil",
   "changePassword": "Skift adgangskode",
@@ -244,24 +247,22 @@
   "logoutConfirm": "Er du sikker på, at du vil logge ud?",
   "deleteAccount": "Slet konto",
   "deleteAccountConfirm": "Er du sikker på, at du vil slette din konto? Denne handling kan ikke fortrydes.",
-
   "networkError": "Netværksfejl. Tjek din forbindelse.",
   "somethingWentWrong": "Noget gik galt. Prøv igen.",
   "sessionExpired": "Session udløbet. Log ind igen.",
   "locationPermissionDenied": "Placeringstilladelse nægtet",
   "enableLocationServices": "Aktivér placeringstjenester for at fortsætte",
-
   "version": "Version {version}",
   "@version": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
-
   "goodMorning": "God morgen",
   "goodAfternoon": "God eftermiddag",
   "goodEvening": "God aften",
-
   "locationRequired": "Placering påkrævet",
   "enableLocationAccess": "Aktivér placeringsadgang for at modtage ordrer.",
   "enable": "Aktivér",
@@ -272,29 +273,23 @@
   "pleaseEnableGps": "Aktivér GPS for at modtage ordrer.",
   "failedToUpdateStatus": "Kunne ikke opdatere status",
   "ok": "OK",
-
   "accountUnderReview": "Konto under gennemgang",
   "accountBeingVerified": "Din konto verificeres. Du bliver underrettet, når den er godkendt.",
-
   "receivingOrders": "Modtager ordrer",
   "goOnlineToStart": "Gå online for at starte",
   "noRecentOrders": "Ingen seneste ordrer",
-
   "headToPickup": "Kør til afhentning",
   "onTheWay": "På vej",
   "atDelivery": "Ved levering",
   "continueText": "Fortsæt",
-
   "week": "Uge",
   "month": "Måned",
   "avgPerOrder": "Gns./Ordre",
   "allTime": "Samlet",
   "noEarningsData": "Ingen indtjeningsdata",
   "completeOrdersToSeeEarnings": "Afslut ordrer for at se din indtjening",
-
   "verified": "Verificeret",
   "driver": "Chauffør",
-
   "knowledgeBase": "Vidensbase",
   "searchForHelp": "Søg efter hjælp...",
   "noArticlesFound": "Ingen artikler fundet",
@@ -303,7 +298,9 @@
   "articlesCount": "{count} artikler",
   "@articlesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "articleNotFound": "Artikel ikke fundet",
@@ -320,16 +317,19 @@
   "sectionsCount": "{count} sektioner",
   "@sectionsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "minRead": "{count} min læsning",
   "@minRead": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "tourAccountUnderReviewTitle": "Konto under gennemgang",
   "tourAccountUnderReviewDesc": "Din konto verificeres. Du kan udforske appen, mens du venter på godkendelse.",
   "tourGoOnlineTitle": "Gå online for at modtage ordrer",
@@ -360,7 +360,6 @@
   "tourAppSettingsDesc": "Skift sprog, tema og få adgang til vidensbasen for hjælp.",
   "tourKnowledgeBaseTitle": "Vidensbase",
   "tourKnowledgeBaseDesc": "Gennemse trin-for-trin guider, tips og svar på ofte stillede spørgsmål.",
-
   "tourSkipBtn": "Spring over",
   "tourBackBtn": "Tilbage",
   "tourNextBtn": "Næste",
@@ -373,7 +372,6 @@
   "tourCompleteDesc": "Du er klar til at begynde at acceptere ordrer og tjene med TaybGo!",
   "tourBrowseKb": "Gennemse vidensbasen",
   "tourGetStarted": "Kom i gang",
-
   "selectCountry": "Vælg land",
   "searchCountry": "Søg land...",
   "secure": "Sikker",
@@ -383,7 +381,9 @@
   "resendIn": "Gensend om {seconds}s",
   "@resendIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "resendCode": "Gensend kode",
@@ -426,26 +426,34 @@
   "failedToDeleteAccount": "Kunne ikke slette konto: {error}",
   "@failedToDeleteAccount": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "justNow": "Lige nu",
   "minutesAgo": "{minutes}m siden",
   "@minutesAgo": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "hoursAgo": "{hours}t siden",
   "@hoursAgo": {
     "placeholders": {
-      "hours": {"type": "int"}
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "daysAgo": "{days}d siden",
   "@daysAgo": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "clearAllNotificationsConfirm": "Er du sikker på, at du vil rydde alle notifikationer?",
@@ -459,7 +467,9 @@
   "secondsAgo": "{seconds}s siden",
   "@secondsAgo": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "subtotal": "Subtotal",
@@ -475,7 +485,6 @@
   "batteryOptimizationTitle": "Slå batterioptimering fra",
   "batteryOptimizationMessage": "For at holde liveplacering aktiv i baggrunden skal du sætte TaybGo Driver til ubegrænset batteribrug i Android-indstillingerne.",
   "batteryOptimizationBannerMessage": "Batterioptimering kan sætte liveplacering på pause, mens du er online. Sæt TaybGo Driver til ubegrænset batteribrug.",
-
   "profileUpdatedSuccessfully": "Profil opdateret",
   "failedToUpdateProfile": "Kunne ikke opdatere profil",
   "supportTickets": "Supporthenvendelser",

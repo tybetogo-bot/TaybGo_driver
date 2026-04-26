@@ -17,9 +17,6 @@ class SupportRepository {
   }) async {
     try {
       final queryParams = <String, dynamic>{'page': page};
-      if (status != null) {
-        queryParams['status'] = status.apiValue;
-      }
 
       final response = await _apiClient.get(
         ApiConstants.supportTickets,
@@ -59,7 +56,6 @@ class SupportRepository {
         'subject': subject,
         'category': category.apiValue,
         'priority': priority.apiValue,
-        'message': message,
       };
       if (orderId != null) {
         data['order_id'] = orderId;
@@ -70,7 +66,24 @@ class SupportRepository {
         data: data,
       );
 
-      return SupportTicket.fromJson(response.data);
+      final ticket = SupportTicket.fromJson(response.data);
+      if (message.trim().isEmpty) {
+        return ticket;
+      }
+
+      final ticketMessage = await sendMessage(ticket.id, message.trim());
+      return SupportTicket(
+        id: ticket.id,
+        subject: ticket.subject,
+        category: ticket.category,
+        priority: ticket.priority,
+        status: ticket.status,
+        orderId: ticket.orderId,
+        orderDisplay: ticket.orderDisplay,
+        createdAt: ticket.createdAt,
+        updatedAt: DateTime.now(),
+        messages: [...ticket.messages, ticketMessage],
+      );
     } on DioException catch (e) {
       debugPrint('[SupportRepository] createTicket error: ${e.message}');
       throw ApiException.fromDioException(e);

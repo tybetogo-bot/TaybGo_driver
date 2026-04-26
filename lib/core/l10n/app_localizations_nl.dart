@@ -618,6 +618,30 @@ class AppLocalizationsNl extends AppLocalizations {
   String get vibrationEnabled => 'Trillen aan';
 
   @override
+  String get notificationSoundRepeats => 'Meldingsgeluid herhalen';
+
+  @override
+  String notificationSoundRepeatsEnabledDesc(int count) {
+    return 'Speel het signaalgeluid $count keer af voor elke melding.';
+  }
+
+  @override
+  String get notificationSoundRepeatsDisabledDesc =>
+      'Schakel eerst geluid in om te kiezen hoe vaak het signaal wordt herhaald.';
+
+  @override
+  String get notificationSoundRepeatsPickerDesc =>
+      'Kies hoe vaak het signaalgeluid voor elke melding moet worden herhaald.';
+
+  @override
+  String get notificationRepeatTime => '1 keer';
+
+  @override
+  String notificationRepeatTimes(int count) {
+    return '$count keer';
+  }
+
+  @override
   String get noNotifications => 'Nog geen meldingen';
 
   @override

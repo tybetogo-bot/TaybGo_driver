@@ -16,20 +16,24 @@ import 'core/providers/order_provider.dart';
 import 'core/providers/auth_provider.dart';
 import 'core/providers/driver_provider.dart';
 import 'core/providers/notification_provider.dart';
+import 'core/providers/notification_settings_provider.dart';
 import 'core/providers/tour_provider.dart';
 import 'core/providers/earnings_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/services/fcm_service.dart';
+import 'core/constants/route_constants.dart';
+import 'features/support/application/support_provider.dart';
 
 GoRouter? _router;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Default to dev if main.dart is launched directly (no flavor entry-point)
+  // Default to prod if main.dart is launched directly (no flavor entry-point)
   if (!AppConfig.isInitialized) {
-    AppConfig.init(env: Environment.dev);
+    AppConfig.init(env: Environment.prod);
   }
+  await AppConfig.persistEnvironment();
 
   await initializeDateFormatting();
 
@@ -62,6 +66,29 @@ void main() async {
   runApp(
     TaybGoDriverApp(authProvider: authProvider, tourProvider: tourProvider),
   );
+
+  fcmService.onNotificationTap = _handleNotificationTap;
+}
+
+void _handleNotificationTap(Map<String, dynamic> data) {
+  final router = _router;
+  if (router == null) return;
+
+  final orderId = _extractNotificationOrderId(data);
+  final route = orderId != null
+      ? RouteConstants.orderDetailPath(orderId)
+      : RouteConstants.orders;
+
+  router.go(route);
+}
+
+String? _extractNotificationOrderId(Map<String, dynamic> data) {
+  final value = data['order_id'] ?? data['orderId'] ?? data['id'];
+  final orderId = value?.toString().trim();
+  if (orderId == null || orderId.isEmpty) {
+    return null;
+  }
+  return orderId;
 }
 
 class TaybGoDriverApp extends StatelessWidget {
@@ -80,7 +107,9 @@ class TaybGoDriverApp extends StatelessWidget {
     final orderProvider = OrderProvider();
     final driverProvider = DriverProvider();
     final notificationProvider = NotificationProvider();
+    final notificationSettingsProvider = NotificationSettingsProvider();
     final earningsProvider = EarningsProvider();
+    final supportProvider = SupportProvider();
     final router = _router ??= AppRouter.createRouter(authProvider);
 
     // Wire up logout callback so all providers clear on any logout
@@ -93,6 +122,7 @@ class TaybGoDriverApp extends StatelessWidget {
       orderProvider.clearAll();
       earningsProvider.clearAll();
       notificationProvider.clearAll();
+      supportProvider.clearAll();
       tourProvider.resetTour();
     };
 
@@ -104,7 +134,9 @@ class TaybGoDriverApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: authProvider),
         ChangeNotifierProvider.value(value: driverProvider),
         ChangeNotifierProvider.value(value: notificationProvider),
+        ChangeNotifierProvider.value(value: notificationSettingsProvider),
         ChangeNotifierProvider.value(value: earningsProvider),
+        ChangeNotifierProvider.value(value: supportProvider),
         ChangeNotifierProvider.value(value: tourProvider),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(

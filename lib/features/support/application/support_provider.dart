@@ -7,21 +7,39 @@ class SupportProvider extends ChangeNotifier {
   final SupportRepository _repository;
 
   SupportProvider({SupportRepository? repository, ApiClient? apiClient})
-      : _repository = repository ??
-            SupportRepository(apiClient: apiClient ?? ApiClient());
+    : _repository =
+          repository ?? SupportRepository(apiClient: apiClient ?? ApiClient());
 
   // Ticket list
   List<SupportTicket> _tickets = [];
   List<SupportTicket> get tickets {
     if (_statusFilter == null) return List.unmodifiable(_tickets);
     return List.unmodifiable(
-      _tickets.where((t) => t.status == _statusFilter),
+      _tickets.where((t) => _matchesStatusFilter(t.status)),
     );
   }
 
   // Filter
   TicketStatus? _statusFilter;
   TicketStatus? get statusFilter => _statusFilter;
+
+  bool _matchesStatusFilter(TicketStatus status) {
+    switch (_statusFilter) {
+      case null:
+        return true;
+      case TicketStatus.open:
+        return status == TicketStatus.open;
+      case TicketStatus.inProgress:
+        return status == TicketStatus.inProgress ||
+            status == TicketStatus.waitingOnCustomer;
+      case TicketStatus.waitingOnCustomer:
+        return status == TicketStatus.waitingOnCustomer;
+      case TicketStatus.resolved:
+        return status == TicketStatus.resolved;
+      case TicketStatus.closed:
+        return status == TicketStatus.closed || status == TicketStatus.resolved;
+    }
+  }
 
   // Pagination
   int _currentPage = 1;
@@ -199,5 +217,20 @@ class SupportProvider extends ChangeNotifier {
 
   void clearCurrentTicket() {
     _currentTicket = null;
+  }
+
+  void clearAll() {
+    _tickets = [];
+    _statusFilter = null;
+    _currentPage = 1;
+    _hasMore = true;
+    _isLoading = false;
+    _isLoadingMore = false;
+    _isCreating = false;
+    _isSending = false;
+    _currentTicket = null;
+    _isLoadingDetail = false;
+    _error = null;
+    notifyListeners();
   }
 }

@@ -1,9 +1,9 @@
 {
   "@@locale": "en",
-
   "appName": "TaybGo Driver",
-  "@appName": {"description": "The app name"},
-
+  "@appName": {
+    "description": "The app name"
+  },
   "welcome": "Welcome",
   "getStarted": "Get Started",
   "next": "Next",
@@ -20,14 +20,12 @@
   "success": "Success",
   "seeAll": "See all",
   "or": "OR",
-
   "onboardingTitle1": "Start Earning Today",
   "onboardingDesc1": "Join thousands of drivers earning on their own schedule",
   "onboardingTitle2": "Accept Orders Easily",
   "onboardingDesc2": "Get notified of new orders and accept with one tap",
   "onboardingTitle3": "Navigate & Deliver",
   "onboardingDesc3": "Built-in navigation helps you reach destinations faster",
-
   "phoneNumber": "Phone Number",
   "enterPhoneNumber": "Enter your phone number",
   "phoneHint": "+49 123 456 7890",
@@ -38,7 +36,9 @@
   "resendOtpIn": "Resend code in {seconds}s",
   "@resendOtpIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "invalidOtp": "Invalid verification code",
@@ -47,26 +47,22 @@
   "@errorsAuthPhoneAlreadyRegistered": {
     "description": "Generic OTP conflict message shown when the phone number is already registered for another account or role."
   },
-
   "email": "Email",
   "enterEmail": "Enter your email",
   "signUpWithApple": "Sign up with Apple",
   "signUpWithGoogle": "Sign up with Google",
   "forgotPassword": "I forgot my password",
-
   "driverApplication": "Driver Application",
   "personalInfo": "Personal Information",
   "vehicleInfo": "Vehicle Information",
   "documents": "Documents",
   "otherDocuments": "Other Documents",
   "reviewSubmit": "Review & Submit",
-
   "fullName": "Full Name",
   "age": "Birthdate",
   "dateOfBirth": "Date of Birth",
   "address": "Address",
   "city": "City",
-
   "vehicleType": "Vehicle Type",
   "selectVehicleType": "Select vehicle type",
   "car": "Car",
@@ -77,13 +73,11 @@
   "vehicleModel": "Vehicle Model",
   "vehicleYear": "Vehicle Year",
   "vehicleColor": "Vehicle Color",
-
   "serviceType": "Service Type",
   "selectServiceType": "What services will you offer?",
   "foodDelivery": "Food Delivery",
   "shipping": "Shipping",
   "taxi": "Taxi",
-
   "uploadDocuments": "Upload Documents",
   "driversLicense": "Driver's License",
   "nationalId": "National ID",
@@ -96,7 +90,6 @@
   "uploadPhoto": "Upload Photo",
   "takePhoto": "Take Photo",
   "chooseFromGallery": "Choose from Gallery",
-
   "submitApplication": "Submit Application",
   "applicationSubmitted": "Application Submitted",
   "applicationPending": "Your application is under review",
@@ -107,14 +100,12 @@
   "vehicleChangeWarningMessage": "Changing your vehicle details will place your account on hold until the administration reviews and approves the update.",
   "vehicleChangeWarningNote": "You won't be able to go online or receive new orders while this review is in progress.",
   "vehicleChangeWarningConfirm": "Confirm and save",
-
   "home": "Home",
   "orders": "Orders",
   "recentOrders": "Recent Orders",
   "earnings": "Earnings",
   "profile": "Profile",
   "search": "Search",
-
   "online": "Online",
   "offline": "Offline",
   "goOnline": "Go Online",
@@ -123,7 +114,6 @@
   "tapToGoOffline": "Tap to go offline",
   "youAreOnline": "You're online and ready to receive orders",
   "youAreOffline": "You're offline. Go online to receive orders",
-
   "newOrder": "New Order",
   "newOrderTitle": "New Order!",
   "newOrderSubtitle": "Accept before time runs out",
@@ -137,13 +127,15 @@
   "acceptIn": "Accept in {seconds}s",
   "@acceptIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
-  "orderAccepted": "Order Accepted",
+  "orderAccepted": "Order accepted!",
   "items": "items",
   "time": "Time",
-  "orderRejected": "Order Rejected",
+  "orderRejected": "Order rejected",
   "orderCompleted": "Order Completed",
   "orderCancelled": "Order Cancelled",
   "pending": "Pending",
@@ -152,7 +144,6 @@
   "rejected": "Rejected",
   "cancelled": "Cancelled",
   "delivered": "Delivered",
-
   "pickup": "Pickup",
   "dropoff": "Drop-off",
   "pickupLocation": "Pickup Location",
@@ -172,7 +163,6 @@
   "yourDistanceTo": "Your distance to",
   "km": "km",
   "min": "min",
-
   "startNavigation": "Start Navigation",
   "arrivedAtPickup": "Arrived at Pickup",
   "startDelivery": "Start Delivery",
@@ -185,31 +175,26 @@
   "arrivedAtDropoffConfirmation": "Confirm that you have arrived at the drop-off location?",
   "completeOrderConfirmation": "Confirm that you have completed this delivery?",
   "updatingStatus": "Updating status...",
-
   "tip": "Tip",
   "earnings_label": "Earnings",
   "deliveryFee": "Delivery Fee",
   "total": "Total",
-
   "currentOrders": "Current Orders",
   "orderHistory": "Order History",
   "noOrdersYet": "No orders yet",
   "noActiveOrders": "No active orders",
   "waitingForOrders": "Waiting for new orders...",
-
   "totalOrders": "Total Orders",
   "totalEarnings": "Total Earnings",
   "avgTripTime": "Avg. Trip Time",
   "completionRate": "Completion Rate",
   "rating": "Rating",
-
   "todayEarnings": "Today's Earnings",
   "weeklyEarnings": "Weekly Earnings",
   "monthlyEarnings": "Monthly Earnings",
   "lastMonthEarnings": "Last Month's Earnings",
   "viewPayslips": "View Payslips",
   "payslipsSentEmail": "Payslips are sent to your email",
-
   "settings": "Settings",
   "language": "Language",
   "english": "English",
@@ -232,6 +217,26 @@
   "promotionalNotifications": "Promotional Notifications",
   "soundEnabled": "Sound Enabled",
   "vibrationEnabled": "Vibration Enabled",
+  "notificationSoundRepeats": "Notification sound repeats",
+  "notificationSoundRepeatsEnabledDesc": "Play the signal sound {count} time(s) for each notification.",
+  "@notificationSoundRepeatsEnabledDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSoundRepeatsDisabledDesc": "Enable sound first to choose how many times the signal repeats.",
+  "notificationSoundRepeatsPickerDesc": "Choose how many times the signal sound should repeat for each notification.",
+  "notificationRepeatTime": "1 time",
+  "notificationRepeatTimes": "{count} times",
+  "@notificationRepeatTimes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noNotifications": "No notifications yet",
   "noNotificationsDesc": "You'll see your notifications here",
   "today": "Today",
@@ -245,7 +250,6 @@
   "earningsReceived": "Earnings received",
   "weeklyReportReady": "Weekly report is ready",
   "accountUpdated": "Account updated",
-
   "account": "Account",
   "editProfile": "Edit Profile",
   "changePassword": "Change Password",
@@ -257,24 +261,22 @@
   "logoutConfirm": "Are you sure you want to logout?",
   "deleteAccount": "Delete Account",
   "deleteAccountConfirm": "Are you sure you want to delete your account? This action cannot be undone.",
-
   "networkError": "Network error. Please check your connection.",
   "somethingWentWrong": "Something went wrong. Please try again.",
   "sessionExpired": "Session expired. Please login again.",
   "locationPermissionDenied": "Location permission denied",
   "enableLocationServices": "Please enable location services to continue",
-
   "version": "Version {version}",
   "@version": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
-
   "goodMorning": "Good morning",
   "goodAfternoon": "Good afternoon",
   "goodEvening": "Good evening",
-
   "locationRequired": "Location Required",
   "enableLocationAccess": "Enable location access to receive orders.",
   "enable": "Enable",
@@ -285,29 +287,23 @@
   "pleaseEnableGps": "Please enable GPS to receive orders.",
   "failedToUpdateStatus": "Failed to update status",
   "ok": "OK",
-
   "accountUnderReview": "Account Under Review",
   "accountBeingVerified": "Your account is being verified. You'll be notified when approved.",
-
   "receivingOrders": "Receiving orders",
   "goOnlineToStart": "Go online to start",
   "noRecentOrders": "No recent orders",
-
   "headToPickup": "Head to pickup",
   "onTheWay": "On the way",
   "atDelivery": "At delivery",
   "continueText": "Continue",
-
   "week": "Week",
   "month": "Month",
   "avgPerOrder": "Avg/Order",
   "allTime": "All Time",
   "noEarningsData": "No earnings data",
   "completeOrdersToSeeEarnings": "Complete orders to see your earnings",
-
   "verified": "Verified",
   "driver": "Driver",
-
   "knowledgeBase": "Knowledge Base",
   "searchForHelp": "Search for help...",
   "noArticlesFound": "No articles found",
@@ -316,7 +312,9 @@
   "articlesCount": "{count} articles",
   "@articlesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "articleNotFound": "Article not found",
@@ -333,16 +331,19 @@
   "sectionsCount": "{count} sections",
   "@sectionsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "minRead": "{count} min read",
   "@minRead": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "tourAccountUnderReviewTitle": "Account Under Review",
   "tourAccountUnderReviewDesc": "Your account is being verified. You can explore the app while waiting for approval.",
   "tourGoOnlineTitle": "Go Online to Receive Orders",
@@ -354,13 +355,13 @@
   "tourOrdersTabTitle": "Orders Tab",
   "tourOrdersTabDesc": "Switch between Current Orders and Order History.",
   "tourTotalEarningsTitle": "Your Total Earnings",
-  "tourTotalEarningsDesc": "Track all your earnings here — base pay, tips, and bonuses.",
+  "tourTotalEarningsDesc": "Track all your earnings here â€” base pay, tips, and bonuses.",
   "tourEarningsBreakdownTitle": "Earnings Breakdown",
   "tourEarningsBreakdownDesc": "See your total orders and average earnings per order.",
   "tourRouteDetailsTitle": "Route Details",
   "tourRouteDetailsDesc": "See the full pickup and dropoff route with addresses, distance, and estimated time.",
   "tourYourEarningsTitle": "Your Earnings",
-  "tourYourEarningsDesc": "View the full payment breakdown — delivery fee, tip, and total payout.",
+  "tourYourEarningsDesc": "View the full payment breakdown â€” delivery fee, tip, and total payout.",
   "tourNavActionsTitle": "Navigation & Actions",
   "tourNavActionsDesc": "Navigate to pickup/dropoff or update the order status as you progress.",
   "tourTurnByTurnTitle": "Turn-by-Turn Navigation",
@@ -368,12 +369,11 @@
   "tourTripControlsTitle": "Trip Controls",
   "tourTripControlsDesc": "Switch between pickup and dropoff routes, view destination details and earnings.",
   "tourUpdateStatusTitle": "Update Status",
-  "tourUpdateStatusDesc": "Tap to mark key milestones — On The Way, Delivered, or Complete.",
+  "tourUpdateStatusDesc": "Tap to mark key milestones â€” On The Way, Delivered, or Complete.",
   "tourAppSettingsTitle": "App Settings",
   "tourAppSettingsDesc": "Change your language, theme, and access the Knowledge Base for help.",
   "tourKnowledgeBaseTitle": "Knowledge Base",
   "tourKnowledgeBaseDesc": "Browse step-by-step guides, tips, and answers to common questions.",
-
   "tourSkipBtn": "Skip",
   "tourBackBtn": "Back",
   "tourNextBtn": "Next",
@@ -386,7 +386,6 @@
   "tourCompleteDesc": "You're all set to start accepting orders and earning with TaybGo!",
   "tourBrowseKb": "Browse Knowledge Base",
   "tourGetStarted": "Get Started",
-
   "selectCountry": "Select Country",
   "searchCountry": "Search country...",
   "secure": "Secure",
@@ -396,7 +395,9 @@
   "resendIn": "Resend in {seconds}s",
   "@resendIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "resendCode": "Resend code",
@@ -444,26 +445,34 @@
   "failedToDeleteAccount": "Failed to delete account: {error}",
   "@failedToDeleteAccount": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "justNow": "Just now",
   "minutesAgo": "{minutes}m ago",
   "@minutesAgo": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "hoursAgo": "{hours}h ago",
   "@hoursAgo": {
     "placeholders": {
-      "hours": {"type": "int"}
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "daysAgo": "{days}d ago",
   "@daysAgo": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "clearAllNotificationsConfirm": "Are you sure you want to clear all notifications?",
@@ -477,7 +486,9 @@
   "secondsAgo": "{seconds}s ago",
   "@secondsAgo": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "subtotal": "Subtotal",
@@ -489,15 +500,12 @@
   "orderPaidDescription": "No cash collection needed",
   "collectCash": "Collect Cash",
   "collectCashReminder": "Remember to collect payment from the customer",
-
   "locationPermissionLostWhileOnline": "Location access is disabled. You won't receive orders until it's enabled.",
   "batteryOptimizationTitle": "Disable battery optimization",
   "batteryOptimizationMessage": "To keep live location active in the background, set TaybGo Driver to unrestricted battery use in Android settings.",
   "batteryOptimizationBannerMessage": "Battery optimization can pause live location while you're online. Set TaybGo Driver to unrestricted battery use.",
-
   "profileUpdatedSuccessfully": "Profile updated successfully",
   "failedToUpdateProfile": "Failed to update profile",
-
   "supportTickets": "Support Tickets",
   "supportFilterAll": "All",
   "supportFilterOpen": "Open",
@@ -527,7 +535,6 @@
   "supportNoMessages": "No messages yet",
   "supportTypeMessage": "Type a message...",
   "supportTicketClosed": "This ticket is closed",
-
   "enterAge": "Select your birthdate",
   "carSize": "Car Size",
   "selectCarSize": "Select car size",
@@ -564,7 +571,6 @@
   "pleaseEnterVehicleModel": "Please enter your vehicle model",
   "pleaseEnterVehicleYear": "Please enter your vehicle year",
   "invalidVehicleYear": "Please enter a valid year",
-
   "dropOrder": "Drop Order",
   "dropOrderDescription": "Return this accepted order to dispatch so another driver can take it.",
   "dropOrderConfirmation": "Are you sure you want to drop this order? It will be removed from your active orders.",
@@ -572,11 +578,8 @@
   "keepOrder": "Keep Order",
   "orderDroppedSuccessfully": "Order returned to dispatch",
   "failedToDropOrder": "Failed to drop order. Please try again.",
-
   "orderAlreadyTaken": "This order was already taken by another driver",
   "orderSuggestionExpired": "This order suggestion has expired",
-  "orderAccepted": "Order accepted!",
-  "orderRejected": "Order rejected",
   "failedToAcceptOrder": "Failed to accept order. Please try again.",
   "failedToRejectOrder": "Failed to reject order"
 }

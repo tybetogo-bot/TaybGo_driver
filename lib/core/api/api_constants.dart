@@ -25,10 +25,10 @@ class ApiConstants {
   static const String userMe = '/me/';
 
   // Support
-  static const String supportTickets = '/support/tickets/';
-  static String supportTicketDetail(int id) => '/support/tickets/$id/';
+  static const String supportTickets = '/driver/support/tickets/';
+  static String supportTicketDetail(int id) => '/driver/support/tickets/$id/';
   static String supportTicketMessages(int id) =>
-      '/support/tickets/$id/messages/';
+      '/driver/support/tickets/$id/messages/';
 
   // Earnings
   static const String driverEarnings = '/drivers/earnings/';

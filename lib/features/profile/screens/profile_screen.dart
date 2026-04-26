@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../../core/config/release_info.dart';
 import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/auth_provider.dart';
@@ -282,6 +283,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         () =>
                             _showLanguagePicker(context, localeProvider, l10n),
                       ),
+                      _buildMenuItem(
+                        Icons.support_agent_outlined,
+                        l10n.helpSupport,
+                        l10n.supportTickets,
+                        AppColors.primary,
+                        textColor,
+                        secondaryColor,
+                        borderColor,
+                        false,
+                        () => context.push(RouteConstants.support),
+                      ),
+                      _buildMenuItem(
+                        Icons.settings_outlined,
+                        l10n.settings,
+                        l10n.notifications,
+                        AppColors.info,
+                        textColor,
+                        secondaryColor,
+                        borderColor,
+                        false,
+                        () => context.push(RouteConstants.settings),
+                      ),
                       Container(
                         key: _tourKeys.kbMenuKey,
                         child: _buildMenuItem(
@@ -360,12 +383,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   child: Column(
                     children: [
                       Text(
-                        l10n.version('1.0.5'),
+                        l10n.version(ReleaseInfo.version),
                         style: TextStyle(fontSize: 12, color: secondaryColor),
                       ),
                       const SizedBox(height: 2),
                       Text(
-                        '17 April 2026',
+                        ReleaseInfo.releaseDate,
                         style: TextStyle(fontSize: 11, color: secondaryColor),
                       ),
                     ],

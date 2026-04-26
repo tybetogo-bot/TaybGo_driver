@@ -39,6 +39,8 @@ class _HomeScreenState extends State<HomeScreen>
   bool _showNewOrderAnimation = false;
   bool _isRefreshing = false;
   bool _showBatteryOptimizationBanner = false;
+  bool _backgroundLocationRecommendationShown = false;
+  static bool get _batteryOptimizationWarningEnabled => false;
   OrderProvider? _orderProvider;
   Timer? _refreshTimer;
   final BatteryOptimizationService _batteryOptimizationService =
@@ -278,6 +280,12 @@ class _HomeScreenState extends State<HomeScreen>
       case ToggleOnlineResult.success:
         if (driverProvider.isOnline) {
           orderProvider.startPolling();
+          if (driverProvider.locationStatus ==
+              LocationPermissionStatus.grantedForegroundOnly) {
+            unawaited(
+              _showBackgroundLocationRecommendationDialog(driverProvider),
+            );
+          }
         } else {
           orderProvider.stopPolling();
         }
@@ -393,10 +401,160 @@ class _HomeScreenState extends State<HomeScreen>
     );
   }
 
+  Future<void> _showBackgroundLocationRecommendationDialog(
+    DriverProvider driverProvider,
+  ) async {
+    if (_backgroundLocationRecommendationShown || !mounted) return;
+    _backgroundLocationRecommendationShown = true;
+
+    final platform = Theme.of(context).platform;
+    final isIOS = platform == TargetPlatform.iOS;
+    final permissionLabel = isIOS ? 'Always' : 'Allow all the time';
+    final steps = isIOS
+        ? 'Open Settings, choose Location, then select Always.'
+        : 'Open App settings, choose Permissions > Location, then select Allow all the time.';
+
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(
+                      Icons.location_on_rounded,
+                      color: AppColors.primary,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Text(
+                      'Improve live location',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              Text(
+                'You are online now. For the most reliable order matching and trip tracking, set location access to "$permissionLabel".',
+                style: TextStyle(
+                  fontSize: 14,
+                  height: 1.35,
+                  color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 14),
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.18),
+                  ),
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(
+                      Icons.settings_rounded,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: Text(
+                        steps,
+                        style: TextStyle(
+                          fontSize: 13,
+                          height: 1.35,
+                          color: Theme.of(ctx).colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    child: const Text('Later'),
+                  ),
+                  const SizedBox(width: 8),
+                  FilledButton(
+                    onPressed: () {
+                      Navigator.pop(ctx);
+                      unawaited(driverProvider.openAppSettings());
+                    },
+                    child: const Text('Open settings'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   Future<void> _refreshBatteryOptimizationWarning({
     required bool showDialog,
   }) async {
-    return;
+    if (!_batteryOptimizationWarningEnabled) {
+      if (_showBatteryOptimizationBanner && mounted) {
+        setState(() => _showBatteryOptimizationBanner = false);
+      }
+      return;
+    }
+
+    final enabled = await _batteryOptimizationService
+        .isBatteryOptimizationEnabled();
+
+    if (!mounted) return;
+
+    if (_showBatteryOptimizationBanner != enabled) {
+      setState(() => _showBatteryOptimizationBanner = enabled);
+    }
+
+    if (!enabled || !showDialog) {
+      return;
+    }
+
+    final driverProvider = context.read<DriverProvider>();
+    final profile = driverProvider.profile;
+    if (profile == null || !profile.isVerified) {
+      return;
+    }
+
+    final shouldShowReminder = await _batteryOptimizationService
+        .shouldShowReminder();
+    if (!mounted || !shouldShowReminder) {
+      return;
+    }
+
+    await _batteryOptimizationService.markReminderShown();
+    await _showBatteryOptimizationDialog();
   }
 
   Future<void> _showBatteryOptimizationDialog() async {
@@ -576,6 +734,8 @@ class _HomeScreenState extends State<HomeScreen>
                                   fontWeight: FontWeight.w600,
                                   color: textColor,
                                 ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                               ),
                             ],
                           ),
@@ -866,156 +1026,176 @@ class _HomeScreenState extends State<HomeScreen>
                       },
                     ),
 
-                    // Status Toggle Button
-                    GestureDetector(
-                      key: _tourKeys.onlineToggleKey,
-                      onTap: driverProvider.isLoading
-                          ? null
-                          : () => _toggleOnline(driverProvider, orderProvider),
-                      child: Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: isOnlineWithLocation
-                              ? AppColors.primary
-                              : surfaceColor,
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: isOnlineWithLocation
-                                ? AppColors.primary
-                                : borderColor,
-                            width: isOnlineWithLocation ? 0 : 1,
-                          ),
-                          boxShadow: isOnlineWithLocation
-                              ? [
-                                  BoxShadow(
-                                    color: AppColors.primary.withValues(
-                                      alpha: 0.3,
-                                    ),
-                                    blurRadius: 12,
-                                    offset: const Offset(0, 4),
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Status Toggle Button
+                        Expanded(
+                          child: GestureDetector(
+                            key: _tourKeys.onlineToggleKey,
+                            onTap: driverProvider.isLoading
+                                ? null
+                                : () => _toggleOnline(
+                                    driverProvider,
+                                    orderProvider,
                                   ),
-                                ]
-                              : null,
-                        ),
-                        child: Row(
-                          children: [
-                            Container(
-                              width: 44,
-                              height: 44,
+                            child: Container(
+                              padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 color: isOnlineWithLocation
-                                    ? Colors.white.withValues(alpha: 0.2)
-                                    : borderColor.withValues(alpha: 0.5),
-                                borderRadius: BorderRadius.circular(12),
+                                    ? AppColors.primary
+                                    : surfaceColor,
+                                borderRadius: BorderRadius.circular(14),
+                                border: Border.all(
+                                  color: isOnlineWithLocation
+                                      ? AppColors.primary
+                                      : borderColor,
+                                  width: isOnlineWithLocation ? 0 : 1,
+                                ),
+                                boxShadow: isOnlineWithLocation
+                                    ? [
+                                        BoxShadow(
+                                          color: AppColors.primary.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                          blurRadius: 12,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ]
+                                    : null,
                               ),
-                              child: driverProvider.isLoading
-                                  ? const Padding(
-                                      padding: EdgeInsets.all(10),
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        color: Colors.white,
-                                      ),
-                                    )
-                                  : Icon(
-                                      Icons.power_settings_new,
-                                      color: isOnlineWithLocation
-                                          ? Colors.white
-                                          : secondaryColor,
-                                      size: 22,
-                                    ),
-                            ),
-                            const SizedBox(width: 14),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                              child: Row(
                                 children: [
-                                  Text(
-                                    isOnlineWithLocation
-                                        ? l10n.online
-                                        : l10n.offline,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.w700,
+                                  Container(
+                                    width: 44,
+                                    height: 44,
+                                    decoration: BoxDecoration(
                                       color: isOnlineWithLocation
-                                          ? Colors.white
-                                          : textColor,
+                                          ? Colors.white.withValues(alpha: 0.2)
+                                          : borderColor.withValues(alpha: 0.5),
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
+                                    child: driverProvider.isLoading
+                                        ? const Padding(
+                                            padding: EdgeInsets.all(10),
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              color: Colors.white,
+                                            ),
+                                          )
+                                        : Icon(
+                                            Icons.power_settings_new,
+                                            color: isOnlineWithLocation
+                                                ? Colors.white
+                                                : secondaryColor,
+                                            size: 22,
+                                          ),
                                   ),
-                                  if (isOnline && !hasLocation) ...[
-                                    const SizedBox(height: 2),
-                                    Row(
+                                  const SizedBox(width: 14),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
-                                        SizedBox(
-                                          width: 12,
-                                          height: 12,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 1.5,
-                                            color: secondaryColor,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 6),
                                         Text(
-                                          l10n.fetchingLocation,
+                                          isOnlineWithLocation
+                                              ? l10n.online
+                                              : l10n.offline,
                                           style: TextStyle(
-                                            fontSize: 12,
-                                            color: secondaryColor,
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w700,
+                                            color: isOnlineWithLocation
+                                                ? Colors.white
+                                                : textColor,
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                  ],
-                                  if (isOnlineWithLocation) ...[
-                                    const SizedBox(height: 2),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.location_on,
-                                          size: 12,
-                                          color: Colors.white.withValues(
-                                            alpha: 0.8,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            driverProvider.currentPlaceName ??
+                                        if (isOnline && !hasLocation) ...[
+                                          const SizedBox(height: 2),
+                                          Row(
+                                            children: [
+                                              SizedBox(
+                                                width: 12,
+                                                height: 12,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                      strokeWidth: 1.5,
+                                                      color: secondaryColor,
+                                                    ),
+                                              ),
+                                              const SizedBox(width: 6),
+                                              Text(
                                                 l10n.fetchingLocation,
-                                            style: TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.white.withValues(
-                                                alpha: 0.8,
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                  color: secondaryColor,
+                                                ),
                                               ),
-                                            ),
-                                            maxLines: 1,
-                                            overflow: TextOverflow.ellipsis,
+                                            ],
                                           ),
-                                        ),
-                                        if (driverProvider.lastLocationUpdate !=
-                                            null) ...[
-                                          const SizedBox(width: 6),
-                                          Text(
-                                            _formatLastUpdate(
-                                              driverProvider
-                                                  .lastLocationUpdate!,
-                                              l10n,
-                                            ),
-                                            style: TextStyle(
-                                              fontSize: 10,
-                                              color: Colors.white.withValues(
-                                                alpha: 0.6,
+                                        ],
+                                        if (isOnlineWithLocation) ...[
+                                          const SizedBox(height: 2),
+                                          Row(
+                                            children: [
+                                              Icon(
+                                                Icons.location_on,
+                                                size: 12,
+                                                color: Colors.white.withValues(
+                                                  alpha: 0.8,
+                                                ),
                                               ),
-                                            ),
+                                              const SizedBox(width: 4),
+                                              Expanded(
+                                                child: Text(
+                                                  driverProvider
+                                                          .currentPlaceName ??
+                                                      l10n.fetchingLocation,
+                                                  style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: Colors.white
+                                                        .withValues(alpha: 0.8),
+                                                  ),
+                                                  maxLines: 1,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                              if (driverProvider
+                                                      .lastLocationUpdate !=
+                                                  null) ...[
+                                                const SizedBox(width: 6),
+                                                Text(
+                                                  _formatLastUpdate(
+                                                    driverProvider
+                                                        .lastLocationUpdate!,
+                                                    l10n,
+                                                  ),
+                                                  style: TextStyle(
+                                                    fontSize: 10,
+                                                    color: Colors.white
+                                                        .withValues(alpha: 0.6),
+                                                  ),
+                                                ),
+                                              ],
+                                            ],
                                           ),
                                         ],
                                       ],
                                     ),
-                                  ],
+                                  ),
                                 ],
                               ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 12),
+                        _buildSupportIconButton(
+                          context: context,
+                          l10n: l10n,
+                          surfaceColor: surfaceColor,
+                          borderColor: borderColor,
+                        ),
+                      ],
                     ),
 
                     const SizedBox(height: 20),
@@ -1258,6 +1438,43 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         );
       },
+    );
+  }
+
+  Widget _buildSupportIconButton({
+    required BuildContext context,
+    required AppLocalizations l10n,
+    required Color surfaceColor,
+    required Color borderColor,
+  }) {
+    const buttonHeight = 76.0;
+
+    return Semantics(
+      button: true,
+      label: l10n.helpSupport,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () => context.push(RouteConstants.support),
+          borderRadius: BorderRadius.circular(14),
+          child: Ink(
+            width: 56,
+            height: buttonHeight,
+            decoration: BoxDecoration(
+              color: surfaceColor,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: AppColors.primary.withValues(alpha: 0.22),
+              ),
+            ),
+            child: const Icon(
+              Icons.support_agent,
+              color: AppColors.primary,
+              size: 24,
+            ),
+          ),
+        ),
+      ),
     );
   }
 

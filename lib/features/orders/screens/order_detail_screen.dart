@@ -249,6 +249,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
   }
 
+  Future<void> _callCustomer(String phoneNumber) async {
+    final phoneUrl = Uri.parse('tel:$phoneNumber');
+    if (await canLaunchUrl(phoneUrl)) {
+      await launchUrl(phoneUrl, mode: LaunchMode.externalApplication);
+    }
+  }
+
   Future<void> _updateOrderStatus(OrderStatus newStatus) async {
     if (_isUpdating || _order == null) return;
 
@@ -1299,32 +1306,38 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                 ),
                 if (order.customerPhone != null &&
                     order.customerPhone!.isNotEmpty)
-                  Text(
-                    order.customerPhone!,
-                    style: TextStyle(fontSize: 12, color: secondaryColor),
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          order.customerPhone!,
+                          style: TextStyle(fontSize: 12, color: secondaryColor),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      InkWell(
+                        onTap: () => _callCustomer(order.customerPhone!),
+                        borderRadius: BorderRadius.circular(8),
+                        child: Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: AppColors.success.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.phone,
+                            color: AppColors.success,
+                            size: 16,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
               ],
             ),
           ),
-          if (order.customerPhone != null && order.customerPhone!.isNotEmpty)
-            GestureDetector(
-              onTap: () async {
-                final phoneUrl = Uri.parse('tel:${order.customerPhone}');
-                await launchUrl(phoneUrl);
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: AppColors.success.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: const Icon(
-                  Icons.phone,
-                  color: AppColors.success,
-                  size: 18,
-                ),
-              ),
-            ),
         ],
       ),
     );

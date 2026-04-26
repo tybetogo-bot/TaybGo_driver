@@ -619,6 +619,31 @@ class AppLocalizationsLb extends AppLocalizations {
   String get vibrationEnabled => 'Vibratioun aktivéiert';
 
   @override
+  String get notificationSoundRepeats =>
+      'Widderhuelunge vum Notifikatiounstoun';
+
+  @override
+  String notificationSoundRepeatsEnabledDesc(int count) {
+    return 'Spillt de Signaltoun $count Mol fir all Notifikatioun.';
+  }
+
+  @override
+  String get notificationSoundRepeatsDisabledDesc =>
+      'Aktiv?iert fir d??ischt den Toun, fir ze wielen, w?i dacks de Signal widderholl g?tt.';
+
+  @override
+  String get notificationSoundRepeatsPickerDesc =>
+      'Wielt, w?i dacks de Signaltoun fir all Notifikatioun widderholl soll ginn.';
+
+  @override
+  String get notificationRepeatTime => '1 Mol';
+
+  @override
+  String notificationRepeatTimes(int count) {
+    return '$count Mol';
+  }
+
+  @override
   String get noNotifications => 'Nach keng Notifikatiounen';
 
   @override

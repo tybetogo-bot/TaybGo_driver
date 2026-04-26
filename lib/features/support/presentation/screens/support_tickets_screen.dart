@@ -43,9 +43,12 @@ class _SupportTicketsScreenState extends State<SupportTicketsScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final secondaryColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final secondaryColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final l10n = AppLocalizations.of(context)!;
 
@@ -60,10 +63,7 @@ class _SupportTicketsScreenState extends State<SupportTicketsScreen> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: AppColors.primary,
         onPressed: () => context.push(RouteConstants.supportCreate),
-        child: Icon(
-          Icons.add,
-          color: isDark ? Colors.black : Colors.white,
-        ),
+        child: Icon(Icons.add, color: isDark ? Colors.black : Colors.white),
       ),
       body: Column(
         children: [
@@ -98,7 +98,8 @@ class _SupportTicketsScreenState extends State<SupportTicketsScreen> {
                   child: ListView.separated(
                     controller: _scrollController,
                     padding: const EdgeInsets.all(16),
-                    itemCount: provider.tickets.length +
+                    itemCount:
+                        provider.tickets.length +
                         (provider.isLoadingMore ? 1 : 0),
                     separatorBuilder: (_, _) => const SizedBox(height: 12),
                     itemBuilder: (context, index) {
@@ -248,8 +249,7 @@ class _SupportTicketsScreenState extends State<SupportTicketsScreen> {
               const SizedBox(height: 6),
               Row(
                 children: [
-                  Icon(Icons.receipt_outlined,
-                      size: 14, color: secondaryColor),
+                  Icon(Icons.receipt_outlined, size: 14, color: secondaryColor),
                   const SizedBox(width: 4),
                   Text(
                     '${l10n.orderId}: ${ticket.orderDisplay}',
@@ -275,9 +275,11 @@ class _SupportTicketsScreenState extends State<SupportTicketsScreen> {
         textColor = AppColors.info;
         label = l10n.supportStatusOpen;
       case TicketStatus.inProgress:
+      case TicketStatus.waitingOnCustomer:
         bgColor = AppColors.warning.withValues(alpha: 0.1);
         textColor = AppColors.warning;
         label = l10n.supportStatusInProgress;
+      case TicketStatus.resolved:
       case TicketStatus.closed:
         bgColor = AppColors.offline.withValues(alpha: 0.1);
         textColor = AppColors.offline;
@@ -302,7 +304,9 @@ class _SupportTicketsScreenState extends State<SupportTicketsScreen> {
   }
 
   Widget _buildPriorityIndicator(
-      TicketPriority priority, AppLocalizations l10n) {
+    TicketPriority priority,
+    AppLocalizations l10n,
+  ) {
     Color color;
     String label;
 
@@ -314,6 +318,7 @@ class _SupportTicketsScreenState extends State<SupportTicketsScreen> {
         color = AppColors.warning;
         label = l10n.supportPriorityMedium;
       case TicketPriority.high:
+      case TicketPriority.urgent:
         color = AppColors.error;
         label = l10n.supportPriorityHigh;
     }
@@ -329,7 +334,11 @@ class _SupportTicketsScreenState extends State<SupportTicketsScreen> {
         const SizedBox(width: 4),
         Text(
           label,
-          style: TextStyle(fontSize: 12, color: color, fontWeight: FontWeight.w500),
+          style: TextStyle(
+            fontSize: 12,
+            color: color,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ],
     );
@@ -349,7 +358,10 @@ class _SupportTicketsScreenState extends State<SupportTicketsScreen> {
           Text(
             l10n.supportNoTickets,
             style: TextStyle(
-                fontSize: 16, fontWeight: FontWeight.w600, color: textColor),
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              color: textColor,
+            ),
           ),
           const SizedBox(height: 8),
           Text(

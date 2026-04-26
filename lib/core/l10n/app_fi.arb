@@ -1,6 +1,5 @@
-﻿{
+{
   "@@locale": "fi",
-
   "appName": "TaybGo Kuljettaja",
   "welcome": "Tervetuloa",
   "getStarted": "Aloita",
@@ -18,14 +17,12 @@
   "success": "Onnistui",
   "seeAll": "Näytä kaikki",
   "or": "TAI",
-
   "onboardingTitle1": "Aloita ansaitseminen tänään",
   "onboardingDesc1": "Liity tuhansien kuljettajien joukkoon, jotka ansaitsevat omaan tahtiinsa",
   "onboardingTitle2": "Hyväksy tilauksia helposti",
   "onboardingDesc2": "Saat ilmoituksen uusista tilauksista ja hyväksy yhdellä napautuksella",
   "onboardingTitle3": "Navigoi & Toimita",
   "onboardingDesc3": "Sisäänrakennettu navigointi auttaa sinua saavuttamaan kohteet nopeammin",
-
   "phoneNumber": "Puhelinnumero",
   "enterPhoneNumber": "Syötä puhelinnumerosi",
   "phoneHint": "+358 40 123 4567",
@@ -36,31 +33,29 @@
   "resendOtpIn": "Lähetä koodi uudelleen {seconds}s kuluttua",
   "@resendOtpIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "invalidOtp": "Virheellinen vahvistuskoodi",
   "otpSent": "Vahvistuskoodi lähetetty",
   "errorsAuthPhoneAlreadyRegistered": "Tämä numero on jo rekisteröity.",
-
   "email": "Sähköposti",
   "enterEmail": "Syötä sähköpostisi",
   "signUpWithApple": "Rekisteröidy Applella",
   "signUpWithGoogle": "Rekisteröidy Googlella",
   "forgotPassword": "Unohtunut salasana",
-
   "driverApplication": "Kuljettajahakemus",
   "personalInfo": "Henkilötiedot",
   "vehicleInfo": "Ajoneuvotiedot",
   "documents": "Asiakirjat",
   "reviewSubmit": "Tarkista & Lähetä",
-
   "fullName": "Koko nimi",
   "age": "Syntymäaika",
   "dateOfBirth": "Syntymäaika",
   "address": "Osoite",
   "city": "Kaupunki",
-
   "vehicleType": "Ajoneuvotyyppi",
   "selectVehicleType": "Valitse ajoneuvotyyppi",
   "car": "Auto",
@@ -71,13 +66,11 @@
   "vehicleModel": "Ajoneuvomalli",
   "vehicleYear": "Ajoneuvon vuosimalli",
   "vehicleColor": "Ajoneuvon väri",
-
   "serviceType": "Palvelutyyppi",
   "selectServiceType": "Mitä palveluja tarjoat?",
   "foodDelivery": "Ruokatoimitus",
   "shipping": "Kuljetus",
   "taxi": "Taksi",
-
   "uploadDocuments": "Lataa asiakirjat",
   "driversLicense": "Ajokortti",
   "nationalId": "Henkilökortti",
@@ -87,21 +80,18 @@
   "uploadPhoto": "Lataa kuva",
   "takePhoto": "Ota kuva",
   "chooseFromGallery": "Valitse galleriasta",
-
   "submitApplication": "Lähetä hakemus",
   "applicationSubmitted": "Hakemus lähetetty",
   "applicationPending": "Hakemuksesi on tarkistettavana",
   "applicationApproved": "Hakemus hyväksytty",
   "applicationRejected": "Hakemus hylätty",
   "pendingApprovalMessage": "Tarkistamme asiakirjojasi. Tämä kestää yleensä 24-48 tuntia.",
-
   "home": "Koti",
   "orders": "Tilaukset",
   "recentOrders": "Viimeaikaiset tilaukset",
   "earnings": "Ansiot",
   "profile": "Profiili",
   "search": "Haku",
-
   "online": "Online",
   "offline": "Offline",
   "goOnline": "Mene verkkoon",
@@ -110,7 +100,6 @@
   "tapToGoOffline": "Napauta mennäksesi offline-tilaan",
   "youAreOnline": "Olet verkossa ja valmis vastaanottamaan tilauksia",
   "youAreOffline": "Olet offline-tilassa. Mene verkkoon vastaanottaaksesi tilauksia",
-
   "newOrder": "Uusi tilaus",
   "newOrderTitle": "Uusi tilaus!",
   "newOrderSubtitle": "Hyväksy ennen ajan loppumista",
@@ -124,7 +113,9 @@
   "acceptIn": "Hyväksy {seconds}s kuluttua",
   "@acceptIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "orderAccepted": "Tilaus hyväksytty",
@@ -139,7 +130,6 @@
   "rejected": "Hylätty",
   "cancelled": "Peruutettu",
   "delivered": "Toimitettu",
-
   "pickup": "Nouto",
   "dropoff": "Toimitus",
   "pickupLocation": "Noutopaikka",
@@ -159,7 +149,6 @@
   "yourDistanceTo": "Etäisyytesi kohteeseen",
   "km": "km",
   "min": "min",
-
   "startNavigation": "Aloita navigointi",
   "arrivedAtPickup": "Saavuit noutopaikkaan",
   "startDelivery": "Aloita toimitus",
@@ -172,31 +161,26 @@
   "arrivedAtDropoffConfirmation": "Vahvista, että olet saapunut toimituspaikkaan?",
   "completeOrderConfirmation": "Vahvista, että olet suorittanut tämän toimituksen?",
   "updatingStatus": "Päivitetään tilaa...",
-
   "tip": "Tippi",
   "earnings_label": "Ansiot",
   "deliveryFee": "Toimitusmaksu",
   "total": "Yhteensä",
-
   "currentOrders": "Nykyiset tilaukset",
   "orderHistory": "Tilaushistoria",
   "noOrdersYet": "Ei tilauksia vielä",
   "noActiveOrders": "Ei aktiivisia tilauksia",
   "waitingForOrders": "Odotetaan uusia tilauksia...",
-
   "totalOrders": "Tilaukset yhteensä",
   "totalEarnings": "Ansiot yhteensä",
   "avgTripTime": "Keskim. matka-aika",
   "completionRate": "Suoritusaste",
   "rating": "Arvosana",
-
   "todayEarnings": "Tämän päivän ansiot",
   "weeklyEarnings": "Viikkoansiot",
   "monthlyEarnings": "Kuukausiansiot",
   "lastMonthEarnings": "Edellisen kuukauden ansiot",
   "viewPayslips": "Näytä palkkakuitit",
   "payslipsSentEmail": "Palkkakuitit lähetetään sähköpostiisi",
-
   "settings": "Asetukset",
   "language": "Kieli",
   "english": "Englanti",
@@ -219,6 +203,26 @@
   "promotionalNotifications": "Kampanjailmoitukset",
   "soundEnabled": "Ääni käytössä",
   "vibrationEnabled": "Värinä käytössä",
+  "notificationSoundRepeats": "Ilmoitus??nen toistot",
+  "notificationSoundRepeatsEnabledDesc": "Toista merkki??ni {count} kertaa jokaiselle ilmoitukselle.",
+  "@notificationSoundRepeatsEnabledDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSoundRepeatsDisabledDesc": "Ota ??ni ensin k?ytt??n valitaksesi, montako kertaa merkki??ni toistetaan.",
+  "notificationSoundRepeatsPickerDesc": "Valitse, montako kertaa merkki??ni toistetaan jokaiselle ilmoitukselle.",
+  "notificationRepeatTime": "1 kerran",
+  "notificationRepeatTimes": "{count} kertaa",
+  "@notificationRepeatTimes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noNotifications": "Ei ilmoituksia vielä",
   "noNotificationsDesc": "Ilmoituksesi näkyvät täällä",
   "today": "Tänään",
@@ -232,7 +236,6 @@
   "earningsReceived": "Ansiot vastaanotettu",
   "weeklyReportReady": "Viikkoraportti on valmis",
   "accountUpdated": "Tili päivitetty",
-
   "account": "Tili",
   "editProfile": "Muokkaa profiilia",
   "changePassword": "Vaihda salasana",
@@ -244,24 +247,22 @@
   "logoutConfirm": "Haluatko varmasti kirjautua ulos?",
   "deleteAccount": "Poista tili",
   "deleteAccountConfirm": "Haluatko varmasti poistaa tilisi? Tätä toimintoa ei voi peruuttaa.",
-
   "networkError": "Verkkovirhe. Tarkista yhteytesi.",
   "somethingWentWrong": "Jokin meni pieleen. Yritä uudelleen.",
   "sessionExpired": "Istunto vanhentunut. Kirjaudu uudelleen.",
   "locationPermissionDenied": "Sijaintilupa evätty",
   "enableLocationServices": "Ota sijaintipalvelut käyttöön jatkaaksesi",
-
   "version": "Versio {version}",
   "@version": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
-
   "goodMorning": "Hyvää huomenta",
   "goodAfternoon": "Hyvää iltapäivää",
   "goodEvening": "Hyvää iltaa",
-
   "locationRequired": "Sijainti vaaditaan",
   "enableLocationAccess": "Ota sijainnin käyttöoikeus käyttöön vastaanottaaksesi tilauksia.",
   "enable": "Ota käyttöön",
@@ -272,29 +273,23 @@
   "pleaseEnableGps": "Ota GPS käyttöön vastaanottaaksesi tilauksia.",
   "failedToUpdateStatus": "Tilan päivitys epäonnistui",
   "ok": "OK",
-
   "accountUnderReview": "Tili tarkistettavana",
   "accountBeingVerified": "Tiliäsi tarkistetaan. Saat ilmoituksen kun se on hyväksytty.",
-
   "receivingOrders": "Vastaanotetaan tilauksia",
   "goOnlineToStart": "Mene verkkoon aloittaaksesi",
   "noRecentOrders": "Ei viimeaikaisia tilauksia",
-
   "headToPickup": "Suuntaa noutoon",
   "onTheWay": "Matkalla",
   "atDelivery": "Toimituspaikalla",
   "continueText": "Jatka",
-
   "week": "Viikko",
   "month": "Kuukausi",
   "avgPerOrder": "Keskim./Tilaus",
   "allTime": "Yhteensä",
   "noEarningsData": "Ei ansiotietoja",
   "completeOrdersToSeeEarnings": "Suorita tilauksia nähdäksesi ansiosi",
-
   "verified": "Vahvistettu",
   "driver": "Kuljettaja",
-
   "knowledgeBase": "Tietopankki",
   "searchForHelp": "Hae apua...",
   "noArticlesFound": "Artikkeleita ei löytynyt",
@@ -303,7 +298,9 @@
   "articlesCount": "{count} artikkelia",
   "@articlesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "articleNotFound": "Artikkelia ei löytynyt",
@@ -320,16 +317,19 @@
   "sectionsCount": "{count} osiota",
   "@sectionsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "minRead": "{count} min lukuaika",
   "@minRead": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "tourAccountUnderReviewTitle": "Tili tarkistettavana",
   "tourAccountUnderReviewDesc": "Tiliäsi tarkistetaan. Voit tutustua sovellukseen odottaessasi hyväksyntää.",
   "tourGoOnlineTitle": "Mene verkkoon vastaanottaaksesi tilauksia",
@@ -360,7 +360,6 @@
   "tourAppSettingsDesc": "Vaihda kieltä, teemaa ja käytä tietopankkia avun saamiseksi.",
   "tourKnowledgeBaseTitle": "Tietopankki",
   "tourKnowledgeBaseDesc": "Selaa askel askeleelta -oppaita, vinkkejä ja vastauksia yleisiin kysymyksiin.",
-
   "tourSkipBtn": "Ohita",
   "tourBackBtn": "Takaisin",
   "tourNextBtn": "Seuraava",
@@ -373,7 +372,6 @@
   "tourCompleteDesc": "Olet valmis aloittamaan tilausten vastaanottamisen ja ansaitsemisen TaybGo:lla!",
   "tourBrowseKb": "Selaa tietopankkia",
   "tourGetStarted": "Aloita",
-
   "selectCountry": "Valitse maa",
   "searchCountry": "Hae maata...",
   "secure": "Turvallinen",
@@ -383,7 +381,9 @@
   "resendIn": "Lähetä uudelleen {seconds}s kuluttua",
   "@resendIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "resendCode": "Lähetä koodi uudelleen",
@@ -426,26 +426,34 @@
   "failedToDeleteAccount": "Tilin poistaminen epäonnistui: {error}",
   "@failedToDeleteAccount": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "justNow": "Juuri nyt",
   "minutesAgo": "{minutes}min sitten",
   "@minutesAgo": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "hoursAgo": "{hours}t sitten",
   "@hoursAgo": {
     "placeholders": {
-      "hours": {"type": "int"}
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "daysAgo": "{days}pv sitten",
   "@daysAgo": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "clearAllNotificationsConfirm": "Haluatko varmasti tyhjentää kaikki ilmoitukset?",
@@ -459,7 +467,9 @@
   "secondsAgo": "{seconds}s sitten",
   "@secondsAgo": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "subtotal": "Välisumma",
@@ -475,7 +485,6 @@
   "batteryOptimizationTitle": "Poista akun optimointi",
   "batteryOptimizationMessage": "Jotta reaaliaikainen sijainti pysyy aktiivisena taustalla, aseta TaybGo Driver rajoittamattomaan akun käyttöön Android-asetuksissa.",
   "batteryOptimizationBannerMessage": "Akun optimointi voi keskeyttää reaaliaikaisen sijainnin, kun olet online-tilassa. Aseta TaybGo Driver rajoittamattomaan akun käyttöön.",
-
   "profileUpdatedSuccessfully": "Profiili päivitetty onnistuneesti",
   "failedToUpdateProfile": "Profiilin päivitys epäonnistui",
   "supportTickets": "Tukipyynnöt",

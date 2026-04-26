@@ -1,6 +1,5 @@
-﻿{
+{
   "@@locale": "lb",
-
   "appName": "TaybGo Chauffeur",
   "welcome": "Wëllkomm",
   "getStarted": "Ufänken",
@@ -18,14 +17,12 @@
   "success": "Erfolleg",
   "seeAll": "Alles gesinn",
   "or": "ODER",
-
   "onboardingTitle1": "Fänkt haut un ze verdéngen",
   "onboardingDesc1": "Schléisst Iech Dausende vu Chauffeure un, déi no hirem eegene Zäitplang verdéngen",
   "onboardingTitle2": "Acceptéiert Bestellunge ganz einfach",
   "onboardingDesc2": "Kritt Notifikatiounen iwwer nei Bestellungen an acceptéiert mat engem Tipp",
   "onboardingTitle3": "Navigéiert & Liwwert",
   "onboardingDesc3": "Déi integréiert Navigatioun hëlleft Iech, Destinatiounen méi séier z'erreechen",
-
   "phoneNumber": "Telefonsnummer",
   "enterPhoneNumber": "Gitt Är Telefonsnummer an",
   "phoneHint": "+352 123 456 789",
@@ -36,31 +33,29 @@
   "resendOtpIn": "Code nach eng Kéier schécken an {seconds}s",
   "@resendOtpIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "invalidOtp": "Ongëltege Verifizéierungscode",
   "otpSent": "Verifizéierungscode geschéckt",
   "errorsAuthPhoneAlreadyRegistered": "Dës Nummer ass schonn registréiert.",
-
   "email": "E-Mail",
   "enterEmail": "Gitt Är E-Mail an",
   "signUpWithApple": "Mat Apple umellen",
   "signUpWithGoogle": "Mat Google umellen",
   "forgotPassword": "Passwuert vergiess",
-
   "driverApplication": "Chauffeur Demande",
   "personalInfo": "Perséinlech Informatiounen",
   "vehicleInfo": "Gefierfsinformatiounen",
   "documents": "Dokumenter",
   "reviewSubmit": "Iwwerpréiwen & Aschécken",
-
   "fullName": "Vollstännegen Numm",
   "age": "Gebuertsdatum",
   "dateOfBirth": "Gebuertsdatum",
   "address": "Adress",
   "city": "Stad",
-
   "vehicleType": "Gefierfstyp",
   "selectVehicleType": "Gefierfstyp auswielen",
   "car": "Auto",
@@ -71,13 +66,11 @@
   "vehicleModel": "Gefierfsmodell",
   "vehicleYear": "Gefierfsjor",
   "vehicleColor": "Gefierfsfaarf",
-
   "serviceType": "Serviceart",
   "selectServiceType": "Wéi eng Servicer bitt Dir un?",
   "foodDelivery": "Iessensliwwerung",
   "shipping": "Versand",
   "taxi": "Taxi",
-
   "uploadDocuments": "Dokumenter eroplueden",
   "driversLicense": "Führerschäin",
   "nationalId": "Identitéitskaart",
@@ -87,21 +80,18 @@
   "uploadPhoto": "Foto eroplueden",
   "takePhoto": "Foto maachen",
   "chooseFromGallery": "Aus der Galerie wielen",
-
   "submitApplication": "Demande aschécken",
   "applicationSubmitted": "Demande ageschéckt",
   "applicationPending": "Är Demande gëtt iwwerpréift",
   "applicationApproved": "Demande ugeholl",
   "applicationRejected": "Demande ofgeleent",
   "pendingApprovalMessage": "Mir iwwerpréifen Är Dokumenter. Dat dauert normalerweis 24-48 Stonnen.",
-
   "home": "Heemsigg",
   "orders": "Bestellungen",
   "recentOrders": "Rezent Bestellungen",
   "earnings": "Verdéngschter",
   "profile": "Profil",
   "search": "Sichen",
-
   "online": "Online",
   "offline": "Offline",
   "goOnline": "Online goen",
@@ -110,7 +100,6 @@
   "tapToGoOffline": "Tippt fir offline ze goen",
   "youAreOnline": "Dir sidd online a prett fir Bestellungen ze kréien",
   "youAreOffline": "Dir sidd offline. Gitt online fir Bestellungen ze kréien",
-
   "newOrder": "Nei Bestellung",
   "newOrderTitle": "Nei Bestellung!",
   "newOrderSubtitle": "Acceptéiert ier d'Zäit ofleeft",
@@ -124,7 +113,9 @@
   "acceptIn": "Acceptéieren an {seconds}s",
   "@acceptIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "orderAccepted": "Bestellung acceptéiert",
@@ -139,7 +130,6 @@
   "rejected": "Ofgeleent",
   "cancelled": "Annuléiert",
   "delivered": "Geliwwert",
-
   "pickup": "Ofhuelen",
   "dropoff": "Liwwerung",
   "pickupLocation": "Ofhuelplaz",
@@ -159,7 +149,6 @@
   "yourDistanceTo": "Är Distanz bis",
   "km": "km",
   "min": "Min",
-
   "startNavigation": "Navigatioun starten",
   "arrivedAtPickup": "Um Ofhuelplaz ukomm",
   "startDelivery": "Liwwerung starten",
@@ -172,31 +161,26 @@
   "arrivedAtDropoffConfirmation": "Bestätegt, datt Dir um Liwwerplaz ukomm sidd?",
   "completeOrderConfirmation": "Bestätegt, datt Dir dës Liwwerung ofgeschloss hutt?",
   "updatingStatus": "Status gëtt aktualiséiert...",
-
   "tip": "Drénkgeld",
   "earnings_label": "Verdéngschter",
   "deliveryFee": "Liwwergebühr",
   "total": "Total",
-
   "currentOrders": "Aktuell Bestellungen",
   "orderHistory": "Bestellungsverlaf",
   "noOrdersYet": "Nach keng Bestellungen",
   "noActiveOrders": "Keng aktiv Bestellungen",
   "waitingForOrders": "Waarden op nei Bestellungen...",
-
   "totalOrders": "Total Bestellungen",
   "totalEarnings": "Total Verdéngschter",
   "avgTripTime": "Duerchschn. Fuerzäit",
   "completionRate": "Ofschlossrat",
   "rating": "Bewäertung",
-
   "todayEarnings": "Verdéngschter haut",
   "weeklyEarnings": "Wëchentlech Verdéngschter",
   "monthlyEarnings": "Méintlech Verdéngschter",
   "lastMonthEarnings": "Verdéngschter leschte Mount",
   "viewPayslips": "Gehaltsabrechnunge gesinn",
   "payslipsSentEmail": "Gehaltsabrechnunge ginn per E-Mail geschéckt",
-
   "settings": "Astellungen",
   "language": "Sprooch",
   "english": "Englesch",
@@ -219,6 +203,26 @@
   "promotionalNotifications": "Promotiounsnotifikatiounen",
   "soundEnabled": "Toun aktivéiert",
   "vibrationEnabled": "Vibratioun aktivéiert",
+  "notificationSoundRepeats": "Widderhuelunge vum Notifikatiounstoun",
+  "notificationSoundRepeatsEnabledDesc": "Spillt de Signaltoun {count} Mol fir all Notifikatioun.",
+  "@notificationSoundRepeatsEnabledDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSoundRepeatsDisabledDesc": "Aktiv?iert fir d??ischt den Toun, fir ze wielen, w?i dacks de Signal widderholl g?tt.",
+  "notificationSoundRepeatsPickerDesc": "Wielt, w?i dacks de Signaltoun fir all Notifikatioun widderholl soll ginn.",
+  "notificationRepeatTime": "1 Mol",
+  "notificationRepeatTimes": "{count} Mol",
+  "@notificationRepeatTimes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noNotifications": "Nach keng Notifikatiounen",
   "noNotificationsDesc": "Är Notifikatiounen erschéngen hei",
   "today": "Haut",
@@ -232,7 +236,6 @@
   "earningsReceived": "Verdéngschter kritt",
   "weeklyReportReady": "Wëchentleche Rapport ass fäerdeg",
   "accountUpdated": "Kont aktualiséiert",
-
   "account": "Kont",
   "editProfile": "Profil änneren",
   "changePassword": "Passwuert änneren",
@@ -244,24 +247,22 @@
   "logoutConfirm": "Sidd Dir sécher, datt Dir Iech auslogge wëllt?",
   "deleteAccount": "Kont läschen",
   "deleteAccountConfirm": "Sidd Dir sécher, datt Dir Äre Kont läsche wëllt? Dës Aktioun kann net réckgängeg gemaach ginn.",
-
   "networkError": "Netzwierkfeeler. Iwwerpréift w.e.g. Är Verbindung.",
   "somethingWentWrong": "Eppes ass schif gaangen. Probéiert w.e.g. nach eng Kéier.",
   "sessionExpired": "Sessioun ofgelaf. Loggt Iech w.e.g. nach eng Kéier an.",
   "locationPermissionDenied": "Standuerterlaubnis verweigert",
   "enableLocationServices": "Aktivéiert w.e.g. d'Standuertservicer fir weiderzemaachen",
-
   "version": "Versioun {version}",
   "@version": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
-
   "goodMorning": "Gudde Moien",
   "goodAfternoon": "Gudden Dag",
   "goodEvening": "Gudden Owend",
-
   "locationRequired": "Standuert erfuerderlech",
   "enableLocationAccess": "Aktivéiert den Zougang zum Standuert fir Bestellungen ze kréien.",
   "enable": "Aktivéieren",
@@ -272,29 +273,23 @@
   "pleaseEnableGps": "Aktivéiert w.e.g. GPS fir Bestellungen ze kréien.",
   "failedToUpdateStatus": "Status konnt net aktualiséiert ginn",
   "ok": "OK",
-
   "accountUnderReview": "Kont gëtt iwwerpréift",
   "accountBeingVerified": "Äre Kont gëtt verifizéiert. Dir gitt benoriichtegt wann en ugeholl gëtt.",
-
   "receivingOrders": "Bestellunge kréien",
   "goOnlineToStart": "Online goen fir unzefänken",
   "noRecentOrders": "Keng rezent Bestellungen",
-
   "headToPickup": "Op zum Ofhuelen",
   "onTheWay": "Ënnerwee",
   "atDelivery": "Bei der Liwwerung",
   "continueText": "Weiderfueren",
-
   "week": "Woch",
   "month": "Mount",
   "avgPerOrder": "Duerchschn./Bestellung",
   "allTime": "Gesamt",
   "noEarningsData": "Keng Verdéngschter-Daten",
   "completeOrdersToSeeEarnings": "Schléisst Bestellungen of fir Är Verdéngschter ze gesinn",
-
   "verified": "Verifizéiert",
   "driver": "Chauffeur",
-
   "knowledgeBase": "Wëssensdatenbank",
   "searchForHelp": "No Hëllef sichen...",
   "noArticlesFound": "Keng Artikele fonnt",
@@ -303,7 +298,9 @@
   "articlesCount": "{count} Artikelen",
   "@articlesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "articleNotFound": "Artikel net fonnt",
@@ -320,16 +317,19 @@
   "sectionsCount": "{count} Sektiounen",
   "@sectionsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "minRead": "{count} Min. Liesezäit",
   "@minRead": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "tourAccountUnderReviewTitle": "Kont gëtt iwwerpréift",
   "tourAccountUnderReviewDesc": "Äre Kont gëtt verifizéiert. Dir kënnt d'App entdecken während Dir op d'Zoustëmmung waart.",
   "tourGoOnlineTitle": "Online goen fir Bestellungen ze kréien",
@@ -360,7 +360,6 @@
   "tourAppSettingsDesc": "Ännert Är Sprooch, Design an Zougang zur Wëssensdatenbank fir Hëllef.",
   "tourKnowledgeBaseTitle": "Wëssensdatenbank",
   "tourKnowledgeBaseDesc": "Duerchsicht Schrëtt-fir-Schrëtt Guiden, Tipps an Äntwerten op heefeg Froen.",
-
   "tourSkipBtn": "Iwwersprangen",
   "tourBackBtn": "Zréck",
   "tourNextBtn": "Weider",
@@ -373,7 +372,6 @@
   "tourCompleteDesc": "Dir sidd prett fir Bestellungen unzehuelen a mat TaybGo ze verdéngen!",
   "tourBrowseKb": "Wëssensdatenbank duerchsichen",
   "tourGetStarted": "Ufänken",
-
   "selectCountry": "Land auswielen",
   "searchCountry": "Land sichen...",
   "secure": "Sécher",
@@ -383,7 +381,9 @@
   "resendIn": "Erëm schécken an {seconds}s",
   "@resendIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "resendCode": "Code erëm schécken",
@@ -426,26 +426,34 @@
   "failedToDeleteAccount": "Kont konnt net geläscht ginn: {error}",
   "@failedToDeleteAccount": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "justNow": "Grad elo",
   "minutesAgo": "viru(n) {minutes} Min.",
   "@minutesAgo": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "hoursAgo": "viru(n) {hours} St.",
   "@hoursAgo": {
     "placeholders": {
-      "hours": {"type": "int"}
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "daysAgo": "viru(n) {days} Deeg",
   "@daysAgo": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "clearAllNotificationsConfirm": "Sidd Dir sécher, datt Dir all Notifikatiounen läsche wëllt?",
@@ -459,7 +467,9 @@
   "secondsAgo": "viru(n) {seconds}s",
   "@secondsAgo": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "subtotal": "Zwëschensumm",
@@ -475,7 +485,6 @@
   "batteryOptimizationTitle": "Batterieoptimisatioun ausschalten",
   "batteryOptimizationMessage": "Fir de Live-Standuert am Hannergrond aktiv ze halen, setzt TaybGo Driver an den Android-Astellungen op onlimitéiert Batteriebenzung.",
   "batteryOptimizationBannerMessage": "Batterieoptimisatioun kann de Live-Standuert pauséieren, wann Dir online sidd. Setzt TaybGo Driver op onlimitéiert Batteriebenzung.",
-
   "profileUpdatedSuccessfully": "Profil erfollegräich aktualiséiert",
   "failedToUpdateProfile": "Profil konnt net aktualiséiert ginn",
   "supportTickets": "Support-Ticketen",

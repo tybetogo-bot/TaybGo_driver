@@ -616,6 +616,30 @@ class AppLocalizationsDa extends AppLocalizations {
   String get vibrationEnabled => 'Vibration aktiveret';
 
   @override
+  String get notificationSoundRepeats => 'Gentagelser af notifikationslyd';
+
+  @override
+  String notificationSoundRepeatsEnabledDesc(int count) {
+    return 'Afspil signallyden $count gang(e) for hver notifikation.';
+  }
+
+  @override
+  String get notificationSoundRepeatsDisabledDesc =>
+      'Aktiv?r lyd f?rst for at v?lge, hvor mange gange signalet skal gentages.';
+
+  @override
+  String get notificationSoundRepeatsPickerDesc =>
+      'V?lg, hvor mange gange signallyden skal gentages for hver notifikation.';
+
+  @override
+  String get notificationRepeatTime => '1 gang';
+
+  @override
+  String notificationRepeatTimes(int count) {
+    return '$count gange';
+  }
+
+  @override
   String get noNotifications => 'Ingen notifikationer endnu';
 
   @override

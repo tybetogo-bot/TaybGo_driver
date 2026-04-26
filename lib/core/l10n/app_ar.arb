@@ -1,9 +1,9 @@
-﻿{
+{
   "@@locale": "ar",
-
   "appName": "TaybGo سائق",
-  "@appName": {"description": "The app name"},
-
+  "@appName": {
+    "description": "The app name"
+  },
   "welcome": "مرحباً",
   "getStarted": "ابدأ الآن",
   "next": "التالي",
@@ -20,14 +20,12 @@
   "success": "نجح",
   "seeAll": "عرض الكل",
   "or": "أو",
-
   "onboardingTitle1": "ابدأ الكسب اليوم",
   "onboardingDesc1": "انضم إلى آلاف السائقين الذين يكسبون وفق جدولهم الخاص",
   "onboardingTitle2": "قبول الطلبات بسهولة",
   "onboardingDesc2": "احصل على إشعار بالطلبات الجديدة واقبلها بنقرة واحدة",
   "onboardingTitle3": "تنقل وتوصيل",
   "onboardingDesc3": "الملاحة المدمجة تساعدك على الوصول إلى الوجهات بشكل أسرع",
-
   "phoneNumber": "رقم الهاتف",
   "enterPhoneNumber": "أدخل رقم هاتفك",
   "phoneHint": "+49 123 456 7890",
@@ -38,32 +36,30 @@
   "resendOtpIn": "إعادة إرسال الرمز في {seconds} ث",
   "@resendOtpIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "invalidOtp": "رمز التحقق غير صحيح",
   "otpSent": "تم إرسال رمز التحقق",
   "errorsAuthPhoneAlreadyRegistered": "هذا الرقم مسجل بالفعل.",
-
   "email": "البريد الإلكتروني",
   "enterEmail": "أدخل بريدك الإلكتروني",
   "signUpWithApple": "التسجيل باستخدام Apple",
   "signUpWithGoogle": "التسجيل باستخدام Google",
   "forgotPassword": "نسيت كلمة المرور",
-
   "driverApplication": "طلب السائق",
   "personalInfo": "المعلومات الشخصية",
   "vehicleInfo": "معلومات المركبة",
   "documents": "الوثائق",
   "otherDocuments": "وثائق أخرى",
   "reviewSubmit": "المراجعة والإرسال",
-
   "fullName": "الاسم الكامل",
   "age": "تاريخ الميلاد",
   "dateOfBirth": "تاريخ الميلاد",
   "address": "العنوان",
   "city": "المدينة",
-
   "vehicleType": "نوع المركبة",
   "selectVehicleType": "اختر نوع المركبة",
   "car": "سيارة",
@@ -74,13 +70,11 @@
   "vehicleModel": "موديل المركبة",
   "vehicleYear": "سنة المركبة",
   "vehicleColor": "لون المركبة",
-
   "serviceType": "نوع الخدمة",
   "selectServiceType": "ما الخدمات التي ستقدمها؟",
   "foodDelivery": "توصيل الطعام",
   "shipping": "الشحن",
   "taxi": "تاكسي",
-
   "uploadDocuments": "رفع الوثائق",
   "driversLicense": "رخصة القيادة",
   "nationalId": "الهوية الوطنية",
@@ -93,7 +87,6 @@
   "uploadPhoto": "رفع صورة",
   "takePhoto": "التقاط صورة",
   "chooseFromGallery": "اختيار من المعرض",
-
   "submitApplication": "إرسال الطلب",
   "applicationSubmitted": "تم إرسال الطلب",
   "applicationPending": "طلبك قيد المراجعة",
@@ -104,14 +97,12 @@
   "vehicleChangeWarningMessage": "سيؤدي تغيير بيانات المركبة إلى وضع حسابك قيد الإيقاف حتى تقوم الإدارة بمراجعة التحديث والموافقة عليه.",
   "vehicleChangeWarningNote": "لن تتمكن من الاتصال أو استقبال طلبات جديدة أثناء فترة المراجعة.",
   "vehicleChangeWarningConfirm": "تأكيد وحفظ",
-
   "home": "الرئيسية",
   "orders": "الطلبات",
   "recentOrders": "الطلبات الأخيرة",
   "earnings": "الأرباح",
   "profile": "الملف الشخصي",
   "search": "بحث",
-
   "online": "متصل",
   "offline": "غير متصل",
   "goOnline": "الاتصال",
@@ -120,7 +111,6 @@
   "tapToGoOffline": "انقر لقطع الاتصال",
   "youAreOnline": "أنت متصل وجاهز لاستقبال الطلبات",
   "youAreOffline": "أنت غير متصل. اتصل لاستقبال الطلبات",
-
   "newOrder": "طلب جديد",
   "newOrderTitle": "طلب جديد!",
   "newOrderSubtitle": "اقبل قبل انتهاء الوقت",
@@ -134,7 +124,9 @@
   "acceptIn": "قبول في {seconds} ث",
   "@acceptIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "orderAccepted": "تم قبول الطلب",
@@ -149,7 +141,6 @@
   "rejected": "مرفوض",
   "cancelled": "ملغى",
   "delivered": "تم التسليم",
-
   "pickup": "الاستلام",
   "dropoff": "التسليم",
   "pickupLocation": "موقع الاستلام",
@@ -169,7 +160,6 @@
   "yourDistanceTo": "المسافة إلى",
   "km": "كم",
   "min": "دقيقة",
-
   "startNavigation": "بدء الملاحة",
   "arrivedAtPickup": "وصلت إلى موقع الاستلام",
   "startDelivery": "بدء التوصيل",
@@ -182,31 +172,26 @@
   "arrivedAtDropoffConfirmation": "تأكيد أنك وصلت إلى موقع التسليم؟",
   "completeOrderConfirmation": "تأكيد أنك أكملت هذا التوصيل؟",
   "updatingStatus": "جاري تحديث الحالة...",
-
   "tip": "إكرامية",
   "earnings_label": "الأرباح",
   "deliveryFee": "رسوم التوصيل",
   "total": "المجموع",
-
   "currentOrders": "الطلبات الحالية",
   "orderHistory": "سجل الطلبات",
   "noOrdersYet": "لا توجد طلبات بعد",
   "noActiveOrders": "لا توجد طلبات نشطة",
   "waitingForOrders": "في انتظار طلبات جديدة...",
-
   "totalOrders": "إجمالي الطلبات",
   "totalEarnings": "إجمالي الأرباح",
   "avgTripTime": "متوسط وقت الرحلة",
   "completionRate": "معدل الإكمال",
   "rating": "التقييم",
-
   "todayEarnings": "أرباح اليوم",
   "weeklyEarnings": "الأرباح الأسبوعية",
   "monthlyEarnings": "الأرباح الشهرية",
   "lastMonthEarnings": "أرباح الشهر الماضي",
   "viewPayslips": "عرض قسائم الرواتب",
   "payslipsSentEmail": "يتم إرسال قسائم الرواتب إلى بريدك الإلكتروني",
-
   "settings": "الإعدادات",
   "language": "اللغة",
   "english": "الإنجليزية",
@@ -229,6 +214,26 @@
   "promotionalNotifications": "الإشعارات الترويجية",
   "soundEnabled": "الصوت مفعل",
   "vibrationEnabled": "الاهتزاز مفعل",
+  "notificationSoundRepeats": "????? ??? ???????",
+  "notificationSoundRepeatsEnabledDesc": "????? ??? ??????? {count} ??? ??? ?????.",
+  "@notificationSoundRepeatsEnabledDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSoundRepeatsDisabledDesc": "???? ????? ????? ??????? ??? ???? ????? ???????.",
+  "notificationSoundRepeatsPickerDesc": "???? ??? ???? ????? ??? ??????? ??? ?????.",
+  "notificationRepeatTime": "??? ?????",
+  "notificationRepeatTimes": "{count} ????",
+  "@notificationRepeatTimes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noNotifications": "لا توجد إشعارات بعد",
   "noNotificationsDesc": "سترى إشعاراتك هنا",
   "today": "اليوم",
@@ -242,7 +247,6 @@
   "earningsReceived": "تم استلام الأرباح",
   "weeklyReportReady": "التقرير الأسبوعي جاهز",
   "accountUpdated": "تم تحديث الحساب",
-
   "account": "الحساب",
   "editProfile": "تعديل الملف الشخصي",
   "changePassword": "تغيير كلمة المرور",
@@ -254,24 +258,22 @@
   "logoutConfirm": "هل أنت متأكد أنك تريد تسجيل الخروج؟",
   "deleteAccount": "حذف الحساب",
   "deleteAccountConfirm": "هل أنت متأكد أنك تريد حذف حسابك؟ لا يمكن التراجع عن هذا الإجراء.",
-
   "networkError": "خطأ في الشبكة. يرجى التحقق من اتصالك.",
   "somethingWentWrong": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
   "sessionExpired": "انتهت الجلسة. يرجى تسجيل الدخول مرة أخرى.",
   "locationPermissionDenied": "تم رفض إذن الموقع",
   "enableLocationServices": "يرجى تمكين خدمات الموقع للمتابعة",
-
   "version": "الإصدار {version}",
   "@version": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
-
   "goodMorning": "صباح الخير",
   "goodAfternoon": "مساء الخير",
   "goodEvening": "مساء الخير",
-
   "locationRequired": "الموقع مطلوب",
   "enableLocationAccess": "قم بتمكين الوصول إلى الموقع لاستقبال الطلبات.",
   "enable": "تفعيل",
@@ -282,29 +284,23 @@
   "pleaseEnableGps": "يرجى تمكين GPS لاستقبال الطلبات.",
   "failedToUpdateStatus": "فشل تحديث الحالة",
   "ok": "حسناً",
-
   "accountUnderReview": "الحساب قيد المراجعة",
   "accountBeingVerified": "يتم التحقق من حسابك. سيتم إشعارك عند الموافقة.",
-
   "receivingOrders": "استقبال الطلبات",
   "goOnlineToStart": "اتصل للبدء",
   "noRecentOrders": "لا توجد طلبات حديثة",
-
   "headToPickup": "توجه إلى الاستلام",
   "onTheWay": "في الطريق",
   "atDelivery": "في موقع التسليم",
   "continueText": "متابعة",
-
   "week": "الأسبوع",
   "month": "الشهر",
   "avgPerOrder": "متوسط/طلب",
   "allTime": "كل الوقت",
   "noEarningsData": "لا توجد بيانات أرباح",
   "completeOrdersToSeeEarnings": "أكمل الطلبات لرؤية أرباحك",
-
   "verified": "موثق",
   "driver": "سائق",
-
   "knowledgeBase": "قاعدة المعرفة",
   "searchForHelp": "البحث عن مساعدة...",
   "noArticlesFound": "لم يتم العثور على مقالات",
@@ -313,7 +309,9 @@
   "articlesCount": "{count} مقالات",
   "@articlesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "articleNotFound": "المقالة غير موجودة",
@@ -330,16 +328,19 @@
   "sectionsCount": "{count} أقسام",
   "@sectionsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "minRead": "{count} دقيقة قراءة",
   "@minRead": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "tourAccountUnderReviewTitle": "الحساب قيد المراجعة",
   "tourAccountUnderReviewDesc": "يتم التحقق من حسابك. يمكنك استكشاف التطبيق أثناء انتظار الموافقة.",
   "tourGoOnlineTitle": "اتصل لاستقبال الطلبات",
@@ -370,7 +371,6 @@
   "tourAppSettingsDesc": "قم بتغيير اللغة والمظهر والوصول إلى قاعدة المعرفة للمساعدة.",
   "tourKnowledgeBaseTitle": "قاعدة المعرفة",
   "tourKnowledgeBaseDesc": "تصفح الأدلة التفصيلية والنصائح والإجابات على الأسئلة الشائعة.",
-
   "tourSkipBtn": "تخطي",
   "tourBackBtn": "رجوع",
   "tourNextBtn": "التالي",
@@ -383,7 +383,6 @@
   "tourCompleteDesc": "أنت جاهز تماماً لبدء قبول الطلبات والكسب مع TaybGo!",
   "tourBrowseKb": "تصفح قاعدة المعرفة",
   "tourGetStarted": "ابدأ",
-
   "selectCountry": "اختر الدولة",
   "searchCountry": "ابحث عن دولة...",
   "secure": "آمن",
@@ -393,7 +392,9 @@
   "resendIn": "إعادة الإرسال في {seconds} ث",
   "@resendIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "resendCode": "إعادة إرسال الرمز",
@@ -436,26 +437,34 @@
   "failedToDeleteAccount": "فشل حذف الحساب: {error}",
   "@failedToDeleteAccount": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "justNow": "الآن",
   "minutesAgo": "منذ {minutes} دقيقة",
   "@minutesAgo": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "hoursAgo": "منذ {hours} ساعة",
   "@hoursAgo": {
     "placeholders": {
-      "hours": {"type": "int"}
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "daysAgo": "منذ {days} يوم",
   "@daysAgo": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "clearAllNotificationsConfirm": "هل أنت متأكد أنك تريد مسح جميع الإشعارات؟",
@@ -469,7 +478,9 @@
   "secondsAgo": "منذ {seconds} ث",
   "@secondsAgo": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "subtotal": "المجموع الفرعي",
@@ -481,12 +492,10 @@
   "orderPaidDescription": "لا حاجة لتحصيل نقدي",
   "collectCash": "تحصيل نقدي",
   "collectCashReminder": "تذكّر تحصيل المبلغ من العميل",
-
   "locationPermissionLostWhileOnline": "الوصول إلى الموقع معطل. لن تتلقى طلبات حتى يتم تفعيله.",
   "batteryOptimizationTitle": "إيقاف تحسين البطارية",
   "batteryOptimizationMessage": "للحفاظ على عمل الموقع المباشر في الخلفية، اضبط TaybGo Driver على استخدام بطارية غير مقيّد من إعدادات Android.",
   "batteryOptimizationBannerMessage": "قد يؤدي تحسين البطارية إلى إيقاف الموقع المباشر أثناء اتصالك. اضبط TaybGo Driver على استخدام بطارية غير مقيّد.",
-
   "profileUpdatedSuccessfully": "تم تحديث الملف الشخصي بنجاح",
   "failedToUpdateProfile": "فشل تحديث الملف الشخصي",
   "supportTickets": "تذاكر الدعم",
@@ -518,7 +527,6 @@
   "supportNoMessages": "لا توجد رسائل بعد",
   "supportTypeMessage": "اكتب رسالة...",
   "supportTicketClosed": "هذه التذكرة مغلقة",
-
   "enterAge": "اختر تاريخ ميلادك",
   "carSize": "حجم السيارة",
   "selectCarSize": "اختر حجم السيارة",
@@ -555,7 +563,6 @@
   "pleaseEnterVehicleModel": "يرجى إدخال موديل المركبة",
   "pleaseEnterVehicleYear": "يرجى إدخال سنة المركبة",
   "invalidVehicleYear": "يرجى إدخال سنة صحيحة",
-
   "dropOrder": "إرجاع الطلب",
   "dropOrderDescription": "سيتم إعادة هذا الطلب المقبول إلى قسم التوزيع ليتم إسناده إلى سائق آخر.",
   "dropOrderConfirmation": "هل أنت متأكد أنك تريد إرجاع هذا الطلب؟ سيختفي من طلباتك النشطة.",

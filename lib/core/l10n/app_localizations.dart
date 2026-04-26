@@ -1298,6 +1298,42 @@ abstract class AppLocalizations {
   /// **'Vibration Enabled'**
   String get vibrationEnabled;
 
+  /// No description provided for @notificationSoundRepeats.
+  ///
+  /// In en, this message translates to:
+  /// **'Notification sound repeats'**
+  String get notificationSoundRepeats;
+
+  /// No description provided for @notificationSoundRepeatsEnabledDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Play the signal sound {count} time(s) for each notification.'**
+  String notificationSoundRepeatsEnabledDesc(int count);
+
+  /// No description provided for @notificationSoundRepeatsDisabledDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable sound first to choose how many times the signal repeats.'**
+  String get notificationSoundRepeatsDisabledDesc;
+
+  /// No description provided for @notificationSoundRepeatsPickerDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how many times the signal sound should repeat for each notification.'**
+  String get notificationSoundRepeatsPickerDesc;
+
+  /// No description provided for @notificationRepeatTime.
+  ///
+  /// In en, this message translates to:
+  /// **'1 time'**
+  String get notificationRepeatTime;
+
+  /// No description provided for @notificationRepeatTimes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} times'**
+  String notificationRepeatTimes(int count);
+
   /// No description provided for @noNotifications.
   ///
   /// In en, this message translates to:
@@ -1841,7 +1877,7 @@ abstract class AppLocalizations {
   /// No description provided for @tourTotalEarningsDesc.
   ///
   /// In en, this message translates to:
-  /// **'Track all your earnings here — base pay, tips, and bonuses.'**
+  /// **'Track all your earnings here â€” base pay, tips, and bonuses.'**
   String get tourTotalEarningsDesc;
 
   /// No description provided for @tourEarningsBreakdownTitle.
@@ -1877,7 +1913,7 @@ abstract class AppLocalizations {
   /// No description provided for @tourYourEarningsDesc.
   ///
   /// In en, this message translates to:
-  /// **'View the full payment breakdown — delivery fee, tip, and total payout.'**
+  /// **'View the full payment breakdown â€” delivery fee, tip, and total payout.'**
   String get tourYourEarningsDesc;
 
   /// No description provided for @tourNavActionsTitle.
@@ -1925,7 +1961,7 @@ abstract class AppLocalizations {
   /// No description provided for @tourUpdateStatusDesc.
   ///
   /// In en, this message translates to:
-  /// **'Tap to mark key milestones — On The Way, Delivered, or Complete.'**
+  /// **'Tap to mark key milestones â€” On The Way, Delivered, or Complete.'**
   String get tourUpdateStatusDesc;
 
   /// No description provided for @tourAppSettingsTitle.

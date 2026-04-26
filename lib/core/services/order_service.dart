@@ -8,7 +8,7 @@ import '../../features/orders/models/order_model.dart';
 class OrderService {
   final ApiClient _apiClient;
 
-  OrderService({required ApiClient apiClient}) : _apiClient = apiClient;
+  OrderService({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
 
   /// Helper to print large JSON objects in chunks (debugPrint truncates at ~1000 chars)
   void _printFullJson(String prefix, dynamic data) {
@@ -180,6 +180,11 @@ class OrderService {
       debugPrint('[OrderService] Error Response: ${e.response?.data}');
       throw ApiException.fromDioException(e);
     }
+  }
+
+  /// Reject/skip an order without relying on in-memory provider state.
+  Future<void> rejectOrderById(String orderId) {
+    return rejectOrder(orderId);
   }
 
   /// Drop an accepted order and return it to dispatch.

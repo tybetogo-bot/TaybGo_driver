@@ -617,6 +617,30 @@ class AppLocalizationsIt extends AppLocalizations {
   String get vibrationEnabled => 'Vibrazione attivata';
 
   @override
+  String get notificationSoundRepeats => 'Ripetizioni del suono di notifica';
+
+  @override
+  String notificationSoundRepeatsEnabledDesc(int count) {
+    return 'Riproduce il suono del segnale $count volta/e per ogni notifica.';
+  }
+
+  @override
+  String get notificationSoundRepeatsDisabledDesc =>
+      'Attiva prima il suono per scegliere quante volte ripetere il segnale.';
+
+  @override
+  String get notificationSoundRepeatsPickerDesc =>
+      'Scegli quante volte il suono del segnale deve ripetersi per ogni notifica.';
+
+  @override
+  String get notificationRepeatTime => '1 volta';
+
+  @override
+  String notificationRepeatTimes(int count) {
+    return '$count volte';
+  }
+
+  @override
   String get noNotifications => 'Nessuna notifica ancora';
 
   @override

@@ -1,6 +1,5 @@
-﻿{
+{
   "@@locale": "de",
-
   "appName": "TaybGo Fahrer",
   "welcome": "Willkommen",
   "getStarted": "Loslegen",
@@ -18,14 +17,12 @@
   "success": "Erfolg",
   "seeAll": "Alle anzeigen",
   "or": "ODER",
-
   "onboardingTitle1": "Verdienen Sie noch heute",
   "onboardingDesc1": "Schließen Sie sich Tausenden von Fahrern an, die nach eigenem Zeitplan verdienen",
   "onboardingTitle2": "Aufträge einfach annehmen",
   "onboardingDesc2": "Werden Sie über neue Aufträge benachrichtigt und nehmen Sie mit einem Tippen an",
   "onboardingTitle3": "Navigieren & Liefern",
   "onboardingDesc3": "Die integrierte Navigation hilft Ihnen, Ziele schneller zu erreichen",
-
   "phoneNumber": "Telefonnummer",
   "enterPhoneNumber": "Geben Sie Ihre Telefonnummer ein",
   "phoneHint": "+49 123 456 7890",
@@ -37,25 +34,21 @@
   "invalidOtp": "Ungültiger Bestätigungscode",
   "otpSent": "Bestätigungscode gesendet",
   "errorsAuthPhoneAlreadyRegistered": "Diese Nummer ist bereits registriert.",
-
   "email": "E-Mail",
   "enterEmail": "Geben Sie Ihre E-Mail ein",
   "signUpWithApple": "Mit Apple anmelden",
   "signUpWithGoogle": "Mit Google anmelden",
   "forgotPassword": "Passwort vergessen",
-
   "driverApplication": "Fahrerantrag",
   "personalInfo": "Persönliche Informationen",
   "vehicleInfo": "Fahrzeuginformationen",
   "documents": "Dokumente",
   "reviewSubmit": "Überprüfen & Absenden",
-
   "fullName": "Vollständiger Name",
   "age": "Geburtsdatum",
   "dateOfBirth": "Geburtsdatum",
   "address": "Adresse",
   "city": "Stadt",
-
   "vehicleType": "Fahrzeugtyp",
   "selectVehicleType": "Fahrzeugtyp auswählen",
   "car": "Auto",
@@ -66,13 +59,11 @@
   "vehicleModel": "Fahrzeugmodell",
   "vehicleYear": "Baujahr",
   "vehicleColor": "Fahrzeugfarbe",
-
   "serviceType": "Serviceart",
   "selectServiceType": "Welche Dienste werden Sie anbieten?",
   "foodDelivery": "Essenslieferung",
   "shipping": "Versand",
   "taxi": "Taxi",
-
   "uploadDocuments": "Dokumente hochladen",
   "driversLicense": "Führerschein",
   "nationalId": "Personalausweis",
@@ -82,21 +73,18 @@
   "uploadPhoto": "Foto hochladen",
   "takePhoto": "Foto aufnehmen",
   "chooseFromGallery": "Aus Galerie wählen",
-
   "submitApplication": "Antrag absenden",
   "applicationSubmitted": "Antrag eingereicht",
   "applicationPending": "Ihr Antrag wird geprüft",
   "applicationApproved": "Antrag genehmigt",
   "applicationRejected": "Antrag abgelehnt",
   "pendingApprovalMessage": "Wir prüfen Ihre Dokumente. Dies dauert normalerweise 24-48 Stunden.",
-
   "home": "Startseite",
   "orders": "Aufträge",
   "recentOrders": "Letzte Aufträge",
   "earnings": "Einnahmen",
   "profile": "Profil",
   "search": "Suche",
-
   "online": "Online",
   "offline": "Offline",
   "goOnline": "Online gehen",
@@ -105,7 +93,6 @@
   "tapToGoOffline": "Tippen um offline zu gehen",
   "youAreOnline": "Sie sind online und bereit, Aufträge zu erhalten",
   "youAreOffline": "Sie sind offline. Gehen Sie online, um Aufträge zu erhalten",
-
   "newOrder": "Neuer Auftrag",
   "newOrderTitle": "Neuer Auftrag!",
   "newOrderSubtitle": "Annehmen bevor die Zeit abläuft",
@@ -129,7 +116,6 @@
   "rejected": "Abgelehnt",
   "cancelled": "Storniert",
   "delivered": "Geliefert",
-
   "pickup": "Abholung",
   "dropoff": "Lieferung",
   "pickupLocation": "Abholort",
@@ -149,7 +135,6 @@
   "yourDistanceTo": "Ihre Entfernung zu",
   "km": "km",
   "min": "Min",
-
   "startNavigation": "Navigation starten",
   "arrivedAtPickup": "Am Abholort angekommen",
   "startDelivery": "Lieferung starten",
@@ -162,31 +147,26 @@
   "arrivedAtDropoffConfirmation": "Bestätigen Sie, dass Sie am Lieferort angekommen sind?",
   "completeOrderConfirmation": "Bestätigen Sie, dass Sie diese Lieferung abgeschlossen haben?",
   "updatingStatus": "Status wird aktualisiert...",
-
   "tip": "Trinkgeld",
   "earnings_label": "Einnahmen",
   "deliveryFee": "Liefergebühr",
   "total": "Gesamt",
-
   "currentOrders": "Aktuelle Aufträge",
   "orderHistory": "Auftragsverlauf",
   "noOrdersYet": "Noch keine Aufträge",
   "noActiveOrders": "Keine aktiven Aufträge",
   "waitingForOrders": "Warten auf neue Aufträge...",
-
   "totalOrders": "Gesamte Aufträge",
   "totalEarnings": "Gesamteinnahmen",
   "avgTripTime": "Durchschn. Fahrzeit",
   "completionRate": "Abschlussrate",
   "rating": "Bewertung",
-
   "todayEarnings": "Einnahmen heute",
   "weeklyEarnings": "Wöchentliche Einnahmen",
   "monthlyEarnings": "Monatliche Einnahmen",
   "lastMonthEarnings": "Einnahmen letzten Monat",
   "viewPayslips": "Gehaltsabrechnungen anzeigen",
   "payslipsSentEmail": "Gehaltsabrechnungen werden per E-Mail gesendet",
-
   "settings": "Einstellungen",
   "language": "Sprache",
   "english": "Englisch",
@@ -209,6 +189,26 @@
   "promotionalNotifications": "Werbebenachrichtigungen",
   "soundEnabled": "Ton aktiviert",
   "vibrationEnabled": "Vibration aktiviert",
+  "notificationSoundRepeats": "Benachrichtigungston wiederholen",
+  "notificationSoundRepeatsEnabledDesc": "Spielt den Signalton {count} Mal f?r jede Benachrichtigung ab.",
+  "@notificationSoundRepeatsEnabledDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSoundRepeatsDisabledDesc": "Aktivieren Sie zuerst den Ton, um festzulegen, wie oft das Signal wiederholt wird.",
+  "notificationSoundRepeatsPickerDesc": "W?hlen Sie, wie oft der Signalton f?r jede Benachrichtigung wiederholt werden soll.",
+  "notificationRepeatTime": "1 Mal",
+  "notificationRepeatTimes": "{count} Mal",
+  "@notificationRepeatTimes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noNotifications": "Noch keine Benachrichtigungen",
   "noNotificationsDesc": "Ihre Benachrichtigungen werden hier angezeigt",
   "today": "Heute",
@@ -222,7 +222,6 @@
   "earningsReceived": "Einnahmen erhalten",
   "weeklyReportReady": "Wochenbericht ist bereit",
   "accountUpdated": "Konto aktualisiert",
-
   "account": "Konto",
   "editProfile": "Profil bearbeiten",
   "changePassword": "Passwort ändern",
@@ -234,19 +233,15 @@
   "logoutConfirm": "Sind Sie sicher, dass Sie sich abmelden möchten?",
   "deleteAccount": "Konto löschen",
   "deleteAccountConfirm": "Sind Sie sicher, dass Sie Ihr Konto löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.",
-
   "networkError": "Netzwerkfehler. Bitte überprüfen Sie Ihre Verbindung.",
   "somethingWentWrong": "Etwas ist schief gelaufen. Bitte versuchen Sie es erneut.",
   "sessionExpired": "Sitzung abgelaufen. Bitte melden Sie sich erneut an.",
   "locationPermissionDenied": "Standortberechtigung verweigert",
   "enableLocationServices": "Bitte aktivieren Sie die Standortdienste, um fortzufahren",
-
   "version": "Version {version}",
-
   "goodMorning": "Guten Morgen",
   "goodAfternoon": "Guten Tag",
   "goodEvening": "Guten Abend",
-
   "locationRequired": "Standort erforderlich",
   "enableLocationAccess": "Aktivieren Sie den Standortzugriff, um Bestellungen zu erhalten.",
   "enable": "Aktivieren",
@@ -257,29 +252,23 @@
   "pleaseEnableGps": "Bitte aktivieren Sie GPS, um Bestellungen zu erhalten.",
   "failedToUpdateStatus": "Status konnte nicht aktualisiert werden",
   "ok": "OK",
-
   "accountUnderReview": "Konto wird überprüft",
   "accountBeingVerified": "Ihr Konto wird überprüft. Sie werden benachrichtigt, wenn es genehmigt ist.",
-
   "receivingOrders": "Bestellungen empfangen",
   "goOnlineToStart": "Online gehen, um zu starten",
   "noRecentOrders": "Keine aktuellen Bestellungen",
-
   "headToPickup": "Zur Abholung fahren",
   "onTheWay": "Unterwegs",
   "atDelivery": "Bei der Lieferung",
   "continueText": "Fortfahren",
-
   "week": "Woche",
   "month": "Monat",
   "avgPerOrder": "Durchschn./Bestellung",
   "allTime": "Gesamt",
   "noEarningsData": "Keine Einnahmedaten",
   "completeOrdersToSeeEarnings": "Schließen Sie Bestellungen ab, um Ihre Einnahmen zu sehen",
-
   "verified": "Verifiziert",
   "driver": "Fahrer",
-
   "knowledgeBase": "Wissensdatenbank",
   "searchForHelp": "Nach Hilfe suchen...",
   "noArticlesFound": "Keine Artikel gefunden",
@@ -299,7 +288,6 @@
   "browseKnowledgeBase": "Wissensdatenbank durchsuchen",
   "sectionsCount": "{count} Abschnitte",
   "minRead": "{count} Min. Lesezeit",
-
   "tourAccountUnderReviewTitle": "Konto wird überprüft",
   "tourAccountUnderReviewDesc": "Ihr Konto wird verifiziert. Sie können die App erkunden, während Sie auf die Genehmigung warten.",
   "tourGoOnlineTitle": "Online gehen, um Bestellungen zu erhalten",
@@ -330,7 +318,6 @@
   "tourAppSettingsDesc": "Ändern Sie Ihre Sprache, Ihr Design und greifen Sie auf die Wissensdatenbank zu.",
   "tourKnowledgeBaseTitle": "Wissensdatenbank",
   "tourKnowledgeBaseDesc": "Durchsuchen Sie Schritt-für-Schritt-Anleitungen, Tipps und Antworten auf häufige Fragen.",
-
   "tourSkipBtn": "Überspringen",
   "tourBackBtn": "Zurück",
   "tourNextBtn": "Weiter",
@@ -343,7 +330,6 @@
   "tourCompleteDesc": "Sie sind bereit, Bestellungen anzunehmen und mit TaybGo zu verdienen!",
   "tourBrowseKb": "Wissensdatenbank durchsuchen",
   "tourGetStarted": "Loslegen",
-
   "selectCountry": "Land auswählen",
   "searchCountry": "Land suchen...",
   "secure": "Sicher",
@@ -353,7 +339,9 @@
   "resendIn": "Erneut senden in {seconds}s",
   "@resendIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "resendCode": "Code erneut senden",
@@ -396,26 +384,34 @@
   "failedToDeleteAccount": "Konto konnte nicht gelöscht werden: {error}",
   "@failedToDeleteAccount": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "justNow": "Gerade eben",
   "minutesAgo": "vor {minutes} Min.",
   "@minutesAgo": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "hoursAgo": "vor {hours} Std.",
   "@hoursAgo": {
     "placeholders": {
-      "hours": {"type": "int"}
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "daysAgo": "vor {days} Tagen",
   "@daysAgo": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "clearAllNotificationsConfirm": "Sind Sie sicher, dass Sie alle Benachrichtigungen löschen möchten?",
@@ -429,7 +425,9 @@
   "secondsAgo": "vor {seconds}s",
   "@secondsAgo": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "subtotal": "Zwischensumme",
@@ -441,12 +439,10 @@
   "orderPaidDescription": "Kein Bargeld einzuziehen",
   "collectCash": "Bargeld kassieren",
   "collectCashReminder": "Vergessen Sie nicht, die Zahlung vom Kunden einzuziehen",
-
   "locationPermissionLostWhileOnline": "Standortzugriff ist deaktiviert. Sie erhalten keine Bestellungen, bis er aktiviert ist.",
   "batteryOptimizationTitle": "Akkuoptimierung deaktivieren",
   "batteryOptimizationMessage": "Damit der Live-Standort im Hintergrund aktiv bleibt, stellen Sie TaybGo Driver in den Android-Einstellungen auf uneingeschränkte Akkunutzung.",
   "batteryOptimizationBannerMessage": "Die Akkuoptimierung kann den Live-Standort pausieren, wenn Sie online sind. Stellen Sie TaybGo Driver auf uneingeschränkte Akkunutzung.",
-
   "profileUpdatedSuccessfully": "Profil erfolgreich aktualisiert",
   "failedToUpdateProfile": "Profil konnte nicht aktualisiert werden",
   "supportTickets": "Support-Tickets",

@@ -618,6 +618,30 @@ class AppLocalizationsFi extends AppLocalizations {
   String get vibrationEnabled => 'Värinä käytössä';
 
   @override
+  String get notificationSoundRepeats => 'Ilmoitus??nen toistot';
+
+  @override
+  String notificationSoundRepeatsEnabledDesc(int count) {
+    return 'Toista merkki??ni $count kertaa jokaiselle ilmoitukselle.';
+  }
+
+  @override
+  String get notificationSoundRepeatsDisabledDesc =>
+      'Ota ??ni ensin k?ytt??n valitaksesi, montako kertaa merkki??ni toistetaan.';
+
+  @override
+  String get notificationSoundRepeatsPickerDesc =>
+      'Valitse, montako kertaa merkki??ni toistetaan jokaiselle ilmoitukselle.';
+
+  @override
+  String get notificationRepeatTime => '1 kerran';
+
+  @override
+  String notificationRepeatTimes(int count) {
+    return '$count kertaa';
+  }
+
+  @override
   String get noNotifications => 'Ei ilmoituksia vielä';
 
   @override

@@ -72,9 +72,12 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final textColor = isDark ? AppColors.darkText : AppColors.lightText;
-    final secondaryColor =
-        isDark ? AppColors.darkTextSecondary : AppColors.lightTextSecondary;
-    final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
+    final secondaryColor = isDark
+        ? AppColors.darkTextSecondary
+        : AppColors.lightTextSecondary;
+    final surfaceColor = isDark
+        ? AppColors.darkSurface
+        : AppColors.lightSurface;
     final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
     final l10n = AppLocalizations.of(context)!;
 
@@ -109,7 +112,13 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
             children: [
               // Ticket info header
               _buildTicketHeader(
-                  ticket, isDark, textColor, secondaryColor, surfaceColor, l10n),
+                ticket,
+                isDark,
+                textColor,
+                secondaryColor,
+                surfaceColor,
+                l10n,
+              ),
               Divider(height: 1, color: borderColor),
 
               // Messages
@@ -124,7 +133,9 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                     : ListView.builder(
                         controller: _scrollController,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 12),
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
                         itemCount: ticket.messages.length,
                         itemBuilder: (context, index) {
                           final message = ticket.messages[index];
@@ -141,8 +152,15 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
 
               // Input bar
               if (!ticket.isClosed)
-                _buildInputBar(isDark, surfaceColor, borderColor, textColor,
-                    secondaryColor, l10n, provider.isSending)
+                _buildInputBar(
+                  isDark,
+                  surfaceColor,
+                  borderColor,
+                  textColor,
+                  secondaryColor,
+                  l10n,
+                  provider.isSending,
+                )
               else
                 _buildClosedBanner(l10n, surfaceColor, secondaryColor),
             ],
@@ -222,9 +240,11 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
         fgColor = AppColors.info;
         label = l10n.supportStatusOpen;
       case TicketStatus.inProgress:
+      case TicketStatus.waitingOnCustomer:
         bgColor = AppColors.warning.withValues(alpha: 0.1);
         fgColor = AppColors.warning;
         label = l10n.supportStatusInProgress;
+      case TicketStatus.resolved:
       case TicketStatus.closed:
         bgColor = AppColors.offline.withValues(alpha: 0.1);
         fgColor = AppColors.offline;
@@ -239,8 +259,11 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
       ),
       child: Text(
         label,
-        style:
-            TextStyle(fontSize: 11, fontWeight: FontWeight.w600, color: fgColor),
+        style: TextStyle(
+          fontSize: 11,
+          fontWeight: FontWeight.w600,
+          color: fgColor,
+        ),
       ),
     );
   }
@@ -253,6 +276,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
       case TicketPriority.medium:
         color = AppColors.warning;
       case TicketPriority.high:
+      case TicketPriority.urgent:
         color = AppColors.error;
     }
     return Container(
@@ -269,6 +293,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
       case TicketPriority.medium:
         return l10n.supportPriorityMedium;
       case TicketPriority.high:
+      case TicketPriority.urgent:
         return l10n.supportPriorityHigh;
     }
   }
@@ -280,7 +305,7 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     Color secondaryColor,
     Color surfaceColor,
   ) {
-    final isUser = message.authorRole == AuthorRole.user;
+    final isUser = message.authorRole == AuthorRole.driver;
     final isSystem = message.authorRole == AuthorRole.system;
 
     if (isSystem) {
@@ -307,15 +332,13 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
     // Received (support/admin) messages: blue tint, left-aligned
     final bubbleColor = isUser
         ? (isDark
-            ? AppColors.primary.withValues(alpha: 0.25)
-            : AppColors.primary.withValues(alpha: 0.15))
+              ? AppColors.primary.withValues(alpha: 0.25)
+              : AppColors.primary.withValues(alpha: 0.15))
         : (isDark
-            ? AppColors.info.withValues(alpha: 0.20)
-            : AppColors.info.withValues(alpha: 0.10));
+              ? AppColors.info.withValues(alpha: 0.20)
+              : AppColors.info.withValues(alpha: 0.10));
 
-    final senderLabel = isUser
-        ? null
-        : (message.authorName ?? 'Admin Support');
+    final senderLabel = isUser ? null : (message.authorName ?? 'Admin Support');
 
     final senderLabelColor = isUser ? AppColors.primary : AppColors.info;
 
@@ -337,8 +360,9 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
           ),
         ),
         child: Column(
-          crossAxisAlignment:
-              isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          crossAxisAlignment: isUser
+              ? CrossAxisAlignment.end
+              : CrossAxisAlignment.start,
           children: [
             if (senderLabel != null)
               Padding(
@@ -403,7 +427,9 @@ class _TicketDetailScreenState extends State<TicketDetailScreen> {
                 filled: true,
                 fillColor: surfaceColor,
                 contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16, vertical: 10),
+                  horizontal: 16,
+                  vertical: 10,
+                ),
               ),
               textInputAction: TextInputAction.send,
               onSubmitted: (_) => _sendMessage(),

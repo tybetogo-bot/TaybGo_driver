@@ -1,6 +1,5 @@
-﻿{
+{
   "@@locale": "sv",
-
   "appName": "TaybGo Förare",
   "welcome": "Välkommen",
   "getStarted": "Kom igång",
@@ -18,14 +17,12 @@
   "success": "Lyckades",
   "seeAll": "Visa alla",
   "or": "ELLER",
-
   "onboardingTitle1": "Börja tjäna idag",
   "onboardingDesc1": "Gå med tusentals förare som tjänar på sitt eget schema",
   "onboardingTitle2": "Acceptera beställningar enkelt",
   "onboardingDesc2": "Få aviseringar om nya beställningar och acceptera med ett tryck",
   "onboardingTitle3": "Navigera & Leverera",
   "onboardingDesc3": "Inbyggd navigering hjälper dig att nå destinationer snabbare",
-
   "phoneNumber": "Telefonnummer",
   "enterPhoneNumber": "Ange ditt telefonnummer",
   "phoneHint": "+46 70 123 45 67",
@@ -36,31 +33,29 @@
   "resendOtpIn": "Skicka kod igen om {seconds}s",
   "@resendOtpIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "invalidOtp": "Ogiltig verifieringskod",
   "otpSent": "Verifieringskod skickad",
   "errorsAuthPhoneAlreadyRegistered": "Det här numret är redan registrerat.",
-
   "email": "E-post",
   "enterEmail": "Ange din e-post",
   "signUpWithApple": "Registrera med Apple",
   "signUpWithGoogle": "Registrera med Google",
   "forgotPassword": "Glömt lösenord",
-
   "driverApplication": "Föraransökan",
   "personalInfo": "Personlig information",
   "vehicleInfo": "Fordonsinformation",
   "documents": "Dokument",
   "reviewSubmit": "Granska & Skicka",
-
   "fullName": "Fullständigt namn",
   "age": "Födelsedatum",
   "dateOfBirth": "Födelsedatum",
   "address": "Adress",
   "city": "Stad",
-
   "vehicleType": "Fordonstyp",
   "selectVehicleType": "Välj fordonstyp",
   "car": "Bil",
@@ -71,13 +66,11 @@
   "vehicleModel": "Fordonsmodell",
   "vehicleYear": "Fordonsår",
   "vehicleColor": "Fordonsfärg",
-
   "serviceType": "Tjänstetyp",
   "selectServiceType": "Vilka tjänster kommer du att erbjuda?",
   "foodDelivery": "Matleverans",
   "shipping": "Frakt",
   "taxi": "Taxi",
-
   "uploadDocuments": "Ladda upp dokument",
   "driversLicense": "Körkort",
   "nationalId": "Identitetskort",
@@ -87,21 +80,18 @@
   "uploadPhoto": "Ladda upp foto",
   "takePhoto": "Ta foto",
   "chooseFromGallery": "Välj från galleri",
-
   "submitApplication": "Skicka ansökan",
   "applicationSubmitted": "Ansökan skickad",
   "applicationPending": "Din ansökan granskas",
   "applicationApproved": "Ansökan godkänd",
   "applicationRejected": "Ansökan avvisad",
   "pendingApprovalMessage": "Vi granskar dina dokument. Det tar vanligtvis 24-48 timmar.",
-
   "home": "Hem",
   "orders": "Beställningar",
   "recentOrders": "Senaste beställningar",
   "earnings": "Inkomster",
   "profile": "Profil",
   "search": "Sök",
-
   "online": "Online",
   "offline": "Offline",
   "goOnline": "Gå online",
@@ -110,7 +100,6 @@
   "tapToGoOffline": "Tryck för att gå offline",
   "youAreOnline": "Du är online och redo att ta emot beställningar",
   "youAreOffline": "Du är offline. Gå online för att ta emot beställningar",
-
   "newOrder": "Ny beställning",
   "newOrderTitle": "Ny beställning!",
   "newOrderSubtitle": "Acceptera innan tiden tar slut",
@@ -124,7 +113,9 @@
   "acceptIn": "Acceptera om {seconds}s",
   "@acceptIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "orderAccepted": "Beställning accepterad",
@@ -139,7 +130,6 @@
   "rejected": "Avvisad",
   "cancelled": "Avbruten",
   "delivered": "Levererad",
-
   "pickup": "Upphämtning",
   "dropoff": "Avlämning",
   "pickupLocation": "Upphämtningsplats",
@@ -159,7 +149,6 @@
   "yourDistanceTo": "Ditt avstånd till",
   "km": "km",
   "min": "min",
-
   "startNavigation": "Starta navigering",
   "arrivedAtPickup": "Ankom till upphämtning",
   "startDelivery": "Starta leverans",
@@ -172,31 +161,26 @@
   "arrivedAtDropoffConfirmation": "Bekräfta att du har ankommit till avlämningsplatsen?",
   "completeOrderConfirmation": "Bekräfta att du har slutfört denna leverans?",
   "updatingStatus": "Uppdaterar status...",
-
   "tip": "Dricks",
   "earnings_label": "Inkomster",
   "deliveryFee": "Leveransavgift",
   "total": "Totalt",
-
   "currentOrders": "Aktuella beställningar",
   "orderHistory": "Beställningshistorik",
   "noOrdersYet": "Inga beställningar ännu",
   "noActiveOrders": "Inga aktiva beställningar",
   "waitingForOrders": "Väntar på nya beställningar...",
-
   "totalOrders": "Totala beställningar",
   "totalEarnings": "Totala inkomster",
   "avgTripTime": "Genomsn. restid",
   "completionRate": "Slutförandegrad",
   "rating": "Betyg",
-
   "todayEarnings": "Dagens inkomster",
   "weeklyEarnings": "Veckovis inkomster",
   "monthlyEarnings": "Månadsvis inkomster",
   "lastMonthEarnings": "Förra månadens inkomster",
   "viewPayslips": "Visa lönebesked",
   "payslipsSentEmail": "Lönebesked skickas till din e-post",
-
   "settings": "Inställningar",
   "language": "Språk",
   "english": "Engelska",
@@ -219,6 +203,26 @@
   "promotionalNotifications": "Kampanjaviseringar",
   "soundEnabled": "Ljud aktiverat",
   "vibrationEnabled": "Vibration aktiverad",
+  "notificationSoundRepeats": "Upprepa aviseringsljud",
+  "notificationSoundRepeatsEnabledDesc": "Spela upp signalljudet {count} g?ng(er) f?r varje avisering.",
+  "@notificationSoundRepeatsEnabledDesc": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationSoundRepeatsDisabledDesc": "Aktivera ljud f?rst f?r att v?lja hur m?nga g?nger signalen ska upprepas.",
+  "notificationSoundRepeatsPickerDesc": "V?lj hur m?nga g?nger signalljudet ska upprepas f?r varje avisering.",
+  "notificationRepeatTime": "1 g?ng",
+  "notificationRepeatTimes": "{count} g?nger",
+  "@notificationRepeatTimes": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "noNotifications": "Inga aviseringar ännu",
   "noNotificationsDesc": "Dina aviseringar visas här",
   "today": "Idag",
@@ -232,7 +236,6 @@
   "earningsReceived": "Inkomster mottagna",
   "weeklyReportReady": "Veckorapporten är klar",
   "accountUpdated": "Konto uppdaterat",
-
   "account": "Konto",
   "editProfile": "Redigera profil",
   "changePassword": "Ändra lösenord",
@@ -244,24 +247,22 @@
   "logoutConfirm": "Är du säker på att du vill logga ut?",
   "deleteAccount": "Radera konto",
   "deleteAccountConfirm": "Är du säker på att du vill radera ditt konto? Denna åtgärd kan inte ångras.",
-
   "networkError": "Nätverksfel. Kontrollera din anslutning.",
   "somethingWentWrong": "Något gick fel. Försök igen.",
   "sessionExpired": "Sessionen har gått ut. Logga in igen.",
   "locationPermissionDenied": "Platstillstånd nekad",
   "enableLocationServices": "Aktivera platstjänster för att fortsätta",
-
   "version": "Version {version}",
   "@version": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
-
   "goodMorning": "God morgon",
   "goodAfternoon": "God eftermiddag",
   "goodEvening": "God kväll",
-
   "locationRequired": "Plats krävs",
   "enableLocationAccess": "Aktivera platsåtkomst för att ta emot beställningar.",
   "enable": "Aktivera",
@@ -272,29 +273,23 @@
   "pleaseEnableGps": "Aktivera GPS för att ta emot beställningar.",
   "failedToUpdateStatus": "Kunde inte uppdatera status",
   "ok": "OK",
-
   "accountUnderReview": "Konto granskas",
   "accountBeingVerified": "Ditt konto verifieras. Du meddelas när det godkänns.",
-
   "receivingOrders": "Tar emot beställningar",
   "goOnlineToStart": "Gå online för att starta",
   "noRecentOrders": "Inga senaste beställningar",
-
   "headToPickup": "Åk till upphämtning",
   "onTheWay": "På väg",
   "atDelivery": "Vid leverans",
   "continueText": "Fortsätt",
-
   "week": "Vecka",
   "month": "Månad",
   "avgPerOrder": "Genomsn./Beställning",
   "allTime": "Totalt",
   "noEarningsData": "Inga inkomstdata",
   "completeOrdersToSeeEarnings": "Slutför beställningar för att se dina inkomster",
-
   "verified": "Verifierad",
   "driver": "Förare",
-
   "knowledgeBase": "Kunskapsbank",
   "searchForHelp": "Sök efter hjälp...",
   "noArticlesFound": "Inga artiklar hittades",
@@ -303,7 +298,9 @@
   "articlesCount": "{count} artiklar",
   "@articlesCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "articleNotFound": "Artikel hittades inte",
@@ -320,16 +317,19 @@
   "sectionsCount": "{count} avsnitt",
   "@sectionsCount": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
   "minRead": "{count} min läsning",
   "@minRead": {
     "placeholders": {
-      "count": {"type": "int"}
+      "count": {
+        "type": "int"
+      }
     }
   },
-
   "tourAccountUnderReviewTitle": "Konto granskas",
   "tourAccountUnderReviewDesc": "Ditt konto verifieras. Du kan utforska appen medan du väntar på godkännande.",
   "tourGoOnlineTitle": "Gå online för att ta emot beställningar",
@@ -360,7 +360,6 @@
   "tourAppSettingsDesc": "Ändra ditt språk, tema och få tillgång till kunskapsbanken för hjälp.",
   "tourKnowledgeBaseTitle": "Kunskapsbank",
   "tourKnowledgeBaseDesc": "Bläddra i steg-för-steg guider, tips och svar på vanliga frågor.",
-
   "tourSkipBtn": "Hoppa över",
   "tourBackBtn": "Tillbaka",
   "tourNextBtn": "Nästa",
@@ -373,7 +372,6 @@
   "tourCompleteDesc": "Du är redo att börja acceptera beställningar och tjäna med TaybGo!",
   "tourBrowseKb": "Bläddra i kunskapsbanken",
   "tourGetStarted": "Kom igång",
-
   "selectCountry": "Välj land",
   "searchCountry": "Sök land...",
   "secure": "Säker",
@@ -383,7 +381,9 @@
   "resendIn": "Skicka igen om {seconds}s",
   "@resendIn": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "resendCode": "Skicka kod igen",
@@ -426,26 +426,34 @@
   "failedToDeleteAccount": "Kunde inte radera konto: {error}",
   "@failedToDeleteAccount": {
     "placeholders": {
-      "error": {"type": "String"}
+      "error": {
+        "type": "String"
+      }
     }
   },
   "justNow": "Just nu",
   "minutesAgo": "{minutes}m sedan",
   "@minutesAgo": {
     "placeholders": {
-      "minutes": {"type": "int"}
+      "minutes": {
+        "type": "int"
+      }
     }
   },
   "hoursAgo": "{hours}t sedan",
   "@hoursAgo": {
     "placeholders": {
-      "hours": {"type": "int"}
+      "hours": {
+        "type": "int"
+      }
     }
   },
   "daysAgo": "{days}d sedan",
   "@daysAgo": {
     "placeholders": {
-      "days": {"type": "int"}
+      "days": {
+        "type": "int"
+      }
     }
   },
   "clearAllNotificationsConfirm": "Är du säker på att du vill rensa alla aviseringar?",
@@ -459,7 +467,9 @@
   "secondsAgo": "{seconds}s sedan",
   "@secondsAgo": {
     "placeholders": {
-      "seconds": {"type": "int"}
+      "seconds": {
+        "type": "int"
+      }
     }
   },
   "subtotal": "Delsumma",
@@ -475,7 +485,6 @@
   "batteryOptimizationTitle": "Stäng av batterioptimering",
   "batteryOptimizationMessage": "För att hålla liveplats aktiv i bakgrunden, ställ in TaybGo Driver på obegränsad batterianvändning i Android-inställningarna.",
   "batteryOptimizationBannerMessage": "Batterioptimering kan pausa liveplats medan du är online. Ställ in TaybGo Driver på obegränsad batterianvändning.",
-
   "profileUpdatedSuccessfully": "Profil uppdaterad",
   "failedToUpdateProfile": "Kunde inte uppdatera profil",
   "supportTickets": "Supportärenden",

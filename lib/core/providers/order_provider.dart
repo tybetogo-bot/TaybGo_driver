@@ -135,7 +135,9 @@ class OrderProvider extends ChangeNotifier {
       debugPrint('[OrderProvider] Received ${orders.length} suggested orders');
 
       if (orders.isNotEmpty) {
-        final freshOrder = orders.first;
+        // The backend can return multiple suggestions. We surface the oldest
+        // available one first by taking the last item in the returned list.
+        final freshOrder = orders.last;
         final isNewOrder =
             _pendingOrder == null || _pendingOrder!.id != freshOrder.id;
 
@@ -300,6 +302,29 @@ class OrderProvider extends ChangeNotifier {
       }
       unawaited(refreshSuggestedOrders());
       // For reject, most errors are harmless (order already gone, etc.)
+      return null;
+    }
+  }
+
+  /// Reject an order by id so notification actions can reuse the same flow.
+  Future<OrderActionError?> rejectOrderById(String orderId) async {
+    try {
+      await _orderService.rejectOrderById(orderId);
+      if (_pendingOrder?.id == orderId) {
+        _pendingOrder = null;
+        notifyListeners();
+      }
+      unawaited(refreshSuggestedOrders());
+      return null;
+    } catch (e) {
+      debugPrint('[OrderProvider] Error rejecting order by id: $e');
+      final errorMsg = e.toString().toLowerCase();
+      if (errorMsg.contains('connection') ||
+          errorMsg.contains('timeout') ||
+          errorMsg.contains('network')) {
+        return OrderActionError.network;
+      }
+      unawaited(refreshSuggestedOrders());
       return null;
     }
   }

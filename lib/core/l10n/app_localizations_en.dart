@@ -616,6 +616,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get vibrationEnabled => 'Vibration Enabled';
 
   @override
+  String get notificationSoundRepeats => 'Notification sound repeats';
+
+  @override
+  String notificationSoundRepeatsEnabledDesc(int count) {
+    return 'Play the signal sound $count time(s) for each notification.';
+  }
+
+  @override
+  String get notificationSoundRepeatsDisabledDesc =>
+      'Enable sound first to choose how many times the signal repeats.';
+
+  @override
+  String get notificationSoundRepeatsPickerDesc =>
+      'Choose how many times the signal sound should repeat for each notification.';
+
+  @override
+  String get notificationRepeatTime => '1 time';
+
+  @override
+  String notificationRepeatTimes(int count) {
+    return '$count times';
+  }
+
+  @override
   String get noNotifications => 'No notifications yet';
 
   @override
@@ -907,7 +931,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourTotalEarningsDesc =>
-      'Track all your earnings here — base pay, tips, and bonuses.';
+      'Track all your earnings here â€” base pay, tips, and bonuses.';
 
   @override
   String get tourEarningsBreakdownTitle => 'Earnings Breakdown';
@@ -928,7 +952,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourYourEarningsDesc =>
-      'View the full payment breakdown — delivery fee, tip, and total payout.';
+      'View the full payment breakdown â€” delivery fee, tip, and total payout.';
 
   @override
   String get tourNavActionsTitle => 'Navigation & Actions';
@@ -956,7 +980,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tourUpdateStatusDesc =>
-      'Tap to mark key milestones — On The Way, Delivered, or Complete.';
+      'Tap to mark key milestones â€” On The Way, Delivered, or Complete.';
 
   @override
   String get tourAppSettingsTitle => 'App Settings';

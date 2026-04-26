@@ -257,13 +257,11 @@ class DriverProvider extends ChangeNotifier {
     if (!status.hasBackgroundAccess) {
       status = await _locationService.requestBackgroundPermission();
       _locationStatus = status;
-      if (!status.hasBackgroundAccess) {
-        _error = _locationService.getStatusMessage(
-          status,
-          requireBackgroundAccess: true,
-        );
+      if (!status.hasForegroundAccess) {
+        final mappedResult = _mapPermissionStatusToToggleResult(status);
+        _error = _locationService.getStatusMessage(status);
         notifyListeners();
-        return ToggleOnlineResult.locationDeniedForever;
+        return mappedResult;
       }
     }
 
@@ -327,7 +325,7 @@ class DriverProvider extends ChangeNotifier {
 
     _locationService.checkPermission().then((status) async {
       _locationStatus = status;
-      _locationPermissionLost = !status.hasBackgroundAccess;
+      _locationPermissionLost = !status.hasForegroundAccess;
 
       if (!status.hasForegroundAccess) {
         debugPrint('[DriverProvider] Location permission not granted: $status');
@@ -392,7 +390,7 @@ class DriverProvider extends ChangeNotifier {
       final status = await _locationService.checkPermission();
       _locationStatus = status;
       final wasLost = _locationPermissionLost;
-      _locationPermissionLost = !status.hasBackgroundAccess;
+      _locationPermissionLost = !status.hasForegroundAccess;
       if (_locationPermissionLost != wasLost) {
         debugPrint(
           '[DriverProvider] Location permission changed: lost=$_locationPermissionLost, status=$status',
