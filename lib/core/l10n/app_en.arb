@@ -303,6 +303,13 @@
   "noEarningsData": "No earnings data",
   "completeOrdersToSeeEarnings": "Complete orders to see your earnings",
   "verified": "Verified",
+  "approved": "Approved",
+  "joinedOn": "Joined {date}",
+  "@joinedOn": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "driver": "Driver",
   "knowledgeBase": "Knowledge Base",
   "searchForHelp": "Search for help...",

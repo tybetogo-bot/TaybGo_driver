@@ -289,6 +289,13 @@
   "noEarningsData": "Inga inkomstdata",
   "completeOrdersToSeeEarnings": "Slutför beställningar för att se dina inkomster",
   "verified": "Verifierad",
+  "approved": "Godkänd",
+  "joinedOn": "Medlem sedan {date}",
+  "@joinedOn": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "driver": "Förare",
   "knowledgeBase": "Kunskapsbank",
   "searchForHelp": "Sök efter hjälp...",

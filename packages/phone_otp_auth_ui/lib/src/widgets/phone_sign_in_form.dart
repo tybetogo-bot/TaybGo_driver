@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
 
@@ -43,10 +43,16 @@ class _PhoneSignInFormState extends State<PhoneSignInForm> {
   late final TextEditingController _phoneController;
   late Country _selectedCountry;
 
+  static String _digitsOnly(String value) {
+    return value.replaceAll(RegExp(r'\D'), '');
+  }
+
   @override
   void initState() {
     super.initState();
-    _phoneController = TextEditingController(text: widget.initialPhoneNumber);
+    _phoneController = TextEditingController(
+      text: _digitsOnly(widget.initialPhoneNumber),
+    );
     _selectedCountry = widget.initialCountry;
   }
 
@@ -56,9 +62,10 @@ class _PhoneSignInFormState extends State<PhoneSignInForm> {
     if (oldWidget.initialCountry != widget.initialCountry) {
       _selectedCountry = widget.initialCountry;
     }
+    final initialPhoneNumber = _digitsOnly(widget.initialPhoneNumber);
     if (oldWidget.initialPhoneNumber != widget.initialPhoneNumber &&
-        widget.initialPhoneNumber != _phoneController.text) {
-      _phoneController.text = widget.initialPhoneNumber;
+        initialPhoneNumber != _phoneController.text) {
+      _phoneController.text = initialPhoneNumber;
     }
   }
 

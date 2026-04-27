@@ -825,6 +825,14 @@ class AppLocalizationsNb extends AppLocalizations {
   String get verified => 'Verifisert';
 
   @override
+  String get approved => 'Godkjent';
+
+  @override
+  String joinedOn(Object date) {
+    return 'Medlem siden $date';
+  }
+
+  @override
   String get driver => 'Sjåfør';
 
   @override

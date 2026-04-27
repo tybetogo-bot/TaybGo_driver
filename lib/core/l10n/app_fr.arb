@@ -268,6 +268,13 @@
   "noEarningsData": "Aucune donnée de revenus",
   "completeOrdersToSeeEarnings": "Complétez des commandes pour voir vos revenus",
   "verified": "Vérifié",
+  "approved": "Approuvé",
+  "joinedOn": "Inscrit le {date}",
+  "@joinedOn": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "driver": "Chauffeur",
   "knowledgeBase": "Base de connaissances",
   "searchForHelp": "Rechercher de l'aide...",

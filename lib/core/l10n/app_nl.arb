@@ -289,6 +289,13 @@
   "noEarningsData": "Geen verdienstengegevens",
   "completeOrdersToSeeEarnings": "Voltooi bestellingen om je verdiensten te zien",
   "verified": "Geverifieerd",
+  "approved": "Goedgekeurd",
+  "joinedOn": "Lid sinds {date}",
+  "@joinedOn": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "driver": "Chauffeur",
   "knowledgeBase": "Kennisbank",
   "searchForHelp": "Zoek hulp...",

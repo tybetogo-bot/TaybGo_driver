@@ -827,6 +827,14 @@ class AppLocalizationsSv extends AppLocalizations {
   String get verified => 'Verifierad';
 
   @override
+  String get approved => 'Godkänd';
+
+  @override
+  String joinedOn(Object date) {
+    return 'Medlem sedan $date';
+  }
+
+  @override
   String get driver => 'Förare';
 
   @override

@@ -290,6 +290,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await showModalBottomSheet<void>(
       context: context,
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      isScrollControlled: true,
       showDragHandle: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -308,74 +309,79 @@ class _SettingsScreenState extends State<SettingsScreen> {
             : AppColors.lightBorder;
 
         return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: const Icon(
-                        Icons.repeat_rounded,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        l10n.notificationSoundRepeats,
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                          color: textColor,
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              maxHeight: MediaQuery.sizeOf(sheetContext).height * 0.85,
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(20, 4, 20, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(
+                          Icons.repeat_rounded,
+                          color: AppColors.primary,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  l10n.notificationSoundRepeatsPickerDesc,
-                  style: TextStyle(
-                    fontSize: 13,
-                    height: 1.35,
-                    color: secondaryColor,
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          l10n.notificationSoundRepeats,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: textColor,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ),
-                const SizedBox(height: 18),
-                for (
-                  int repeat = NotificationPreferencesService.minRepeatCount;
-                  repeat <= NotificationPreferencesService.maxRepeatCount;
-                  repeat++
-                )
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 10),
-                    child: _buildRepeatChoiceCard(
-                      repeat: repeat,
-                      selected: currentValue == repeat,
-                      label: repeat == 1
-                          ? l10n.notificationRepeatTime
-                          : l10n.notificationRepeatTimes(repeat),
-                      textColor: textColor,
-                      secondaryColor: secondaryColor,
-                      surfaceColor: surfaceColor,
-                      borderColor: borderColor,
-                      onTap: () async {
-                        await provider.setRepeatCount(repeat);
-                        if (sheetContext.mounted) {
-                          Navigator.of(sheetContext).pop();
-                        }
-                      },
+                  const SizedBox(height: 12),
+                  Text(
+                    l10n.notificationSoundRepeatsPickerDesc,
+                    style: TextStyle(
+                      fontSize: 13,
+                      height: 1.35,
+                      color: secondaryColor,
                     ),
                   ),
-              ],
+                  const SizedBox(height: 18),
+                  for (
+                    int repeat = NotificationPreferencesService.minRepeatCount;
+                    repeat <= NotificationPreferencesService.maxRepeatCount;
+                    repeat++
+                  )
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10),
+                      child: _buildRepeatChoiceCard(
+                        repeat: repeat,
+                        selected: currentValue == repeat,
+                        label: repeat == 1
+                            ? l10n.notificationRepeatTime
+                            : l10n.notificationRepeatTimes(repeat),
+                        textColor: textColor,
+                        secondaryColor: secondaryColor,
+                        surfaceColor: surfaceColor,
+                        borderColor: borderColor,
+                        onTap: () async {
+                          await provider.setRepeatCount(repeat);
+                          if (sheetContext.mounted) {
+                            Navigator.of(sheetContext).pop();
+                          }
+                        },
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         );

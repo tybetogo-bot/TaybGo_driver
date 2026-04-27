@@ -828,6 +828,14 @@ class AppLocalizationsNl extends AppLocalizations {
   String get verified => 'Geverifieerd';
 
   @override
+  String get approved => 'Goedgekeurd';
+
+  @override
+  String joinedOn(Object date) {
+    return 'Lid sinds $date';
+  }
+
+  @override
   String get driver => 'Chauffeur';
 
   @override

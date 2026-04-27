@@ -139,8 +139,40 @@ class _HomeScreenState extends State<HomeScreen>
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
     if (state == AppLifecycleState.resumed) {
-      unawaited(_refreshBatteryOptimizationWarning(showDialog: false));
+      unawaited(_refreshHomeDataAndServicesOnResume());
     }
+  }
+
+  Future<void> _refreshHomeDataAndServicesOnResume() async {
+    final orderProvider = _orderProvider;
+    if (orderProvider == null) {
+      await _refreshBatteryOptimizationWarning(showDialog: false);
+      return;
+    }
+
+    final driverProvider = context.read<DriverProvider>();
+
+    await Future.wait([
+      orderProvider.fetchOrderHistory(),
+      orderProvider.checkActiveOrder(),
+      driverProvider.fetchProfile(),
+    ]);
+
+    if (!mounted) return;
+
+    final profile = driverProvider.profile;
+    if (profile != null) {
+      orderProvider.setStats(profile.totalOrders, profile.totalEarnings);
+
+      if (profile.isOnline) {
+        orderProvider.startPolling();
+        driverProvider.resumeLocationTrackingIfOnline();
+      } else {
+        orderProvider.stopPolling();
+      }
+    }
+
+    await _refreshBatteryOptimizationWarning(showDialog: false);
   }
 
   void _onNewOrder() {

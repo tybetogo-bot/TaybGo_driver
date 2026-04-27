@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
@@ -25,6 +27,7 @@ import 'core/constants/route_constants.dart';
 import 'features/support/application/support_provider.dart';
 
 GoRouter? _router;
+_NotificationCleanupObserver? _notificationCleanupObserver;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -51,6 +54,8 @@ void main() async {
   } else {
     await fcmService.initialize();
   }
+  _notificationCleanupObserver = _NotificationCleanupObserver(fcmService);
+  WidgetsBinding.instance.addObserver(_notificationCleanupObserver!);
 
   // Initialize auth provider before running app
   final authProvider = AuthProvider();
@@ -67,28 +72,29 @@ void main() async {
     TaybGoDriverApp(authProvider: authProvider, tourProvider: tourProvider),
   );
 
+  unawaited(fcmService.clearDeliveredNotifications());
   fcmService.onNotificationTap = _handleNotificationTap;
 }
 
-void _handleNotificationTap(Map<String, dynamic> data) {
+void _handleNotificationTap(Map<String, dynamic> _) {
   final router = _router;
   if (router == null) return;
 
-  final orderId = _extractNotificationOrderId(data);
-  final route = orderId != null
-      ? RouteConstants.orderDetailPath(orderId)
-      : RouteConstants.orders;
-
-  router.go(route);
+  unawaited(FcmService().clearDeliveredNotifications());
+  router.go(RouteConstants.home);
 }
 
-String? _extractNotificationOrderId(Map<String, dynamic> data) {
-  final value = data['order_id'] ?? data['orderId'] ?? data['id'];
-  final orderId = value?.toString().trim();
-  if (orderId == null || orderId.isEmpty) {
-    return null;
+class _NotificationCleanupObserver extends WidgetsBindingObserver {
+  _NotificationCleanupObserver(this._fcmService);
+
+  final FcmService _fcmService;
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      unawaited(_fcmService.clearDeliveredNotifications());
+    }
   }
-  return orderId;
 }
 
 class TaybGoDriverApp extends StatelessWidget {

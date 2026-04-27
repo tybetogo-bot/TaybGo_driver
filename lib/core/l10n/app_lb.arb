@@ -289,6 +289,13 @@
   "noEarningsData": "Keng Verdéngschter-Daten",
   "completeOrdersToSeeEarnings": "Schléisst Bestellungen of fir Är Verdéngschter ze gesinn",
   "verified": "Verifizéiert",
+  "approved": "Ugeholl",
+  "joinedOn": "Dobäi zanter {date}",
+  "@joinedOn": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "driver": "Chauffeur",
   "knowledgeBase": "Wëssensdatenbank",
   "searchForHelp": "No Hëllef sichen...",

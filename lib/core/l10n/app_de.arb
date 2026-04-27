@@ -268,6 +268,13 @@
   "noEarningsData": "Keine Einnahmedaten",
   "completeOrdersToSeeEarnings": "Schließen Sie Bestellungen ab, um Ihre Einnahmen zu sehen",
   "verified": "Verifiziert",
+  "approved": "Genehmigt",
+  "joinedOn": "Beigetreten {date}",
+  "@joinedOn": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "driver": "Fahrer",
   "knowledgeBase": "Wissensdatenbank",
   "searchForHelp": "Nach Hilfe suchen...",

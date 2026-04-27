@@ -17,7 +17,7 @@
 
     <application
         android:label="@string/app_name"
-        android:name="${applicationName}"
+        android:name=".MainApplication"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"
@@ -73,7 +73,7 @@
         <!-- Default FCM notification channel -->
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="order_alerts" />
+            android:value="order_alerts_sound_vibrate_5" />
 
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

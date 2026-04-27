@@ -26,6 +26,10 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
 
+  static String _digitsOnly(String value) {
+    return value.replaceAll(RegExp(r'\D'), '');
+  }
+
   static const List<Map<String, String>> _vehicleTypeOptions = [
     {'value': 'CAR', 'labelKey': 'car'},
     {'value': 'BIKE', 'labelKey': 'bicycle'},
@@ -96,7 +100,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     // Initialize personal info
     _nameController = TextEditingController(text: profile?.fullName ?? '');
-    _phoneController = TextEditingController(text: profile?.phone ?? '');
+    _phoneController = TextEditingController(
+      text: _digitsOnly(profile?.phone ?? ''),
+    );
     _selectedBirthdate = profile?.birthdate;
     _birthdateController = TextEditingController();
     _syncBirthdateController();
@@ -192,7 +198,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void _applyProfile(DriverProfile profile) {
     _nameController.text = profile.fullName;
-    _phoneController.text = profile.phone;
+    _phoneController.text = _digitsOnly(profile.phone);
     _selectedBirthdate = profile.birthdate;
     _syncBirthdateController();
 
@@ -533,7 +539,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _buildTextField(
                 controller: _phoneController,
                 hint: l10n.phoneHint,
-                keyboardType: TextInputType.phone,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 textDirection: TextDirection.ltr,
                 surfaceColor: surfaceColor,
                 borderColor: borderColor,
@@ -589,6 +596,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 onChanged: (value) {
                   setState(() => _selectedVehicleType = value);
                 },
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return l10n.selectVehicleType;
+                  }
+                  return null;
+                },
                 surfaceColor: surfaceColor,
                 borderColor: borderColor,
                 textColor: textColor,
@@ -612,6 +625,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   onChanged: (value) {
                     setState(() => _selectedCarSize = value);
                   },
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return l10n.pleaseSelectCarSize;
+                    }
+                    return null;
+                  },
                   surfaceColor: surfaceColor,
                   borderColor: borderColor,
                   textColor: textColor,
@@ -634,6 +653,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   borderColor: borderColor,
                   textColor: textColor,
                   hintColor: hintColor,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return l10n.pleaseEnterPlateNumber;
+                    }
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 16),
@@ -652,6 +677,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   borderColor: borderColor,
                   textColor: textColor,
                   hintColor: hintColor,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return l10n.pleaseEnterVehicleColor;
+                    }
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 16),
@@ -670,6 +701,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   borderColor: borderColor,
                   textColor: textColor,
                   hintColor: hintColor,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return l10n.pleaseEnterVehicleMake;
+                    }
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 16),
@@ -688,6 +725,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   borderColor: borderColor,
                   textColor: textColor,
                   hintColor: hintColor,
+                  validator: (value) {
+                    if (value == null || value.trim().isEmpty) {
+                      return l10n.pleaseEnterVehicleModel;
+                    }
+                    return null;
+                  },
                 ),
 
                 const SizedBox(height: 16),
@@ -708,6 +751,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   borderColor: borderColor,
                   textColor: textColor,
                   hintColor: hintColor,
+                  validator: (value) {
+                    final trimmed = value?.trim() ?? '';
+                    if (trimmed.isEmpty) {
+                      return l10n.pleaseEnterVehicleYear;
+                    }
+                    final year = int.tryParse(trimmed);
+                    if (year == null ||
+                        year < 1990 ||
+                        year > DateTime.now().year + 1) {
+                      return l10n.invalidVehicleYear;
+                    }
+                    return null;
+                  },
                 ),
               ],
 
@@ -1029,6 +1085,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     required List<DropdownMenuItem<String>> items,
     required String hint,
     required void Function(String?) onChanged,
+    String? Function(String?)? validator,
     required Color surfaceColor,
     required Color borderColor,
     required Color textColor,
@@ -1057,11 +1114,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+        ),
       ),
       dropdownColor: surfaceColor,
       style: TextStyle(fontSize: 15, color: textColor),
       items: items,
       onChanged: onChanged,
+      validator: validator,
     );
   }
 

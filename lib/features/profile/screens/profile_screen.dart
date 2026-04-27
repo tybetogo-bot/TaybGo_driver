@@ -175,7 +175,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                       const SizedBox(height: 6),
                       // Status badge
-                      _buildStatusBadge(profile?.status),
+                      _buildStatusBadge(context, profile?.status),
                       const SizedBox(height: 12),
                       // Contact info
                       if (profile?.phone.isNotEmpty == true)
@@ -225,7 +225,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         const SizedBox(height: 6),
                         _buildInfoChip(
                           Icons.calendar_today_outlined,
-                          'Joined ${profile.memberSince}',
+                          l10n.joinedOn(profile.memberSince),
                           secondaryColor,
                         ),
                       ],
@@ -403,24 +403,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildStatusBadge(String? status) {
+  Widget _buildStatusBadge(BuildContext context, String? status) {
     if (status == null) return const SizedBox.shrink();
+
+    final l10n = AppLocalizations.of(context)!;
 
     Color color;
     IconData icon;
+    late final String label;
     switch (status.toUpperCase()) {
       case 'APPROVED':
         color = AppColors.success;
         icon = Icons.verified;
+        label = l10n.approved;
       case 'PENDING':
         color = AppColors.warning;
         icon = Icons.hourglass_top;
+        label = l10n.pending;
       case 'REJECTED':
         color = AppColors.error;
         icon = Icons.cancel;
+        label = l10n.rejected;
       default:
         color = AppColors.info;
         icon = Icons.info_outline;
+        label = status[0] + status.substring(1).toLowerCase();
     }
 
     return Container(
@@ -435,7 +442,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Icon(icon, size: 14, color: color),
           const SizedBox(width: 4),
           Text(
-            status[0] + status.substring(1).toLowerCase(),
+            label,
             style: TextStyle(
               fontSize: 12,
               fontWeight: FontWeight.w500,

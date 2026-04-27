@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../features/onboarding/screens/onboarding_screen.dart';
 import '../../features/auth/screens/phone_screen.dart';
 import '../../features/auth/screens/otp_screen.dart';
 import '../../features/application/screens/application_screen.dart';
@@ -31,14 +30,13 @@ class AppRouter {
   static GoRouter createRouter(AuthProvider authProvider) {
     return GoRouter(
       navigatorKey: _rootNavigatorKey,
-      initialLocation: RouteConstants.onboarding,
+      initialLocation: RouteConstants.phone,
       refreshListenable: authProvider,
       redirect: (context, state) {
         final isAuthenticated = authProvider.isAuthenticated;
-        final onboardingComplete = authProvider.onboardingComplete;
         final currentPath = state.matchedLocation;
 
-        debugPrint('[Router] Redirect check - path: $currentPath, isAuth: $isAuthenticated, onboardingComplete: $onboardingComplete');
+        debugPrint('[Router] Redirect check - path: $currentPath, isAuth: $isAuthenticated');
 
         // If authenticated, redirect from auth routes
         if (isAuthenticated) {
@@ -58,12 +56,6 @@ class AppRouter {
 
         // Not authenticated below this point
 
-        // If onboarding complete, skip onboarding screen
-        if (onboardingComplete && currentPath == RouteConstants.onboarding) {
-          debugPrint('[Router] Redirecting to phone (onboarding complete)');
-          return RouteConstants.phone;
-        }
-
         // Allow access to auth routes and application routes without auth
         if (currentPath == RouteConstants.onboarding ||
             currentPath == RouteConstants.phone ||
@@ -74,19 +66,15 @@ class AppRouter {
           return null;
         }
 
-        // If not authenticated and trying to access protected route, redirect appropriately
-        if (!onboardingComplete) {
-          debugPrint('[Router] Redirecting to onboarding (not complete)');
-          return RouteConstants.onboarding;
-        }
+        // If not authenticated and trying to access protected route, redirect to login.
         debugPrint('[Router] Redirecting to phone (fallback)');
         return RouteConstants.phone;
       },
       routes: [
-      // Onboarding
+      // Legacy onboarding path now opens login directly.
       GoRoute(
         path: RouteConstants.onboarding,
-        builder: (context, state) => const OnboardingScreen(),
+        builder: (context, state) => const PhoneScreen(),
       ),
 
       // Auth

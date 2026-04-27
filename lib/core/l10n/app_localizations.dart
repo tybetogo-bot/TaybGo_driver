@@ -1688,6 +1688,18 @@ abstract class AppLocalizations {
   /// **'Verified'**
   String get verified;
 
+  /// No description provided for @approved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get approved;
+
+  /// No description provided for @joinedOn.
+  ///
+  /// In en, this message translates to:
+  /// **'Joined {date}'**
+  String joinedOn(Object date);
+
   /// No description provided for @driver.
   ///
   /// In en, this message translates to:

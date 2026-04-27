@@ -613,27 +613,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get vibrationEnabled => 'الاهتزاز مفعل';
 
   @override
-  String get notificationSoundRepeats => '????? ??? ???????';
+  String get notificationSoundRepeats => 'تكرار صوت الإشعار';
 
   @override
   String notificationSoundRepeatsEnabledDesc(int count) {
-    return '????? ??? ??????? $count ??? ??? ?????.';
+    return 'تشغيل صوت التنبيه $count مرة لكل إشعار.';
   }
 
   @override
   String get notificationSoundRepeatsDisabledDesc =>
-      '???? ????? ????? ??????? ??? ???? ????? ???????.';
+      'فعّل الصوت أولاً لاختيار عدد مرات تكرار التنبيه.';
 
   @override
   String get notificationSoundRepeatsPickerDesc =>
-      '???? ??? ???? ????? ??? ??????? ??? ?????.';
+      'اختر عدد مرات تكرار صوت التنبيه لكل إشعار.';
 
   @override
-  String get notificationRepeatTime => '??? ?????';
+  String get notificationRepeatTime => 'مرة واحدة';
 
   @override
   String notificationRepeatTimes(int count) {
-    return '$count ????';
+    return '$count مرات';
   }
 
   @override
@@ -819,6 +819,14 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get verified => 'موثق';
+
+  @override
+  String get approved => 'مقبول';
+
+  @override
+  String joinedOn(Object date) {
+    return 'انضم في $date';
+  }
 
   @override
   String get driver => 'سائق';

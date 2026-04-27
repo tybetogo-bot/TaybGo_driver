@@ -832,6 +832,14 @@ class AppLocalizationsFr extends AppLocalizations {
   String get verified => 'Vérifié';
 
   @override
+  String get approved => 'Approuvé';
+
+  @override
+  String joinedOn(Object date) {
+    return 'Inscrit le $date';
+  }
+
+  @override
   String get driver => 'Chauffeur';
 
   @override

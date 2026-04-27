@@ -828,6 +828,14 @@ class AppLocalizationsFi extends AppLocalizations {
   String get verified => 'Vahvistettu';
 
   @override
+  String get approved => 'Hyväksytty';
+
+  @override
+  String joinedOn(Object date) {
+    return 'Liittynyt $date';
+  }
+
+  @override
   String get driver => 'Kuljettaja';
 
   @override

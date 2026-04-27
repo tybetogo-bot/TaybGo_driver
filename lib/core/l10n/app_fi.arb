@@ -289,6 +289,13 @@
   "noEarningsData": "Ei ansiotietoja",
   "completeOrdersToSeeEarnings": "Suorita tilauksia nähdäksesi ansiosi",
   "verified": "Vahvistettu",
+  "approved": "Hyväksytty",
+  "joinedOn": "Liittynyt {date}",
+  "@joinedOn": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "driver": "Kuljettaja",
   "knowledgeBase": "Tietopankki",
   "searchForHelp": "Hae apua...",

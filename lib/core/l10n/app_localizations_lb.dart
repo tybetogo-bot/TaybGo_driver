@@ -834,6 +834,14 @@ class AppLocalizationsLb extends AppLocalizations {
   String get verified => 'Verifizéiert';
 
   @override
+  String get approved => 'Ugeholl';
+
+  @override
+  String joinedOn(Object date) {
+    return 'Dobäi zanter $date';
+  }
+
+  @override
   String get driver => 'Chauffeur';
 
   @override

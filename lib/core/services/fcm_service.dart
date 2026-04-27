@@ -95,6 +95,16 @@ int _notificationIdForPayload(String payload) {
   return payload.hashCode;
 }
 
+String? _notificationTagForMessage(RemoteMessage message) {
+  final androidTag = message.notification?.android?.tag?.trim();
+  if (androidTag != null && androidTag.isNotEmpty) {
+    return androidTag;
+  }
+
+  final orderId = _extractOrderId(message.data);
+  return orderId == null ? null : 'order_$orderId';
+}
+
 AndroidNotificationChannel _channelForPreferences({
   required int repeatCount,
   required bool soundEnabled,
@@ -425,6 +435,18 @@ Future<void> _showNotification({
   );
   final payload = jsonEncode(message.data);
   final orderId = _extractOrderId(message.data);
+  final androidTag = _notificationTagForMessage(message);
+  final notificationId = androidTag != null
+      ? 0
+      : (message.messageId?.hashCode ?? _notificationIdForPayload(payload));
+
+  if (initializePlugin && message.notification != null && isOrderNotification) {
+    await plugin.cancelAll();
+    debugPrint(
+      '[FCM] Cleared auto-displayed FCM notification before local show',
+    );
+  }
+
   final androidActions = <AndroidNotificationAction>[
     if (isDispatchOffer && orderId != null) ...<AndroidNotificationAction>[
       const AndroidNotificationAction(
@@ -449,7 +471,7 @@ Future<void> _showNotification({
   ];
 
   await plugin.show(
-    message.messageId?.hashCode ?? _notificationIdForPayload(payload),
+    notificationId,
     title,
     body,
     NotificationDetails(
@@ -474,6 +496,7 @@ Future<void> _showNotification({
               )
             : null,
         actions: androidActions,
+        tag: androidTag,
       ),
       iOS: DarwinNotificationDetails(
         presentAlert: true,
@@ -643,6 +666,20 @@ class FcmService {
     }
 
     _localNotificationsInitialized = true;
+  }
+
+  Future<void> clearDeliveredNotifications() async {
+    if (kIsWeb) return;
+
+    try {
+      if (!_localNotificationsInitialized) {
+        await initializeLocalNotifications();
+      }
+      await _localNotifications.cancelAll();
+      debugPrint('[FCM] Cleared delivered app notifications');
+    } catch (e) {
+      debugPrint('[FCM] Failed to clear delivered notifications: $e');
+    }
   }
 
   Future<String?> getToken() async {

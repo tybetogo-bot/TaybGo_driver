@@ -289,6 +289,13 @@
   "noEarningsData": "Nessun dato sui guadagni",
   "completeOrdersToSeeEarnings": "Completa ordini per vedere i tuoi guadagni",
   "verified": "Verificato",
+  "approved": "Approvato",
+  "joinedOn": "Iscritto il {date}",
+  "@joinedOn": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "driver": "Autista",
   "knowledgeBase": "Base di conoscenza",
   "searchForHelp": "Cerca aiuto...",

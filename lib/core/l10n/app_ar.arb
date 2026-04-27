@@ -214,8 +214,8 @@
   "promotionalNotifications": "الإشعارات الترويجية",
   "soundEnabled": "الصوت مفعل",
   "vibrationEnabled": "الاهتزاز مفعل",
-  "notificationSoundRepeats": "????? ??? ???????",
-  "notificationSoundRepeatsEnabledDesc": "????? ??? ??????? {count} ??? ??? ?????.",
+  "notificationSoundRepeats": "تكرار صوت الإشعار",
+  "notificationSoundRepeatsEnabledDesc": "تشغيل صوت التنبيه {count} مرة لكل إشعار.",
   "@notificationSoundRepeatsEnabledDesc": {
     "placeholders": {
       "count": {
@@ -223,10 +223,10 @@
       }
     }
   },
-  "notificationSoundRepeatsDisabledDesc": "???? ????? ????? ??????? ??? ???? ????? ???????.",
-  "notificationSoundRepeatsPickerDesc": "???? ??? ???? ????? ??? ??????? ??? ?????.",
-  "notificationRepeatTime": "??? ?????",
-  "notificationRepeatTimes": "{count} ????",
+  "notificationSoundRepeatsDisabledDesc": "فعّل الصوت أولاً لاختيار عدد مرات تكرار التنبيه.",
+  "notificationSoundRepeatsPickerDesc": "اختر عدد مرات تكرار صوت التنبيه لكل إشعار.",
+  "notificationRepeatTime": "مرة واحدة",
+  "notificationRepeatTimes": "{count} مرات",
   "@notificationRepeatTimes": {
     "placeholders": {
       "count": {
@@ -300,6 +300,13 @@
   "noEarningsData": "لا توجد بيانات أرباح",
   "completeOrdersToSeeEarnings": "أكمل الطلبات لرؤية أرباحك",
   "verified": "موثق",
+  "approved": "مقبول",
+  "joinedOn": "انضم في {date}",
+  "@joinedOn": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "driver": "سائق",
   "knowledgeBase": "قاعدة المعرفة",
   "searchForHelp": "البحث عن مساعدة...",

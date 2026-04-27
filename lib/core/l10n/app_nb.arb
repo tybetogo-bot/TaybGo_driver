@@ -289,6 +289,13 @@
   "noEarningsData": "Ingen inntektsdata",
   "completeOrdersToSeeEarnings": "Fullfør bestillinger for å se inntektene dine",
   "verified": "Verifisert",
+  "approved": "Godkjent",
+  "joinedOn": "Medlem siden {date}",
+  "@joinedOn": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "driver": "Sjåfør",
   "knowledgeBase": "Kunnskapsbase",
   "searchForHelp": "Søk etter hjelp...",

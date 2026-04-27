@@ -826,6 +826,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get verified => 'Verified';
 
   @override
+  String get approved => 'Approved';
+
+  @override
+  String joinedOn(Object date) {
+    return 'Joined $date';
+  }
+
+  @override
   String get driver => 'Driver';
 
   @override

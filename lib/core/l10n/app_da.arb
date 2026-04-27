@@ -289,6 +289,13 @@
   "noEarningsData": "Ingen indtjeningsdata",
   "completeOrdersToSeeEarnings": "Afslut ordrer for at se din indtjening",
   "verified": "Verificeret",
+  "approved": "Godkendt",
+  "joinedOn": "Tilmeldt {date}",
+  "@joinedOn": {
+    "placeholders": {
+      "date": {}
+    }
+  },
   "driver": "Chauffør",
   "knowledgeBase": "Vidensbase",
   "searchForHelp": "Søg efter hjælp...",
