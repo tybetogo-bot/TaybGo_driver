@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -28,52 +30,94 @@ import 'features/support/application/support_provider.dart';
 
 GoRouter? _router;
 _NotificationCleanupObserver? _notificationCleanupObserver;
+bool _crashlyticsReady = false;
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+Future<void> main() async {
+  await runZonedGuarded(() async {
+    WidgetsFlutterBinding.ensureInitialized();
 
-  // Default to prod if main.dart is launched directly (no flavor entry-point)
-  if (!AppConfig.isInitialized) {
-    AppConfig.init(env: Environment.prod);
-  }
-  await AppConfig.persistEnvironment();
+    // Default to prod if main.dart is launched directly (no flavor entry-point)
+    if (!AppConfig.isInitialized) {
+      AppConfig.init(env: Environment.prod);
+    }
+    await AppConfig.persistEnvironment();
 
-  await initializeDateFormatting();
+    await initializeDateFormatting();
 
-  // Initialize Firebase
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  debugPrint('[Main] Firebase initialized');
+    // Initialize Firebase
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    debugPrint('[Main] Firebase initialized');
 
-  // Initialize FCM (permissions, channels, listeners)
-  // On web, run non-blocking so a stuck permission prompt doesn't prevent app load
-  final fcmService = FcmService();
+    await _initializeCrashlytics();
+
+    // Initialize FCM (permissions, channels, listeners)
+    // On web, run non-blocking so a stuck permission prompt doesn't prevent app load
+    final fcmService = FcmService();
+    if (kIsWeb) {
+      fcmService.initialize().catchError((e) {
+        debugPrint('[Main] FCM web init failed: $e');
+      });
+    } else {
+      await fcmService.initialize();
+    }
+    _notificationCleanupObserver = _NotificationCleanupObserver(fcmService);
+    WidgetsBinding.instance.addObserver(_notificationCleanupObserver!);
+
+    // Initialize auth provider before running app
+    final authProvider = AuthProvider();
+    await authProvider.initialize();
+
+    // Initialize tour provider
+    final tourProvider = TourProvider();
+    await tourProvider.init();
+
+    // Create router once with the auth provider
+    _router = AppRouter.createRouter(authProvider);
+
+    runApp(
+      TaybGoDriverApp(authProvider: authProvider, tourProvider: tourProvider),
+    );
+
+    unawaited(fcmService.clearDeliveredNotifications());
+    fcmService.onNotificationTap = _handleNotificationTap;
+  }, _recordFatalError);
+}
+
+Future<void> _initializeCrashlytics() async {
   if (kIsWeb) {
-    fcmService.initialize().catchError((e) {
-      debugPrint('[Main] FCM web init failed: $e');
-    });
-  } else {
-    await fcmService.initialize();
+    return;
   }
-  _notificationCleanupObserver = _NotificationCleanupObserver(fcmService);
-  WidgetsBinding.instance.addObserver(_notificationCleanupObserver!);
 
-  // Initialize auth provider before running app
-  final authProvider = AuthProvider();
-  await authProvider.initialize();
-
-  // Initialize tour provider
-  final tourProvider = TourProvider();
-  await tourProvider.init();
-
-  // Create router once with the auth provider
-  _router = AppRouter.createRouter(authProvider);
-
-  runApp(
-    TaybGoDriverApp(authProvider: authProvider, tourProvider: tourProvider),
+  await FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(
+    !kDebugMode || AppConfig.isProd,
   );
+  _crashlyticsReady = true;
 
-  unawaited(fcmService.clearDeliveredNotifications());
-  fcmService.onNotificationTap = _handleNotificationTap;
+  FlutterError.onError = (FlutterErrorDetails details) {
+    FlutterError.presentError(details);
+    unawaited(FirebaseCrashlytics.instance.recordFlutterFatalError(details));
+  };
+
+  PlatformDispatcher.instance.onError = (Object error, StackTrace stack) {
+    unawaited(
+      FirebaseCrashlytics.instance.recordError(error, stack, fatal: true),
+    );
+    return true;
+  };
+}
+
+void _recordFatalError(Object error, StackTrace stack) {
+  debugPrint('[Main] Uncaught error: $error');
+
+  if (kIsWeb || !_crashlyticsReady) {
+    return;
+  }
+
+  unawaited(
+    FirebaseCrashlytics.instance.recordError(error, stack, fatal: true),
+  );
 }
 
 void _handleNotificationTap(Map<String, dynamic> _) {

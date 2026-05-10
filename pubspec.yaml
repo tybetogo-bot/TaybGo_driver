@@ -1,7 +1,7 @@
 name: teybatdriver
 description: "TaybGo Driver - Driver partner application"
 publish_to: 'none'
-version: 1.0.8+9
+version: 1.0.9+10
 
 environment:
   sdk: ^3.10.4
@@ -48,6 +48,7 @@ dependencies:
 
   # Firebase
   firebase_core: ^3.8.1
+  firebase_crashlytics: ^4.3.10
   firebase_messaging: ^15.1.6
 
   # Local notifications (for foreground FCM display)

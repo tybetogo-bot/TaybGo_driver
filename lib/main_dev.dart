@@ -1,7 +1,7 @@
 import 'core/config/app_config.dart';
 import 'main.dart' as app;
 
-void main() {
+Future<void> main() {
   AppConfig.init(env: Environment.dev);
-  app.main();
+  return app.main();
 }
