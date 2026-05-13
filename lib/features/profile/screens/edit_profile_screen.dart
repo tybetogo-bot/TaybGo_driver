@@ -320,6 +320,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
 
+    final l10n = AppLocalizations.of(context)!;
+    final requiredDocumentsError = _validateCarRequiredDocuments(l10n);
+    if (requiredDocumentsError != null) {
+      _showErrorSnackBar(requiredDocumentsError);
+      return;
+    }
+
     final requiresApproval = _hasVehicleDataChanges() || _hasDocumentChanges();
     if (requiresApproval) {
       final confirmed = await _showProfileApprovalWarningDialog();
@@ -329,7 +336,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     setState(() => _isSaving = true);
 
     final driverProvider = context.read<DriverProvider>();
-    final l10n = AppLocalizations.of(context)!;
     final isCarType = _isCarVehicleType(_selectedVehicleType);
 
     final success = await driverProvider.updateUserProfile(
@@ -386,16 +392,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       );
       context.pop();
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(driverProvider.error ?? l10n.failedToUpdateProfile),
-          backgroundColor: AppColors.error,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-      );
+      _showErrorSnackBar(driverProvider.error ?? l10n.failedToUpdateProfile);
     }
   }
 
@@ -834,6 +831,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
                 l10n: l10n,
+                isRequired: _requiresCarRegistrationDocuments,
               ),
 
               const SizedBox(height: 12),
@@ -855,6 +853,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
                 l10n: l10n,
+                isRequired: _requiresCarRegistrationDocuments,
               ),
 
               const SizedBox(height: 12),
@@ -898,6 +897,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
                 l10n: l10n,
+                isRequired: _requiresCarRegistrationDocuments,
               ),
 
               const SizedBox(height: 12),
@@ -919,6 +919,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
                 l10n: l10n,
+                isRequired: _requiresCarRegistrationDocuments,
               ),
 
               const SizedBox(height: 12),
@@ -940,6 +941,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
                 l10n: l10n,
+                isRequired: _requiresCarRegistrationDocuments,
               ),
 
               const SizedBox(height: 36),
@@ -1140,6 +1142,40 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _bankDocumentUploading;
 
   bool get _isSaveActionDisabled => _isSaving || _isAnyDocumentUploading;
+
+  bool get _requiresCarRegistrationDocuments =>
+      _isCarVehicleType(_selectedVehicleType);
+
+  String? _validateCarRequiredDocuments(AppLocalizations l10n) {
+    if (!_requiresCarRegistrationDocuments) return null;
+
+    final requiredDocuments = <MapEntry<String, String?>>[
+      MapEntry(l10n.driversLicense, _drivingLicenseUrl),
+      MapEntry(l10n.nationalId, _idDocumentUrl),
+      MapEntry(l10n.healthInsuranceDocument, _healthInsuranceDocumentUrl),
+      MapEntry(l10n.addressDocument, _addressDocumentUrl),
+      MapEntry(l10n.bankDocument, _bankDocumentUrl),
+    ];
+
+    for (final document in requiredDocuments) {
+      if (_normalizeDocumentUrl(document.value) == null) {
+        return l10n.pleaseUploadDocument(document.key);
+      }
+    }
+
+    return null;
+  }
+
+  void _showErrorSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: AppColors.error,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+      ),
+    );
+  }
 
   bool _hasVehicleDataChanges() {
     final profile = _driverProvider.profile;
@@ -1595,10 +1631,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     required Color secondaryColor,
     required Color surfaceColor,
     required AppLocalizations l10n,
+    bool isRequired = false,
   }) {
     final previewBytes = bytes;
     final hasBytes = previewBytes != null && previewBytes.isNotEmpty;
-    final isUploaded = url != null && url.isNotEmpty;
+    final isUploaded = _normalizeDocumentUrl(url) != null;
 
     return GestureDetector(
       onTap: isUploading || _isSaving ? null : onTap,
@@ -1653,13 +1690,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    label,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: textColor,
-                    ),
+                  Row(
+                    children: [
+                      Flexible(
+                        child: Text(
+                          label,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: textColor,
+                          ),
+                        ),
+                      ),
+                      if (isRequired)
+                        const Text(
+                          ' *',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.error,
+                          ),
+                        ),
+                    ],
                   ),
                   const SizedBox(height: 4),
                   if (isUploading)

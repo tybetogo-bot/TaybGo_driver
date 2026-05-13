@@ -1,7 +1,7 @@
 name: teybatdriver
 description: "TaybGo Driver - Driver partner application"
 publish_to: 'none'
-version: 1.0.9+10
+version: 1.0.10+11
 
 environment:
   sdk: ^3.10.4
