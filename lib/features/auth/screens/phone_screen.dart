@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:phone_otp_auth_ui/phone_otp_auth_ui.dart';
 import 'package:provider/provider.dart';
+import '../../../core/config/release_info.dart';
 import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
@@ -373,6 +374,19 @@ class _PhoneScreenState extends State<PhoneScreen> {
                       ),
                     ),
                   ],
+                ),
+              ),
+
+              const SizedBox(height: 12),
+
+              // App version / release date (subtle)
+              Center(
+                child: Text(
+                  'v${ReleaseInfo.version} · ${ReleaseInfo.releaseDate}',
+                  style: TextStyle(
+                    fontSize: 11,
+                    color: secondaryColor.withValues(alpha: 0.7),
+                  ),
                 ),
               ),
             ],
