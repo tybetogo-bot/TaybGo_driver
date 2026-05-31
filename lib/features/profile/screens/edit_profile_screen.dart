@@ -1240,6 +1240,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Future<PickedDocument?> _pickImageWithSource(ImageSource source) async {
     final picked = await _imagePicker.pickImage(
       source: source,
+      maxWidth: 1600,
+      maxHeight: 1600,
       imageQuality: 80,
     );
     if (picked == null) return null;
@@ -1677,7 +1679,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: hasBytes
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.memory(previewBytes, fit: BoxFit.cover),
+                      child: Image.memory(
+                        previewBytes,
+                        fit: BoxFit.cover,
+                        // Decode to a thumbnail-sized bitmap, not the full
+                        // image. Full-res decodes across several documents can
+                        // exhaust memory and reload the tab on low-end web.
+                        cacheWidth: 200,
+                      ),
                     )
                   : Icon(
                       icon,
