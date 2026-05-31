@@ -1,5 +1,5 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
@@ -42,15 +42,15 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   final CloudinaryService _cloudinaryService = CloudinaryService();
   final ImagePicker _imagePicker = ImagePicker();
 
-  File? _drivingLicenseFile;
+  Uint8List? _drivingLicenseBytes;
   String? _drivingLicenseUrl;
   bool _drivingLicenseUploading = false;
 
-  File? _idDocumentFile;
+  Uint8List? _idDocumentBytes;
   String? _idDocumentUrl;
   bool _idDocumentUploading = false;
 
-  File? _otherDocumentsFile;
+  Uint8List? _otherDocumentsBytes;
   String? _otherDocumentsUrl;
   bool _otherDocumentsUploading = false;
 
@@ -809,7 +809,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   Future<void> _pickAndUpload({
     required String label,
     required String folder,
-    required void Function(File? file) setFile,
+    required void Function(Uint8List? bytes) setBytes,
     required void Function(String? url) setUrl,
     required void Function(bool loading) setLoading,
   }) async {
@@ -860,27 +860,50 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
     if (source == null) return;
 
-    final picked = await _imagePicker.pickImage(source: source, imageQuality: 80);
-    if (picked == null) return;
+    try {
+      // Constrain dimensions/quality so a full-resolution photo isn't decoded
+      // into memory. On web an oversized image can exhaust the tab's heap and
+      // crash/reload the app; this keeps every platform's footprint small.
+      final picked = await _imagePicker.pickImage(
+        source: source,
+        maxWidth: 1600,
+        maxHeight: 1600,
+        imageQuality: 80,
+      );
+      if (picked == null) return;
 
-    final file = File(picked.path);
-    setState(() {
-      setFile(file);
-      setLoading(true);
-      _error = null;
-    });
+      // Read bytes once — works on web (no filesystem) and native alike.
+      final bytes = await picked.readAsBytes();
+      if (!mounted) return;
+      setState(() {
+        setBytes(bytes);
+        setLoading(true);
+        _error = null;
+      });
 
-    final url = await _cloudinaryService.uploadImage(file, folder: folder);
+      final url = await _cloudinaryService.uploadImage(
+        bytes,
+        filename: picked.name,
+        folder: folder,
+      );
 
-    if (!mounted) return;
-    setState(() {
-      setLoading(false);
-      if (url != null) {
-        setUrl(url);
-      } else {
+      if (!mounted) return;
+      setState(() {
+        setLoading(false);
+        if (url != null) {
+          setUrl(url);
+        } else {
+          _error = l10n.uploadFailed;
+        }
+      });
+    } catch (e) {
+      debugPrint('[ApplicationScreen] Pick/upload error: $e');
+      if (!mounted) return;
+      setState(() {
+        setLoading(false);
         _error = l10n.uploadFailed;
-      }
-    });
+      });
+    }
   }
 
   Widget _buildDocumentsStep(Color textColor, Color secondaryColor, Color surfaceColor, AppLocalizations l10n) {
@@ -909,13 +932,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           _buildUploadCard(
             label: l10n.driversLicense,
             icon: Icons.badge_outlined,
-            file: _drivingLicenseFile,
+            bytes: _drivingLicenseBytes,
             url: _drivingLicenseUrl,
             isUploading: _drivingLicenseUploading,
             onTap: () => _pickAndUpload(
               label: l10n.driversLicense,
               folder: 'driver_licenses',
-              setFile: (f) => _drivingLicenseFile = f,
+              setBytes: (b) => _drivingLicenseBytes = b,
               setUrl: (u) => _drivingLicenseUrl = u,
               setLoading: (l) => _drivingLicenseUploading = l,
             ),
@@ -930,13 +953,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           _buildUploadCard(
             label: l10n.nationalId,
             icon: Icons.credit_card_outlined,
-            file: _idDocumentFile,
+            bytes: _idDocumentBytes,
             url: _idDocumentUrl,
             isUploading: _idDocumentUploading,
             onTap: () => _pickAndUpload(
               label: l10n.nationalId,
               folder: 'id_documents',
-              setFile: (f) => _idDocumentFile = f,
+              setBytes: (b) => _idDocumentBytes = b,
               setUrl: (u) => _idDocumentUrl = u,
               setLoading: (l) => _idDocumentUploading = l,
             ),
@@ -951,13 +974,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           _buildUploadCard(
             label: l10n.documents,
             icon: Icons.description_outlined,
-            file: _otherDocumentsFile,
+            bytes: _otherDocumentsBytes,
             url: _otherDocumentsUrl,
             isUploading: _otherDocumentsUploading,
             onTap: () => _pickAndUpload(
               label: l10n.documents,
               folder: 'other_documents',
-              setFile: (f) => _otherDocumentsFile = f,
+              setBytes: (b) => _otherDocumentsBytes = b,
               setUrl: (u) => _otherDocumentsUrl = u,
               setLoading: (l) => _otherDocumentsUploading = l,
             ),
@@ -997,7 +1020,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   Widget _buildUploadCard({
     required String label,
     required IconData icon,
-    required File? file,
+    required Uint8List? bytes,
     required String? url,
     required bool isUploading,
     required VoidCallback onTap,
@@ -1006,7 +1029,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     required Color surfaceColor,
     required AppLocalizations l10n,
   }) {
-    final hasFile = file != null;
+    final hasFile = bytes != null;
     final isUploaded = url != null;
 
     return GestureDetector(
@@ -1047,10 +1070,19 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                     : AppColors.primary.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: hasFile && !kIsWeb
+              child: hasFile
                   ? ClipRRect(
                       borderRadius: BorderRadius.circular(12),
-                      child: Image.file(file, fit: BoxFit.cover),
+                      child: Image.memory(
+                        bytes,
+                        fit: BoxFit.cover,
+                        width: 56,
+                        height: 56,
+                        // Decode only as large as the thumbnail needs (2x for
+                        // crisp rendering) instead of the full picked image.
+                        cacheWidth: 112,
+                        cacheHeight: 112,
+                      ),
                     )
                   : Icon(
                       icon,
