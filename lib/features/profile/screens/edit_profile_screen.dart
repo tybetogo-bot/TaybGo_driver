@@ -148,7 +148,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // Initialize service toggles
     _acceptsFood = profile?.acceptsFood ?? false;
     _acceptsShipping = profile?.acceptsShipping ?? false;
-    _acceptsTaxi = profile?.acceptsTaxi ?? false;
+    _acceptsTaxi =
+        _isCarVehicleType(profile?.vehicleType) &&
+        (profile?.acceptsTaxi ?? false);
 
     if (profile != null) {
       _profileInitialized = true;
@@ -222,7 +224,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     _acceptsFood = profile.acceptsFood;
     _acceptsShipping = profile.acceptsShipping;
-    _acceptsTaxi = profile.acceptsTaxi;
+    _acceptsTaxi =
+        _isCarVehicleType(profile.vehicleType) && profile.acceptsTaxi;
 
     _profileInitialized = true;
 
@@ -367,7 +370,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           : null,
       acceptsFood: _acceptsFood,
       acceptsShipping: _acceptsShipping,
-      acceptsTaxi: _acceptsTaxi,
+      acceptsTaxi: isCarType ? _acceptsTaxi : false,
       drivingLicense: _drivingLicenseUrl,
       idDocument: _idDocumentUrl,
       otherDocuments: _otherDocumentsUrl,
@@ -591,7 +594,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 items: vehicleTypeItems,
                 hint: l10n.selectVehicleType,
                 onChanged: (value) {
-                  setState(() => _selectedVehicleType = value);
+                  setState(() {
+                    _selectedVehicleType = value;
+                    if (!_isCarVehicleType(value)) {
+                      _acceptsTaxi = false;
+                    }
+                  });
                 },
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
@@ -793,16 +801,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 surfaceColor,
                 textColor,
               ),
-              const SizedBox(height: 12),
-
-              _buildServiceToggle(
-                l10n.taxi,
-                Icons.local_taxi_outlined,
-                _acceptsTaxi,
-                (value) => setState(() => _acceptsTaxi = value),
-                surfaceColor,
-                textColor,
-              ),
+              if (_isCarVehicleType(_selectedVehicleType)) ...[
+                const SizedBox(height: 12),
+                _buildServiceToggle(
+                  l10n.taxi,
+                  Icons.local_taxi_outlined,
+                  _acceptsTaxi,
+                  (value) => setState(() => _acceptsTaxi = value),
+                  surfaceColor,
+                  textColor,
+                ),
+              ],
 
               const SizedBox(height: 28),
 

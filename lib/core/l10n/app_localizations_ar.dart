@@ -1507,4 +1507,119 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get failedToRejectOrder => 'Failed to reject order';
+
+  @override
+  String get changelog => 'سجل التغييرات';
+
+  @override
+  String get changelogTitle => 'ما الجديد؟';
+
+  @override
+  String get changelogSubtitle =>
+      'اطّلع سريعًا على أحدث التحسينات في تطبيق TaybGo Driver.';
+
+  @override
+  String get changelogCurrent => 'الحالي';
+
+  @override
+  String get changelogBuild => 'البنية';
+
+  @override
+  String get changelogReleased => 'صدر في';
+
+  @override
+  String get changelogReleaseNotes => 'ملاحظات الإصدار';
+
+  @override
+  String get changelogHighlights => 'أبرز التغييرات';
+
+  @override
+  String get changelogFixes => 'الإصلاحات';
+
+  @override
+  String get changelogImprovements => 'التحسينات';
+
+  @override
+  String get changelogStability => 'الاستقرار';
+
+  @override
+  String get changelogPlatform => 'المنصة';
+
+  @override
+  String get changelogRelease => 'الإصدار';
+
+  @override
+  String get changelogDateAug9 => '9 أغسطس 2026';
+
+  @override
+  String get changelogDateMay31 => '31 مايو 2026';
+
+  @override
+  String get changelogDateMay24 => '24 مايو 2026';
+
+  @override
+  String get changelogDateMay13 => '13 مايو 2026';
+
+  @override
+  String get changelogDateMay11 => '11 مايو 2026';
+
+  @override
+  String get changelogCurrentTaxi =>
+      'تم تقييد اختيار خدمة التاكسي على سائقي السيارات ومنع سائقي الدراجات الهوائية من تفعيلها أثناء التسجيل وتعديل الملف الشخصي.';
+
+  @override
+  String get changelogVersion1113Upload =>
+      'تم تقليل استهلاك الذاكرة أثناء رفع الملفات على الويب لجعل رفع المستندات أكثر موثوقية على الأجهزة منخفضة الإمكانات.';
+
+  @override
+  String get changelogCurrentChangelog =>
+      'تمت إضافة سجل تغييرات مترجم وقابل للتوسيع إلى الملف الشخصي، مع سجل الإصدارات وأرقام البنية والتواريخ وملاحظات الإصدار.';
+
+  @override
+  String get changelogVersion1113Version =>
+      'تمت إضافة إصدار التطبيق وتاريخ الإصدار إلى شاشة تسجيل الدخول وشاشة بدء تشغيل الويب.';
+
+  @override
+  String get changelogCurrentRelease =>
+      'تم تحديث التطبيق إلى الإصدار 1.0.12+14 مع أحدث تحسينات تطبيق السائق.';
+
+  @override
+  String get changelogVersion1113Release =>
+      'تم تحديث نسخة متجر Play إلى الإصدار 1.0.11+13 (رمز الإصدار 13).';
+
+  @override
+  String get changelogVersion1112Release =>
+      'تم إصدار تطبيق السائق بالإصدار 1.0.11+12 وتسجيل بيانات الإصدار الخاصة به.';
+
+  @override
+  String get changelogVersion1011Documents =>
+      'تمت إضافة التحقق من المستندات المطلوبة لسائقي السيارات.';
+
+  @override
+  String get changelogVersion1011Uploads =>
+      'تم توضيح المستندات المطلوبة وتحسين عرض حالة الرفع.';
+
+  @override
+  String get changelogVersion1011Feedback =>
+      'تم تحسين التحقق ورسائل الخطأ عند حفظ تغييرات الملف الشخصي.';
+
+  @override
+  String get changelogVersion1011Release =>
+      'تم إصدار تطبيق السائق بالإصدار 1.0.10+11.';
+
+  @override
+  String get changelogVersion0910Crashlytics =>
+      'تمت إضافة تقارير Crashlytics للأخطاء الفادحة في إصدارات الإنتاج.';
+
+  @override
+  String get changelogVersion0910Notifications =>
+      'تم تحسين دورة حياة الإشعارات ومنع التكرار ومعالجة إشعارات الطلبات.';
+
+  @override
+  String get changelogVersion0910Platform =>
+      'تم تحديث إعدادات إصدارات Android وiOS وmacOS والويب مع بيئتي التطوير والإنتاج.';
+
+  @override
+  String get changelogVersion0910Release =>
+      'تم إصدار تطبيق السائق بالإصدار 1.0.9+10.';
 }

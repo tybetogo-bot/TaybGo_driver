@@ -1522,4 +1522,119 @@ class AppLocalizationsNl extends AppLocalizations {
 
   @override
   String get failedToRejectOrder => 'Failed to reject order';
+
+  @override
+  String get changelog => 'Wijzigingslogboek';
+
+  @override
+  String get changelogTitle => 'Wat is er nieuw?';
+
+  @override
+  String get changelogSubtitle =>
+      'Bekijk snel de nieuwste verbeteringen in TaybGo Driver.';
+
+  @override
+  String get changelogCurrent => 'Huidig';
+
+  @override
+  String get changelogBuild => 'Build';
+
+  @override
+  String get changelogReleased => 'Uitgebracht';
+
+  @override
+  String get changelogReleaseNotes => 'Releaseopmerkingen';
+
+  @override
+  String get changelogHighlights => 'Hoogtepunten';
+
+  @override
+  String get changelogFixes => 'Oplossingen';
+
+  @override
+  String get changelogImprovements => 'Verbeteringen';
+
+  @override
+  String get changelogStability => 'Stabiliteit';
+
+  @override
+  String get changelogPlatform => 'Platform';
+
+  @override
+  String get changelogRelease => 'Release';
+
+  @override
+  String get changelogDateAug9 => '9 augustus 2026';
+
+  @override
+  String get changelogDateMay31 => '31 mei 2026';
+
+  @override
+  String get changelogDateMay24 => '24 mei 2026';
+
+  @override
+  String get changelogDateMay13 => '13 mei 2026';
+
+  @override
+  String get changelogDateMay11 => '11 mei 2026';
+
+  @override
+  String get changelogCurrentTaxi =>
+      'De taxidienst kan nu alleen door automobilisten worden geselecteerd; fietskoeriers kunnen deze tijdens registratie en profielbewerking niet meer inschakelen.';
+
+  @override
+  String get changelogVersion1113Upload =>
+      'Het geheugengebruik bij webuploads is verlaagd, zodat het uploaden van documenten betrouwbaarder is op minder krachtige apparaten.';
+
+  @override
+  String get changelogCurrentChangelog =>
+      'Een gelokaliseerd, uitklapbaar wijzigingslogboek is aan Profiel toegevoegd met releasegeschiedenis, buildnummers, datums en releaseopmerkingen.';
+
+  @override
+  String get changelogVersion1113Version =>
+      'De appversie en releasedatum worden nu getoond op het inlogscherm en het web-startscherm.';
+
+  @override
+  String get changelogCurrentRelease =>
+      'De app is bijgewerkt naar versie 1.0.12+14 met de nieuwste verbeteringen voor de chauffeursapp.';
+
+  @override
+  String get changelogVersion1113Release =>
+      'De Play Store-build is bijgewerkt naar versie 1.0.11+13 (versiecode 13).';
+
+  @override
+  String get changelogVersion1112Release =>
+      'De chauffeursapp is uitgebracht als versie 1.0.11+12 en de releasemetadata is vastgelegd.';
+
+  @override
+  String get changelogVersion1011Documents =>
+      'Validatie van verplichte documenten voor automobilisten is toegevoegd.';
+
+  @override
+  String get changelogVersion1011Uploads =>
+      'Verplichte documenten zijn duidelijker gemarkeerd en de verwerking van de uploadstatus is verbeterd.';
+
+  @override
+  String get changelogVersion1011Feedback =>
+      'Validatie en foutmeldingen bij het opslaan van profielwijzigingen zijn verbeterd.';
+
+  @override
+  String get changelogVersion1011Release =>
+      'De chauffeursapp is uitgebracht als versie 1.0.10+11.';
+
+  @override
+  String get changelogVersion0910Crashlytics =>
+      'Crashlytics-rapportage voor fatale fouten in release-builds is toegevoegd.';
+
+  @override
+  String get changelogVersion0910Notifications =>
+      'De levenscyclus van meldingen, deduplicatie en de verwerking van ordermeldingen zijn verbeterd.';
+
+  @override
+  String get changelogVersion0910Platform =>
+      'De releaseconfiguratie voor Android, iOS, macOS en web is vernieuwd met ontwikkel- en productieflavors.';
+
+  @override
+  String get changelogVersion0910Release =>
+      'De chauffeursapp is uitgebracht als versie 1.0.9+10.';
 }

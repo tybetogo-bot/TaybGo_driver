@@ -1518,4 +1518,119 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get failedToRejectOrder => 'Failed to reject order';
+
+  @override
+  String get changelog => 'Changelog';
+
+  @override
+  String get changelogTitle => 'What\'s new';
+
+  @override
+  String get changelogSubtitle =>
+      'A quick look at the latest improvements in TaybGo Driver.';
+
+  @override
+  String get changelogCurrent => 'Current';
+
+  @override
+  String get changelogBuild => 'Build';
+
+  @override
+  String get changelogReleased => 'Released';
+
+  @override
+  String get changelogReleaseNotes => 'Release notes';
+
+  @override
+  String get changelogHighlights => 'Highlights';
+
+  @override
+  String get changelogFixes => 'Fixes';
+
+  @override
+  String get changelogImprovements => 'Improvements';
+
+  @override
+  String get changelogStability => 'Stability';
+
+  @override
+  String get changelogPlatform => 'Platform';
+
+  @override
+  String get changelogRelease => 'Release';
+
+  @override
+  String get changelogDateAug9 => '9 August 2026';
+
+  @override
+  String get changelogDateMay31 => '31 May 2026';
+
+  @override
+  String get changelogDateMay24 => '24 May 2026';
+
+  @override
+  String get changelogDateMay13 => '13 May 2026';
+
+  @override
+  String get changelogDateMay11 => '11 May 2026';
+
+  @override
+  String get changelogCurrentTaxi =>
+      'Restricted Taxi service selection to car drivers and prevented bicycle drivers from enabling it during registration and profile editing.';
+
+  @override
+  String get changelogVersion1113Upload =>
+      'Reduced web upload memory usage to make document uploads more reliable on low-end devices.';
+
+  @override
+  String get changelogCurrentChangelog =>
+      'Added a localized, expandable changelog to Profile with release history, build numbers, dates, and release notes.';
+
+  @override
+  String get changelogVersion1113Version =>
+      'Added the app version and release date to the sign-in screen and web splash screen.';
+
+  @override
+  String get changelogCurrentRelease =>
+      'Updated the app to version 1.0.12+14 with today\'s driver-app improvements.';
+
+  @override
+  String get changelogVersion1113Release =>
+      'Updated the Play Store build to version 1.0.11+13 (version code 13).';
+
+  @override
+  String get changelogVersion1112Release =>
+      'Released driver app version 1.0.11+12 and recorded its release metadata.';
+
+  @override
+  String get changelogVersion1011Documents =>
+      'Added required-document validation for car drivers.';
+
+  @override
+  String get changelogVersion1011Uploads =>
+      'Marked required documents clearly and improved upload-state handling.';
+
+  @override
+  String get changelogVersion1011Feedback =>
+      'Improved validation and error feedback when saving profile changes.';
+
+  @override
+  String get changelogVersion1011Release =>
+      'Released driver app version 1.0.10+11.';
+
+  @override
+  String get changelogVersion0910Crashlytics =>
+      'Added Crashlytics reporting for fatal errors in release builds.';
+
+  @override
+  String get changelogVersion0910Notifications =>
+      'Improved notification lifecycle, deduplication, and order-notification handling.';
+
+  @override
+  String get changelogVersion0910Platform =>
+      'Refreshed Android, iOS, macOS, and web release configuration with development and production flavors.';
+
+  @override
+  String get changelogVersion0910Release =>
+      'Released driver app version 1.0.9+10.';
 }

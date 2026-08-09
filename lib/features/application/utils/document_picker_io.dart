@@ -3,7 +3,7 @@ import 'package:file_picker/file_picker.dart';
 import '../models/picked_document.dart';
 
 Future<PickedDocument?> pickDocument({required bool imagesOnly}) async {
-  final result = await FilePicker.platform.pickFiles(
+  final result = await FilePicker.pickFiles(
     withData: true,
     type: imagesOnly ? FileType.image : FileType.any,
   );

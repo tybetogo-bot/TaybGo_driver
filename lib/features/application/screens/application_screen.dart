@@ -79,6 +79,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   bool get _isBicycle => _selectedVehicle == 'BIKE';
   bool get _isMotorcycle => _selectedVehicle == 'MOTOR';
+  bool get _canAcceptTaxi => _selectedVehicle == 'CAR';
   bool get _requiresDrivingLicense => !_isBicycle;
   bool get _requiresFullVehicleDetails =>
       _selectedVehicle == 'CAR' || _selectedVehicle == 'VAN';
@@ -197,7 +198,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         }
         return null;
       case _RegistrationStep.services:
-        if (!_acceptsFood && !_acceptsShipping && !_acceptsTaxi) {
+        if (!_acceptsFood &&
+            !_acceptsShipping &&
+            !(_canAcceptTaxi && _acceptsTaxi)) {
           return l10n.pleaseSelectService;
         }
         return null;
@@ -351,7 +354,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         vehicleYear: vehicleYear,
         acceptsFood: _acceptsFood,
         acceptsShipping: _acceptsShipping,
-        acceptsTaxi: _acceptsTaxi,
+        acceptsTaxi: _canAcceptTaxi && _acceptsTaxi,
         drivingLicense: _requiresDrivingLicense ? _drivingLicenseUrl : null,
         idDocument: _idDocumentUrl,
         healthInsuranceDocument: _healthInsuranceDocumentUrl,
@@ -790,6 +793,9 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                 onTap: () => setState(() {
                   _selectedVehicle = vehicle['value'];
                   _error = null;
+                  if (!_canAcceptTaxi) {
+                    _acceptsTaxi = false;
+                  }
                   if (_isBicycle) {
                     _selectedCarSize = null;
                     _plateNumberController.clear();
@@ -1057,17 +1063,19 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             secondaryColor: secondaryColor,
             surfaceColor: surfaceColor,
           ),
-          const SizedBox(height: 12),
-          _buildServiceCard(
-            title: l10n.taxi,
-            description: l10n.transportPassengersDesc,
-            icon: Icons.local_taxi_outlined,
-            isSelected: _acceptsTaxi,
-            onTap: () => setState(() => _acceptsTaxi = !_acceptsTaxi),
-            textColor: textColor,
-            secondaryColor: secondaryColor,
-            surfaceColor: surfaceColor,
-          ),
+          if (_canAcceptTaxi) ...[
+            const SizedBox(height: 12),
+            _buildServiceCard(
+              title: l10n.taxi,
+              description: l10n.transportPassengersDesc,
+              icon: Icons.local_taxi_outlined,
+              isSelected: _acceptsTaxi,
+              onTap: () => setState(() => _acceptsTaxi = !_acceptsTaxi),
+              textColor: textColor,
+              secondaryColor: secondaryColor,
+              surfaceColor: surfaceColor,
+            ),
+          ],
 
           const SizedBox(height: 24),
 

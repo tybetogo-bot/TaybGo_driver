@@ -1534,4 +1534,119 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get failedToRejectOrder => 'Failed to reject order';
+
+  @override
+  String get changelog => 'Änderungsprotokoll';
+
+  @override
+  String get changelogTitle => 'Was ist neu?';
+
+  @override
+  String get changelogSubtitle =>
+      'Ein kurzer Überblick über die neuesten Verbesserungen in TaybGo Driver.';
+
+  @override
+  String get changelogCurrent => 'Aktuell';
+
+  @override
+  String get changelogBuild => 'Build';
+
+  @override
+  String get changelogReleased => 'Veröffentlicht';
+
+  @override
+  String get changelogReleaseNotes => 'Versionshinweise';
+
+  @override
+  String get changelogHighlights => 'Highlights';
+
+  @override
+  String get changelogFixes => 'Fehlerbehebungen';
+
+  @override
+  String get changelogImprovements => 'Verbesserungen';
+
+  @override
+  String get changelogStability => 'Stabilität';
+
+  @override
+  String get changelogPlatform => 'Plattform';
+
+  @override
+  String get changelogRelease => 'Veröffentlichung';
+
+  @override
+  String get changelogDateAug9 => '9. August 2026';
+
+  @override
+  String get changelogDateMay31 => '31. Mai 2026';
+
+  @override
+  String get changelogDateMay24 => '24. Mai 2026';
+
+  @override
+  String get changelogDateMay13 => '13. Mai 2026';
+
+  @override
+  String get changelogDateMay11 => '11. Mai 2026';
+
+  @override
+  String get changelogCurrentTaxi =>
+      'Die Auswahl des Taxidienstes wurde auf Autofahrer beschränkt; Fahrradfahrer können ihn bei Registrierung und Profilbearbeitung nicht mehr aktivieren.';
+
+  @override
+  String get changelogVersion1113Upload =>
+      'Der Speicherverbrauch bei Web-Uploads wurde reduziert, damit Dokumentuploads auf leistungsschwächeren Geräten zuverlässiger funktionieren.';
+
+  @override
+  String get changelogCurrentChangelog =>
+      'Ein lokalisiertes, aufklappbares Änderungsprotokoll mit Versionshistorie, Buildnummern, Daten und Versionshinweisen wurde zum Profil hinzugefügt.';
+
+  @override
+  String get changelogVersion1113Version =>
+      'App-Version und Veröffentlichungsdatum werden jetzt auf dem Anmeldebildschirm und im Web-Startbildschirm angezeigt.';
+
+  @override
+  String get changelogCurrentRelease =>
+      'Die App wurde auf Version 1.0.12+14 mit den neuesten Verbesserungen der Fahrer-App aktualisiert.';
+
+  @override
+  String get changelogVersion1113Release =>
+      'Der Play-Store-Build wurde auf Version 1.0.11+13 (Versionscode 13) aktualisiert.';
+
+  @override
+  String get changelogVersion1112Release =>
+      'Die Fahrer-App wurde in Version 1.0.11+12 veröffentlicht und ihre Veröffentlichungsmetadaten wurden hinterlegt.';
+
+  @override
+  String get changelogVersion1011Documents =>
+      'Eine Prüfung der erforderlichen Dokumente für Autofahrer wurde hinzugefügt.';
+
+  @override
+  String get changelogVersion1011Uploads =>
+      'Erforderliche Dokumente werden deutlicher markiert und der Upload-Status wurde verbessert.';
+
+  @override
+  String get changelogVersion1011Feedback =>
+      'Validierung und Fehlermeldungen beim Speichern von Profiländerungen wurden verbessert.';
+
+  @override
+  String get changelogVersion1011Release =>
+      'Die Fahrer-App wurde in Version 1.0.10+11 veröffentlicht.';
+
+  @override
+  String get changelogVersion0910Crashlytics =>
+      'Crashlytics-Berichte für schwerwiegende Fehler in Release-Builds wurden hinzugefügt.';
+
+  @override
+  String get changelogVersion0910Notifications =>
+      'Benachrichtigungsabläufe, Duplikaterkennung und die Verarbeitung von Bestellbenachrichtigungen wurden verbessert.';
+
+  @override
+  String get changelogVersion0910Platform =>
+      'Die Release-Konfiguration für Android, iOS, macOS und Web wurde mit Entwicklungs- und Produktions-Flavors aktualisiert.';
+
+  @override
+  String get changelogVersion0910Release =>
+      'Die Fahrer-App wurde in Version 1.0.9+10 veröffentlicht.';
 }

@@ -2965,6 +2965,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to reject order'**
   String get failedToRejectOrder;
+
+  /// No description provided for @changelog.
+  ///
+  /// In en, this message translates to:
+  /// **'Changelog'**
+  String get changelog;
+
+  /// No description provided for @changelogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'What\'s new'**
+  String get changelogTitle;
+
+  /// No description provided for @changelogSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'A quick look at the latest improvements in TaybGo Driver.'**
+  String get changelogSubtitle;
+
+  /// No description provided for @changelogCurrent.
+  ///
+  /// In en, this message translates to:
+  /// **'Current'**
+  String get changelogCurrent;
+
+  /// No description provided for @changelogBuild.
+  ///
+  /// In en, this message translates to:
+  /// **'Build'**
+  String get changelogBuild;
+
+  /// No description provided for @changelogReleased.
+  ///
+  /// In en, this message translates to:
+  /// **'Released'**
+  String get changelogReleased;
+
+  /// No description provided for @changelogReleaseNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Release notes'**
+  String get changelogReleaseNotes;
+
+  /// No description provided for @changelogHighlights.
+  ///
+  /// In en, this message translates to:
+  /// **'Highlights'**
+  String get changelogHighlights;
+
+  /// No description provided for @changelogFixes.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixes'**
+  String get changelogFixes;
+
+  /// No description provided for @changelogImprovements.
+  ///
+  /// In en, this message translates to:
+  /// **'Improvements'**
+  String get changelogImprovements;
+
+  /// No description provided for @changelogStability.
+  ///
+  /// In en, this message translates to:
+  /// **'Stability'**
+  String get changelogStability;
+
+  /// No description provided for @changelogPlatform.
+  ///
+  /// In en, this message translates to:
+  /// **'Platform'**
+  String get changelogPlatform;
+
+  /// No description provided for @changelogRelease.
+  ///
+  /// In en, this message translates to:
+  /// **'Release'**
+  String get changelogRelease;
+
+  /// No description provided for @changelogDateAug9.
+  ///
+  /// In en, this message translates to:
+  /// **'9 August 2026'**
+  String get changelogDateAug9;
+
+  /// No description provided for @changelogDateMay31.
+  ///
+  /// In en, this message translates to:
+  /// **'31 May 2026'**
+  String get changelogDateMay31;
+
+  /// No description provided for @changelogDateMay24.
+  ///
+  /// In en, this message translates to:
+  /// **'24 May 2026'**
+  String get changelogDateMay24;
+
+  /// No description provided for @changelogDateMay13.
+  ///
+  /// In en, this message translates to:
+  /// **'13 May 2026'**
+  String get changelogDateMay13;
+
+  /// No description provided for @changelogDateMay11.
+  ///
+  /// In en, this message translates to:
+  /// **'11 May 2026'**
+  String get changelogDateMay11;
+
+  /// No description provided for @changelogCurrentTaxi.
+  ///
+  /// In en, this message translates to:
+  /// **'Restricted Taxi service selection to car drivers and prevented bicycle drivers from enabling it during registration and profile editing.'**
+  String get changelogCurrentTaxi;
+
+  /// No description provided for @changelogVersion1113Upload.
+  ///
+  /// In en, this message translates to:
+  /// **'Reduced web upload memory usage to make document uploads more reliable on low-end devices.'**
+  String get changelogVersion1113Upload;
+
+  /// No description provided for @changelogCurrentChangelog.
+  ///
+  /// In en, this message translates to:
+  /// **'Added a localized, expandable changelog to Profile with release history, build numbers, dates, and release notes.'**
+  String get changelogCurrentChangelog;
+
+  /// No description provided for @changelogVersion1113Version.
+  ///
+  /// In en, this message translates to:
+  /// **'Added the app version and release date to the sign-in screen and web splash screen.'**
+  String get changelogVersion1113Version;
+
+  /// No description provided for @changelogCurrentRelease.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated the app to version 1.0.12+14 with today\'s driver-app improvements.'**
+  String get changelogCurrentRelease;
+
+  /// No description provided for @changelogVersion1113Release.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated the Play Store build to version 1.0.11+13 (version code 13).'**
+  String get changelogVersion1113Release;
+
+  /// No description provided for @changelogVersion1112Release.
+  ///
+  /// In en, this message translates to:
+  /// **'Released driver app version 1.0.11+12 and recorded its release metadata.'**
+  String get changelogVersion1112Release;
+
+  /// No description provided for @changelogVersion1011Documents.
+  ///
+  /// In en, this message translates to:
+  /// **'Added required-document validation for car drivers.'**
+  String get changelogVersion1011Documents;
+
+  /// No description provided for @changelogVersion1011Uploads.
+  ///
+  /// In en, this message translates to:
+  /// **'Marked required documents clearly and improved upload-state handling.'**
+  String get changelogVersion1011Uploads;
+
+  /// No description provided for @changelogVersion1011Feedback.
+  ///
+  /// In en, this message translates to:
+  /// **'Improved validation and error feedback when saving profile changes.'**
+  String get changelogVersion1011Feedback;
+
+  /// No description provided for @changelogVersion1011Release.
+  ///
+  /// In en, this message translates to:
+  /// **'Released driver app version 1.0.10+11.'**
+  String get changelogVersion1011Release;
+
+  /// No description provided for @changelogVersion0910Crashlytics.
+  ///
+  /// In en, this message translates to:
+  /// **'Added Crashlytics reporting for fatal errors in release builds.'**
+  String get changelogVersion0910Crashlytics;
+
+  /// No description provided for @changelogVersion0910Notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Improved notification lifecycle, deduplication, and order-notification handling.'**
+  String get changelogVersion0910Notifications;
+
+  /// No description provided for @changelogVersion0910Platform.
+  ///
+  /// In en, this message translates to:
+  /// **'Refreshed Android, iOS, macOS, and web release configuration with development and production flavors.'**
+  String get changelogVersion0910Platform;
+
+  /// No description provided for @changelogVersion0910Release.
+  ///
+  /// In en, this message translates to:
+  /// **'Released driver app version 1.0.9+10.'**
+  String get changelogVersion0910Release;
 }
 
 class _AppLocalizationsDelegate

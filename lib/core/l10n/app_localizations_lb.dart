@@ -1533,4 +1533,119 @@ class AppLocalizationsLb extends AppLocalizations {
 
   @override
   String get failedToRejectOrder => 'Failed to reject order';
+
+  @override
+  String get changelog => 'Ännerungsprotokoll';
+
+  @override
+  String get changelogTitle => 'Wat ass nei?';
+
+  @override
+  String get changelogSubtitle =>
+      'E séieren Iwwerbléck iwwer déi lescht Verbesserungen am TaybGo Driver.';
+
+  @override
+  String get changelogCurrent => 'Aktuell';
+
+  @override
+  String get changelogBuild => 'Build';
+
+  @override
+  String get changelogReleased => 'Verëffentlecht';
+
+  @override
+  String get changelogReleaseNotes => 'Release-Notizen';
+
+  @override
+  String get changelogHighlights => 'Highlights';
+
+  @override
+  String get changelogFixes => 'Feelerbehebungen';
+
+  @override
+  String get changelogImprovements => 'Verbesserungen';
+
+  @override
+  String get changelogStability => 'Stabilitéit';
+
+  @override
+  String get changelogPlatform => 'Plattform';
+
+  @override
+  String get changelogRelease => 'Release';
+
+  @override
+  String get changelogDateAug9 => '9. August 2026';
+
+  @override
+  String get changelogDateMay31 => '31. Mee 2026';
+
+  @override
+  String get changelogDateMay24 => '24. Mee 2026';
+
+  @override
+  String get changelogDateMay13 => '13. Mee 2026';
+
+  @override
+  String get changelogDateMay11 => '11. Mee 2026';
+
+  @override
+  String get changelogCurrentTaxi =>
+      'D\'Auswiel vum Taxidéngscht gouf op Autofuerer limitéiert; Vëlosfuerer kënnen en bei der Registréierung an der Profilbearbechtung net méi aktivéieren.';
+
+  @override
+  String get changelogVersion1113Upload =>
+      'D\'Späicherverbrauch bei Web-Uploads gouf reduzéiert, fir Dokumenter op manner staarken Apparater méi zouverlässeg eropzelueden.';
+
+  @override
+  String get changelogCurrentChangelog =>
+      'Am Profil gouf en lokaliséierten, ausklappbare Ännerungsprotokoll mat Verëffentlechungsgeschicht, Buildnummeren, Datumen a Release-Notize bäigefüügt.';
+
+  @override
+  String get changelogVersion1113Version =>
+      'D\'App-Versioun an de Verëffentlechungsdatum ginn elo um Login-Bildschierm an um Web-Startbildschierm ugewisen.';
+
+  @override
+  String get changelogCurrentRelease =>
+      'D\'App gouf op d\'Versioun 1.0.12+14 mat den neiste Verbesserunge vun der Fuerer-App aktualiséiert.';
+
+  @override
+  String get changelogVersion1113Release =>
+      'De Play-Store-Build gouf op d\'Versioun 1.0.11+13 (Versiounscode 13) aktualiséiert.';
+
+  @override
+  String get changelogVersion1112Release =>
+      'D\'Fuerer-App gouf an der Versioun 1.0.11+12 verëffentlecht an hir Verëffentlechungsmetadate goufe gespäichert.';
+
+  @override
+  String get changelogVersion1011Documents =>
+      'D\'Validatioun vun den erfuerderlechen Dokumenter fir Autofuerer gouf derbäigesat.';
+
+  @override
+  String get changelogVersion1011Uploads =>
+      'Erfuerderlech Dokumenter ginn elo méi kloer markéiert an d\'Veraarbechtung vum Upload-Status gouf verbessert.';
+
+  @override
+  String get changelogVersion1011Feedback =>
+      'D\'Validatioun an d\'Feelermeldunge beim Späichere vu Profilännerunge goufe verbessert.';
+
+  @override
+  String get changelogVersion1011Release =>
+      'D\'Fuerer-App gouf an der Versioun 1.0.10+11 verëffentlecht.';
+
+  @override
+  String get changelogVersion0910Crashlytics =>
+      'Crashlytics-Berichter fir schwéier Feeler a Release-Builds goufen derbäigesat.';
+
+  @override
+  String get changelogVersion0910Notifications =>
+      'Den Notifikatiouns-Liewenszyklus, d\'Deduplikatioun an d\'Veraarbechtung vun Bestellungsnotifikatioune goufe verbessert.';
+
+  @override
+  String get changelogVersion0910Platform =>
+      'D\'Release-Konfiguratioun fir Android, iOS, macOS an de Web gouf mat Entwécklungs- a Produktiouns-Flavors aktualiséiert.';
+
+  @override
+  String get changelogVersion0910Release =>
+      'D\'Fuerer-App gouf an der Versioun 1.0.9+10 verëffentlecht.';
 }

@@ -1519,4 +1519,119 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get failedToRejectOrder => 'Failed to reject order';
+
+  @override
+  String get changelog => 'Ändringslogg';
+
+  @override
+  String get changelogTitle => 'Vad är nytt?';
+
+  @override
+  String get changelogSubtitle =>
+      'Se de senaste förbättringarna i TaybGo Driver.';
+
+  @override
+  String get changelogCurrent => 'Aktuell';
+
+  @override
+  String get changelogBuild => 'Build';
+
+  @override
+  String get changelogReleased => 'Släppt';
+
+  @override
+  String get changelogReleaseNotes => 'Versionsanteckningar';
+
+  @override
+  String get changelogHighlights => 'Höjdpunkter';
+
+  @override
+  String get changelogFixes => 'Rättningar';
+
+  @override
+  String get changelogImprovements => 'Förbättringar';
+
+  @override
+  String get changelogStability => 'Stabilitet';
+
+  @override
+  String get changelogPlatform => 'Plattform';
+
+  @override
+  String get changelogRelease => 'Release';
+
+  @override
+  String get changelogDateAug9 => '9 augusti 2026';
+
+  @override
+  String get changelogDateMay31 => '31 maj 2026';
+
+  @override
+  String get changelogDateMay24 => '24 maj 2026';
+
+  @override
+  String get changelogDateMay13 => '13 maj 2026';
+
+  @override
+  String get changelogDateMay11 => '11 maj 2026';
+
+  @override
+  String get changelogCurrentTaxi =>
+      'Val av taxitjänsten begränsades till bilförare, och cykelförare kan inte längre aktivera den vid registrering eller profilredigering.';
+
+  @override
+  String get changelogVersion1113Upload =>
+      'Minskade minnesanvändningen vid web uppladdningar så att dokumentuppladdningar blir mer tillförlitliga på mindre kraftfulla enheter.';
+
+  @override
+  String get changelogCurrentChangelog =>
+      'En lokaliserad, utfällbar ändringslogg lades till i Profil med versionshistorik, buildnummer, datum och versionsanteckningar.';
+
+  @override
+  String get changelogVersion1113Version =>
+      'Appens version och lanseringsdatum visas nu på inloggningsskärmen och webbens startskärm.';
+
+  @override
+  String get changelogCurrentRelease =>
+      'Appen uppdaterades till version 1.0.12+14 med de senaste förbättringarna i förarappen.';
+
+  @override
+  String get changelogVersion1113Release =>
+      'Play Store-versionen uppdaterades till 1.0.11+13 (versionskod 13).';
+
+  @override
+  String get changelogVersion1112Release =>
+      'Förarappen släpptes i version 1.0.11+12 och dess versionsmetadata registrerades.';
+
+  @override
+  String get changelogVersion1011Documents =>
+      'Validering av obligatoriska dokument för bilförare lades till.';
+
+  @override
+  String get changelogVersion1011Uploads =>
+      'Obligatoriska dokument markeras tydligare och hanteringen av uppladdningsstatus förbättrades.';
+
+  @override
+  String get changelogVersion1011Feedback =>
+      'Validering och felmeddelanden vid sparande av profiländringar förbättrades.';
+
+  @override
+  String get changelogVersion1011Release =>
+      'Förarappen släpptes i version 1.0.10+11.';
+
+  @override
+  String get changelogVersion0910Crashlytics =>
+      'Crashlytics-rapportering för allvarliga fel i releaseversioner lades till.';
+
+  @override
+  String get changelogVersion0910Notifications =>
+      'Notifieringarnas livscykel, dubbletthantering och hanteringen av ordernotiser förbättrades.';
+
+  @override
+  String get changelogVersion0910Platform =>
+      'Releasekonfigurationen för Android, iOS, macOS och webben uppdaterades med utvecklings- och produktionsflavors.';
+
+  @override
+  String get changelogVersion0910Release =>
+      'Förarappen släpptes i version 1.0.9+10.';
 }

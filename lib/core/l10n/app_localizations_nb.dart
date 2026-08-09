@@ -1518,4 +1518,119 @@ class AppLocalizationsNb extends AppLocalizations {
 
   @override
   String get failedToRejectOrder => 'Failed to reject order';
+
+  @override
+  String get changelog => 'Endringslogg';
+
+  @override
+  String get changelogTitle => 'Hva er nytt?';
+
+  @override
+  String get changelogSubtitle =>
+      'En rask oversikt over de siste forbedringene i TaybGo Driver.';
+
+  @override
+  String get changelogCurrent => 'Gjeldende';
+
+  @override
+  String get changelogBuild => 'Build';
+
+  @override
+  String get changelogReleased => 'Utgitt';
+
+  @override
+  String get changelogReleaseNotes => 'Versjonsnotater';
+
+  @override
+  String get changelogHighlights => 'Høydepunkter';
+
+  @override
+  String get changelogFixes => 'Feilrettinger';
+
+  @override
+  String get changelogImprovements => 'Forbedringer';
+
+  @override
+  String get changelogStability => 'Stabilitet';
+
+  @override
+  String get changelogPlatform => 'Plattform';
+
+  @override
+  String get changelogRelease => 'Utgivelse';
+
+  @override
+  String get changelogDateAug9 => '9. august 2026';
+
+  @override
+  String get changelogDateMay31 => '31. mai 2026';
+
+  @override
+  String get changelogDateMay24 => '24. mai 2026';
+
+  @override
+  String get changelogDateMay13 => '13. mai 2026';
+
+  @override
+  String get changelogDateMay11 => '11. mai 2026';
+
+  @override
+  String get changelogCurrentTaxi =>
+      'Valg av taxitjenesten er begrenset til bilsjåfører, og sykkelsjåfører kan ikke lenger aktivere den under registrering eller profilredigering.';
+
+  @override
+  String get changelogVersion1113Upload =>
+      'Reduserte minnebruken ved opplastinger på nettet for å gjøre dokumentopplastinger mer pålitelige på enheter med lav ytelse.';
+
+  @override
+  String get changelogCurrentChangelog =>
+      'La til en lokalisert, utvidbar endringslogg i Profil med utgivelseshistorikk, buildnumre, datoer og versjonsnotater.';
+
+  @override
+  String get changelogVersion1113Version =>
+      'La til appversjon og utgivelsesdato på innloggingsskjermen og på web-startskjermen.';
+
+  @override
+  String get changelogCurrentRelease =>
+      'Oppdaterte appen til versjon 1.0.12+14 med de nyeste forbedringene i sjåførapplikasjonen.';
+
+  @override
+  String get changelogVersion1113Release =>
+      'Play Store-bygget ble oppdatert til versjon 1.0.11+13 (versjonskode 13).';
+
+  @override
+  String get changelogVersion1112Release =>
+      'Sjåførapplikasjonen ble utgitt i versjon 1.0.11+12, og utgivelsesmetadataene ble registrert.';
+
+  @override
+  String get changelogVersion1011Documents =>
+      'La til validering av obligatoriske dokumenter for bilsjåfører.';
+
+  @override
+  String get changelogVersion1011Uploads =>
+      'Obligatoriske dokumenter markeres tydeligere, og håndteringen av opplastingsstatus er forbedret.';
+
+  @override
+  String get changelogVersion1011Feedback =>
+      'Forbedret validering og feilmeldinger ved lagring av profilendringer.';
+
+  @override
+  String get changelogVersion1011Release =>
+      'Sjåførapplikasjonen ble utgitt i versjon 1.0.10+11.';
+
+  @override
+  String get changelogVersion0910Crashlytics =>
+      'La til Crashlytics-rapportering for alvorlige feil i release-bygg.';
+
+  @override
+  String get changelogVersion0910Notifications =>
+      'Forbedret varslenes livssyklus, deduplisering og håndtering av ordremeldinger.';
+
+  @override
+  String get changelogVersion0910Platform =>
+      'Oppdaterte release-konfigurasjonen for Android, iOS, macOS og web med utviklings- og produksjonsflavors.';
+
+  @override
+  String get changelogVersion0910Release =>
+      'Sjåførapplikasjonen ble utgitt i versjon 1.0.9+10.';
 }

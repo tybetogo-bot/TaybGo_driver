@@ -24,6 +24,7 @@ class RouteConstants {
   static const String settings = '/settings';
   static const String notifications = '/notifications';
   static const String editProfile = '/edit-profile';
+  static const String changelog = '/changelog';
 
   // Knowledge Base
   static const String knowledgeBase = '/knowledge-base';

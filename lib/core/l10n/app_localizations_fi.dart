@@ -1522,4 +1522,119 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get failedToRejectOrder => 'Failed to reject order';
+
+  @override
+  String get changelog => 'Muutosloki';
+
+  @override
+  String get changelogTitle => 'Mitä uutta?';
+
+  @override
+  String get changelogSubtitle =>
+      'Tutustu nopeasti TaybGo Driverin uusimpiin parannuksiin.';
+
+  @override
+  String get changelogCurrent => 'Nykyinen';
+
+  @override
+  String get changelogBuild => 'Koontiversio';
+
+  @override
+  String get changelogReleased => 'Julkaistu';
+
+  @override
+  String get changelogReleaseNotes => 'Julkaisutiedot';
+
+  @override
+  String get changelogHighlights => 'Kohokohdat';
+
+  @override
+  String get changelogFixes => 'Korjaukset';
+
+  @override
+  String get changelogImprovements => 'Parannukset';
+
+  @override
+  String get changelogStability => 'Vakaus';
+
+  @override
+  String get changelogPlatform => 'Alusta';
+
+  @override
+  String get changelogRelease => 'Julkaisu';
+
+  @override
+  String get changelogDateAug9 => '9. elokuuta 2026';
+
+  @override
+  String get changelogDateMay31 => '31. toukokuuta 2026';
+
+  @override
+  String get changelogDateMay24 => '24. toukokuuta 2026';
+
+  @override
+  String get changelogDateMay13 => '13. toukokuuta 2026';
+
+  @override
+  String get changelogDateMay11 => '11. toukokuuta 2026';
+
+  @override
+  String get changelogCurrentTaxi =>
+      'Taxi-palvelun valinta rajattiin autonkuljettajille, eivätkä pyöräkuljettajat voi enää ottaa sitä käyttöön rekisteröinnin tai profiilin muokkauksen aikana.';
+
+  @override
+  String get changelogVersion1113Upload =>
+      'Verkkolatausten muistinkulutusta pienennettiin, jotta asiakirjojen lataaminen olisi luotettavampaa vähätehoisilla laitteilla.';
+
+  @override
+  String get changelogCurrentChangelog =>
+      'Profiiliin lisättiin lokalisoitu avattava muutosloki, jossa näkyvät julkaisuhistoria, koontiversiot, päivämäärät ja julkaisutiedot.';
+
+  @override
+  String get changelogVersion1113Version =>
+      'Sovelluksen versio ja julkaisupäivä lisättiin kirjautumisnäyttöön ja verkon aloitusnäyttöön.';
+
+  @override
+  String get changelogCurrentRelease =>
+      'Sovellus päivitettiin versioon 1.0.12+14 uusimpien kuljettajasovelluksen parannusten kera.';
+
+  @override
+  String get changelogVersion1113Release =>
+      'Play Kaupan koontiversio päivitettiin versioon 1.0.11+13 (versionumero 13).';
+
+  @override
+  String get changelogVersion1112Release =>
+      'Kuljettajasovellus julkaistiin versiona 1.0.11+12 ja sen julkaisutiedot tallennettiin.';
+
+  @override
+  String get changelogVersion1011Documents =>
+      'Autonkuljettajille lisättiin pakollisten asiakirjojen tarkistus.';
+
+  @override
+  String get changelogVersion1011Uploads =>
+      'Pakolliset asiakirjat merkitään nyt selkeästi ja lataustilan käsittelyä parannettiin.';
+
+  @override
+  String get changelogVersion1011Feedback =>
+      'Profiilimuutosten tallennuksen tarkistuksia ja virheilmoituksia parannettiin.';
+
+  @override
+  String get changelogVersion1011Release =>
+      'Kuljettajasovellus julkaistiin versiona 1.0.10+11.';
+
+  @override
+  String get changelogVersion0910Crashlytics =>
+      'Julkaisuversioiden vakaville virheille lisättiin Crashlytics-raportointi.';
+
+  @override
+  String get changelogVersion0910Notifications =>
+      'Ilmoitusten elinkaarta, duplikaattien estoa ja tilausilmoitusten käsittelyä parannettiin.';
+
+  @override
+  String get changelogVersion0910Platform =>
+      'Androidin, iOS:n, macOS:n ja verkon julkaisuasetukset päivitettiin kehitys- ja tuotantoversioille.';
+
+  @override
+  String get changelogVersion0910Release =>
+      'Kuljettajasovellus julkaistiin versiona 1.0.9+10.';
 }

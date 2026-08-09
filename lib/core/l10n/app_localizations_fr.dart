@@ -1534,4 +1534,119 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get failedToRejectOrder => 'Failed to reject order';
+
+  @override
+  String get changelog => 'Journal des modifications';
+
+  @override
+  String get changelogTitle => 'Nouveautés';
+
+  @override
+  String get changelogSubtitle =>
+      'Découvrez rapidement les dernières améliorations de TaybGo Driver.';
+
+  @override
+  String get changelogCurrent => 'Actuelle';
+
+  @override
+  String get changelogBuild => 'Build';
+
+  @override
+  String get changelogReleased => 'Publié le';
+
+  @override
+  String get changelogReleaseNotes => 'Notes de version';
+
+  @override
+  String get changelogHighlights => 'Points forts';
+
+  @override
+  String get changelogFixes => 'Correctifs';
+
+  @override
+  String get changelogImprovements => 'Améliorations';
+
+  @override
+  String get changelogStability => 'Stabilité';
+
+  @override
+  String get changelogPlatform => 'Plateforme';
+
+  @override
+  String get changelogRelease => 'Version';
+
+  @override
+  String get changelogDateAug9 => '9 août 2026';
+
+  @override
+  String get changelogDateMay31 => '31 mai 2026';
+
+  @override
+  String get changelogDateMay24 => '24 mai 2026';
+
+  @override
+  String get changelogDateMay13 => '13 mai 2026';
+
+  @override
+  String get changelogDateMay11 => '11 mai 2026';
+
+  @override
+  String get changelogCurrentTaxi =>
+      'La sélection du service de taxi est désormais réservée aux chauffeurs en voiture et les chauffeurs à vélo ne peuvent plus l\'activer lors de l\'inscription ou de la modification du profil.';
+
+  @override
+  String get changelogVersion1113Upload =>
+      'La consommation mémoire des importations web a été réduite afin de rendre l\'envoi de documents plus fiable sur les appareils peu puissants.';
+
+  @override
+  String get changelogCurrentChangelog =>
+      'Un journal des modifications localisé et dépliable a été ajouté au profil, avec l\'historique des versions, les numéros de build, les dates et les notes de version.';
+
+  @override
+  String get changelogVersion1113Version =>
+      'La version de l\'application et la date de publication sont désormais affichées sur l\'écran de connexion et l\'écran de démarrage web.';
+
+  @override
+  String get changelogCurrentRelease =>
+      'L\'application a été mise à jour vers la version 1.0.12+14 avec les dernières améliorations de l\'application chauffeur.';
+
+  @override
+  String get changelogVersion1113Release =>
+      'Le build du Play Store a été mis à jour vers la version 1.0.11+13 (code de version 13).';
+
+  @override
+  String get changelogVersion1112Release =>
+      'L\'application chauffeur est sortie en version 1.0.11+12 et ses métadonnées de publication ont été enregistrées.';
+
+  @override
+  String get changelogVersion1011Documents =>
+      'La validation des documents obligatoires pour les chauffeurs en voiture a été ajoutée.';
+
+  @override
+  String get changelogVersion1011Uploads =>
+      'Les documents obligatoires sont mieux signalés et la gestion de l\'état des importations a été améliorée.';
+
+  @override
+  String get changelogVersion1011Feedback =>
+      'La validation et les messages d\'erreur lors de l\'enregistrement des modifications du profil ont été améliorés.';
+
+  @override
+  String get changelogVersion1011Release =>
+      'L\'application chauffeur est sortie en version 1.0.10+11.';
+
+  @override
+  String get changelogVersion0910Crashlytics =>
+      'Le signalement Crashlytics des erreurs fatales dans les builds de production a été ajouté.';
+
+  @override
+  String get changelogVersion0910Notifications =>
+      'Le cycle de vie des notifications, la déduplication et le traitement des notifications de commandes ont été améliorés.';
+
+  @override
+  String get changelogVersion0910Platform =>
+      'La configuration de publication pour Android, iOS, macOS et le web a été actualisée avec les flavors de développement et de production.';
+
+  @override
+  String get changelogVersion0910Release =>
+      'L\'application chauffeur est sortie en version 1.0.9+10.';
 }

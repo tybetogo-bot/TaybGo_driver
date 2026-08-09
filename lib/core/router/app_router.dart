@@ -11,6 +11,7 @@ import '../../features/navigation/screens/navigation_screen.dart';
 import '../../features/earnings/screens/earnings_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../features/profile/screens/edit_profile_screen.dart';
+import '../../features/profile/screens/changelog_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
 import '../../features/knowledge_base/screens/knowledge_base_screen.dart';
@@ -158,6 +159,10 @@ class AppRouter {
       GoRoute(
         path: RouteConstants.editProfile,
         builder: (context, state) => const EditProfileScreen(),
+      ),
+      GoRoute(
+        path: RouteConstants.changelog,
+        builder: (context, state) => const ChangelogScreen(),
       ),
 
       // Knowledge Base
