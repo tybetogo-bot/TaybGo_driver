@@ -5,13 +5,16 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:provider/provider.dart';
+import '../../../core/models/driver_address.dart';
 import '../../../core/models/driver_profile.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/l10n/framework_locale_support.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/services/cloudinary_service.dart';
+import '../../../core/services/location_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/birthdate_utils.dart';
+import '../../../shared/widgets/driver_address_fields.dart';
 import '../../application/utils/document_picker.dart';
 
 enum _DocumentPickAction { camera, gallery, file }
@@ -54,6 +57,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _vehicleModelController;
   late TextEditingController _vehicleYearController;
 
+  // Structured profile address
+  late TextEditingController _addressLabelController;
+  late TextEditingController _addressLatitudeController;
+  late TextEditingController _addressLongitudeController;
+  late TextEditingController _fullAddressController;
+  late TextEditingController _streetNameController;
+  late TextEditingController _houseNumberController;
+  late TextEditingController _cityController;
+  late TextEditingController _postalCodeController;
+  late TextEditingController _countryController;
+
   // Document status
   Uint8List? _drivingLicenseBytes;
   String? _drivingLicenseUrl;
@@ -86,9 +100,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late final DriverProvider _driverProvider;
   final CloudinaryService _cloudinaryService = CloudinaryService();
   final ImagePicker _imagePicker = ImagePicker();
+  final LocationService _locationService = LocationService();
   bool _profileInitialized = false;
 
   bool _isSaving = false;
+  bool _isLoadingAddressLocation = false;
   DateTime? _selectedBirthdate;
 
   @override
@@ -127,6 +143,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ? profile.vehicleYear.toString()
           : '',
     );
+
+    final address = profile?.address;
+    _addressLabelController = TextEditingController(text: address?.label ?? '');
+    _addressLatitudeController = TextEditingController(
+      text: address?.lat ?? '',
+    );
+    _addressLongitudeController = TextEditingController(
+      text: address?.lng ?? '',
+    );
+    _fullAddressController = TextEditingController(
+      text: address?.fullAddress ?? '',
+    );
+    _streetNameController = TextEditingController(
+      text: address?.streetName ?? '',
+    );
+    _houseNumberController = TextEditingController(
+      text: address?.houseNumber ?? '',
+    );
+    _cityController = TextEditingController(text: address?.city ?? '');
+    _postalCodeController = TextEditingController(
+      text: address?.postalCode ?? '',
+    );
+    _countryController = TextEditingController(text: address?.country ?? '');
 
     // Initialize document URLs from existing profile
     _drivingLicenseUrl = profile?.drivingLicense;
@@ -168,6 +207,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _vehicleMakeController.dispose();
     _vehicleModelController.dispose();
     _vehicleYearController.dispose();
+    _addressLabelController.dispose();
+    _addressLatitudeController.dispose();
+    _addressLongitudeController.dispose();
+    _fullAddressController.dispose();
+    _streetNameController.dispose();
+    _houseNumberController.dispose();
+    _cityController.dispose();
+    _postalCodeController.dispose();
+    _countryController.dispose();
     super.dispose();
   }
 
@@ -214,6 +262,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         profile.vehicleYear != null && profile.vehicleYear! > 0
         ? profile.vehicleYear.toString()
         : '';
+
+    final address = profile.address;
+    _addressLabelController.text = address?.label ?? '';
+    _addressLatitudeController.text = address?.lat ?? '';
+    _addressLongitudeController.text = address?.lng ?? '';
+    _fullAddressController.text = address?.fullAddress ?? '';
+    _streetNameController.text = address?.streetName ?? '';
+    _houseNumberController.text = address?.houseNumber ?? '';
+    _cityController.text = address?.city ?? '';
+    _postalCodeController.text = address?.postalCode ?? '';
+    _countryController.text = address?.country ?? '';
 
     _drivingLicenseUrl = profile.drivingLicense;
     _idDocumentUrl = profile.idDocument;
@@ -320,17 +379,176 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
   }
 
+  String? _addressFieldValue(TextEditingController controller) {
+    final value = controller.text.trim();
+    return value.isEmpty ? null : value;
+  }
+
+  DriverAddress? _addressFromFields() {
+    final address = DriverAddress(
+      label: _addressFieldValue(_addressLabelController),
+      lat: _addressFieldValue(_addressLatitudeController),
+      lng: _addressFieldValue(_addressLongitudeController),
+      fullAddress: _addressFieldValue(_fullAddressController),
+      streetName: _addressFieldValue(_streetNameController),
+      houseNumber: _addressFieldValue(_houseNumberController),
+      city: _addressFieldValue(_cityController),
+      postalCode: _addressFieldValue(_postalCodeController),
+      country: _addressFieldValue(_countryController),
+    );
+    return address.hasAnyValue ? address : null;
+  }
+
+  String? _validateAddress(AppLocalizations l10n) {
+    final address = _addressFromFields();
+    if (address == null) return null;
+
+    final hasExistingAddress = _driverProvider.profile?.address != null;
+    if (!hasExistingAddress &&
+        (address.label == null ||
+            address.lat == null ||
+            address.lng == null ||
+            address.fullAddress == null)) {
+      return l10n.addressRequiredFields;
+    }
+
+    if (address.lat != null) {
+      final latitude = double.tryParse(address.lat!);
+      if (latitude == null || latitude < -90 || latitude > 90) {
+        return l10n.invalidLatitude;
+      }
+    }
+
+    if (address.lng != null) {
+      final longitude = double.tryParse(address.lng!);
+      if (longitude == null || longitude < -180 || longitude > 180) {
+        return l10n.invalidLongitude;
+      }
+    }
+
+    return null;
+  }
+
+  Future<void> _useCurrentLocation() async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _isLoadingAddressLocation = true;
+    });
+
+    final result = await _locationService.getCurrentLocation();
+    if (!mounted) return;
+
+    if (result.success && result.position != null) {
+      setState(() {
+        _isLoadingAddressLocation = false;
+        _addressLatitudeController.text = result.position!.latitude
+            .toStringAsFixed(6);
+        _addressLongitudeController.text = result.position!.longitude
+            .toStringAsFixed(6);
+      });
+    } else {
+      setState(() => _isLoadingAddressLocation = false);
+      _showErrorSnackBar(result.message ?? l10n.locationFetchFailed);
+    }
+  }
+
+  String? _changedAddressValue(String? value, String? original) {
+    if (value?.trim() == original?.trim()) return null;
+    return value?.trim().isEmpty == true ? null : value?.trim();
+  }
+
+  DriverAddress? _buildAddressUpdate() {
+    final entered = _addressFromFields();
+    if (entered == null) return null;
+
+    final existing = _driverProvider.profile?.address;
+    if (existing == null) return entered;
+
+    final patch = DriverAddress(
+      label: _changedAddressValue(entered.label, existing.label),
+      lat: _changedAddressValue(entered.lat, existing.lat),
+      lng: _changedAddressValue(entered.lng, existing.lng),
+      fullAddress: _changedAddressValue(
+        entered.fullAddress,
+        existing.fullAddress,
+      ),
+      streetName: _changedAddressValue(entered.streetName, existing.streetName),
+      houseNumber: _changedAddressValue(
+        entered.houseNumber,
+        existing.houseNumber,
+      ),
+      city: _changedAddressValue(entered.city, existing.city),
+      postalCode: _changedAddressValue(entered.postalCode, existing.postalCode),
+      country: _changedAddressValue(entered.country, existing.country),
+    );
+    return patch.hasAnyValue ? patch : null;
+  }
+
+  bool _sameDate(DateTime? first, DateTime? second) {
+    if (first == null || second == null) return first == second;
+    return first.year == second.year &&
+        first.month == second.month &&
+        first.day == second.day;
+  }
+
+  String? _nameUpdate() {
+    final profile = _driverProvider.profile;
+    final value = _nameController.text.trim();
+    if (profile == null || value == profile.fullName.trim()) return null;
+    return value.isEmpty ? null : value;
+  }
+
+  String? _phoneUpdate() {
+    final profile = _driverProvider.profile;
+    final value = _digitsOnly(_phoneController.text);
+    if (profile == null || value == _digitsOnly(profile.phone)) return null;
+    return value.isEmpty ? null : value;
+  }
+
+  DateTime? _birthdateUpdate() {
+    final profile = _driverProvider.profile;
+    if (profile == null || _sameDate(_selectedBirthdate, profile.birthdate)) {
+      return null;
+    }
+    return _selectedBirthdate;
+  }
+
+  bool _hasServiceChanges() {
+    final profile = _driverProvider.profile;
+    if (profile == null) return false;
+    return _acceptsFood != profile.acceptsFood ||
+        _acceptsShipping != profile.acceptsShipping ||
+        _acceptsTaxi != profile.acceptsTaxi;
+  }
+
+  String? _changedDocumentValue(String? value, String? original) {
+    if (_normalizeDocumentUrl(value) == _normalizeDocumentUrl(original)) {
+      return null;
+    }
+    return _normalizeDocumentUrl(value);
+  }
+
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
 
     final l10n = AppLocalizations.of(context)!;
+    final addressError = _validateAddress(l10n);
+    if (addressError != null) {
+      _showErrorSnackBar(addressError);
+      return;
+    }
+
+    final hasVehicleChanges = _hasVehicleDataChanges();
+    final hasDocumentChanges = _hasDocumentChanges();
+    final hasServiceChanges = _hasServiceChanges();
+    final addressUpdate = _buildAddressUpdate();
     final requiredDocumentsError = _validateCarRequiredDocuments(l10n);
     if (requiredDocumentsError != null) {
       _showErrorSnackBar(requiredDocumentsError);
       return;
     }
 
-    final requiresApproval = _hasVehicleDataChanges() || _hasDocumentChanges();
+    final requiresApproval = hasVehicleChanges || hasDocumentChanges;
     if (requiresApproval) {
       final confirmed = await _showProfileApprovalWarningDialog();
       if (!confirmed || !mounted) return;
@@ -342,41 +560,72 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final isCarType = _isCarVehicleType(_selectedVehicleType);
 
     final success = await driverProvider.updateUserProfile(
-      name: _nameController.text.trim().isNotEmpty
-          ? _nameController.text.trim()
-          : null,
-      phone: _phoneController.text.trim().isNotEmpty
-          ? _phoneController.text.trim()
-          : null,
-      birthdate: _selectedBirthdate,
-      vehicleType: _selectedVehicleType,
-      clearCarDetails: !isCarType,
-      carSize: isCarType ? _selectedCarSize : null,
+      name: _nameUpdate(),
+      phone: _phoneUpdate(),
+      birthdate: _birthdateUpdate(),
+      vehicleType: hasVehicleChanges ? _selectedVehicleType : null,
+      clearCarDetails: hasVehicleChanges && !isCarType,
+      carSize: hasVehicleChanges && isCarType ? _selectedCarSize : null,
       vehiclePlateNumber:
-          isCarType && _vehiclePlateNumberController.text.trim().isNotEmpty
+          hasVehicleChanges &&
+              isCarType &&
+              _vehiclePlateNumberController.text.trim().isNotEmpty
           ? _vehiclePlateNumberController.text.trim()
           : null,
-      vehicleColor: isCarType && _vehicleColorController.text.trim().isNotEmpty
+      vehicleColor:
+          hasVehicleChanges &&
+              isCarType &&
+              _vehicleColorController.text.trim().isNotEmpty
           ? _vehicleColorController.text.trim()
           : null,
-      vehicleMake: isCarType && _vehicleMakeController.text.trim().isNotEmpty
+      vehicleMake:
+          hasVehicleChanges &&
+              isCarType &&
+              _vehicleMakeController.text.trim().isNotEmpty
           ? _vehicleMakeController.text.trim()
           : null,
-      vehicleModel: isCarType && _vehicleModelController.text.trim().isNotEmpty
+      vehicleModel:
+          hasVehicleChanges &&
+              isCarType &&
+              _vehicleModelController.text.trim().isNotEmpty
           ? _vehicleModelController.text.trim()
           : null,
-      vehicleYear: isCarType && _vehicleYearController.text.trim().isNotEmpty
+      vehicleYear:
+          hasVehicleChanges &&
+              isCarType &&
+              _vehicleYearController.text.trim().isNotEmpty
           ? int.tryParse(_vehicleYearController.text.trim())
           : null,
-      acceptsFood: _acceptsFood,
-      acceptsShipping: _acceptsShipping,
-      acceptsTaxi: isCarType ? _acceptsTaxi : false,
-      drivingLicense: _drivingLicenseUrl,
-      idDocument: _idDocumentUrl,
-      otherDocuments: _otherDocumentsUrl,
-      healthInsuranceDocument: _healthInsuranceDocumentUrl,
-      addressDocument: _addressDocumentUrl,
-      bankDocument: _bankDocumentUrl,
+      acceptsFood: hasServiceChanges ? _acceptsFood : null,
+      acceptsShipping: hasServiceChanges ? _acceptsShipping : null,
+      acceptsTaxi: hasServiceChanges
+          ? (isCarType ? _acceptsTaxi : false)
+          : null,
+      drivingLicense: _changedDocumentValue(
+        _drivingLicenseUrl,
+        _driverProvider.profile?.drivingLicense,
+      ),
+      idDocument: _changedDocumentValue(
+        _idDocumentUrl,
+        _driverProvider.profile?.idDocument,
+      ),
+      otherDocuments: _changedDocumentValue(
+        _otherDocumentsUrl,
+        _driverProvider.profile?.otherDocuments,
+      ),
+      healthInsuranceDocument: _changedDocumentValue(
+        _healthInsuranceDocumentUrl,
+        _driverProvider.profile?.healthInsuranceDocument,
+      ),
+      addressDocument: _changedDocumentValue(
+        _addressDocumentUrl,
+        _driverProvider.profile?.addressDocument,
+      ),
+      bankDocument: _changedDocumentValue(
+        _bankDocumentUrl,
+        _driverProvider.profile?.bankDocument,
+      ),
+      address: addressUpdate,
     );
 
     if (!mounted) return;
@@ -570,6 +819,30 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   Icons.calendar_month_outlined,
                   color: AppColors.primary,
                 ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // Structured address section
+              _buildSectionHeader(l10n.address, Icons.home_outlined, textColor),
+              const SizedBox(height: 16),
+              DriverAddressFields(
+                labelController: _addressLabelController,
+                latitudeController: _addressLatitudeController,
+                longitudeController: _addressLongitudeController,
+                fullAddressController: _fullAddressController,
+                streetNameController: _streetNameController,
+                houseNumberController: _houseNumberController,
+                cityController: _cityController,
+                postalCodeController: _postalCodeController,
+                countryController: _countryController,
+                textColor: textColor,
+                secondaryColor: secondaryColor,
+                surfaceColor: surfaceColor,
+                borderColor: borderColor,
+                hintColor: hintColor,
+                isLoadingLocation: _isLoadingAddressLocation,
+                onUseCurrentLocation: _useCurrentLocation,
               ),
 
               const SizedBox(height: 28),

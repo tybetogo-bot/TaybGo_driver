@@ -161,7 +161,84 @@ class AppLocalizationsAr extends AppLocalizations {
   String get address => 'العنوان';
 
   @override
+  String get addressStepTitle => 'العنوان المحفوظ';
+
+  @override
+  String get addressStepSubtitle => 'أضف عنواناً اختيارياً إلى ملف السائق.';
+
+  @override
+  String get addressOptionalSubtitle =>
+      'اختياري. إذا أضفت عنواناً، أكمل الحقول المطلوبة.';
+
+  @override
+  String get addressLabel => 'اسم العنوان';
+
+  @override
+  String get addressLabelHint => 'مثال: المنزل';
+
+  @override
+  String get fullAddress => 'العنوان الكامل';
+
+  @override
+  String get fullAddressHint => 'مثال: شارع الملك 12، الرياض';
+
+  @override
+  String get latitude => 'خط العرض';
+
+  @override
+  String get latitudeHint => 'مثال: 24.713600';
+
+  @override
+  String get longitude => 'خط الطول';
+
+  @override
+  String get longitudeHint => 'مثال: 46.675300';
+
+  @override
+  String get useCurrentLocation => 'استخدام الموقع الحالي';
+
+  @override
+  String get streetName => 'اسم الشارع';
+
+  @override
+  String get streetNameHint => 'مثال: شارع الملك';
+
+  @override
+  String get houseNumber => 'رقم المنزل';
+
+  @override
+  String get houseNumberHint => 'مثال: 12';
+
+  @override
   String get city => 'المدينة';
+
+  @override
+  String get cityHint => 'مثال: الرياض';
+
+  @override
+  String get postalCode => 'الرمز البريدي';
+
+  @override
+  String get postalCodeHint => 'مثال: 12345';
+
+  @override
+  String get country => 'الدولة';
+
+  @override
+  String get countryHint => 'مثال: SA';
+
+  @override
+  String get addressRequiredFields =>
+      'اسم العنوان وخط العرض وخط الطول والعنوان الكامل مطلوبة معاً.';
+
+  @override
+  String get invalidLatitude => 'أدخل خط عرض صحيحاً بين -90 و90.';
+
+  @override
+  String get invalidLongitude => 'أدخل خط طول صحيحاً بين -180 و180.';
+
+  @override
+  String get locationFetchFailed => 'تعذر تحديد موقعك الحالي.';
 
   @override
   String get vehicleType => 'نوع المركبة';
@@ -1550,6 +1627,21 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get changelogDateAug9 => '9 أغسطس 2026';
+
+  @override
+  String get changelogDateAug11 => '11 أغسطس 2026';
+
+  @override
+  String get changelogVersion1013Address =>
+      'تمت إضافة عناوين منظمة اختيارية للسائقين مع الإحداثيات وتفاصيل العنوان الكامل أثناء التسجيل وتعديل الملف الشخصي.';
+
+  @override
+  String get changelogVersion1013Status =>
+      'تستخدم تحديثات العنوان فقط طلبات PATCH جزئية وتحافظ على حالة السائق المعتمد.';
+
+  @override
+  String get changelogVersion1013Release =>
+      'تم إصدار تطبيق السائق بالإصدار 1.0.13+15.';
 
   @override
   String get changelogDateMay31 => '31 مايو 2026';

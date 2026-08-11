@@ -410,11 +410,161 @@ abstract class AppLocalizations {
   /// **'Address'**
   String get address;
 
+  /// No description provided for @addressStepTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved Address'**
+  String get addressStepTitle;
+
+  /// No description provided for @addressStepSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add an optional address for your driver profile.'**
+  String get addressStepSubtitle;
+
+  /// No description provided for @addressOptionalSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional. If you add an address, complete the required fields.'**
+  String get addressOptionalSubtitle;
+
+  /// No description provided for @addressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Address label'**
+  String get addressLabel;
+
+  /// No description provided for @addressLabelHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Home'**
+  String get addressLabelHint;
+
+  /// No description provided for @fullAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Full address'**
+  String get fullAddress;
+
+  /// No description provided for @fullAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 12 King Street, Riyadh'**
+  String get fullAddressHint;
+
+  /// No description provided for @latitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Latitude'**
+  String get latitude;
+
+  /// No description provided for @latitudeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 24.713600'**
+  String get latitudeHint;
+
+  /// No description provided for @longitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Longitude'**
+  String get longitude;
+
+  /// No description provided for @longitudeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 46.675300'**
+  String get longitudeHint;
+
+  /// No description provided for @useCurrentLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Use current location'**
+  String get useCurrentLocation;
+
+  /// No description provided for @streetName.
+  ///
+  /// In en, this message translates to:
+  /// **'Street name'**
+  String get streetName;
+
+  /// No description provided for @streetNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. King Street'**
+  String get streetNameHint;
+
+  /// No description provided for @houseNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'House number'**
+  String get houseNumber;
+
+  /// No description provided for @houseNumberHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 12'**
+  String get houseNumberHint;
+
   /// No description provided for @city.
   ///
   /// In en, this message translates to:
   /// **'City'**
   String get city;
+
+  /// No description provided for @cityHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Riyadh'**
+  String get cityHint;
+
+  /// No description provided for @postalCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Postal code'**
+  String get postalCode;
+
+  /// No description provided for @postalCodeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 12345'**
+  String get postalCodeHint;
+
+  /// No description provided for @country.
+  ///
+  /// In en, this message translates to:
+  /// **'Country'**
+  String get country;
+
+  /// No description provided for @countryHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. SA'**
+  String get countryHint;
+
+  /// No description provided for @addressRequiredFields.
+  ///
+  /// In en, this message translates to:
+  /// **'Label, latitude, longitude, and full address are required together.'**
+  String get addressRequiredFields;
+
+  /// No description provided for @invalidLatitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid latitude between -90 and 90.'**
+  String get invalidLatitude;
+
+  /// No description provided for @invalidLongitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid longitude between -180 and 180.'**
+  String get invalidLongitude;
+
+  /// No description provided for @locationFetchFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to determine your current location.'**
+  String get locationFetchFailed;
 
   /// No description provided for @vehicleType.
   ///
@@ -3049,6 +3199,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'9 August 2026'**
   String get changelogDateAug9;
+
+  /// No description provided for @changelogDateAug11.
+  ///
+  /// In en, this message translates to:
+  /// **'11 August 2026'**
+  String get changelogDateAug11;
+
+  /// No description provided for @changelogVersion1013Address.
+  ///
+  /// In en, this message translates to:
+  /// **'Added optional structured driver addresses with coordinates and full-address details during registration and profile editing.'**
+  String get changelogVersion1013Address;
+
+  /// No description provided for @changelogVersion1013Status.
+  ///
+  /// In en, this message translates to:
+  /// **'Address-only profile updates now use partial PATCH payloads and preserve an approved driver\'s status.'**
+  String get changelogVersion1013Status;
+
+  /// No description provided for @changelogVersion1013Release.
+  ///
+  /// In en, this message translates to:
+  /// **'Released driver app version 1.0.13+15.'**
+  String get changelogVersion1013Release;
 
   /// No description provided for @changelogDateMay31.
   ///
