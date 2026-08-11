@@ -8,15 +8,25 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/l10n/framework_locale_support.dart';
+import '../../../core/models/driver_address.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/services/cloudinary_service.dart';
 import '../../../core/services/driver_registration_service.dart';
+import '../../../core/services/location_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/birthdate_utils.dart';
+import '../../../shared/widgets/driver_address_fields.dart';
 import '../utils/document_picker.dart';
 
-enum _RegistrationStep { personal, vehicle, details, services, documents }
+enum _RegistrationStep {
+  personal,
+  vehicle,
+  details,
+  services,
+  address,
+  documents,
+}
 
 enum _DocumentPickAction { camera, gallery, file }
 
@@ -42,9 +52,19 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   final _vehicleMakeController = TextEditingController();
   final _vehicleModelController = TextEditingController();
   final _vehicleYearController = TextEditingController();
+  final _addressLabelController = TextEditingController();
+  final _addressLatitudeController = TextEditingController();
+  final _addressLongitudeController = TextEditingController();
+  final _fullAddressController = TextEditingController();
+  final _streetNameController = TextEditingController();
+  final _houseNumberController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _postalCodeController = TextEditingController();
+  final _countryController = TextEditingController();
   // Document upload state
   final CloudinaryService _cloudinaryService = CloudinaryService();
   final ImagePicker _imagePicker = ImagePicker();
+  final LocationService _locationService = LocationService();
 
   Uint8List? _drivingLicenseBytes;
   String? _drivingLicenseUrl;
@@ -96,7 +116,11 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
       steps.add(_RegistrationStep.details);
     }
 
-    steps.addAll([_RegistrationStep.services, _RegistrationStep.documents]);
+    steps.addAll([
+      _RegistrationStep.services,
+      _RegistrationStep.address,
+      _RegistrationStep.documents,
+    ]);
 
     return steps;
   }
@@ -111,6 +135,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   // Loading state
   bool _isLoading = false;
+  bool _isLoadingAddressLocation = false;
   String? _error;
   DateTime? _selectedBirthdate;
 
@@ -145,6 +170,15 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     _vehicleMakeController.dispose();
     _vehicleModelController.dispose();
     _vehicleYearController.dispose();
+    _addressLabelController.dispose();
+    _addressLatitudeController.dispose();
+    _addressLongitudeController.dispose();
+    _fullAddressController.dispose();
+    _streetNameController.dispose();
+    _houseNumberController.dispose();
+    _cityController.dispose();
+    _postalCodeController.dispose();
+    _countryController.dispose();
     _pageController.dispose();
     super.dispose();
   }
@@ -204,6 +238,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
           return l10n.pleaseSelectService;
         }
         return null;
+      case _RegistrationStep.address:
+        return _validateAddress(l10n);
       case _RegistrationStep.documents:
         final requiredDocuments = <MapEntry<String, String?>>[
           if (_requiresDrivingLicense)
@@ -295,6 +331,68 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     return value.isEmpty ? null : value;
   }
 
+  DriverAddress? _addressFromFields() {
+    final address = DriverAddress(
+      label: _controllerValueOrNull(_addressLabelController),
+      lat: _controllerValueOrNull(_addressLatitudeController),
+      lng: _controllerValueOrNull(_addressLongitudeController),
+      fullAddress: _controllerValueOrNull(_fullAddressController),
+      streetName: _controllerValueOrNull(_streetNameController),
+      houseNumber: _controllerValueOrNull(_houseNumberController),
+      city: _controllerValueOrNull(_cityController),
+      postalCode: _controllerValueOrNull(_postalCodeController),
+      country: _controllerValueOrNull(_countryController),
+    );
+    return address.hasAnyValue ? address : null;
+  }
+
+  String? _validateAddress(AppLocalizations l10n) {
+    final address = _addressFromFields();
+    if (address == null) return null;
+
+    if (address.label == null ||
+        address.lat == null ||
+        address.lng == null ||
+        address.fullAddress == null) {
+      return l10n.addressRequiredFields;
+    }
+
+    final latitude = double.tryParse(address.lat!);
+    if (latitude == null || latitude < -90 || latitude > 90) {
+      return l10n.invalidLatitude;
+    }
+
+    final longitude = double.tryParse(address.lng!);
+    if (longitude == null || longitude < -180 || longitude > 180) {
+      return l10n.invalidLongitude;
+    }
+
+    return null;
+  }
+
+  Future<void> _useCurrentLocation() async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() {
+      _isLoadingAddressLocation = true;
+      _error = null;
+    });
+
+    final result = await _locationService.getCurrentLocation();
+    if (!mounted) return;
+
+    setState(() {
+      _isLoadingAddressLocation = false;
+      if (result.success && result.position != null) {
+        _addressLatitudeController.text = result.position!.latitude
+            .toStringAsFixed(6);
+        _addressLongitudeController.text = result.position!.longitude
+            .toStringAsFixed(6);
+      } else {
+        _error = result.message ?? l10n.locationFetchFailed;
+      }
+    });
+  }
+
   Future<void> _submit() async {
     final l10n = AppLocalizations.of(context)!;
     final error = _validateCurrentStep(l10n);
@@ -361,6 +459,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         addressDocument: _addressDocumentUrl,
         bankDocument: _bankDocumentUrl,
         otherDocuments: _otherDocumentsUrl,
+        address: _addressFromFields(),
       );
 
       if (!mounted) return;
@@ -574,6 +673,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         return l10n.stepDetails;
       case _RegistrationStep.services:
         return l10n.stepServices;
+      case _RegistrationStep.address:
+        return l10n.address;
       case _RegistrationStep.documents:
         return l10n.stepDocuments;
     }
@@ -612,6 +713,11 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         case _RegistrationStep.services:
           pages.add(
             _buildServicesStep(textColor, secondaryColor, surfaceColor, l10n),
+          );
+          break;
+        case _RegistrationStep.address:
+          pages.add(
+            _buildAddressStep(textColor, secondaryColor, surfaceColor, l10n),
           );
           break;
         case _RegistrationStep.documents:
@@ -1261,6 +1367,60 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         _error = l10n.uploadFailed;
       }
     });
+  }
+
+  Widget _buildAddressStep(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    AppLocalizations l10n,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final hintColor = isDark ? AppColors.darkTextHint : AppColors.lightTextHint;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          Text(
+            l10n.addressStepTitle,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.addressStepSubtitle,
+            style: TextStyle(fontSize: 15, color: secondaryColor),
+          ),
+          const SizedBox(height: 24),
+          DriverAddressFields(
+            labelController: _addressLabelController,
+            latitudeController: _addressLatitudeController,
+            longitudeController: _addressLongitudeController,
+            fullAddressController: _fullAddressController,
+            streetNameController: _streetNameController,
+            houseNumberController: _houseNumberController,
+            cityController: _cityController,
+            postalCodeController: _postalCodeController,
+            countryController: _countryController,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            surfaceColor: surfaceColor,
+            borderColor: borderColor,
+            hintColor: hintColor,
+            isLoadingLocation: _isLoadingAddressLocation,
+            onUseCurrentLocation: _useCurrentLocation,
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
   }
 
   Widget _buildDocumentsStep(

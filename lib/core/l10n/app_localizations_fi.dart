@@ -162,7 +162,87 @@ class AppLocalizationsFi extends AppLocalizations {
   String get address => 'Osoite';
 
   @override
+  String get addressStepTitle => 'Saved Address';
+
+  @override
+  String get addressStepSubtitle =>
+      'Add an optional address for your driver profile.';
+
+  @override
+  String get addressOptionalSubtitle =>
+      'Optional. If you add an address, complete the required fields.';
+
+  @override
+  String get addressLabel => 'Address label';
+
+  @override
+  String get addressLabelHint => 'e.g. Home';
+
+  @override
+  String get fullAddress => 'Full address';
+
+  @override
+  String get fullAddressHint => 'e.g. 12 King Street, Riyadh';
+
+  @override
+  String get latitude => 'Latitude';
+
+  @override
+  String get latitudeHint => 'e.g. 24.713600';
+
+  @override
+  String get longitude => 'Longitude';
+
+  @override
+  String get longitudeHint => 'e.g. 46.675300';
+
+  @override
+  String get useCurrentLocation => 'Use current location';
+
+  @override
+  String get streetName => 'Street name';
+
+  @override
+  String get streetNameHint => 'e.g. King Street';
+
+  @override
+  String get houseNumber => 'House number';
+
+  @override
+  String get houseNumberHint => 'e.g. 12';
+
+  @override
   String get city => 'Kaupunki';
+
+  @override
+  String get cityHint => 'e.g. Riyadh';
+
+  @override
+  String get postalCode => 'Postal code';
+
+  @override
+  String get postalCodeHint => 'e.g. 12345';
+
+  @override
+  String get country => 'Country';
+
+  @override
+  String get countryHint => 'e.g. SA';
+
+  @override
+  String get addressRequiredFields =>
+      'Label, latitude, longitude, and full address are required together.';
+
+  @override
+  String get invalidLatitude => 'Enter a valid latitude between -90 and 90.';
+
+  @override
+  String get invalidLongitude =>
+      'Enter a valid longitude between -180 and 180.';
+
+  @override
+  String get locationFetchFailed =>
+      'Unable to determine your current location.';
 
   @override
   String get vehicleType => 'Ajoneuvotyyppi';
@@ -1565,6 +1645,21 @@ class AppLocalizationsFi extends AppLocalizations {
 
   @override
   String get changelogDateAug9 => '9. elokuuta 2026';
+
+  @override
+  String get changelogDateAug11 => '11. elokuuta 2026';
+
+  @override
+  String get changelogVersion1013Address =>
+      'Lisättiin valinnaiset jäsennellyt kuljettajan osoitteet koordinaatteineen ja täydellisine osoitetietoineen rekisteröinnin ja profiilin muokkauksen yhteyteen.';
+
+  @override
+  String get changelogVersion1013Status =>
+      'Pelkkien osoitetietojen päivitykset käyttävät nyt osittaisia PATCH-pyyntöjä ja säilyttävät hyväksytyn kuljettajan tilan.';
+
+  @override
+  String get changelogVersion1013Release =>
+      'Kuljettajasovelluksen versio 1.0.13+15 julkaistiin.';
 
   @override
   String get changelogDateMay31 => '31. toukokuuta 2026';

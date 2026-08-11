@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import '../api/api_client.dart';
+import '../models/driver_address.dart';
 import '../models/driver_profile.dart';
 import '../services/driver_service.dart';
 import '../services/geocoding_service.dart';
@@ -97,6 +98,7 @@ class DriverProvider extends ChangeNotifier {
     String? email,
     String? vehicleType,
     String? vehiclePlate,
+    DriverAddress? address,
   }) async {
     _isLoading = true;
     _error = null;
@@ -109,6 +111,7 @@ class DriverProvider extends ChangeNotifier {
         email: email,
         vehicleType: vehicleType,
         vehiclePlate: vehiclePlate,
+        address: address,
       );
       _isLoading = false;
       notifyListeners();
@@ -142,13 +145,14 @@ class DriverProvider extends ChangeNotifier {
     String? healthInsuranceDocument,
     String? addressDocument,
     String? bankDocument,
+    DriverAddress? address,
   }) async {
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      await _driverService.updateUserProfile(
+      final updatedProfile = await _driverService.updateUserProfile(
         name: name,
         phone: phone,
         birthdate: birthdate,
@@ -169,7 +173,10 @@ class DriverProvider extends ChangeNotifier {
         healthInsuranceDocument: healthInsuranceDocument,
         addressDocument: addressDocument,
         bankDocument: bankDocument,
+        address: address,
       );
+      _profile = updatedProfile;
+      notifyListeners();
       // Refresh driver profile to reflect changes
       await fetchProfile();
       return true;

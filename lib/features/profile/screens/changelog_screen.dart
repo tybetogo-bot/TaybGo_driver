@@ -400,10 +400,32 @@ class ChangelogScreen extends StatelessWidget {
 
   List<_ChangelogRelease> _buildReleases(AppLocalizations l10n) => [
     _ChangelogRelease(
+      version: '1.0.13+15',
+      build: '15',
+      date: l10n.changelogDateAug11,
+      isCurrent: true,
+      sections: [
+        _ChangelogSection(
+          title: l10n.changelogImprovements,
+          icon: Icons.location_on_outlined,
+          items: [l10n.changelogVersion1013Address],
+        ),
+        _ChangelogSection(
+          title: l10n.changelogStability,
+          icon: Icons.verified_user_outlined,
+          items: [l10n.changelogVersion1013Status],
+        ),
+        _ChangelogSection(
+          title: l10n.changelogRelease,
+          icon: Icons.rocket_launch_outlined,
+          items: [l10n.changelogVersion1013Release],
+        ),
+      ],
+    ),
+    _ChangelogRelease(
       version: '1.0.12+14',
       build: '14',
       date: l10n.changelogDateAug9,
-      isCurrent: true,
       sections: [
         _ChangelogSection(
           title: l10n.changelogFixes,

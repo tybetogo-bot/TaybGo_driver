@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../api/api_client.dart';
 import '../api/api_constants.dart';
+import '../models/driver_address.dart';
 import '../utils/birthdate_utils.dart';
 
 class DriverRegistrationService {
@@ -32,6 +33,7 @@ class DriverRegistrationService {
     String? healthInsuranceDocument,
     String? addressDocument,
     String? bankDocument,
+    DriverAddress? address,
   }) async {
     try {
       final data = <String, dynamic>{
@@ -82,6 +84,12 @@ class DriverRegistrationService {
       if (otherDocuments != null) {
         data['other_documents'] = otherDocuments;
       }
+      if (address != null) {
+        final addressData = address.toCreateJson();
+        if (addressData.isNotEmpty) {
+          data['address'] = addressData;
+        }
+      }
 
       debugPrint('[DriverRegistrationService] === REGISTER DRIVER REQUEST ===');
       debugPrint(
@@ -100,12 +108,20 @@ class DriverRegistrationService {
       debugPrint('[DriverRegistrationService] Status: ${response.statusCode}');
       debugPrint('[DriverRegistrationService] Data: ${response.data}');
 
+      final responseData = response.data is Map
+          ? Map<String, dynamic>.from(response.data as Map)
+          : <String, dynamic>{};
+      final responseAddress = responseData['address'];
+
       return DriverRegistrationResult(
         success: true,
-        message: response.data['message'] ?? 'Registration successful',
-        driverId: response.data['id']?.toString(),
+        message: responseData['message'] ?? 'Registration successful',
+        driverId: responseData['id']?.toString(),
         isVerified:
-            response.data['is_verified'] ?? response.data['verified'] ?? false,
+            responseData['is_verified'] ?? responseData['verified'] ?? false,
+        address: responseAddress is Map
+            ? DriverAddress.fromJson(Map<String, dynamic>.from(responseAddress))
+            : null,
       );
     } on DioException catch (e) {
       debugPrint(
@@ -146,11 +162,13 @@ class DriverRegistrationResult {
   final String message;
   final String? driverId;
   final bool isVerified;
+  final DriverAddress? address;
 
   DriverRegistrationResult({
     required this.success,
     required this.message,
     this.driverId,
     this.isVerified = false,
+    this.address,
   });
 }
