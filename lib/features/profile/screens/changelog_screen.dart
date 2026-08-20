@@ -411,6 +411,7 @@ class ChangelogScreen extends StatelessWidget {
           items: [
             l10n.changelogVersion101416ApplicationFlow,
             l10n.changelogVersion101416Address,
+            l10n.changelogVersion101416ProfileAddress,
             l10n.changelogVersion101416Vehicle,
             l10n.changelogVersion101416Documents,
           ],

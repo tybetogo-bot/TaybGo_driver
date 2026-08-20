@@ -872,6 +872,24 @@ class AppLocalizationsLb extends AppLocalizations {
   String get editProfile => 'Profil änneren';
 
   @override
+  String get currentAddress => 'Current address';
+
+  @override
+  String get editAddress => 'Edit Address';
+
+  @override
+  String get saveAddress => 'Save Address';
+
+  @override
+  String get noAddressAdded => 'No address added yet';
+
+  @override
+  String get addressUpdatedSuccessfully => 'Address updated successfully';
+
+  @override
+  String get failedToUpdateAddress => 'Failed to update address';
+
+  @override
   String get changePassword => 'Passwuert änneren';
 
   @override
@@ -1781,11 +1799,15 @@ class AppLocalizationsLb extends AppLocalizations {
 
   @override
   String get changelogVersion101416Address =>
-      'Refactored address entry in registration and Edit Profile around required Google Places search, a clear selected-address summary, complete structured address data, coordinates, and stronger validation.';
+      'Refactored registration address entry around required Google Places search, a clear selected-address summary, complete structured address data, coordinates, and stronger validation.';
+
+  @override
+  String get changelogVersion101416ProfileAddress =>
+      'Edit Profile now shows the saved address in a compact card with an Edit Address action that opens a dedicated Google Places editor.';
 
   @override
   String get changelogVersion101416Vehicle =>
-      'Restored complete vehicle details and added a vehicle-year selector covering 1960 through next year.';
+      'Restored complete vehicle details and added the same vehicle-year selector to registration and Edit Profile, covering 1960 through next year.';
 
   @override
   String get changelogVersion101416Documents =>
