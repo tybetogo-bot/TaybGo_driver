@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,16 +7,15 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:provider/provider.dart';
+import '../../../core/constants/route_constants.dart';
 import '../../../core/models/driver_address.dart';
 import '../../../core/models/driver_profile.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/l10n/framework_locale_support.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/services/cloudinary_service.dart';
-import '../../../core/services/google_places_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/birthdate_utils.dart';
-import '../../../shared/widgets/google_places_address_picker.dart';
 import '../../application/utils/document_picker.dart';
 
 enum _DocumentPickAction { camera, gallery, file }
@@ -27,11 +28,6 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
-  static const _googleMapsApiKey = String.fromEnvironment(
-    'GOOGLE_MAPS_API_KEY',
-  );
-  static const _existingAddressSelectionId = 'existing-profile-address';
-
   final _formKey = GlobalKey<FormState>();
 
   static String _digitsOnly(String value) {
@@ -60,22 +56,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _vehicleColorController;
   late TextEditingController _vehicleMakeController;
   late TextEditingController _vehicleModelController;
-  late TextEditingController _vehicleYearController;
-
-  // Structured profile address
-  late TextEditingController _addressLabelController;
-  late TextEditingController _addressLatitudeController;
-  late TextEditingController _addressLongitudeController;
-  late TextEditingController _fullAddressController;
-  late TextEditingController _streetNameController;
-  late TextEditingController _houseNumberController;
-  late TextEditingController _cityController;
-  late TextEditingController _postalCodeController;
-  late TextEditingController _countryController;
-  late TextEditingController _placesSearchController;
-  GooglePlacesService? _placesService;
-  DriverAddress? _selectedGoogleAddress;
-  String? _selectedGooglePlaceId;
 
   // Document status
   Uint8List? _drivingLicenseBytes;
@@ -105,6 +85,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   // Vehicle type & car size
   String? _selectedVehicleType;
   String? _selectedCarSize;
+  int? _selectedVehicleYear;
+
+  int get _maximumVehicleYear => DateTime.now().year + 1;
+  List<int> get _vehicleYears => List<int>.generate(
+    _maximumVehicleYear - 1960 + 1,
+    (index) => _maximumVehicleYear - index,
+  );
 
   late final DriverProvider _driverProvider;
   final CloudinaryService _cloudinaryService = CloudinaryService();
@@ -117,12 +104,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   @override
   void initState() {
     super.initState();
-    if (_googleMapsApiKey.isNotEmpty) {
-      _placesService = GooglePlacesService(apiKey: _googleMapsApiKey);
-    }
     _driverProvider = context.read<DriverProvider>();
     _driverProvider.addListener(_handleDriverProfileChanged);
     final profile = _driverProvider.profile;
+    if (profile == null) {
+      unawaited(_driverProvider.fetchProfile());
+    }
 
     // Initialize personal info
     _nameController = TextEditingController(text: profile?.fullName ?? '');
@@ -148,41 +135,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _vehicleModelController = TextEditingController(
       text: profile?.vehicleModel ?? '',
     );
-    _vehicleYearController = TextEditingController(
-      text: profile?.vehicleYear != null && profile!.vehicleYear! > 0
-          ? profile.vehicleYear.toString()
-          : '',
-    );
-
-    final address = profile?.address;
-    _addressLabelController = TextEditingController(text: address?.label ?? '');
-    _addressLatitudeController = TextEditingController(
-      text: address?.lat ?? '',
-    );
-    _addressLongitudeController = TextEditingController(
-      text: address?.lng ?? '',
-    );
-    _fullAddressController = TextEditingController(
-      text: address?.fullAddress ?? '',
-    );
-    _streetNameController = TextEditingController(
-      text: address?.streetName ?? '',
-    );
-    _houseNumberController = TextEditingController(
-      text: address?.houseNumber ?? '',
-    );
-    _cityController = TextEditingController(text: address?.city ?? '');
-    _postalCodeController = TextEditingController(
-      text: address?.postalCode ?? '',
-    );
-    _countryController = TextEditingController(text: address?.country ?? '');
-    _placesSearchController = TextEditingController(
-      text: address?.fullAddress ?? '',
-    );
-    _selectedGoogleAddress = address;
-    _selectedGooglePlaceId = address == null
-        ? null
-        : _existingAddressSelectionId;
+    _selectedVehicleYear = _validVehicleYear(profile?.vehicleYear);
 
     // Initialize document URLs from existing profile
     _drivingLicenseUrl = profile?.drivingLicense;
@@ -223,18 +176,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _vehicleColorController.dispose();
     _vehicleMakeController.dispose();
     _vehicleModelController.dispose();
-    _vehicleYearController.dispose();
-    _addressLabelController.dispose();
-    _addressLatitudeController.dispose();
-    _addressLongitudeController.dispose();
-    _fullAddressController.dispose();
-    _streetNameController.dispose();
-    _houseNumberController.dispose();
-    _cityController.dispose();
-    _postalCodeController.dispose();
-    _countryController.dispose();
-    _placesSearchController.dispose();
-    _placesService?.close();
     super.dispose();
   }
 
@@ -277,26 +218,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _vehicleColorController.text = profile.vehicleColor ?? '';
     _vehicleMakeController.text = profile.vehicleMake ?? '';
     _vehicleModelController.text = profile.vehicleModel ?? '';
-    _vehicleYearController.text =
-        profile.vehicleYear != null && profile.vehicleYear! > 0
-        ? profile.vehicleYear.toString()
-        : '';
-
-    final address = profile.address;
-    _addressLabelController.text = address?.label ?? '';
-    _addressLatitudeController.text = address?.lat ?? '';
-    _addressLongitudeController.text = address?.lng ?? '';
-    _fullAddressController.text = address?.fullAddress ?? '';
-    _streetNameController.text = address?.streetName ?? '';
-    _houseNumberController.text = address?.houseNumber ?? '';
-    _cityController.text = address?.city ?? '';
-    _postalCodeController.text = address?.postalCode ?? '';
-    _countryController.text = address?.country ?? '';
-    _placesSearchController.text = address?.fullAddress ?? '';
-    _selectedGoogleAddress = address;
-    _selectedGooglePlaceId = address == null
-        ? null
-        : _existingAddressSelectionId;
+    _selectedVehicleYear = _validVehicleYear(profile.vehicleYear);
 
     _drivingLicenseUrl = profile.drivingLicense;
     _idDocumentUrl = profile.idDocument;
@@ -403,163 +325,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
   }
 
-  String? _addressFieldValue(TextEditingController controller) {
-    final value = controller.text.trim();
-    return value.isEmpty ? null : value;
-  }
-
-  DriverAddress? _addressFromFields() {
-    final address = DriverAddress(
-      label: _addressFieldValue(_addressLabelController),
-      lat: _addressFieldValue(_addressLatitudeController),
-      lng: _addressFieldValue(_addressLongitudeController),
-      fullAddress: _addressFieldValue(_fullAddressController),
-      streetName: _addressFieldValue(_streetNameController),
-      houseNumber: _addressFieldValue(_houseNumberController),
-      city: _addressFieldValue(_cityController),
-      postalCode: _addressFieldValue(_postalCodeController),
-      country: _addressFieldValue(_countryController),
-    );
-    return address.hasAnyValue ? address : null;
-  }
-
-  String? _validateAddress(AppLocalizations l10n) {
-    if (_placesSearchController.text.trim().isEmpty) {
-      return l10n.addressRequired;
-    }
-    if (_selectedGooglePlaceId == null) {
-      return l10n.selectAddressSuggestion;
-    }
-
-    final address = _addressFromFields();
-    if (address == null) return l10n.addressRequired;
-
-    if (address.label == null ||
-        address.lat == null ||
-        address.lng == null ||
-        address.fullAddress == null) {
-      return l10n.addressCoordinatesMissing;
-    }
-
-    final latitude = double.tryParse(address.lat!);
-    if (latitude == null || latitude < -90 || latitude > 90) {
-      return l10n.invalidLatitude;
-    }
-
-    final longitude = double.tryParse(address.lng!);
-    if (longitude == null || longitude < -180 || longitude > 180) {
-      return l10n.invalidLongitude;
-    }
-
-    return null;
-  }
-
-  void _handleGooglePlaceSelection(GooglePlaceAddressSelection selection) {
-    final l10n = AppLocalizations.of(context)!;
-    final sourceAddress = selection.address;
-    final address = DriverAddress(
-      label: sourceAddress.label ?? l10n.home,
-      lat: sourceAddress.lat,
-      lng: sourceAddress.lng,
-      fullAddress: sourceAddress.fullAddress,
-      streetName: sourceAddress.streetName,
-      houseNumber: sourceAddress.houseNumber,
-      city: sourceAddress.city,
-      postalCode: sourceAddress.postalCode,
-      country: sourceAddress.country,
-    );
-
-    setState(() {
-      _selectedGooglePlaceId = selection.placeId;
-      _selectedGoogleAddress = address;
-      _addressLabelController.text = address.label!;
-      _addressLatitudeController.text = address.lat ?? '';
-      _addressLongitudeController.text = address.lng ?? '';
-      _fullAddressController.text = address.fullAddress ?? '';
-      _streetNameController.text = address.streetName ?? '';
-      _houseNumberController.text = address.houseNumber ?? '';
-      _cityController.text = address.city ?? '';
-      _postalCodeController.text = address.postalCode ?? '';
-      _countryController.text = address.country ?? '';
-    });
-  }
-
-  void _clearGoogleAddress() {
-    _placesSearchController.clear();
-    setState(() {
-      _selectedGooglePlaceId = null;
-      _selectedGoogleAddress = null;
-      _addressLabelController.clear();
-      _addressLatitudeController.clear();
-      _addressLongitudeController.clear();
-      _fullAddressController.clear();
-      _streetNameController.clear();
-      _houseNumberController.clear();
-      _cityController.clear();
-      _postalCodeController.clear();
-      _countryController.clear();
-    });
-  }
-
-  void _handleAddressQueryChanged(String _) {
-    setState(() {
-      if (_selectedGooglePlaceId != null) {
-        _selectedGooglePlaceId = null;
-        _selectedGoogleAddress = null;
-        _addressLatitudeController.clear();
-        _addressLongitudeController.clear();
-        _fullAddressController.clear();
-        _streetNameController.clear();
-        _houseNumberController.clear();
-        _cityController.clear();
-        _postalCodeController.clear();
-        _countryController.clear();
-      }
-    });
-  }
-
-  void _handleAddressDetailsChanged() {
-    setState(() => _selectedGoogleAddress = _addressFromFields());
-  }
-
-  void _handlePlacesError(Object error) {
-    debugPrint('[EditProfileScreen] Google Places error: $error');
-    if (!mounted) return;
-    _showErrorSnackBar(AppLocalizations.of(context)!.addressSearchError);
-  }
-
-  String? _changedAddressValue(String? value, String? original) {
-    if (value?.trim() == original?.trim()) return null;
-    return value?.trim().isEmpty == true ? null : value?.trim();
-  }
-
-  DriverAddress? _buildAddressUpdate() {
-    final entered = _addressFromFields();
-    if (entered == null) return null;
-
-    final existing = _driverProvider.profile?.address;
-    if (existing == null) return entered;
-
-    final patch = DriverAddress(
-      label: _changedAddressValue(entered.label, existing.label),
-      lat: _changedAddressValue(entered.lat, existing.lat),
-      lng: _changedAddressValue(entered.lng, existing.lng),
-      fullAddress: _changedAddressValue(
-        entered.fullAddress,
-        existing.fullAddress,
-      ),
-      streetName: _changedAddressValue(entered.streetName, existing.streetName),
-      houseNumber: _changedAddressValue(
-        entered.houseNumber,
-        existing.houseNumber,
-      ),
-      city: _changedAddressValue(entered.city, existing.city),
-      postalCode: _changedAddressValue(entered.postalCode, existing.postalCode),
-      country: _changedAddressValue(entered.country, existing.country),
-    );
-    return patch.hasAnyValue ? patch : null;
-  }
-
   bool _sameDate(DateTime? first, DateTime? second) {
     if (first == null || second == null) return first == second;
     return first.year == second.year &&
@@ -608,16 +373,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     final l10n = AppLocalizations.of(context)!;
-    final addressError = _validateAddress(l10n);
-    if (addressError != null) {
-      _showErrorSnackBar(addressError);
-      return;
-    }
-
     final hasVehicleChanges = _hasVehicleDataChanges();
     final hasDocumentChanges = _hasDocumentChanges();
     final hasServiceChanges = _hasServiceChanges();
-    final addressUpdate = _buildAddressUpdate();
     final requiredDocumentsError = _validateCarRequiredDocuments(l10n);
     if (requiredDocumentsError != null) {
       _showErrorSnackBar(requiredDocumentsError);
@@ -666,12 +424,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               _vehicleModelController.text.trim().isNotEmpty
           ? _vehicleModelController.text.trim()
           : null,
-      vehicleYear:
-          hasVehicleChanges &&
-              isCarType &&
-              _vehicleYearController.text.trim().isNotEmpty
-          ? int.tryParse(_vehicleYearController.text.trim())
-          : null,
+      vehicleYear: hasVehicleChanges && isCarType ? _selectedVehicleYear : null,
       acceptsFood: hasServiceChanges ? _acceptsFood : null,
       acceptsShipping: hasServiceChanges ? _acceptsShipping : null,
       acceptsTaxi: hasServiceChanges
@@ -701,7 +454,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         _bankDocumentUrl,
         _driverProvider.profile?.bankDocument,
       ),
-      address: addressUpdate,
     );
 
     if (!mounted) return;
@@ -899,26 +651,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               const SizedBox(height: 28),
 
-              // Required Google Places address section
-              _buildSectionHeader(l10n.address, Icons.home_outlined, textColor),
+              _buildSectionHeader(
+                l10n.currentAddress,
+                Icons.home_outlined,
+                textColor,
+              ),
               const SizedBox(height: 16),
-              GooglePlacesAddressPicker(
-                service: _placesService,
-                searchController: _placesSearchController,
-                selectedAddress: _selectedGoogleAddress,
-                labelController: _addressLabelController,
-                houseNumberController: _houseNumberController,
-                postalCodeController: _postalCodeController,
-                textColor: textColor,
-                secondaryColor: secondaryColor,
-                surfaceColor: surfaceColor,
-                borderColor: borderColor,
-                hintColor: hintColor,
-                onSelection: _handleGooglePlaceSelection,
-                onClear: _clearGoogleAddress,
-                onError: _handlePlacesError,
-                onQueryChanged: _handleAddressQueryChanged,
-                onDetailsChanged: _handleAddressDetailsChanged,
+              Consumer<DriverProvider>(
+                builder: (context, provider, _) => _buildCurrentAddressCard(
+                  provider.profile?.address,
+                  textColor,
+                  secondaryColor,
+                  surfaceColor,
+                  borderColor,
+                  l10n,
+                ),
               ),
 
               const SizedBox(height: 28),
@@ -1096,28 +843,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   secondaryColor,
                 ),
                 const SizedBox(height: 8),
-                _buildTextField(
-                  controller: _vehicleYearController,
-                  hint: l10n.enterVehicleYear,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                _buildVehicleYearDropdown(
                   surfaceColor: surfaceColor,
                   borderColor: borderColor,
                   textColor: textColor,
                   hintColor: hintColor,
-                  validator: (value) {
-                    final trimmed = value?.trim() ?? '';
-                    if (trimmed.isEmpty) {
-                      return l10n.pleaseEnterVehicleYear;
-                    }
-                    final year = int.tryParse(trimmed);
-                    if (year == null ||
-                        year < 1990 ||
-                        year > DateTime.now().year + 1) {
-                      return l10n.invalidVehicleYear;
-                    }
-                    return null;
-                  },
+                  l10n: l10n,
                 ),
               ],
 
@@ -1365,6 +1096,96 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  Widget _buildCurrentAddressCard(
+    DriverAddress? address,
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    Color borderColor,
+    AppLocalizations l10n,
+  ) {
+    final fullAddress = address?.fullAddress?.toString().trim();
+    final area = [
+      address?.postalCode,
+      address?.city,
+      address?.country,
+    ].whereType<String>().where((value) => value.trim().isNotEmpty).join(' · ');
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.location_on_rounded,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      fullAddress == null || fullAddress.isEmpty
+                          ? l10n.noAddressAdded
+                          : fullAddress,
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        height: 1.35,
+                      ),
+                    ),
+                    if (area.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        area,
+                        style: TextStyle(color: secondaryColor, fontSize: 12),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          OutlinedButton.icon(
+            onPressed: () => context.push(RouteConstants.editAddress),
+            icon: const Icon(Icons.edit_outlined, size: 17),
+            label: Text(l10n.editAddress),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              side: BorderSide(
+                color: AppColors.primary.withValues(alpha: 0.45),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFieldLabel(IconData icon, String label, Color color) {
     return Row(
       children: [
@@ -1491,6 +1312,68 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  Widget _buildVehicleYearDropdown({
+    required Color surfaceColor,
+    required Color borderColor,
+    required Color textColor,
+    required Color hintColor,
+    required AppLocalizations l10n,
+  }) {
+    return DropdownButtonFormField<int>(
+      key: ValueKey(_selectedVehicleYear),
+      initialValue: _selectedVehicleYear,
+      menuMaxHeight: 320,
+      decoration: InputDecoration(
+        hintText: l10n.selectVehicleYear,
+        hintStyle: TextStyle(fontSize: 14, color: hintColor),
+        filled: true,
+        fillColor: surfaceColor,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: borderColor),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+        ),
+      ),
+      dropdownColor: surfaceColor,
+      style: TextStyle(fontSize: 15, color: textColor),
+      items: _vehicleYears
+          .map(
+            (year) => DropdownMenuItem<int>(
+              value: year,
+              child: Text(year.toString()),
+            ),
+          )
+          .toList(),
+      onChanged: (value) => setState(() => _selectedVehicleYear = value),
+      validator: (value) {
+        if (value == null) return l10n.pleaseEnterVehicleYear;
+        if (value < 1960 || value > _maximumVehicleYear) {
+          return l10n.invalidVehicleYear;
+        }
+        return null;
+      },
+    );
+  }
+
   bool get _isAnyDocumentUploading =>
       _drivingLicenseUploading ||
       _idDocumentUploading ||
@@ -1551,9 +1434,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _normalizeVehicleText(profile.vehicleMake) ||
         _normalizeVehicleText(_vehicleModelController.text) !=
             _normalizeVehicleText(profile.vehicleModel) ||
-        _normalizeVehicleYear(
-              int.tryParse(_vehicleYearController.text.trim()),
-            ) !=
+        _normalizeVehicleYear(_selectedVehicleYear) !=
             _normalizeVehicleYear(profile.vehicleYear);
   }
 
@@ -1592,6 +1473,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   int? _normalizeVehicleYear(int? value) {
     if (value == null || value <= 0) return null;
+    return value;
+  }
+
+  int? _validVehicleYear(int? value) {
+    if (value == null || value < 1960 || value > _maximumVehicleYear) {
+      return null;
+    }
     return value;
   }
 

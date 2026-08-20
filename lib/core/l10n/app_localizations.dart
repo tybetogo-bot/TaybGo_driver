@@ -1766,6 +1766,42 @@ abstract class AppLocalizations {
   /// **'Edit Profile'**
   String get editProfile;
 
+  /// No description provided for @currentAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Current address'**
+  String get currentAddress;
+
+  /// No description provided for @editAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Address'**
+  String get editAddress;
+
+  /// No description provided for @saveAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Address'**
+  String get saveAddress;
+
+  /// No description provided for @noAddressAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'No address added yet'**
+  String get noAddressAdded;
+
+  /// No description provided for @addressUpdatedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Address updated successfully'**
+  String get addressUpdatedSuccessfully;
+
+  /// No description provided for @failedToUpdateAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update address'**
+  String get failedToUpdateAddress;
+
   /// No description provided for @changePassword.
   ///
   /// In en, this message translates to:
@@ -3419,13 +3455,19 @@ abstract class AppLocalizations {
   /// No description provided for @changelogVersion101416Address.
   ///
   /// In en, this message translates to:
-  /// **'Refactored address entry in registration and Edit Profile around required Google Places search, a clear selected-address summary, complete structured address data, coordinates, and stronger validation.'**
+  /// **'Refactored registration address entry around required Google Places search, a clear selected-address summary, complete structured address data, coordinates, and stronger validation.'**
   String get changelogVersion101416Address;
+
+  /// No description provided for @changelogVersion101416ProfileAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile now shows the saved address in a compact card with an Edit Address action that opens a dedicated Google Places editor.'**
+  String get changelogVersion101416ProfileAddress;
 
   /// No description provided for @changelogVersion101416Vehicle.
   ///
   /// In en, this message translates to:
-  /// **'Restored complete vehicle details and added a vehicle-year selector covering 1960 through next year.'**
+  /// **'Restored complete vehicle details and added the same vehicle-year selector to registration and Edit Profile, covering 1960 through next year.'**
   String get changelogVersion101416Vehicle;
 
   /// No description provided for @changelogVersion101416Documents.
