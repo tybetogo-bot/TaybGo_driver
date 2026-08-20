@@ -118,7 +118,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
     _selectedBirthdate = profile?.birthdate;
     _birthdateController = TextEditingController();
-    _syncBirthdateController();
 
     // Initialize vehicle info
     _selectedVehicleType = profile?.vehicleType;
@@ -164,6 +163,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     if (profile != null) {
       _profileInitialized = true;
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Birthdate formatting depends on the inherited app locale, which is not
+    // safe to read until after initState has completed.
+    _syncBirthdateController();
   }
 
   @override
