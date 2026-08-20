@@ -361,7 +361,14 @@ class OrderService {
           debugPrint(
             '[OrderService] Found active order: ${order.id} with status ${order.status}',
           );
-          return order;
+          try {
+            return await getOrderDetails(order.id);
+          } catch (error) {
+            debugPrint(
+              '[OrderService] Falling back to list data for active order ${order.id}: $error',
+            );
+            return order;
+          }
         }
       }
 

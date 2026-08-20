@@ -419,14 +419,80 @@ abstract class AppLocalizations {
   /// No description provided for @addressStepSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Add an optional address for your driver profile.'**
+  /// **'Search for your home address and select the correct result from Google.'**
   String get addressStepSubtitle;
 
   /// No description provided for @addressOptionalSubtitle.
   ///
   /// In en, this message translates to:
-  /// **'Optional. If you add an address, complete the required fields.'**
+  /// **'Required — select an address from Google so we can verify your service area.'**
   String get addressOptionalSubtitle;
+
+  /// No description provided for @addressRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please search for and select your address.'**
+  String get addressRequired;
+
+  /// No description provided for @searchForAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for your address'**
+  String get searchForAddress;
+
+  /// No description provided for @searchAddressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Start typing a street, building, or place name'**
+  String get searchAddressHint;
+
+  /// No description provided for @addressSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Address selected'**
+  String get addressSelected;
+
+  /// No description provided for @addressDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Address details'**
+  String get addressDetails;
+
+  /// No description provided for @addressSearchUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Address search is not configured for this build.'**
+  String get addressSearchUnavailable;
+
+  /// No description provided for @addressSearchError.
+  ///
+  /// In en, this message translates to:
+  /// **'We couldn\'t load address results. Check your connection and try again.'**
+  String get addressSearchError;
+
+  /// No description provided for @noAddressResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching addresses found. Try adding a city or postal code.'**
+  String get noAddressResults;
+
+  /// No description provided for @selectAddressSuggestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select an address from the Google suggestions.'**
+  String get selectAddressSuggestion;
+
+  /// No description provided for @addressCoordinatesMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'This result is missing location details. Please choose another address.'**
+  String get addressCoordinatesMissing;
+
+  /// No description provided for @clearAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear address'**
+  String get clearAddress;
 
   /// No description provided for @addressLabel.
   ///
@@ -584,6 +650,12 @@ abstract class AppLocalizations {
   /// **'Car'**
   String get car;
 
+  /// No description provided for @van.
+  ///
+  /// In en, this message translates to:
+  /// **'Van'**
+  String get van;
+
   /// No description provided for @motorcycle.
   ///
   /// In en, this message translates to:
@@ -655,6 +727,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Taxi'**
   String get taxi;
+
+  /// No description provided for @foodOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Food order'**
+  String get foodOrder;
+
+  /// No description provided for @shippingOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Shipping order'**
+  String get shippingOrder;
+
+  /// No description provided for @taxiRide.
+  ///
+  /// In en, this message translates to:
+  /// **'Taxi ride'**
+  String get taxiRide;
+
+  /// No description provided for @allOrders.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get allOrders;
 
   /// No description provided for @uploadDocuments.
   ///
@@ -1010,6 +1106,18 @@ abstract class AppLocalizations {
   /// **'Delivered'**
   String get delivered;
 
+  /// No description provided for @expired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get expired;
+
+  /// No description provided for @restaurantDelivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Restaurant delivered'**
+  String get restaurantDelivered;
+
   /// No description provided for @pickup.
   ///
   /// In en, this message translates to:
@@ -1213,6 +1321,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delivery Fee'**
   String get deliveryFee;
+
+  /// No description provided for @driverDeliveryFee.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver delivery fee'**
+  String get driverDeliveryFee;
+
+  /// No description provided for @requiredVehicle.
+  ///
+  /// In en, this message translates to:
+  /// **'Required vehicle'**
+  String get requiredVehicle;
+
+  /// No description provided for @packageDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Package details'**
+  String get packageDetails;
+
+  /// No description provided for @packageSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get packageSize;
+
+  /// No description provided for @packageWeight.
+  ///
+  /// In en, this message translates to:
+  /// **'Weight'**
+  String get packageWeight;
+
+  /// No description provided for @packageContents.
+  ///
+  /// In en, this message translates to:
+  /// **'Contents'**
+  String get packageContents;
+
+  /// No description provided for @rideDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Ride details'**
+  String get rideDetails;
+
+  /// No description provided for @deliveryInstructions.
+  ///
+  /// In en, this message translates to:
+  /// **'Instructions'**
+  String get deliveryInstructions;
+
+  /// No description provided for @typeDetailsUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional details will appear when provided by dispatch.'**
+  String get typeDetailsUnavailable;
+
+  /// No description provided for @headToPassenger.
+  ///
+  /// In en, this message translates to:
+  /// **'Head to passenger'**
+  String get headToPassenger;
+
+  /// No description provided for @passengerDroppedOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Passenger dropped off'**
+  String get passengerDroppedOff;
+
+  /// No description provided for @completeRide.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete ride'**
+  String get completeRide;
+
+  /// No description provided for @acceptRide.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept ride'**
+  String get acceptRide;
+
+  /// No description provided for @acceptShippingOrder.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept shipment'**
+  String get acceptShippingOrder;
 
   /// No description provided for @total.
   ///
@@ -2420,6 +2612,18 @@ abstract class AppLocalizations {
   /// **'Services'**
   String get stepServices;
 
+  /// No description provided for @applicationStepProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of {total}'**
+  String applicationStepProgress(int current, int total);
+
+  /// No description provided for @applicationNextStep.
+  ///
+  /// In en, this message translates to:
+  /// **'Next: {step}'**
+  String applicationNextStep(String step);
+
   /// No description provided for @ecoFriendlyOption.
   ///
   /// In en, this message translates to:
@@ -2443,12 +2647,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Large deliveries'**
   String get largeDeliveries;
-
-  /// No description provided for @van.
-  ///
-  /// In en, this message translates to:
-  /// **'Van'**
-  String get van;
 
   /// No description provided for @deleteDataWarning.
   ///
@@ -2623,6 +2821,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Remember to collect payment from the customer'**
   String get collectCashReminder;
+
+  /// No description provided for @collectCashAmountReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'Collect {amount} from the customer before completing.'**
+  String collectCashAmountReminder(String amount);
 
   /// No description provided for @locationPermissionLostWhileOnline.
   ///
@@ -2912,6 +3116,12 @@ abstract class AppLocalizations {
   /// **'e.g. 2020'**
   String get enterVehicleYear;
 
+  /// No description provided for @selectVehicleYear.
+  ///
+  /// In en, this message translates to:
+  /// **'Select vehicle year'**
+  String get selectVehicleYear;
+
   /// No description provided for @vehicleDetailsTitle.
   ///
   /// In en, this message translates to:
@@ -2933,7 +3143,7 @@ abstract class AppLocalizations {
   /// No description provided for @stepDocuments.
   ///
   /// In en, this message translates to:
-  /// **'Docs'**
+  /// **'Documents'**
   String get stepDocuments;
 
   /// No description provided for @documentsTitle.
@@ -3047,7 +3257,7 @@ abstract class AppLocalizations {
   /// No description provided for @invalidVehicleYear.
   ///
   /// In en, this message translates to:
-  /// **'Please enter a valid year'**
+  /// **'Please select a valid vehicle year'**
   String get invalidVehicleYear;
 
   /// No description provided for @dropOrder.
@@ -3193,6 +3403,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Release'**
   String get changelogRelease;
+
+  /// No description provided for @changelogDateAug20.
+  ///
+  /// In en, this message translates to:
+  /// **'20 August 2026'**
+  String get changelogDateAug20;
+
+  /// No description provided for @changelogVersion101416ApplicationFlow.
+  ///
+  /// In en, this message translates to:
+  /// **'Redesigned the driver application into five focused steps with clearer progress, organized sections, better field guidance, and inline validation.'**
+  String get changelogVersion101416ApplicationFlow;
+
+  /// No description provided for @changelogVersion101416Address.
+  ///
+  /// In en, this message translates to:
+  /// **'Refactored address entry in registration and Edit Profile around required Google Places search, a clear selected-address summary, complete structured address data, coordinates, and stronger validation.'**
+  String get changelogVersion101416Address;
+
+  /// No description provided for @changelogVersion101416Vehicle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restored complete vehicle details and added a vehicle-year selector covering 1960 through next year.'**
+  String get changelogVersion101416Vehicle;
+
+  /// No description provided for @changelogVersion101416Documents.
+  ///
+  /// In en, this message translates to:
+  /// **'Improved required-document presentation, upload states, and registration error feedback.'**
+  String get changelogVersion101416Documents;
+
+  /// No description provided for @changelogVersion101416DriverFee.
+  ///
+  /// In en, this message translates to:
+  /// **'Incoming orders now show the driver\'s delivery fee instead of the customer total; paid order details show only that fee, while unpaid orders also show the amount to collect.'**
+  String get changelogVersion101416DriverFee;
+
+  /// No description provided for @changelogVersion101416OrderTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Added type-aware Food, Shipping, and Taxi experiences with package, vehicle, car-class, instruction, status, and action details where provided by the API.'**
+  String get changelogVersion101416OrderTypes;
+
+  /// No description provided for @changelogVersion101416History.
+  ///
+  /// In en, this message translates to:
+  /// **'Added Food, Shipping, and Taxi filters to order history with clearer type badges and references.'**
+  String get changelogVersion101416History;
+
+  /// No description provided for @changelogVersion101416Earnings.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected home and earnings summaries to driver earnings data, kept All Time as the default, and added date and order-type filters.'**
+  String get changelogVersion101416Earnings;
+
+  /// No description provided for @changelogVersion101416Reliability.
+  ///
+  /// In en, this message translates to:
+  /// **'Improved accepted-order refresh, active-order detail loading, API status handling, and fallback behavior when optional type-specific data is unavailable.'**
+  String get changelogVersion101416Reliability;
+
+  /// No description provided for @changelogVersion101416Release.
+  ///
+  /// In en, this message translates to:
+  /// **'Released driver app version 1.0.14+16.'**
+  String get changelogVersion101416Release;
 
   /// No description provided for @changelogDateAug9.
   ///

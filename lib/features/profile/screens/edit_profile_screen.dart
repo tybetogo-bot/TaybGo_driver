@@ -11,10 +11,10 @@ import '../../../core/l10n/app_localizations.dart';
 import '../../../core/l10n/framework_locale_support.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/services/cloudinary_service.dart';
-import '../../../core/services/location_service.dart';
+import '../../../core/services/google_places_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/birthdate_utils.dart';
-import '../../../shared/widgets/driver_address_fields.dart';
+import '../../../shared/widgets/google_places_address_picker.dart';
 import '../../application/utils/document_picker.dart';
 
 enum _DocumentPickAction { camera, gallery, file }
@@ -27,6 +27,11 @@ class EditProfileScreen extends StatefulWidget {
 }
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
+  static const _googleMapsApiKey = String.fromEnvironment(
+    'GOOGLE_MAPS_API_KEY',
+  );
+  static const _existingAddressSelectionId = 'existing-profile-address';
+
   final _formKey = GlobalKey<FormState>();
 
   static String _digitsOnly(String value) {
@@ -67,6 +72,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _cityController;
   late TextEditingController _postalCodeController;
   late TextEditingController _countryController;
+  late TextEditingController _placesSearchController;
+  GooglePlacesService? _placesService;
+  DriverAddress? _selectedGoogleAddress;
+  String? _selectedGooglePlaceId;
 
   // Document status
   Uint8List? _drivingLicenseBytes;
@@ -100,16 +109,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late final DriverProvider _driverProvider;
   final CloudinaryService _cloudinaryService = CloudinaryService();
   final ImagePicker _imagePicker = ImagePicker();
-  final LocationService _locationService = LocationService();
   bool _profileInitialized = false;
 
   bool _isSaving = false;
-  bool _isLoadingAddressLocation = false;
   DateTime? _selectedBirthdate;
 
   @override
   void initState() {
     super.initState();
+    if (_googleMapsApiKey.isNotEmpty) {
+      _placesService = GooglePlacesService(apiKey: _googleMapsApiKey);
+    }
     _driverProvider = context.read<DriverProvider>();
     _driverProvider.addListener(_handleDriverProfileChanged);
     final profile = _driverProvider.profile;
@@ -166,6 +176,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       text: address?.postalCode ?? '',
     );
     _countryController = TextEditingController(text: address?.country ?? '');
+    _placesSearchController = TextEditingController(
+      text: address?.fullAddress ?? '',
+    );
+    _selectedGoogleAddress = address;
+    _selectedGooglePlaceId = address == null
+        ? null
+        : _existingAddressSelectionId;
 
     // Initialize document URLs from existing profile
     _drivingLicenseUrl = profile?.drivingLicense;
@@ -216,6 +233,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _cityController.dispose();
     _postalCodeController.dispose();
     _countryController.dispose();
+    _placesSearchController.dispose();
+    _placesService?.close();
     super.dispose();
   }
 
@@ -273,6 +292,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _cityController.text = address?.city ?? '';
     _postalCodeController.text = address?.postalCode ?? '';
     _countryController.text = address?.country ?? '';
+    _placesSearchController.text = address?.fullAddress ?? '';
+    _selectedGoogleAddress = address;
+    _selectedGooglePlaceId = address == null
+        ? null
+        : _existingAddressSelectionId;
 
     _drivingLicenseUrl = profile.drivingLicense;
     _idDocumentUrl = profile.idDocument;
@@ -400,56 +424,108 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 
   String? _validateAddress(AppLocalizations l10n) {
+    if (_placesSearchController.text.trim().isEmpty) {
+      return l10n.addressRequired;
+    }
+    if (_selectedGooglePlaceId == null) {
+      return l10n.selectAddressSuggestion;
+    }
+
     final address = _addressFromFields();
-    if (address == null) return null;
+    if (address == null) return l10n.addressRequired;
 
-    final hasExistingAddress = _driverProvider.profile?.address != null;
-    if (!hasExistingAddress &&
-        (address.label == null ||
-            address.lat == null ||
-            address.lng == null ||
-            address.fullAddress == null)) {
-      return l10n.addressRequiredFields;
+    if (address.label == null ||
+        address.lat == null ||
+        address.lng == null ||
+        address.fullAddress == null) {
+      return l10n.addressCoordinatesMissing;
     }
 
-    if (address.lat != null) {
-      final latitude = double.tryParse(address.lat!);
-      if (latitude == null || latitude < -90 || latitude > 90) {
-        return l10n.invalidLatitude;
-      }
+    final latitude = double.tryParse(address.lat!);
+    if (latitude == null || latitude < -90 || latitude > 90) {
+      return l10n.invalidLatitude;
     }
 
-    if (address.lng != null) {
-      final longitude = double.tryParse(address.lng!);
-      if (longitude == null || longitude < -180 || longitude > 180) {
-        return l10n.invalidLongitude;
-      }
+    final longitude = double.tryParse(address.lng!);
+    if (longitude == null || longitude < -180 || longitude > 180) {
+      return l10n.invalidLongitude;
     }
 
     return null;
   }
 
-  Future<void> _useCurrentLocation() async {
+  void _handleGooglePlaceSelection(GooglePlaceAddressSelection selection) {
     final l10n = AppLocalizations.of(context)!;
+    final sourceAddress = selection.address;
+    final address = DriverAddress(
+      label: sourceAddress.label ?? l10n.home,
+      lat: sourceAddress.lat,
+      lng: sourceAddress.lng,
+      fullAddress: sourceAddress.fullAddress,
+      streetName: sourceAddress.streetName,
+      houseNumber: sourceAddress.houseNumber,
+      city: sourceAddress.city,
+      postalCode: sourceAddress.postalCode,
+      country: sourceAddress.country,
+    );
+
     setState(() {
-      _isLoadingAddressLocation = true;
+      _selectedGooglePlaceId = selection.placeId;
+      _selectedGoogleAddress = address;
+      _addressLabelController.text = address.label!;
+      _addressLatitudeController.text = address.lat ?? '';
+      _addressLongitudeController.text = address.lng ?? '';
+      _fullAddressController.text = address.fullAddress ?? '';
+      _streetNameController.text = address.streetName ?? '';
+      _houseNumberController.text = address.houseNumber ?? '';
+      _cityController.text = address.city ?? '';
+      _postalCodeController.text = address.postalCode ?? '';
+      _countryController.text = address.country ?? '';
     });
+  }
 
-    final result = await _locationService.getCurrentLocation();
+  void _clearGoogleAddress() {
+    _placesSearchController.clear();
+    setState(() {
+      _selectedGooglePlaceId = null;
+      _selectedGoogleAddress = null;
+      _addressLabelController.clear();
+      _addressLatitudeController.clear();
+      _addressLongitudeController.clear();
+      _fullAddressController.clear();
+      _streetNameController.clear();
+      _houseNumberController.clear();
+      _cityController.clear();
+      _postalCodeController.clear();
+      _countryController.clear();
+    });
+  }
+
+  void _handleAddressQueryChanged(String _) {
+    setState(() {
+      if (_selectedGooglePlaceId != null) {
+        _selectedGooglePlaceId = null;
+        _selectedGoogleAddress = null;
+        _addressLatitudeController.clear();
+        _addressLongitudeController.clear();
+        _fullAddressController.clear();
+        _streetNameController.clear();
+        _houseNumberController.clear();
+        _cityController.clear();
+        _postalCodeController.clear();
+        _countryController.clear();
+      }
+    });
+  }
+
+  void _handleAddressDetailsChanged() {
+    setState(() => _selectedGoogleAddress = _addressFromFields());
+  }
+
+  void _handlePlacesError(Object error) {
+    debugPrint('[EditProfileScreen] Google Places error: $error');
     if (!mounted) return;
-
-    if (result.success && result.position != null) {
-      setState(() {
-        _isLoadingAddressLocation = false;
-        _addressLatitudeController.text = result.position!.latitude
-            .toStringAsFixed(6);
-        _addressLongitudeController.text = result.position!.longitude
-            .toStringAsFixed(6);
-      });
-    } else {
-      setState(() => _isLoadingAddressLocation = false);
-      _showErrorSnackBar(result.message ?? l10n.locationFetchFailed);
-    }
+    _showErrorSnackBar(AppLocalizations.of(context)!.addressSearchError);
   }
 
   String? _changedAddressValue(String? value, String? original) {
@@ -823,26 +899,26 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               const SizedBox(height: 28),
 
-              // Structured address section
+              // Required Google Places address section
               _buildSectionHeader(l10n.address, Icons.home_outlined, textColor),
               const SizedBox(height: 16),
-              DriverAddressFields(
+              GooglePlacesAddressPicker(
+                service: _placesService,
+                searchController: _placesSearchController,
+                selectedAddress: _selectedGoogleAddress,
                 labelController: _addressLabelController,
-                latitudeController: _addressLatitudeController,
-                longitudeController: _addressLongitudeController,
-                fullAddressController: _fullAddressController,
-                streetNameController: _streetNameController,
                 houseNumberController: _houseNumberController,
-                cityController: _cityController,
                 postalCodeController: _postalCodeController,
-                countryController: _countryController,
                 textColor: textColor,
                 secondaryColor: secondaryColor,
                 surfaceColor: surfaceColor,
                 borderColor: borderColor,
                 hintColor: hintColor,
-                isLoadingLocation: _isLoadingAddressLocation,
-                onUseCurrentLocation: _useCurrentLocation,
+                onSelection: _handleGooglePlaceSelection,
+                onClear: _clearGoogleAddress,
+                onError: _handlePlacesError,
+                onQueryChanged: _handleAddressQueryChanged,
+                onDetailsChanged: _handleAddressDetailsChanged,
               ),
 
               const SizedBox(height: 28),

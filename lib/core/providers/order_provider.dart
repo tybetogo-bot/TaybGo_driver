@@ -209,8 +209,18 @@ class OrderProvider extends ChangeNotifier {
     try {
       await _orderService.acceptOrder(targetOrderId);
 
-      if (orderForLocalUpdate != null) {
-        _activeOrder = orderForLocalUpdate.copyWith(
+      OrderModel? acceptedOrder;
+      try {
+        acceptedOrder = await _orderService.getOrderDetails(targetOrderId);
+      } catch (error) {
+        debugPrint(
+          '[OrderProvider] Accepted order details are not available yet: $error',
+        );
+      }
+
+      final acceptedSnapshot = acceptedOrder ?? orderForLocalUpdate;
+      if (acceptedSnapshot != null) {
+        _activeOrder = acceptedSnapshot.copyWith(
           status: OrderStatus.accepted,
           acceptedAt: DateTime.now(),
         );
@@ -569,8 +579,30 @@ class OrderProvider extends ChangeNotifier {
       );
 
       if (freshActive != null) {
-        // Always update active order with latest server data
-        _activeOrder = freshActive;
+        final currentActive = _activeOrder;
+        if (currentActive?.id == freshActive.id) {
+          // The list payload may omit driver_delivery_fee and other detail-only
+          // fields. Preserve the enriched active order while syncing changes.
+          _activeOrder = currentActive!.copyWith(
+            status: freshActive.status,
+            subtotal: freshActive.subtotal,
+            deliveryFee: freshActive.deliveryFee,
+            driverDeliveryFee: freshActive.hasDriverDeliveryFee
+                ? freshActive.driverDeliveryFee
+                : currentActive.driverDeliveryFee,
+            hasDriverDeliveryFee:
+                freshActive.hasDriverDeliveryFee ||
+                currentActive.hasDriverDeliveryFee,
+            tip: freshActive.tip,
+            total: freshActive.total,
+            paymentType: freshActive.paymentType,
+            isPaid: freshActive.isPaid,
+            acceptedAt: freshActive.acceptedAt ?? currentActive.acceptedAt,
+            completedAt: freshActive.completedAt ?? currentActive.completedAt,
+          );
+        } else {
+          _activeOrder = freshActive;
+        }
       } else if (_activeOrder != null) {
         // Server says no active order — clear local stale one
         // unless we just accepted it and the server hasn't caught up

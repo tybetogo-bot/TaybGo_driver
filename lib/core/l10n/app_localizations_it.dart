@@ -166,11 +166,50 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get addressStepSubtitle =>
-      'Add an optional address for your driver profile.';
+      'Search for your home address and select the correct result from Google.';
 
   @override
   String get addressOptionalSubtitle =>
-      'Optional. If you add an address, complete the required fields.';
+      'Required — select an address from Google so we can verify your service area.';
+
+  @override
+  String get addressRequired => 'Please search for and select your address.';
+
+  @override
+  String get searchForAddress => 'Search for your address';
+
+  @override
+  String get searchAddressHint =>
+      'Start typing a street, building, or place name';
+
+  @override
+  String get addressSelected => 'Address selected';
+
+  @override
+  String get addressDetails => 'Address details';
+
+  @override
+  String get addressSearchUnavailable =>
+      'Address search is not configured for this build.';
+
+  @override
+  String get addressSearchError =>
+      'We couldn\'t load address results. Check your connection and try again.';
+
+  @override
+  String get noAddressResults =>
+      'No matching addresses found. Try adding a city or postal code.';
+
+  @override
+  String get selectAddressSuggestion =>
+      'Please select an address from the Google suggestions.';
+
+  @override
+  String get addressCoordinatesMissing =>
+      'This result is missing location details. Please choose another address.';
+
+  @override
+  String get clearAddress => 'Clear address';
 
   @override
   String get addressLabel => 'Address label';
@@ -254,6 +293,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get car => 'Auto';
 
   @override
+  String get van => 'Furgone';
+
+  @override
   String get motorcycle => 'Moto';
 
   @override
@@ -288,6 +330,18 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get taxi => 'Taxi';
+
+  @override
+  String get foodOrder => 'Food order';
+
+  @override
+  String get shippingOrder => 'Shipping order';
+
+  @override
+  String get taxiRide => 'Taxi ride';
+
+  @override
+  String get allOrders => 'All';
 
   @override
   String get uploadDocuments => 'Carica documenti';
@@ -472,6 +526,12 @@ class AppLocalizationsIt extends AppLocalizations {
   String get delivered => 'Consegnato';
 
   @override
+  String get expired => 'Expired';
+
+  @override
+  String get restaurantDelivered => 'Restaurant delivered';
+
+  @override
   String get pickup => 'Ritiro';
 
   @override
@@ -577,6 +637,49 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get deliveryFee => 'Costo di consegna';
+
+  @override
+  String get driverDeliveryFee => 'Driver delivery fee';
+
+  @override
+  String get requiredVehicle => 'Required vehicle';
+
+  @override
+  String get packageDetails => 'Package details';
+
+  @override
+  String get packageSize => 'Size';
+
+  @override
+  String get packageWeight => 'Weight';
+
+  @override
+  String get packageContents => 'Contents';
+
+  @override
+  String get rideDetails => 'Ride details';
+
+  @override
+  String get deliveryInstructions => 'Instructions';
+
+  @override
+  String get typeDetailsUnavailable =>
+      'Additional details will appear when provided by dispatch.';
+
+  @override
+  String get headToPassenger => 'Head to passenger';
+
+  @override
+  String get passengerDroppedOff => 'Passenger dropped off';
+
+  @override
+  String get completeRide => 'Complete ride';
+
+  @override
+  String get acceptRide => 'Accept ride';
+
+  @override
+  String get acceptShippingOrder => 'Accept shipment';
 
   @override
   String get total => 'Totale';
@@ -1231,6 +1334,16 @@ class AppLocalizationsIt extends AppLocalizations {
   String get stepServices => 'Servizi';
 
   @override
+  String applicationStepProgress(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String applicationNextStep(String step) {
+    return 'Next: $step';
+  }
+
+  @override
   String get ecoFriendlyOption => 'Opzione ecologica';
 
   @override
@@ -1241,9 +1354,6 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get largeDeliveries => 'Consegne grandi';
-
-  @override
-  String get van => 'Furgone';
 
   @override
   String get deleteDataWarning =>
@@ -1346,6 +1456,11 @@ class AppLocalizationsIt extends AppLocalizations {
   @override
   String get collectCashReminder =>
       'Ricorda di riscuotere il pagamento dal cliente';
+
+  @override
+  String collectCashAmountReminder(String amount) {
+    return 'Collect $amount from the customer before completing.';
+  }
 
   @override
   String get locationPermissionLostWhileOnline =>
@@ -1495,6 +1610,9 @@ class AppLocalizationsIt extends AppLocalizations {
   String get enterVehicleYear => 'e.g. 2020';
 
   @override
+  String get selectVehicleYear => 'Select vehicle year';
+
+  @override
   String get vehicleDetailsTitle => 'Vehicle Details';
 
   @override
@@ -1504,7 +1622,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get stepDetails => 'Details';
 
   @override
-  String get stepDocuments => 'Docs';
+  String get stepDocuments => 'Documents';
 
   @override
   String get documentsTitle => 'Upload Documents';
@@ -1562,7 +1680,7 @@ class AppLocalizationsIt extends AppLocalizations {
   String get pleaseEnterVehicleYear => 'Please enter your vehicle year';
 
   @override
-  String get invalidVehicleYear => 'Please enter a valid year';
+  String get invalidVehicleYear => 'Please select a valid vehicle year';
 
   @override
   String get dropOrder => 'Drop Order';
@@ -1639,6 +1757,49 @@ class AppLocalizationsIt extends AppLocalizations {
 
   @override
   String get changelogRelease => 'Rilascio';
+
+  @override
+  String get changelogDateAug20 => '20 August 2026';
+
+  @override
+  String get changelogVersion101416ApplicationFlow =>
+      'Redesigned the driver application into five focused steps with clearer progress, organized sections, better field guidance, and inline validation.';
+
+  @override
+  String get changelogVersion101416Address =>
+      'Refactored address entry in registration and Edit Profile around required Google Places search, a clear selected-address summary, complete structured address data, coordinates, and stronger validation.';
+
+  @override
+  String get changelogVersion101416Vehicle =>
+      'Restored complete vehicle details and added a vehicle-year selector covering 1960 through next year.';
+
+  @override
+  String get changelogVersion101416Documents =>
+      'Improved required-document presentation, upload states, and registration error feedback.';
+
+  @override
+  String get changelogVersion101416DriverFee =>
+      'Incoming orders now show the driver\'s delivery fee instead of the customer total; paid order details show only that fee, while unpaid orders also show the amount to collect.';
+
+  @override
+  String get changelogVersion101416OrderTypes =>
+      'Added type-aware Food, Shipping, and Taxi experiences with package, vehicle, car-class, instruction, status, and action details where provided by the API.';
+
+  @override
+  String get changelogVersion101416History =>
+      'Added Food, Shipping, and Taxi filters to order history with clearer type badges and references.';
+
+  @override
+  String get changelogVersion101416Earnings =>
+      'Connected home and earnings summaries to driver earnings data, kept All Time as the default, and added date and order-type filters.';
+
+  @override
+  String get changelogVersion101416Reliability =>
+      'Improved accepted-order refresh, active-order detail loading, API status handling, and fallback behavior when optional type-specific data is unavailable.';
+
+  @override
+  String get changelogVersion101416Release =>
+      'Released driver app version 1.0.14+16.';
 
   @override
   String get changelogDateAug9 => '9 agosto 2026';

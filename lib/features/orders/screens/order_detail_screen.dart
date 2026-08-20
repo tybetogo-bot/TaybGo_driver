@@ -13,6 +13,7 @@ import '../../../core/services/location_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../tour/tour_keys.dart';
 import '../models/order_model.dart';
+import '../utils/order_presentation.dart';
 import '../widgets/order_action_confirmation_sheet.dart';
 
 class OrderDetailScreen extends StatefulWidget {
@@ -485,8 +486,15 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Status Badge
-                _buildStatusBadge(order, l10n),
+                // Order type and status
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    _buildOrderTypeBadge(order, l10n),
+                    _buildStatusBadge(order, l10n),
+                  ],
+                ),
                 const SizedBox(height: 12),
 
                 // Route Card
@@ -510,6 +518,18 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   secondaryColor,
                   surfaceColor,
                 ),
+
+                if (order.orderType != OrderType.food ||
+                    order.hasDeliveryInstructions) ...[
+                  const SizedBox(height: 16),
+                  _buildTypeSpecificCard(
+                    order,
+                    l10n,
+                    textColor,
+                    secondaryColor,
+                    surfaceColor,
+                  ),
+                ],
 
                 // Order Items (for food orders)
                 if (order.items.isNotEmpty) ...[
@@ -635,6 +655,32 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
+  Widget _buildOrderTypeBadge(OrderModel order, AppLocalizations l10n) {
+    final color = order.orderType.color;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(order.orderType.icon, size: 16, color: color),
+          const SizedBox(width: 6),
+          Text(
+            order.orderType.label(l10n),
+            style: TextStyle(
+              color: color,
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildStatusBadge(OrderModel order, AppLocalizations l10n) {
     Color statusColor;
     IconData statusIcon;
@@ -655,9 +701,10 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         break;
       case OrderStatus.cancelled:
       case OrderStatus.rejected:
+      case OrderStatus.expired:
         statusColor = AppColors.error;
         statusIcon = Icons.cancel;
-        statusText = l10n.orderCancelled;
+        statusText = order.status.localizedName(l10n);
         break;
       case OrderStatus.onTheWay:
         statusColor = AppColors.primary;
@@ -670,9 +717,12 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
         statusText = l10n.orderAccepted;
         break;
       case OrderStatus.delivered:
+      case OrderStatus.restaurantDelivered:
         statusColor = AppColors.success;
         statusIcon = Icons.location_on;
-        statusText = l10n.atDelivery;
+        statusText = order.status == OrderStatus.restaurantDelivered
+            ? l10n.restaurantDelivered
+            : l10n.atDelivery;
         break;
     }
 
@@ -1157,6 +1207,185 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     );
   }
 
+  Widget _buildTypeSpecificCard(
+    OrderModel order,
+    AppLocalizations l10n,
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+  ) {
+    final typeColor = order.orderType.color;
+    final details = <Widget>[];
+    late final String title;
+    late final IconData icon;
+
+    switch (order.orderType) {
+      case OrderType.shipping:
+        title = l10n.packageDetails;
+        icon = Icons.inventory_2_outlined;
+        if (order.requestedDeliveryType != null) {
+          details.add(
+            _buildDetailValueRow(
+              l10n.requiredVehicle,
+              order.requestedDeliveryType!.label(l10n),
+              textColor,
+              secondaryColor,
+            ),
+          );
+        }
+        final package = order.shippingPackage;
+        if (package != null) {
+          if (package.size.isNotEmpty) {
+            details.add(
+              _buildDetailValueRow(
+                l10n.packageSize,
+                package.size,
+                textColor,
+                secondaryColor,
+              ),
+            );
+          }
+          if (package.weightKg > 0) {
+            details.add(
+              _buildDetailValueRow(
+                l10n.packageWeight,
+                '${package.weightKg.toStringAsFixed(1)} kg',
+                textColor,
+                secondaryColor,
+              ),
+            );
+          }
+          if (package.content.isNotEmpty) {
+            details.add(
+              _buildDetailValueRow(
+                l10n.packageContents,
+                package.content,
+                textColor,
+                secondaryColor,
+              ),
+            );
+          }
+        }
+        break;
+      case OrderType.taxi:
+        title = l10n.rideDetails;
+        icon = Icons.local_taxi_outlined;
+        if (order.requestedVehicleType != null) {
+          details.add(
+            _buildDetailValueRow(
+              l10n.requiredVehicle,
+              order.requestedVehicleType!.label(l10n),
+              textColor,
+              secondaryColor,
+            ),
+          );
+        }
+        if (order.requestedCarSize != null) {
+          details.add(
+            _buildDetailValueRow(
+              l10n.carSize,
+              order.requestedCarSize!.label(l10n),
+              textColor,
+              secondaryColor,
+            ),
+          );
+        }
+        break;
+      case OrderType.food:
+        title = l10n.deliveryInstructions;
+        icon = Icons.notes_outlined;
+        break;
+    }
+
+    if (order.hasDeliveryInstructions) {
+      details.add(
+        _buildDetailValueRow(
+          l10n.deliveryInstructions,
+          order.deliveryInstructions!.trim(),
+          textColor,
+          secondaryColor,
+        ),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: typeColor.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, size: 18, color: typeColor),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                ),
+              ),
+            ],
+          ),
+          const Divider(height: 24),
+          if (details.isEmpty)
+            Text(
+              l10n.typeDetailsUnavailable,
+              style: TextStyle(fontSize: 13, color: secondaryColor),
+            )
+          else
+            for (var index = 0; index < details.length; index++) ...[
+              details[index],
+              if (index < details.length - 1) const SizedBox(height: 12),
+            ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildDetailValueRow(
+    String label,
+    String value,
+    Color textColor,
+    Color secondaryColor,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SizedBox(
+          width: 112,
+          child: Text(
+            label,
+            style: TextStyle(fontSize: 12, color: secondaryColor),
+          ),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+            value,
+            style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w600,
+              color: textColor,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildItemsCard(
     OrderModel order,
     AppLocalizations l10n,
@@ -1358,53 +1587,39 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
       ),
       child: Column(
         children: [
-          if (order.subtotal > 0) ...[
-            _buildEarningRow(
-              l10n.subtotal,
-              order.formattedSubtotal,
-              secondaryColor,
-              textColor,
+          _buildEarningRow(
+            l10n.driverDeliveryFee,
+            order.formattedDriverDeliveryFee,
+            secondaryColor,
+            textColor,
+          ),
+          if (order.shouldShowCustomerTotal) ...[
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 10),
+              child: Divider(height: 1),
             ),
-            const SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  l10n.total,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: textColor,
+                  ),
+                ),
+                Text(
+                  order.formattedTotal,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.success,
+                  ),
+                ),
+              ],
+            ),
           ],
-          _buildEarningRow(
-            l10n.deliveryFee,
-            order.formattedDeliveryFee,
-            secondaryColor,
-            textColor,
-          ),
-          const SizedBox(height: 10),
-          _buildEarningRow(
-            l10n.tip,
-            order.formattedTip,
-            secondaryColor,
-            textColor,
-          ),
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 10),
-            child: Divider(height: 1),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                l10n.total,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                  color: textColor,
-                ),
-              ),
-              Text(
-                order.formattedTotal,
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.success,
-                ),
-              ),
-            ],
-          ),
         ],
       ),
     );
@@ -1467,7 +1682,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           _buildMetaRow(
             Icons.category,
             l10n.orderType,
-            order.orderType.name.toUpperCase(),
+            order.orderType.label(l10n),
             secondaryColor,
             textColor,
           ),
@@ -1602,7 +1817,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     bool isAcceptAction = false;
 
     if (isPending) {
-      actionText = l10n.orderAccepted;
+      actionText = order.orderType.acceptLabel(l10n);
       confirmTitle = l10n.acceptOrder;
       confirmMessage = l10n.acceptOrderConfirmation;
       actionIcon = Icons.check;
@@ -1629,7 +1844,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           actionText = l10n.orderCompleted;
           confirmTitle = l10n.completeOrder;
           confirmMessage = _hasFreshOrderDetails && order.needsCashCollection
-              ? '${l10n.collectCashReminder}\n\n${l10n.completeOrderConfirmation}'
+              ? '${l10n.collectCashAmountReminder(order.formattedTotal)}\n\n${l10n.completeOrderConfirmation}'
               : l10n.completeOrderConfirmation;
           actionIcon = Icons.check_circle;
           nextStatus = OrderStatus.completed;
@@ -1641,6 +1856,45 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           confirmMessage = '';
           actionIcon = Icons.navigation;
           nextStatus = null;
+      }
+
+      final backendNextStatus = order.nextAllowedStatus;
+      if (backendNextStatus == OrderStatus.onTheWay ||
+          backendNextStatus == OrderStatus.delivered ||
+          backendNextStatus == OrderStatus.completed) {
+        nextStatus = backendNextStatus;
+      }
+
+      switch (nextStatus) {
+        case OrderStatus.onTheWay:
+          actionText = order.orderType == OrderType.taxi
+              ? l10n.headToPassenger
+              : l10n.startDelivery;
+          confirmTitle = actionText;
+          confirmMessage = l10n.startDeliveryConfirmation;
+          actionIcon = order.orderType.icon;
+          break;
+        case OrderStatus.delivered:
+          actionText = order.orderType == OrderType.taxi
+              ? l10n.passengerDroppedOff
+              : l10n.markAsDelivered;
+          confirmTitle = l10n.arrivedAtDropoff;
+          confirmMessage = l10n.arrivedAtDropoffConfirmation;
+          actionIcon = Icons.location_on;
+          break;
+        case OrderStatus.completed:
+          actionText = order.orderType == OrderType.taxi
+              ? l10n.completeRide
+              : l10n.orderCompleted;
+          confirmTitle = actionText;
+          confirmMessage = _hasFreshOrderDetails && order.needsCashCollection
+              ? '${l10n.collectCashAmountReminder(order.formattedTotal)}\n\n${l10n.completeOrderConfirmation}'
+              : l10n.completeOrderConfirmation;
+          actionIcon = Icons.check_circle;
+          actionColor = AppColors.success;
+          break;
+        default:
+          break;
       }
     }
 

@@ -35,6 +35,7 @@ class TourMockData {
       // Pricing breakdown
       subtotal: 25.50,
       deliveryFee: 5.00,
+      driverDeliveryFee: 5.00,
       tip: 3.50,
       total: 34.00,
 
@@ -44,24 +45,9 @@ class TourMockData {
 
       // Order items
       items: [
-        OrderItem(
-          id: 1,
-          name: 'Margherita Pizza',
-          quantity: 1,
-          price: 12.99,
-        ),
-        OrderItem(
-          id: 2,
-          name: 'Caesar Salad',
-          quantity: 1,
-          price: 8.99,
-        ),
-        OrderItem(
-          id: 3,
-          name: 'Coca Cola',
-          quantity: 2,
-          price: 1.76,
-        ),
+        OrderItem(id: 1, name: 'Margherita Pizza', quantity: 1, price: 12.99),
+        OrderItem(id: 2, name: 'Caesar Salad', quantity: 1, price: 8.99),
+        OrderItem(id: 3, name: 'Coca Cola', quantity: 2, price: 1.76),
       ],
 
       // Timestamps
@@ -97,6 +83,7 @@ class TourMockData {
 
       subtotal: 18.99,
       deliveryFee: 4.50,
+      driverDeliveryFee: 4.50,
       tip: 2.50,
       total: 25.99,
 
@@ -104,24 +91,9 @@ class TourMockData {
       estimatedMinutes: 12,
 
       items: [
-        OrderItem(
-          id: 1,
-          name: 'Classic Burger',
-          quantity: 2,
-          price: 9.99,
-        ),
-        OrderItem(
-          id: 2,
-          name: 'French Fries',
-          quantity: 1,
-          price: 4.99,
-        ),
-        OrderItem(
-          id: 3,
-          name: 'Milkshake',
-          quantity: 1,
-          price: 4.01,
-        ),
+        OrderItem(id: 1, name: 'Classic Burger', quantity: 2, price: 9.99),
+        OrderItem(id: 2, name: 'French Fries', quantity: 1, price: 4.99),
+        OrderItem(id: 3, name: 'Milkshake', quantity: 1, price: 4.01),
       ],
 
       createdAt: DateTime.now(),
@@ -158,9 +130,6 @@ class TourMockData {
 
   /// Get all available mock orders
   static List<OrderModel> getAllMockOrders() {
-    return [
-      createMockOrder(),
-      createMockOrder2(),
-    ];
+    return [createMockOrder(), createMockOrder2()];
   }
 }

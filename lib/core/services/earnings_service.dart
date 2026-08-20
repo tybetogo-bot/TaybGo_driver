@@ -37,13 +37,15 @@ class EarningsService {
         return EarningsResponse.fromJson(data);
       }
 
-      debugPrint('[EarningsService] Unexpected response type: ${data.runtimeType}');
+      debugPrint(
+        '[EarningsService] Unexpected response type: ${data.runtimeType}',
+      );
       return EarningsResponse(
         count: 0,
         summary: EarningsSummary(
           totalOrders: 0,
           totalEarnings: 0,
-          totalDeliveryFees: 0,
+          totalDriverDeliveryFees: 0,
           totalTips: 0,
         ),
         results: [],
