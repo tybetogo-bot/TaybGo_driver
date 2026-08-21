@@ -3,13 +3,13 @@ import '../../orders/models/order_model.dart';
 class EarningsSummary {
   final int totalOrders;
   final double totalEarnings;
-  final double totalDeliveryFees;
+  final double totalDriverDeliveryFees;
   final double totalTips;
 
   EarningsSummary({
     required this.totalOrders,
     required this.totalEarnings,
-    required this.totalDeliveryFees,
+    required this.totalDriverDeliveryFees,
     required this.totalTips,
   });
 
@@ -17,7 +17,9 @@ class EarningsSummary {
     return EarningsSummary(
       totalOrders: _parseInt(json['total_orders']),
       totalEarnings: _parseDouble(json['total_earnings']),
-      totalDeliveryFees: _parseDouble(json['total_delivery_fees']),
+      totalDriverDeliveryFees: _parseDouble(
+        json['total_driver_delivery_fees'] ?? json['total_delivery_fees'],
+      ),
       totalTips: _parseDouble(json['total_tips']),
     );
   }
@@ -46,7 +48,7 @@ class EarningEntry {
   final OrderStatus status;
   final String? restaurantName;
   final DateTime? earnedAt;
-  final double deliveryFee;
+  final double driverDeliveryFee;
   final double tip;
   final double earningAmount;
 
@@ -57,7 +59,7 @@ class EarningEntry {
     required this.status,
     this.restaurantName,
     this.earnedAt,
-    required this.deliveryFee,
+    required this.driverDeliveryFee,
     required this.tip,
     required this.earningAmount,
   });
@@ -70,7 +72,9 @@ class EarningEntry {
       status: OrderStatus.fromApi(json['status'] ?? 'PENDING'),
       restaurantName: json['restaurant_name'],
       earnedAt: _parseDateTime(json['earned_at']),
-      deliveryFee: _parseDouble(json['delivery_fee']),
+      driverDeliveryFee: _parseDouble(
+        json['driver_delivery_fee'] ?? json['delivery_fee'],
+      ),
       tip: _parseDouble(json['tip']),
       earningAmount: _parseDouble(json['earning_amount']),
     );
@@ -121,7 +125,8 @@ class EarningsResponse {
       next: json['next'],
       previous: json['previous'],
       summary: EarningsSummary.fromJson(json['summary'] ?? {}),
-      results: (json['results'] as List<dynamic>?)
+      results:
+          (json['results'] as List<dynamic>?)
               ?.map((e) => EarningEntry.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],

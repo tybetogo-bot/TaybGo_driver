@@ -7,6 +7,8 @@ import '../../../core/providers/earnings_provider.dart';
 import '../../../core/providers/tour_provider.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../tour/tour_keys.dart';
+import '../../orders/models/order_model.dart';
+import '../../orders/utils/order_presentation.dart';
 import '../models/earnings_model.dart';
 
 class EarningsScreen extends StatefulWidget {
@@ -16,11 +18,12 @@ class EarningsScreen extends StatefulWidget {
   State<EarningsScreen> createState() => _EarningsScreenState();
 }
 
-enum _DateFilter { today, week, month, custom }
+enum _DateFilter { all, today, week, month, custom }
 
 class _EarningsScreenState extends State<EarningsScreen> {
   bool _isRefreshing = false;
-  _DateFilter _selectedFilter = _DateFilter.month;
+  _DateFilter _selectedFilter = _DateFilter.all;
+  OrderType? _selectedOrderType;
   DateTimeRange? _customRange;
 
   // Tour keys from singleton
@@ -51,13 +54,19 @@ class _EarningsScreenState extends State<EarningsScreen> {
     String? to;
 
     switch (filter) {
+      case _DateFilter.all:
+        from = null;
+        to = null;
       case _DateFilter.today:
         from = DateTime(now.year, now.month, now.day).toIso8601String();
         to = now.toIso8601String();
       case _DateFilter.week:
         final weekStart = now.subtract(Duration(days: now.weekday - 1));
-        from = DateTime(weekStart.year, weekStart.month, weekStart.day)
-            .toIso8601String();
+        from = DateTime(
+          weekStart.year,
+          weekStart.month,
+          weekStart.day,
+        ).toIso8601String();
         to = now.toIso8601String();
       case _DateFilter.month:
         from = DateTime(now.year, now.month, 1).toIso8601String();
@@ -69,13 +78,24 @@ class _EarningsScreenState extends State<EarningsScreen> {
             _customRange!.end.year,
             _customRange!.end.month,
             _customRange!.end.day,
-            23, 59, 59,
+            23,
+            59,
+            59,
           ).toIso8601String();
         }
     }
 
     setState(() => _selectedFilter = filter);
-    context.read<EarningsProvider>().fetchEarnings(from: from, to: to);
+    context.read<EarningsProvider>().fetchEarnings(
+      from: from,
+      to: to,
+      orderType: _selectedOrderType?.apiValue,
+    );
+  }
+
+  void _applyOrderType(OrderType? orderType) {
+    setState(() => _selectedOrderType = orderType);
+    _applyFilter(_selectedFilter);
   }
 
   Future<void> _pickCustomRange() async {
@@ -84,17 +104,15 @@ class _EarningsScreenState extends State<EarningsScreen> {
       context: context,
       firstDate: DateTime(now.year - 1),
       lastDate: now,
-      initialDateRange: _customRange ??
-          DateTimeRange(
-            start: DateTime(now.year, now.month, 1),
-            end: now,
-          ),
+      initialDateRange:
+          _customRange ??
+          DateTimeRange(start: DateTime(now.year, now.month, 1), end: now),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: Theme.of(context).colorScheme.copyWith(
-              primary: AppColors.success,
-            ),
+            colorScheme: Theme.of(
+              context,
+            ).colorScheme.copyWith(primary: AppColors.success),
           ),
           child: child!,
         );
@@ -176,7 +194,14 @@ class _EarningsScreenState extends State<EarningsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Date filter chips
-                _buildDateFilters(surfaceColor, textColor, secondaryColor, l10n),
+                _buildDateFilters(
+                  surfaceColor,
+                  textColor,
+                  secondaryColor,
+                  l10n,
+                ),
+                const SizedBox(height: 10),
+                _buildOrderTypeFilters(surfaceColor, secondaryColor, l10n),
                 const SizedBox(height: 16),
 
                 // Total earnings card
@@ -256,8 +281,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
                             Expanded(
                               child: _buildStatCard(
                                 Icons.local_shipping_outlined,
-                                '\$${(summary?.totalDeliveryFees ?? 0).toStringAsFixed(2)}',
-                                l10n.deliveryFee,
+                                '\$${(summary?.totalDriverDeliveryFees ?? 0).toStringAsFixed(2)}',
+                                l10n.driverDeliveryFee,
                                 AppColors.info,
                                 surfaceColor,
                                 textColor,
@@ -335,6 +360,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
       Localizations.localeOf(context),
     );
     switch (_selectedFilter) {
+      case _DateFilter.all:
+        return l10n.allTime;
       case _DateFilter.today:
         return l10n.today;
       case _DateFilter.week:
@@ -357,32 +384,130 @@ class _EarningsScreenState extends State<EarningsScreen> {
     AppLocalizations l10n,
   ) {
     final filters = {
+      _DateFilter.all: l10n.allTime,
       _DateFilter.today: l10n.today,
       _DateFilter.week: l10n.week,
       _DateFilter.month: l10n.month,
     };
 
-    return Row(
-      children: [
-        ...filters.entries.map((e) {
-          final isSelected = _selectedFilter == e.key;
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          ...filters.entries.map((e) {
+            final isSelected = _selectedFilter == e.key;
+            return Padding(
+              padding: const EdgeInsetsDirectional.only(end: 8),
+              child: ChoiceChip(
+                label: Text(e.value),
+                selected: isSelected,
+                onSelected: (_) => _applyFilter(e.key),
+                selectedColor: AppColors.success.withValues(alpha: 0.15),
+                backgroundColor: surfaceColor,
+                labelStyle: TextStyle(
+                  fontSize: 13,
+                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
+                  color: isSelected ? AppColors.success : secondaryColor,
+                ),
+                side: BorderSide(
+                  color: isSelected
+                      ? AppColors.success.withValues(alpha: 0.4)
+                      : Colors.transparent,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                showCheckmark: false,
+                visualDensity: VisualDensity.compact,
+              ),
+            );
+          }),
+          ChoiceChip(
+            label: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  Icons.date_range,
+                  size: 14,
+                  color: _selectedFilter == _DateFilter.custom
+                      ? AppColors.success
+                      : secondaryColor,
+                ),
+                const SizedBox(width: 4),
+                Text(
+                  _selectedFilter == _DateFilter.custom && _customRange != null
+                      ? DateFormat.MMMd().format(_customRange!.start)
+                      : '...',
+                ),
+              ],
+            ),
+            selected: _selectedFilter == _DateFilter.custom,
+            onSelected: (_) => _pickCustomRange(),
+            selectedColor: AppColors.success.withValues(alpha: 0.15),
+            backgroundColor: surfaceColor,
+            labelStyle: TextStyle(
+              fontSize: 13,
+              fontWeight: _selectedFilter == _DateFilter.custom
+                  ? FontWeight.w600
+                  : FontWeight.w400,
+              color: _selectedFilter == _DateFilter.custom
+                  ? AppColors.success
+                  : secondaryColor,
+            ),
+            side: BorderSide(
+              color: _selectedFilter == _DateFilter.custom
+                  ? AppColors.success.withValues(alpha: 0.4)
+                  : Colors.transparent,
+            ),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            showCheckmark: false,
+            visualDensity: VisualDensity.compact,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildOrderTypeFilters(
+    Color surfaceColor,
+    Color secondaryColor,
+    AppLocalizations l10n,
+  ) {
+    final filters = <OrderType?, String>{
+      null: l10n.allOrders,
+      OrderType.food: l10n.foodOrder,
+      OrderType.shipping: l10n.shipping,
+      OrderType.taxi: l10n.taxi,
+    };
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: filters.entries.map((entry) {
+          final selected = _selectedOrderType == entry.key;
+          final color = entry.key?.color ?? AppColors.success;
           return Padding(
             padding: const EdgeInsetsDirectional.only(end: 8),
             child: ChoiceChip(
-              label: Text(e.value),
-              selected: isSelected,
-              onSelected: (_) => _applyFilter(e.key),
-              selectedColor: AppColors.success.withValues(alpha: 0.15),
+              avatar: entry.key == null
+                  ? null
+                  : Icon(entry.key!.icon, size: 15, color: color),
+              label: Text(entry.value),
+              selected: selected,
+              onSelected: (_) => _applyOrderType(entry.key),
+              selectedColor: color.withValues(alpha: 0.12),
               backgroundColor: surfaceColor,
-              labelStyle: TextStyle(
-                fontSize: 13,
-                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
-                color: isSelected ? AppColors.success : secondaryColor,
-              ),
               side: BorderSide(
-                color: isSelected
-                    ? AppColors.success.withValues(alpha: 0.4)
+                color: selected
+                    ? color.withValues(alpha: 0.4)
                     : Colors.transparent,
+              ),
+              labelStyle: TextStyle(
+                fontSize: 12,
+                fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                color: selected ? color : secondaryColor,
               ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
@@ -391,51 +516,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
               visualDensity: VisualDensity.compact,
             ),
           );
-        }),
-        ChoiceChip(
-          label: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(
-                Icons.date_range,
-                size: 14,
-                color: _selectedFilter == _DateFilter.custom
-                    ? AppColors.success
-                    : secondaryColor,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                _selectedFilter == _DateFilter.custom && _customRange != null
-                    ? DateFormat.MMMd().format(_customRange!.start)
-                    : '...',
-              ),
-            ],
-          ),
-          selected: _selectedFilter == _DateFilter.custom,
-          onSelected: (_) => _pickCustomRange(),
-          selectedColor: AppColors.success.withValues(alpha: 0.15),
-          backgroundColor: surfaceColor,
-          labelStyle: TextStyle(
-            fontSize: 13,
-            fontWeight: _selectedFilter == _DateFilter.custom
-                ? FontWeight.w600
-                : FontWeight.w400,
-            color: _selectedFilter == _DateFilter.custom
-                ? AppColors.success
-                : secondaryColor,
-          ),
-          side: BorderSide(
-            color: _selectedFilter == _DateFilter.custom
-                ? AppColors.success.withValues(alpha: 0.4)
-                : Colors.transparent,
-          ),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          showCheckmark: false,
-          visualDensity: VisualDensity.compact,
-        ),
-      ],
+        }).toList(),
+      ),
     );
   }
 
@@ -516,6 +598,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
     Color textColor,
     Color secondaryColor,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     final icon = switch (entry.orderType.apiValue) {
       'FOOD' => Icons.restaurant,
       'TAXI' => Icons.local_taxi,
@@ -561,7 +644,11 @@ class _EarningsScreenState extends State<EarningsScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  entry.restaurantName ?? '#${entry.orderId}',
+                  entry.restaurantName ??
+                      entry.orderType.referenceLabel(
+                        l10n,
+                        entry.orderId.toString(),
+                      ),
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
@@ -574,6 +661,11 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 Text(
                   dateStr,
                   style: TextStyle(fontSize: 12, color: secondaryColor),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  '${l10n.driverDeliveryFee}: \$${entry.driverDeliveryFee.toStringAsFixed(2)}',
+                  style: TextStyle(fontSize: 11, color: secondaryColor),
                 ),
               ],
             ),
@@ -591,11 +683,8 @@ class _EarningsScreenState extends State<EarningsScreen> {
               ),
               if (entry.tip > 0)
                 Text(
-                  '+\$${entry.tip.toStringAsFixed(2)} tip',
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: AppColors.warning,
-                  ),
+                  '${l10n.tip}: \$${entry.tip.toStringAsFixed(2)}',
+                  style: TextStyle(fontSize: 11, color: AppColors.warning),
                 ),
             ],
           ),

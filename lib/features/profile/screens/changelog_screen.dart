@@ -400,10 +400,52 @@ class ChangelogScreen extends StatelessWidget {
 
   List<_ChangelogRelease> _buildReleases(AppLocalizations l10n) => [
     _ChangelogRelease(
+      version: '1.0.14+16',
+      build: '16',
+      date: l10n.changelogDateAug20,
+      isCurrent: true,
+      sections: [
+        _ChangelogSection(
+          title: l10n.driverApplication,
+          icon: Icons.assignment_outlined,
+          items: [
+            l10n.changelogVersion101416ApplicationFlow,
+            l10n.changelogVersion101416Address,
+            l10n.changelogVersion101416ProfileAddress,
+            l10n.changelogVersion101416Vehicle,
+            l10n.changelogVersion101416Documents,
+          ],
+        ),
+        _ChangelogSection(
+          title: l10n.orders,
+          icon: Icons.route_outlined,
+          items: [
+            l10n.changelogVersion101416DriverFee,
+            l10n.changelogVersion101416OrderTypes,
+            l10n.changelogVersion101416History,
+          ],
+        ),
+        _ChangelogSection(
+          title: l10n.earnings_label,
+          icon: Icons.account_balance_wallet_outlined,
+          items: [l10n.changelogVersion101416Earnings],
+        ),
+        _ChangelogSection(
+          title: l10n.changelogStability,
+          icon: Icons.verified_user_outlined,
+          items: [l10n.changelogVersion101416Reliability],
+        ),
+        _ChangelogSection(
+          title: l10n.changelogRelease,
+          icon: Icons.rocket_launch_outlined,
+          items: [l10n.changelogVersion101416Release],
+        ),
+      ],
+    ),
+    _ChangelogRelease(
       version: '1.0.13+15',
       build: '15',
       date: l10n.changelogDateAug11,
-      isCurrent: true,
       sections: [
         _ChangelogSection(
           title: l10n.changelogImprovements,

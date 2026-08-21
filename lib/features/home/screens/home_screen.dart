@@ -6,6 +6,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/route_constants.dart';
+import '../../../core/api/api_client.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/providers/notification_provider.dart';
@@ -13,10 +14,14 @@ import '../../../core/providers/order_provider.dart';
 import '../../../core/providers/tour_provider.dart';
 import '../../../core/services/battery_optimization_service.dart';
 import '../../../core/services/location_service.dart';
+import '../../../core/services/earnings_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../earnings/models/earnings_model.dart';
 import '../../orders/models/order_model.dart';
+import '../../orders/utils/order_presentation.dart';
 import '../../tour/widgets/tour_welcome_card.dart';
 import '../../tour/tour_keys.dart';
+import '../utils/home_earnings_date_filter.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -40,11 +45,18 @@ class _HomeScreenState extends State<HomeScreen>
   bool _isRefreshing = false;
   bool _showBatteryOptimizationBanner = false;
   bool _backgroundLocationRecommendationShown = false;
+  HomeEarningsDateFilter _earningsDateFilter = HomeEarningsDateFilter.all;
+  EarningsResponse? _homeEarnings;
+  bool _isLoadingHomeEarnings = false;
+  int _homeEarningsRequestId = 0;
   static bool get _batteryOptimizationWarningEnabled => false;
   OrderProvider? _orderProvider;
   Timer? _refreshTimer;
   final BatteryOptimizationService _batteryOptimizationService =
       BatteryOptimizationService();
+  late final EarningsService _homeEarningsService = EarningsService(
+    apiClient: ApiClient(),
+  );
 
   // Tour keys from singleton
   final _tourKeys = TourKeys.instance;
@@ -97,6 +109,7 @@ class _HomeScreenState extends State<HomeScreen>
 
       // Fetch order history for recent orders display
       _orderProvider!.fetchOrderHistory();
+      unawaited(_fetchHomeEarnings());
 
       // Check for any active order (in case app was closed during delivery)
       _orderProvider!.checkActiveOrder();
@@ -156,6 +169,7 @@ class _HomeScreenState extends State<HomeScreen>
       orderProvider.fetchOrderHistory(),
       orderProvider.checkActiveOrder(),
       driverProvider.fetchProfile(),
+      _fetchHomeEarnings(),
     ]);
 
     if (!mounted) return;
@@ -222,11 +236,7 @@ class _HomeScreenState extends State<HomeScreen>
                 color: Colors.white.withValues(alpha: 0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
-                Icons.local_shipping,
-                color: Colors.white,
-                size: 18,
-              ),
+              child: Icon(order.orderType.icon, color: Colors.white, size: 18),
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -235,7 +245,7 @@ class _HomeScreenState extends State<HomeScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    l10n.newOrderTitle,
+                    order.orderType.label(l10n),
                     style: const TextStyle(
                       fontWeight: FontWeight.w600,
                       color: Colors.white,
@@ -243,7 +253,7 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ),
                   Text(
-                    '${order.formattedPrice} \u2022 ${order.formattedDistance}',
+                    '${order.formattedDriverDeliveryFee} \u2022 ${order.formattedDistance}',
                     style: TextStyle(
                       color: Colors.white.withValues(alpha: 0.9),
                       fontSize: 12,
@@ -254,7 +264,7 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ],
         ),
-        backgroundColor: AppColors.primary,
+        backgroundColor: order.orderType.color,
         behavior: SnackBarBehavior.floating,
         margin: const EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 8),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -271,6 +281,30 @@ class _HomeScreenState extends State<HomeScreen>
     return l10n.goodEvening;
   }
 
+  Future<void> _fetchHomeEarnings() async {
+    final requestId = ++_homeEarningsRequestId;
+    if (mounted) setState(() => _isLoadingHomeEarnings = true);
+
+    final range = homeEarningsDateRange(_earningsDateFilter);
+    try {
+      final response = await _homeEarningsService.getEarnings(
+        from: range.from?.toIso8601String(),
+        to: range.to?.toIso8601String(),
+        ordering: '-earned_at',
+        page: 1,
+        pageSize: 1,
+      );
+      if (!mounted || requestId != _homeEarningsRequestId) return;
+      setState(() => _homeEarnings = response);
+    } catch (_) {
+      // Keep the last successful summary visible when a refresh fails.
+    } finally {
+      if (mounted && requestId == _homeEarningsRequestId) {
+        setState(() => _isLoadingHomeEarnings = false);
+      }
+    }
+  }
+
   Future<void> _refreshData() async {
     if (_isRefreshing) return;
     setState(() => _isRefreshing = true);
@@ -280,6 +314,7 @@ class _HomeScreenState extends State<HomeScreen>
     await Future.wait([
       _orderProvider!.fetchOrderHistory(),
       _orderProvider!.checkActiveOrder(),
+      _fetchHomeEarnings(),
       driverProvider.fetchProfile().then((_) {
         final profile = driverProvider.profile;
         if (profile != null) {
@@ -1269,22 +1304,17 @@ class _HomeScreenState extends State<HomeScreen>
                         l10n,
                       ),
 
-                    // Stats Card - calculate from completed orders only
+                    // Stats Card - use the driver earnings API summary.
                     Builder(
                       builder: (context) {
-                        final completedOrders = orderProvider.orderHistory
-                            .where((o) => o.status == OrderStatus.completed)
-                            .toList();
-                        final completedCount = completedOrders.length;
-                        final totalDeliveryFees = completedOrders.fold<double>(
-                          0.0,
-                          (sum, order) => sum + order.deliveryFee,
-                        );
-                        final totalTips = completedOrders.fold<double>(
-                          0.0,
-                          (sum, order) => sum + order.tip,
-                        );
-                        final totalEarnings = totalDeliveryFees + totalTips;
+                        final earningsSummary = _homeEarnings?.summary;
+                        final completedCount =
+                            earningsSummary?.totalOrders ?? 0;
+                        final totalDeliveryFees =
+                            earningsSummary?.totalDriverDeliveryFees ?? 0;
+                        final totalTips = earningsSummary?.totalTips ?? 0;
+                        final totalEarnings =
+                            earningsSummary?.totalEarnings ?? 0;
 
                         return Container(
                           key: _tourKeys.statsCardKey,
@@ -1305,14 +1335,41 @@ class _HomeScreenState extends State<HomeScreen>
                                   ),
                                   const SizedBox(width: 6),
                                   Text(
-                                    l10n.todayEarnings,
+                                    l10n.earnings_label,
                                     style: TextStyle(
                                       fontSize: 13,
                                       fontWeight: FontWeight.w500,
                                       color: secondaryColor,
                                     ),
                                   ),
+                                  const Spacer(),
+                                  if (_isLoadingHomeEarnings) ...[
+                                    const SizedBox(
+                                      width: 12,
+                                      height: 12,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 1.5,
+                                        color: AppColors.primary,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                  ],
+                                  Text(
+                                    _earningsDateFilterLabel(l10n),
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w600,
+                                      color: AppColors.primary,
+                                    ),
+                                  ),
                                 ],
+                              ),
+                              const SizedBox(height: 12),
+                              _buildEarningsDateFilters(
+                                surfaceColor,
+                                secondaryColor,
+                                borderColor,
+                                l10n,
                               ),
                               const SizedBox(height: 18),
                               Row(
@@ -1336,7 +1393,7 @@ class _HomeScreenState extends State<HomeScreen>
                                     child: _buildStatItem(
                                       Icons.local_shipping_outlined,
                                       '\$${totalDeliveryFees.toStringAsFixed(2)}',
-                                      l10n.deliveryFee,
+                                      l10n.driverDeliveryFee,
                                       AppColors.info,
                                       textColor,
                                       secondaryColor,
@@ -1518,6 +1575,66 @@ class _HomeScreenState extends State<HomeScreen>
     return l10n.hoursAgo(diff.inHours);
   }
 
+  String _earningsDateFilterLabel(AppLocalizations l10n) {
+    return switch (_earningsDateFilter) {
+      HomeEarningsDateFilter.all => l10n.allTime,
+      HomeEarningsDateFilter.today => l10n.today,
+      HomeEarningsDateFilter.week => l10n.week,
+      HomeEarningsDateFilter.month => l10n.month,
+    };
+  }
+
+  Widget _buildEarningsDateFilters(
+    Color surfaceColor,
+    Color secondaryColor,
+    Color borderColor,
+    AppLocalizations l10n,
+  ) {
+    final filters = <HomeEarningsDateFilter, String>{
+      HomeEarningsDateFilter.all: l10n.allTime,
+      HomeEarningsDateFilter.today: l10n.today,
+      HomeEarningsDateFilter.week: l10n.week,
+      HomeEarningsDateFilter.month: l10n.month,
+    };
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: filters.entries.map((entry) {
+          final isSelected = _earningsDateFilter == entry.key;
+          return Padding(
+            padding: const EdgeInsetsDirectional.only(end: 8),
+            child: ChoiceChip(
+              label: Text(entry.value),
+              selected: isSelected,
+              onSelected: (_) {
+                setState(() => _earningsDateFilter = entry.key);
+                unawaited(_fetchHomeEarnings());
+              },
+              selectedColor: AppColors.primary.withValues(alpha: 0.14),
+              backgroundColor: surfaceColor,
+              side: BorderSide(
+                color: isSelected
+                    ? AppColors.primary.withValues(alpha: 0.45)
+                    : borderColor,
+              ),
+              labelStyle: TextStyle(
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                color: isSelected ? AppColors.primary : secondaryColor,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              showCheckmark: false,
+              visualDensity: VisualDensity.compact,
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+
   Widget _buildStatItem(
     IconData icon,
     String value,
@@ -1553,6 +1670,7 @@ class _HomeScreenState extends State<HomeScreen>
     Color borderColor,
     AppLocalizations l10n,
   ) {
+    final typeColor = order.orderType.color;
     final glowValue = _showNewOrderAnimation ? _glowAnimation.value : 0.0;
     final glowOpacity = 0.15 + (glowValue * 0.25); // 0.15 → 0.40
     final borderWidth = 1.5 + (glowValue * 0.5); // 1.5 → 2.0
@@ -1563,12 +1681,12 @@ class _HomeScreenState extends State<HomeScreen>
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: surfaceColor,
-        border: Border.all(color: AppColors.primary, width: borderWidth),
+        border: Border.all(color: typeColor, width: borderWidth),
         borderRadius: BorderRadius.circular(14),
         boxShadow: _showNewOrderAnimation
             ? [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: glowOpacity),
+                  color: typeColor.withValues(alpha: glowOpacity),
                   blurRadius: 12 + (glowValue * 8),
                   spreadRadius: glowValue * 2,
                 ),
@@ -1587,34 +1705,30 @@ class _HomeScreenState extends State<HomeScreen>
                   vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.primary.withValues(alpha: 0.1),
+                  color: typeColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Row(
                   children: [
-                    const Icon(
-                      Icons.local_shipping,
-                      size: 14,
-                      color: AppColors.primary,
-                    ),
+                    Icon(order.orderType.icon, size: 14, color: typeColor),
                     const SizedBox(width: 5),
                     Text(
-                      l10n.newOrderTitle,
-                      style: const TextStyle(
+                      order.orderType.label(l10n),
+                      style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.primary,
+                        color: typeColor,
                       ),
                     ),
                   ],
                 ),
               ),
               Text(
-                order.formattedPrice,
-                style: const TextStyle(
+                order.formattedDriverDeliveryFee,
+                style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.w700,
-                  color: AppColors.primary,
+                  color: typeColor,
                 ),
               ),
             ],
@@ -1806,6 +1920,19 @@ class _HomeScreenState extends State<HomeScreen>
             ],
           ),
 
+          if (order.orderType != OrderType.food ||
+              order.hasDeliveryInstructions) ...[
+            const SizedBox(height: 14),
+            _buildIncomingTypeDetails(
+              order,
+              l10n,
+              textColor,
+              secondaryColor,
+              borderColor,
+              typeColor,
+            ),
+          ],
+
           // Order items (for food orders)
           if (order.items.isNotEmpty) ...[
             const SizedBox(height: 14),
@@ -1870,40 +1997,10 @@ class _HomeScreenState extends State<HomeScreen>
             ),
             child: Column(
               children: [
-                if (order.subtotal > 0)
-                  _buildPriceRow(
-                    l10n.subtotal,
-                    order.formattedSubtotal,
-                    secondaryColor,
-                  ),
                 _buildPriceRow(
-                  l10n.deliveryFee,
-                  order.formattedDeliveryFee,
+                  l10n.driverDeliveryFee,
+                  order.formattedDriverDeliveryFee,
                   secondaryColor,
-                ),
-                if (order.tip > 0)
-                  _buildPriceRow(l10n.tip, order.formattedTip, secondaryColor),
-                const Divider(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      l10n.total,
-                      style: TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: textColor,
-                      ),
-                    ),
-                    Text(
-                      order.formattedTotal,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  ],
                 ),
               ],
             ),
@@ -1983,11 +2080,9 @@ class _HomeScreenState extends State<HomeScreen>
                           _showOrderFeedback(error, isAccept: true);
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
+                    backgroundColor: typeColor,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: AppColors.primary.withValues(
-                      alpha: 0.6,
-                    ),
+                    disabledBackgroundColor: typeColor.withValues(alpha: 0.6),
                     disabledForegroundColor: Colors.white,
                     elevation: 0,
                     padding: const EdgeInsets.symmetric(vertical: 14),
@@ -2010,7 +2105,7 @@ class _HomeScreenState extends State<HomeScreen>
                             const Icon(Icons.check_circle_outline, size: 18),
                             const SizedBox(width: 8),
                             Text(
-                              l10n.accept,
+                              order.orderType.acceptLabel(l10n),
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                               ),
@@ -2023,6 +2118,155 @@ class _HomeScreenState extends State<HomeScreen>
           ),
         ],
       ),
+    );
+  }
+
+  Widget _buildIncomingTypeDetails(
+    OrderModel order,
+    AppLocalizations l10n,
+    Color textColor,
+    Color secondaryColor,
+    Color borderColor,
+    Color typeColor,
+  ) {
+    final details = <Widget>[];
+
+    if (order.orderType == OrderType.shipping) {
+      final vehicle = order.requestedDeliveryType;
+      final package = order.shippingPackage;
+      if (vehicle != null) {
+        details.add(
+          _buildTypeDetailLine(
+            Icons.local_shipping_outlined,
+            l10n.requiredVehicle,
+            vehicle.label(l10n),
+            textColor,
+            secondaryColor,
+            typeColor,
+          ),
+        );
+      }
+      if (package != null && package.hasDetails) {
+        final packageSummary = [
+          if (package.size.isNotEmpty) package.size,
+          if (package.weightKg > 0) '${package.weightKg.toStringAsFixed(1)} kg',
+          if (package.content.isNotEmpty) package.content,
+        ].join(' · ');
+        details.add(
+          _buildTypeDetailLine(
+            Icons.inventory_2_outlined,
+            l10n.packageDetails,
+            packageSummary,
+            textColor,
+            secondaryColor,
+            typeColor,
+          ),
+        );
+      }
+    } else if (order.orderType == OrderType.taxi) {
+      final vehicle = order.requestedVehicleType;
+      final carSize = order.requestedCarSize;
+      if (vehicle != null) {
+        details.add(
+          _buildTypeDetailLine(
+            Icons.directions_car_outlined,
+            l10n.requiredVehicle,
+            vehicle.label(l10n),
+            textColor,
+            secondaryColor,
+            typeColor,
+          ),
+        );
+      }
+      if (carSize != null) {
+        details.add(
+          _buildTypeDetailLine(
+            Icons.airline_seat_recline_extra,
+            l10n.carSize,
+            carSize.label(l10n),
+            textColor,
+            secondaryColor,
+            typeColor,
+          ),
+        );
+      }
+    }
+
+    if (order.hasDeliveryInstructions) {
+      details.add(
+        _buildTypeDetailLine(
+          Icons.notes_outlined,
+          l10n.deliveryInstructions,
+          order.deliveryInstructions!.trim(),
+          textColor,
+          secondaryColor,
+          typeColor,
+        ),
+      );
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: typeColor.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: typeColor.withValues(alpha: 0.18)),
+      ),
+      child: details.isEmpty
+          ? Text(
+              l10n.typeDetailsUnavailable,
+              style: TextStyle(fontSize: 12, color: secondaryColor),
+            )
+          : Column(
+              children: [
+                for (var i = 0; i < details.length; i++) ...[
+                  details[i],
+                  if (i < details.length - 1)
+                    Divider(
+                      height: 16,
+                      color: borderColor.withValues(alpha: 0.6),
+                    ),
+                ],
+              ],
+            ),
+    );
+  }
+
+  Widget _buildTypeDetailLine(
+    IconData icon,
+    String label,
+    String value,
+    Color textColor,
+    Color secondaryColor,
+    Color typeColor,
+  ) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(icon, size: 16, color: typeColor),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(fontSize: 11, color: secondaryColor),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: textColor,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -2060,23 +2304,30 @@ class _HomeScreenState extends State<HomeScreen>
     String buttonText;
     IconData buttonIcon;
     VoidCallback? onButtonPressed;
+    final typeColor = order.orderType.color;
 
     switch (order.status) {
       case OrderStatus.accepted:
-        statusText = l10n.headToPickup;
-        buttonText = l10n.onTheWay;
-        buttonIcon = Icons.local_shipping;
+        statusText = order.orderType == OrderType.taxi
+            ? l10n.headToPassenger
+            : l10n.headToPickup;
+        buttonText = statusText;
+        buttonIcon = order.orderType.icon;
         onButtonPressed = () => orderProvider.startDelivery();
         break;
       case OrderStatus.onTheWay:
         statusText = l10n.onTheWay;
-        buttonText = l10n.markAsDelivered;
+        buttonText = order.orderType == OrderType.taxi
+            ? l10n.passengerDroppedOff
+            : l10n.markAsDelivered;
         buttonIcon = Icons.location_on;
         onButtonPressed = () => orderProvider.markDelivered();
         break;
       case OrderStatus.delivered:
         statusText = l10n.atDelivery;
-        buttonText = l10n.orderCompleted;
+        buttonText = order.orderType == OrderType.taxi
+            ? l10n.completeRide
+            : l10n.orderCompleted;
         buttonIcon = Icons.check_circle;
         onButtonPressed = () => orderProvider.completeOrder();
         break;
@@ -2109,26 +2360,19 @@ class _HomeScreenState extends State<HomeScreen>
                       vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
+                      color: typeColor.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Row(
                       children: [
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: const BoxDecoration(
-                            color: AppColors.primary,
-                            shape: BoxShape.circle,
-                          ),
-                        ),
+                        Icon(order.orderType.icon, size: 13, color: typeColor),
                         const SizedBox(width: 6),
                         Text(
                           statusText,
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.primary,
+                            color: typeColor,
                           ),
                         ),
                       ],
@@ -2142,7 +2386,7 @@ class _HomeScreenState extends State<HomeScreen>
                 ],
               ),
               Text(
-                order.formattedPrice,
+                order.formattedDriverDeliveryFee,
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
@@ -2392,7 +2636,7 @@ class _HomeScreenState extends State<HomeScreen>
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  order.formattedPrice,
+                  order.formattedDriverDeliveryFee,
                   style: const TextStyle(
                     fontSize: 15,
                     fontWeight: FontWeight.w600,

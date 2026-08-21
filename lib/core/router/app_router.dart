@@ -11,6 +11,7 @@ import '../../features/navigation/screens/navigation_screen.dart';
 import '../../features/earnings/screens/earnings_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../features/profile/screens/edit_profile_screen.dart';
+import '../../features/profile/screens/edit_address_screen.dart';
 import '../../features/profile/screens/changelog_screen.dart';
 import '../../features/settings/screens/settings_screen.dart';
 import '../../features/notifications/screens/notifications_screen.dart';
@@ -37,7 +38,16 @@ class AppRouter {
         final isAuthenticated = authProvider.isAuthenticated;
         final currentPath = state.matchedLocation;
 
-        debugPrint('[Router] Redirect check - path: $currentPath, isAuth: $isAuthenticated');
+        debugPrint(
+          '[Router] Redirect check - path: $currentPath, isAuth: $isAuthenticated',
+        );
+
+        // Wait for stored credentials to be restored before protecting routes.
+        // This prevents an authenticated app reload from briefly redirecting
+        // away from the application flow.
+        if (!authProvider.initialized) {
+          return null;
+        }
 
         // If authenticated, redirect from auth routes
         if (isAuthenticated) {
@@ -46,10 +56,14 @@ class AppRouter {
               currentPath == RouteConstants.otp) {
             // New users need to complete their profile first
             if (authProvider.isNewUser) {
-              debugPrint('[Router] Redirecting to application (new user needs profile)');
+              debugPrint(
+                '[Router] Redirecting to application (new user needs profile)',
+              );
               return RouteConstants.application;
             }
-            debugPrint('[Router] Redirecting to home (authenticated on auth route)');
+            debugPrint(
+              '[Router] Redirecting to home (authenticated on auth route)',
+            );
             return RouteConstants.home;
           }
           return null;
@@ -57,12 +71,11 @@ class AppRouter {
 
         // Not authenticated below this point
 
-        // Allow access to auth routes and application routes without auth
+        // Only authentication routes are public. The application and pending
+        // approval screens submit or expose driver data and require a session.
         if (currentPath == RouteConstants.onboarding ||
             currentPath == RouteConstants.phone ||
-            currentPath == RouteConstants.otp ||
-            currentPath == RouteConstants.application ||
-            currentPath == RouteConstants.pendingApproval) {
+            currentPath == RouteConstants.otp) {
           debugPrint('[Router] Allowing access to: $currentPath');
           return null;
         }
@@ -72,135 +85,135 @@ class AppRouter {
         return RouteConstants.phone;
       },
       routes: [
-      // Legacy onboarding path now opens login directly.
-      GoRoute(
-        path: RouteConstants.onboarding,
-        builder: (context, state) => const PhoneScreen(),
-      ),
+        // Legacy onboarding path now opens login directly.
+        GoRoute(
+          path: RouteConstants.onboarding,
+          builder: (context, state) => const PhoneScreen(),
+        ),
 
-      // Auth
-      GoRoute(
-        path: RouteConstants.phone,
-        builder: (context, state) => const PhoneScreen(),
-      ),
-      GoRoute(
-        path: RouteConstants.otp,
-        builder: (context, state) {
-          final phone = state.extra as String? ?? '';
-          return OtpScreen(phoneNumber: phone);
-        },
-      ),
+        // Auth
+        GoRoute(
+          path: RouteConstants.phone,
+          builder: (context, state) => const PhoneScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.otp,
+          builder: (context, state) {
+            final phone = state.extra as String? ?? '';
+            return OtpScreen(phoneNumber: phone);
+          },
+        ),
 
-      // Application
-      GoRoute(
-        path: RouteConstants.application,
-        builder: (context, state) => const ApplicationScreen(),
-      ),
-      GoRoute(
-        path: RouteConstants.pendingApproval,
-        builder: (context, state) => const PendingApprovalScreen(),
-      ),
+        // Application
+        GoRoute(
+          path: RouteConstants.application,
+          builder: (context, state) => const ApplicationScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.pendingApproval,
+          builder: (context, state) => const PendingApprovalScreen(),
+        ),
 
-      // Main App with Bottom Navigation
-      ShellRoute(
-        navigatorKey: _shellNavigatorKey,
-        builder: (context, state, child) => ShellScaffold(child: child),
-        routes: [
-          GoRoute(
-            path: RouteConstants.home,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: HomeScreen(),
+        // Main App with Bottom Navigation
+        ShellRoute(
+          navigatorKey: _shellNavigatorKey,
+          builder: (context, state, child) => ShellScaffold(child: child),
+          routes: [
+            GoRoute(
+              path: RouteConstants.home,
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: HomeScreen()),
             ),
-          ),
-          GoRoute(
-            path: RouteConstants.orders,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: OrdersScreen(),
+            GoRoute(
+              path: RouteConstants.orders,
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: OrdersScreen()),
             ),
-          ),
-          GoRoute(
-            path: RouteConstants.earnings,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: EarningsScreen(),
+            GoRoute(
+              path: RouteConstants.earnings,
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: EarningsScreen()),
             ),
-          ),
-          GoRoute(
-            path: RouteConstants.profile,
-            pageBuilder: (context, state) => const NoTransitionPage(
-              child: ProfileScreen(),
+            GoRoute(
+              path: RouteConstants.profile,
+              pageBuilder: (context, state) =>
+                  const NoTransitionPage(child: ProfileScreen()),
             ),
-          ),
-        ],
-      ),
+          ],
+        ),
 
-      // Standalone screens (no bottom nav)
-      GoRoute(
-        path: RouteConstants.orderDetail,
-        builder: (context, state) {
-          final orderId = state.pathParameters['id'] ?? '';
-          return OrderDetailScreen(orderId: orderId);
-        },
-      ),
-      GoRoute(
-        path: RouteConstants.navigation,
-        builder: (context, state) {
-          final orderId = state.pathParameters['id'] ?? '';
-          return NavigationScreen(orderId: orderId);
-        },
-      ),
-      GoRoute(
-        path: RouteConstants.settings,
-        builder: (context, state) => const SettingsScreen(),
-      ),
-      GoRoute(
-        path: RouteConstants.notifications,
-        builder: (context, state) => const NotificationsScreen(),
-      ),
-      GoRoute(
-        path: RouteConstants.editProfile,
-        builder: (context, state) => const EditProfileScreen(),
-      ),
-      GoRoute(
-        path: RouteConstants.changelog,
-        builder: (context, state) => const ChangelogScreen(),
-      ),
+        // Standalone screens (no bottom nav)
+        GoRoute(
+          path: RouteConstants.orderDetail,
+          builder: (context, state) {
+            final orderId = state.pathParameters['id'] ?? '';
+            return OrderDetailScreen(orderId: orderId);
+          },
+        ),
+        GoRoute(
+          path: RouteConstants.navigation,
+          builder: (context, state) {
+            final orderId = state.pathParameters['id'] ?? '';
+            return NavigationScreen(orderId: orderId);
+          },
+        ),
+        GoRoute(
+          path: RouteConstants.settings,
+          builder: (context, state) => const SettingsScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.notifications,
+          builder: (context, state) => const NotificationsScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.editProfile,
+          builder: (context, state) => const EditProfileScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.editAddress,
+          builder: (context, state) => const EditAddressScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.changelog,
+          builder: (context, state) => const ChangelogScreen(),
+        ),
 
-      // Knowledge Base
-      GoRoute(
-        path: RouteConstants.knowledgeBase,
-        builder: (context, state) => const KnowledgeBaseScreen(),
-      ),
-      GoRoute(
-        path: RouteConstants.kbArticle,
-        builder: (context, state) {
-          final categoryId = state.pathParameters['categoryId'] ?? '';
-          final articleId = state.pathParameters['articleId'] ?? '';
-          final article = state.extra as KBArticle?;
-          return KBArticleScreen(
-            categoryId: categoryId,
-            articleId: articleId,
-            article: article,
-          );
-        },
-      ),
+        // Knowledge Base
+        GoRoute(
+          path: RouteConstants.knowledgeBase,
+          builder: (context, state) => const KnowledgeBaseScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.kbArticle,
+          builder: (context, state) {
+            final categoryId = state.pathParameters['categoryId'] ?? '';
+            final articleId = state.pathParameters['articleId'] ?? '';
+            final article = state.extra as KBArticle?;
+            return KBArticleScreen(
+              categoryId: categoryId,
+              articleId: articleId,
+              article: article,
+            );
+          },
+        ),
 
-      // Support
-      GoRoute(
-        path: RouteConstants.support,
-        builder: (context, state) => const SupportTicketsScreen(),
-      ),
-      GoRoute(
-        path: RouteConstants.supportTicketDetail,
-        builder: (context, state) {
-          final ticketId = state.pathParameters['ticketId'] ?? '';
-          return TicketDetailScreen(ticketId: ticketId);
-        },
-      ),
-      GoRoute(
-        path: RouteConstants.supportCreate,
-        builder: (context, state) => const CreateTicketScreen(),
-      ),
-    ],
+        // Support
+        GoRoute(
+          path: RouteConstants.support,
+          builder: (context, state) => const SupportTicketsScreen(),
+        ),
+        GoRoute(
+          path: RouteConstants.supportTicketDetail,
+          builder: (context, state) {
+            final ticketId = state.pathParameters['ticketId'] ?? '';
+            return TicketDetailScreen(ticketId: ticketId);
+          },
+        ),
+        GoRoute(
+          path: RouteConstants.supportCreate,
+          builder: (context, state) => const CreateTicketScreen(),
+        ),
+      ],
     );
   }
 }
