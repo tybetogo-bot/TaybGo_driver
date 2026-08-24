@@ -21,6 +21,7 @@ class PhoneSignInForm extends StatefulWidget {
     this.strings = const AuthUiStrings(),
     this.title,
     this.subtitle,
+    this.additionalFields,
   });
 
   final FutureOr<void> Function(PhoneNumberValue value) onSubmit;
@@ -33,6 +34,7 @@ class PhoneSignInForm extends StatefulWidget {
   final AuthUiStrings strings;
   final Widget? title;
   final Widget? subtitle;
+  final Widget? additionalFields;
 
   @override
   State<PhoneSignInForm> createState() => _PhoneSignInFormState();
@@ -145,6 +147,10 @@ class _PhoneSignInFormState extends State<PhoneSignInForm> {
               return null;
             },
           ),
+          if (widget.additionalFields != null) ...[
+            const SizedBox(height: 18),
+            widget.additionalFields!,
+          ],
           if (widget.errorText != null) ...[
             const SizedBox(height: 14),
             _ErrorBanner(text: widget.errorText!),

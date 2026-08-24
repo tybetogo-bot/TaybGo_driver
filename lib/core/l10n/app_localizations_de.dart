@@ -132,6 +132,51 @@ class AppLocalizationsDe extends AppLocalizations {
   String get forgotPassword => 'Passwort vergessen';
 
   @override
+  String get password => 'Password';
+
+  @override
+  String get enterPassword => 'Enter your password';
+
+  @override
+  String get signIn => 'Sign in';
+
+  @override
+  String get passwordRequiredForDriver =>
+      'Password sign-in is required for driver accounts.';
+
+  @override
+  String get checkingSignInMethod => 'Checking sign-in method…';
+
+  @override
+  String get configFallback =>
+      'Could not refresh sign-in settings. Using password sign-in.';
+
+  @override
+  String get updateRequiredTitle => 'Update required';
+
+  @override
+  String get updateRequiredMessage =>
+      'Install the latest TaybGo Driver version to continue.';
+
+  @override
+  String latestVersionLabel(String version) {
+    return 'Latest version: $version';
+  }
+
+  @override
+  String get updateNow => 'Update now';
+
+  @override
+  String get checkAgain => 'Check again';
+
+  @override
+  String get invalidUpdateUrl =>
+      'The update link is unavailable. Please try again.';
+
+  @override
+  String get couldNotOpenLink => 'Could not open this link.';
+
+  @override
   String get driverApplication => 'Fahrerantrag';
 
   @override
@@ -1790,6 +1835,33 @@ class AppLocalizationsDe extends AppLocalizations {
 
   @override
   String get changelogRelease => 'Veröffentlichung';
+
+  @override
+  String get changelogDateAug24 => '24 August 2026';
+
+  @override
+  String get changelogVersion101517Authentication =>
+      'Driver sign-in now follows the live backend policy and automatically uses password or OTP authentication when enabled for the driver role.';
+
+  @override
+  String get changelogVersion101517Password =>
+      'Added secure password sign-in for driver accounts while keeping role-aware OTP support available for configured deployments.';
+
+  @override
+  String get changelogVersion101517Updates =>
+      'Added a required-update screen so unsupported app versions can be directed to the correct update without entering the app.';
+
+  @override
+  String get changelogVersion101517Legal =>
+      'Terms of Service and Privacy Policy links now come from the public application configuration and can be updated without a new app release.';
+
+  @override
+  String get changelogVersion101517Reliability =>
+      'Improved anonymous authentication error handling, configuration fallback behavior, startup timeouts, validation feedback, and small-screen login layout.';
+
+  @override
+  String get changelogVersion101517Release =>
+      'Released TaybGo Driver version 1.0.15+17.';
 
   @override
   String get changelogDateAug20 => '20 August 2026';

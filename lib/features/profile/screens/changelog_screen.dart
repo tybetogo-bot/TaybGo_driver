@@ -400,10 +400,43 @@ class ChangelogScreen extends StatelessWidget {
 
   List<_ChangelogRelease> _buildReleases(AppLocalizations l10n) => [
     _ChangelogRelease(
+      version: '1.0.15+17',
+      build: '17',
+      date: l10n.changelogDateAug24,
+      isCurrent: true,
+      sections: [
+        _ChangelogSection(
+          title: l10n.account,
+          icon: Icons.lock_person_outlined,
+          items: [
+            l10n.changelogVersion101517Authentication,
+            l10n.changelogVersion101517Password,
+          ],
+        ),
+        _ChangelogSection(
+          title: l10n.changelogPlatform,
+          icon: Icons.system_update_alt_rounded,
+          items: [
+            l10n.changelogVersion101517Updates,
+            l10n.changelogVersion101517Legal,
+          ],
+        ),
+        _ChangelogSection(
+          title: l10n.changelogStability,
+          icon: Icons.verified_user_outlined,
+          items: [l10n.changelogVersion101517Reliability],
+        ),
+        _ChangelogSection(
+          title: l10n.changelogRelease,
+          icon: Icons.rocket_launch_outlined,
+          items: [l10n.changelogVersion101517Release],
+        ),
+      ],
+    ),
+    _ChangelogRelease(
       version: '1.0.14+16',
       build: '16',
       date: l10n.changelogDateAug20,
-      isCurrent: true,
       sections: [
         _ChangelogSection(
           title: l10n.driverApplication,

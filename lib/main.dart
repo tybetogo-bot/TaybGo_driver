@@ -22,11 +22,13 @@ import 'core/providers/driver_provider.dart';
 import 'core/providers/notification_provider.dart';
 import 'core/providers/notification_settings_provider.dart';
 import 'core/providers/tour_provider.dart';
+import 'core/providers/public_config_provider.dart';
 import 'core/providers/earnings_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/services/fcm_service.dart';
 import 'core/constants/route_constants.dart';
 import 'features/support/application/support_provider.dart';
+import 'shared/widgets/required_update_gate.dart';
 
 GoRouter? _router;
 _NotificationCleanupObserver? _notificationCleanupObserver;
@@ -69,6 +71,9 @@ Future<void> main() async {
     final authProvider = AuthProvider();
     await authProvider.initialize();
 
+    final publicConfigProvider = PublicConfigProvider();
+    await publicConfigProvider.initialize();
+
     // Initialize tour provider
     final tourProvider = TourProvider();
     await tourProvider.init();
@@ -77,7 +82,11 @@ Future<void> main() async {
     _router = AppRouter.createRouter(authProvider);
 
     runApp(
-      TaybGoDriverApp(authProvider: authProvider, tourProvider: tourProvider),
+      TaybGoDriverApp(
+        authProvider: authProvider,
+        tourProvider: tourProvider,
+        publicConfigProvider: publicConfigProvider,
+      ),
     );
 
     unawaited(fcmService.clearDeliveredNotifications());
@@ -144,13 +153,16 @@ class _NotificationCleanupObserver extends WidgetsBindingObserver {
 class TaybGoDriverApp extends StatelessWidget {
   final AuthProvider authProvider;
   final TourProvider tourProvider;
+  final PublicConfigProvider publicConfigProvider;
 
   TaybGoDriverApp({
     super.key,
     AuthProvider? authProvider,
     TourProvider? tourProvider,
+    PublicConfigProvider? publicConfigProvider,
   }) : authProvider = authProvider ?? AuthProvider(),
-       tourProvider = tourProvider ?? TourProvider();
+       tourProvider = tourProvider ?? TourProvider(),
+       publicConfigProvider = publicConfigProvider ?? PublicConfigProvider();
 
   @override
   Widget build(BuildContext context) {
@@ -188,6 +200,7 @@ class TaybGoDriverApp extends StatelessWidget {
         ChangeNotifierProvider.value(value: earningsProvider),
         ChangeNotifierProvider.value(value: supportProvider),
         ChangeNotifierProvider.value(value: tourProvider),
+        ChangeNotifierProvider.value(value: publicConfigProvider),
       ],
       child: Consumer2<ThemeProvider, LocaleProvider>(
         builder: (context, themeProvider, localeProvider, _) {
@@ -209,6 +222,8 @@ class TaybGoDriverApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate,
             ],
             routerConfig: router,
+            builder: (context, child) =>
+                RequiredUpdateGate(child: child ?? const SizedBox.shrink()),
           );
         },
       ),

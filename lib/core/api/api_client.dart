@@ -81,6 +81,13 @@ class ApiClient {
 
 class _AuthInterceptor extends QueuedInterceptor {
   static const Duration _tokenExpiryLeeway = Duration(seconds: 30);
+  static const _publicEndpoints = [
+    ApiConstants.publicConfig,
+    ApiConstants.passwordLogin,
+    ApiConstants.otpRequest,
+    ApiConstants.otpVerify,
+    ApiConstants.tokenRefresh,
+  ];
 
   final Dio _dio;
   final TokenStorage _tokenStorage;
@@ -95,15 +102,7 @@ class _AuthInterceptor extends QueuedInterceptor {
     RequestInterceptorHandler handler,
   ) async {
     // Skip auth header for public endpoints.
-    final publicEndpoints = [
-      ApiConstants.otpRequest,
-      ApiConstants.otpVerify,
-      ApiConstants.tokenRefresh,
-    ];
-
-    final isPublic = publicEndpoints.any(
-      (endpoint) => options.path == endpoint || options.path.endsWith(endpoint),
-    );
+    final isPublic = _isPublicEndpoint(options.path);
     debugPrint('[AuthInterceptor] Request: ${options.path}');
     debugPrint('[AuthInterceptor] Is public endpoint: $isPublic');
 
@@ -119,6 +118,10 @@ class _AuthInterceptor extends QueuedInterceptor {
 
     handler.next(options);
   }
+
+  bool _isPublicEndpoint(String path) => _publicEndpoints.any(
+    (endpoint) => path == endpoint || path.endsWith(endpoint),
+  );
 
   Future<bool> validateStoredSession() async {
     final accessToken = await _tokenStorage.getAccessToken();
@@ -364,6 +367,7 @@ class _AuthInterceptor extends QueuedInterceptor {
     debugPrint('[AuthInterceptor] Error Response: ${err.response?.data}');
 
     final isAuthRequest =
+        _isPublicEndpoint(err.requestOptions.path) ||
         err.requestOptions.path == ApiConstants.tokenRefresh ||
         err.requestOptions.path.endsWith(ApiConstants.tokenRefresh) ||
         err.requestOptions.path == ApiConstants.logout ||

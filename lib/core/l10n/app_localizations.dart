@@ -350,6 +350,84 @@ abstract class AppLocalizations {
   /// **'I forgot my password'**
   String get forgotPassword;
 
+  /// No description provided for @password.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get password;
+
+  /// No description provided for @enterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password'**
+  String get enterPassword;
+
+  /// No description provided for @signIn.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign in'**
+  String get signIn;
+
+  /// No description provided for @passwordRequiredForDriver.
+  ///
+  /// In en, this message translates to:
+  /// **'Password sign-in is required for driver accounts.'**
+  String get passwordRequiredForDriver;
+
+  /// No description provided for @checkingSignInMethod.
+  ///
+  /// In en, this message translates to:
+  /// **'Checking sign-in method…'**
+  String get checkingSignInMethod;
+
+  /// No description provided for @configFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not refresh sign-in settings. Using password sign-in.'**
+  String get configFallback;
+
+  /// No description provided for @updateRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Update required'**
+  String get updateRequiredTitle;
+
+  /// No description provided for @updateRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Install the latest TaybGo Driver version to continue.'**
+  String get updateRequiredMessage;
+
+  /// No description provided for @latestVersionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest version: {version}'**
+  String latestVersionLabel(String version);
+
+  /// No description provided for @updateNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Update now'**
+  String get updateNow;
+
+  /// No description provided for @checkAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get checkAgain;
+
+  /// No description provided for @invalidUpdateUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'The update link is unavailable. Please try again.'**
+  String get invalidUpdateUrl;
+
+  /// No description provided for @couldNotOpenLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open this link.'**
+  String get couldNotOpenLink;
+
   /// No description provided for @driverApplication.
   ///
   /// In en, this message translates to:
@@ -3439,6 +3517,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Release'**
   String get changelogRelease;
+
+  /// No description provided for @changelogDateAug24.
+  ///
+  /// In en, this message translates to:
+  /// **'24 August 2026'**
+  String get changelogDateAug24;
+
+  /// No description provided for @changelogVersion101517Authentication.
+  ///
+  /// In en, this message translates to:
+  /// **'Driver sign-in now follows the live backend policy and automatically uses password or OTP authentication when enabled for the driver role.'**
+  String get changelogVersion101517Authentication;
+
+  /// No description provided for @changelogVersion101517Password.
+  ///
+  /// In en, this message translates to:
+  /// **'Added secure password sign-in for driver accounts while keeping role-aware OTP support available for configured deployments.'**
+  String get changelogVersion101517Password;
+
+  /// No description provided for @changelogVersion101517Updates.
+  ///
+  /// In en, this message translates to:
+  /// **'Added a required-update screen so unsupported app versions can be directed to the correct update without entering the app.'**
+  String get changelogVersion101517Updates;
+
+  /// No description provided for @changelogVersion101517Legal.
+  ///
+  /// In en, this message translates to:
+  /// **'Terms of Service and Privacy Policy links now come from the public application configuration and can be updated without a new app release.'**
+  String get changelogVersion101517Legal;
+
+  /// No description provided for @changelogVersion101517Reliability.
+  ///
+  /// In en, this message translates to:
+  /// **'Improved anonymous authentication error handling, configuration fallback behavior, startup timeouts, validation feedback, and small-screen login layout.'**
+  String get changelogVersion101517Reliability;
+
+  /// No description provided for @changelogVersion101517Release.
+  ///
+  /// In en, this message translates to:
+  /// **'Released TaybGo Driver version 1.0.15+17.'**
+  String get changelogVersion101517Release;
 
   /// No description provided for @changelogDateAug20.
   ///
