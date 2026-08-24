@@ -3524,6 +3524,30 @@ abstract class AppLocalizations {
   /// **'24 August 2026'**
   String get changelogDateAug24;
 
+  /// No description provided for @changelogVersion101618WebPlaces.
+  ///
+  /// In en, this message translates to:
+  /// **'Address autocomplete on web now uses the supported Google Maps JavaScript API with compatibility fallback for existing Google Places projects.'**
+  String get changelogVersion101618WebPlaces;
+
+  /// No description provided for @changelogVersion101618AddressConfig.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Places configuration is centralized and supplied through the build environment without duplicating the key in Driver source files.'**
+  String get changelogVersion101618AddressConfig;
+
+  /// No description provided for @changelogVersion101618ReleaseGuard.
+  ///
+  /// In en, this message translates to:
+  /// **'Android release builds now block missing or malformed Places configuration before an unusable APK or App Bundle can be produced.'**
+  String get changelogVersion101618ReleaseGuard;
+
+  /// No description provided for @changelogVersion101618Release.
+  ///
+  /// In en, this message translates to:
+  /// **'Released TaybGo Driver version 1.0.16+18.'**
+  String get changelogVersion101618Release;
+
   /// No description provided for @changelogVersion101517Authentication.
   ///
   /// In en, this message translates to:
