@@ -46,6 +46,7 @@ class GooglePlacesService {
     : _client = client ?? http.Client();
 
   static const _baseUrl = 'https://places.googleapis.com/v1';
+  static const _legacyBaseUrl = 'https://maps.googleapis.com/maps/api/place';
   static const _autocompleteFieldMask =
       'suggestions.placePrediction.placeId,'
       'suggestions.placePrediction.text.text,'
@@ -79,29 +80,38 @@ class GooglePlacesService {
           .toList(growable: false);
     }
 
-    final response = await _client.post(
-      Uri.parse('$_baseUrl/places:autocomplete'),
-      headers: _headers(_autocompleteFieldMask),
-      body: jsonEncode({
-        'input': normalizedInput,
-        'sessionToken': sessionToken,
-        if (_isNonEmpty(languageCode)) 'languageCode': languageCode,
-        if (_isNonEmpty(regionCode)) 'regionCode': regionCode,
-      }),
-    );
-    final data = _decodeResponse(response);
-    final suggestions = data['suggestions'];
-    if (suggestions is! List) return const [];
+    try {
+      final response = await _client.post(
+        Uri.parse('$_baseUrl/places:autocomplete'),
+        headers: _headers(_autocompleteFieldMask),
+        body: jsonEncode({
+          'input': normalizedInput,
+          'sessionToken': sessionToken,
+          if (_isNonEmpty(languageCode)) 'languageCode': languageCode,
+          if (_isNonEmpty(regionCode)) 'regionCode': regionCode,
+        }),
+      );
+      final data = _decodeResponse(response);
+      final suggestions = data['suggestions'];
+      if (suggestions is! List) return const [];
 
-    return suggestions
-        .whereType<Map>()
-        .map((item) => item.cast<String, dynamic>())
-        .map((item) => item['placePrediction'])
-        .whereType<Map>()
-        .map((item) => item.cast<String, dynamic>())
-        .map(_suggestionFromJson)
-        .whereType<GooglePlaceSuggestion>()
-        .toList(growable: false);
+      return suggestions
+          .whereType<Map>()
+          .map((item) => item.cast<String, dynamic>())
+          .map((item) => item['placePrediction'])
+          .whereType<Map>()
+          .map((item) => item.cast<String, dynamic>())
+          .map(_suggestionFromJson)
+          .whereType<GooglePlaceSuggestion>()
+          .toList(growable: false);
+    } on Exception {
+      return _legacyAutocomplete(
+        input: normalizedInput,
+        sessionToken: sessionToken,
+        languageCode: languageCode,
+        regionCode: regionCode,
+      );
+    }
   }
 
   Future<GooglePlaceAddressSelection> resolveAddress({
@@ -135,11 +145,33 @@ class GooglePlacesService {
             if (_isNonEmpty(regionCode)) 'regionCode': regionCode!,
           },
         );
-    final response = await _client.get(
-      uri,
-      headers: _headers(_detailsFieldMask),
-    );
-    final data = _decodeResponse(response);
+    try {
+      final response = await _client.get(
+        uri,
+        headers: _headers(_detailsFieldMask),
+      );
+      final data = _decodeResponse(response);
+      return _selectionFromNewJson(
+        data: data,
+        suggestion: suggestion,
+        label: label,
+      );
+    } on Exception {
+      return _legacyResolveAddress(
+        suggestion: suggestion,
+        sessionToken: sessionToken,
+        label: label,
+        languageCode: languageCode,
+        regionCode: regionCode,
+      );
+    }
+  }
+
+  GooglePlaceAddressSelection _selectionFromNewJson({
+    required Map<String, dynamic> data,
+    required GooglePlaceSuggestion suggestion,
+    required String label,
+  }) {
     final location = data['location'];
     if (location is! Map) {
       throw const GooglePlacesException(
@@ -198,6 +230,102 @@ class GooglePlacesService {
 
   void close() => _client.close();
 
+  Future<List<GooglePlaceSuggestion>> _legacyAutocomplete({
+    required String input,
+    required String sessionToken,
+    String? languageCode,
+    String? regionCode,
+  }) async {
+    final response = await _client.get(
+      Uri.parse('$_legacyBaseUrl/autocomplete/json').replace(
+        queryParameters: {
+          'input': input,
+          'key': apiKey,
+          'sessiontoken': sessionToken,
+          if (_isNonEmpty(languageCode)) 'language': languageCode!,
+          if (_isNonEmpty(regionCode)) 'components': 'country:$regionCode',
+        },
+      ),
+    );
+    final data = _decodeLegacyResponse(response);
+    if (data['status'] == 'ZERO_RESULTS') return const [];
+
+    final predictions = data['predictions'];
+    if (predictions is! List) return const [];
+    return predictions
+        .whereType<Map>()
+        .map((item) => item.cast<String, dynamic>())
+        .map(_suggestionFromLegacyJson)
+        .whereType<GooglePlaceSuggestion>()
+        .toList(growable: false);
+  }
+
+  Future<GooglePlaceAddressSelection> _legacyResolveAddress({
+    required GooglePlaceSuggestion suggestion,
+    required String sessionToken,
+    required String label,
+    String? languageCode,
+    String? regionCode,
+  }) async {
+    final response = await _client.get(
+      Uri.parse('$_legacyBaseUrl/details/json').replace(
+        queryParameters: {
+          'place_id': suggestion.placeId,
+          'key': apiKey,
+          'sessiontoken': sessionToken,
+          'fields': 'place_id,formatted_address,address_component,geometry',
+          if (_isNonEmpty(languageCode)) 'language': languageCode!,
+          if (_isNonEmpty(regionCode)) 'region': regionCode!,
+        },
+      ),
+    );
+    final data = _decodeLegacyResponse(response);
+    final result = data['result'];
+    final resultMap = result is Map
+        ? result.cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final geometry = resultMap['geometry'];
+    final geometryMap = geometry is Map
+        ? geometry.cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final location = geometryMap['location'];
+    final locationMap = location is Map
+        ? location.cast<String, dynamic>()
+        : const <String, dynamic>{};
+    final latitude = (locationMap['lat'] as num?)?.toDouble();
+    final longitude = (locationMap['lng'] as num?)?.toDouble();
+    if (latitude == null || longitude == null) {
+      throw const GooglePlacesException(
+        'The selected place did not include valid coordinates.',
+      );
+    }
+
+    final components = _addressComponents(resultMap['address_components']);
+    return GooglePlaceAddressSelection(
+      placeId: suggestion.placeId,
+      address: DriverAddress(
+        label: _normalize(label),
+        lat: latitude.toStringAsFixed(6),
+        lng: longitude.toStringAsFixed(6),
+        fullAddress: _firstNonEmpty([
+          resultMap['formatted_address']?.toString(),
+          suggestion.fullText,
+        ]),
+        streetName: _component(components, 'route'),
+        houseNumber: _component(components, 'street_number'),
+        city: _firstNonEmpty([
+          _component(components, 'locality'),
+          _component(components, 'administrative_area_level_1'),
+        ]),
+        postalCode: _component(components, 'postal_code'),
+        country: _firstNonEmpty([
+          _component(components, 'country', short: true),
+          _component(components, 'country'),
+        ]),
+      ),
+    );
+  }
+
   Map<String, String> _headers(String fieldMask) => {
     'Content-Type': 'application/json',
     'X-Goog-Api-Key': apiKey,
@@ -229,6 +357,17 @@ class GooglePlacesService {
       );
     }
     return data;
+  }
+
+  Map<String, dynamic> _decodeLegacyResponse(http.Response response) {
+    final data = _decodeResponse(response);
+    final status = data['status']?.toString();
+    if (status == 'OK' || status == 'ZERO_RESULTS') return data;
+    throw GooglePlacesException(
+      data['error_message']?.toString() ??
+          'Google Places legacy request failed${status == null ? '' : ' ($status)'}.',
+      statusCode: response.statusCode,
+    );
   }
 
   GooglePlaceSuggestion? _suggestionFromJson(Map<String, dynamic> json) {
@@ -269,6 +408,23 @@ class GooglePlacesService {
       fullText: fullText,
       primaryText: _normalize(json['primaryText']?.toString()) ?? fullText,
       secondaryText: _normalize(json['secondaryText']?.toString()),
+    );
+  }
+
+  GooglePlaceSuggestion? _suggestionFromLegacyJson(Map<String, dynamic> json) {
+    final placeId = _normalize(json['place_id']?.toString());
+    final fullText = _normalize(json['description']?.toString());
+    if (placeId == null || fullText == null) return null;
+    final structured = json['structured_formatting'];
+    final structuredMap = structured is Map
+        ? structured.cast<String, dynamic>()
+        : const <String, dynamic>{};
+    return GooglePlaceSuggestion(
+      placeId: placeId,
+      fullText: fullText,
+      primaryText:
+          _normalize(structuredMap['main_text']?.toString()) ?? fullText,
+      secondaryText: _normalize(structuredMap['secondary_text']?.toString()),
     );
   }
 
@@ -320,9 +476,10 @@ class GooglePlacesService {
     for (final component in components) {
       final types = component['types'];
       if (types is List && types.contains(type)) {
-        return _normalize(
+        return _firstNonEmpty([
           component[short ? 'shortText' : 'longText']?.toString(),
-        );
+          component[short ? 'short_name' : 'long_name']?.toString(),
+        ]);
       }
     }
     return null;
