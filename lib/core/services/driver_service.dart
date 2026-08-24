@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import '../api/api_client.dart';
 import '../api/api_constants.dart';
+import '../models/driver_address.dart';
 import '../models/driver_profile.dart';
 import '../utils/birthdate_utils.dart';
 
@@ -56,6 +57,7 @@ class DriverService {
     String? email,
     String? vehicleType,
     String? vehiclePlate,
+    DriverAddress? address,
   }) async {
     try {
       final data = <String, dynamic>{};
@@ -64,6 +66,7 @@ class DriverService {
       if (email != null) data['email'] = email;
       if (vehicleType != null) data['vehicle_type'] = vehicleType;
       if (vehiclePlate != null) data['vehicle_plate'] = vehiclePlate;
+      _addAddressPatch(data, address);
 
       debugPrint('[DriverService] === UPDATE PROFILE REQUEST ===');
       debugPrint('[DriverService] Endpoint: ${ApiConstants.driverProfile}');
@@ -86,7 +89,7 @@ class DriverService {
     }
   }
 
-  Future<void> updateUserProfile({
+  Future<DriverProfile> updateUserProfile({
     String? name,
     String? phone,
     DateTime? birthdate,
@@ -107,6 +110,7 @@ class DriverService {
     String? healthInsuranceDocument,
     String? addressDocument,
     String? bankDocument,
+    DriverAddress? address,
   }) async {
     try {
       final data = <String, dynamic>{};
@@ -174,6 +178,7 @@ class DriverService {
       if (otherDocuments != null) {
         data['other_documents'] = otherDocuments;
       }
+      _addAddressPatch(data, address);
 
       debugPrint('[DriverService] === UPDATE USER PROFILE REQUEST ===');
       debugPrint('[DriverService] Endpoint: ${ApiConstants.driverProfile}');
@@ -208,10 +213,22 @@ class DriverService {
           '[DriverService] Response bank_document: ${response.data['bank_document']}',
         );
       }
+      return DriverProfile.fromJson(response.data);
     } on DioException catch (e) {
       debugPrint('[DriverService] Update User Profile Error: ${e.message}');
       debugPrint('[DriverService] Error Response: ${e.response?.data}');
       throw ApiException.fromDioException(e);
+    }
+  }
+
+  static void _addAddressPatch(
+    Map<String, dynamic> data,
+    DriverAddress? address,
+  ) {
+    if (address == null) return;
+    final addressData = address.toPatchJson();
+    if (addressData.isNotEmpty) {
+      data['address'] = addressData;
     }
   }
 

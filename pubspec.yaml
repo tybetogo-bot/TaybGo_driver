@@ -1,7 +1,7 @@
 name: teybatdriver
 description: "TaybGo Driver - Driver partner application"
 publish_to: 'none'
-version: 1.0.11+13
+version: 1.0.15+17
 
 environment:
   sdk: ^3.10.4
@@ -38,7 +38,7 @@ dependencies:
 
   # Image picking for documents
   image_picker: ^1.1.2
-  file_picker: ^10.3.3
+  file_picker: ^11.0.2
 
   # Direct DOM access for web file picker (bypasses file_picker web quirks)
   web: ^1.1.1

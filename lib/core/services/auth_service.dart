@@ -12,9 +12,11 @@ class OtpRequestResponse {
 
   factory OtpRequestResponse.fromJson(Map<String, dynamic> json) {
     return OtpRequestResponse(
-      message: json['message'] ?? 'OTP sent successfully',
+      message: json['detail'] ?? json['message'] ?? 'OTP sent successfully',
       sessionId: json['session_id'],
-      debugOtp: json['otp']?.toString() ?? json['code']?.toString(),
+      debugOtp: kDebugMode
+          ? json['otp']?.toString() ?? json['code']?.toString()
+          : null,
     );
   }
 }
@@ -52,6 +54,30 @@ class AuthService {
   /// Set callback to handle token refresh failures
   void setTokenRefreshFailedCallback(void Function() callback) {
     _apiClient.onTokenRefreshFailed = callback;
+  }
+
+  Future<OtpVerifyResponse> loginWithPassword({
+    required String phoneNumber,
+    required String password,
+  }) async {
+    try {
+      final response = await _apiClient.post(
+        ApiConstants.passwordLogin,
+        data: {'phone': phoneNumber, 'password': password},
+      );
+      final data = response.data;
+      if (data is! Map<String, dynamic>) {
+        throw const FormatException('Password login response was empty.');
+      }
+      final loginResponse = OtpVerifyResponse.fromJson(data);
+      await _apiClient.tokenStorage.saveTokens(
+        accessToken: loginResponse.accessToken,
+        refreshToken: loginResponse.refreshToken,
+      );
+      return loginResponse;
+    } on DioException catch (e) {
+      throw ApiException.fromDioException(e);
+    }
   }
 
   Map<String, dynamic> _buildOtpRequestData({

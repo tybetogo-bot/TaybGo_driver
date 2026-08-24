@@ -1,6 +1,6 @@
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
@@ -8,15 +8,18 @@ import 'package:provider/provider.dart';
 import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/l10n/framework_locale_support.dart';
+import '../../../core/models/driver_address.dart';
 import '../../../core/providers/auth_provider.dart';
 import '../../../core/providers/driver_provider.dart';
 import '../../../core/services/cloudinary_service.dart';
 import '../../../core/services/driver_registration_service.dart';
+import '../../../core/services/google_places_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/birthdate_utils.dart';
+import '../../../shared/widgets/google_places_address_picker.dart';
 import '../utils/document_picker.dart';
 
-enum _RegistrationStep { personal, vehicle, details, services, documents }
+enum _RegistrationStep { personal, vehicle, services, address, documents }
 
 enum _DocumentPickAction { camera, gallery, file }
 
@@ -28,8 +31,14 @@ class ApplicationScreen extends StatefulWidget {
 }
 
 class _ApplicationScreenState extends State<ApplicationScreen> {
+  static const _googleMapsApiKey = String.fromEnvironment(
+    'GOOGLE_MAPS_API_KEY',
+  );
+
   final _formKey = GlobalKey<FormState>();
   final _pageController = PageController();
+  final _placesSearchController = TextEditingController();
+  GooglePlacesService? _placesService;
 
   // Current step (0-indexed)
   int _currentStep = 0;
@@ -41,10 +50,20 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   final _vehicleColorController = TextEditingController();
   final _vehicleMakeController = TextEditingController();
   final _vehicleModelController = TextEditingController();
-  final _vehicleYearController = TextEditingController();
+  final _addressLabelController = TextEditingController();
+  final _addressLatitudeController = TextEditingController();
+  final _addressLongitudeController = TextEditingController();
+  final _fullAddressController = TextEditingController();
+  final _streetNameController = TextEditingController();
+  final _houseNumberController = TextEditingController();
+  final _cityController = TextEditingController();
+  final _postalCodeController = TextEditingController();
+  final _countryController = TextEditingController();
   // Document upload state
   final CloudinaryService _cloudinaryService = CloudinaryService();
   final ImagePicker _imagePicker = ImagePicker();
+  DriverAddress? _selectedGoogleAddress;
+  String? _selectedGooglePlaceId;
 
   Uint8List? _drivingLicenseBytes;
   String? _drivingLicenseUrl;
@@ -73,31 +92,33 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   // Form state
   String _selectedVehicle = 'CAR';
   String? _selectedCarSize;
+  int? _selectedVehicleYear;
   bool _acceptsFood = true;
   bool _acceptsShipping = false;
   bool _acceptsTaxi = false;
 
   bool get _isBicycle => _selectedVehicle == 'BIKE';
   bool get _isMotorcycle => _selectedVehicle == 'MOTOR';
+  bool get _canAcceptTaxi => _selectedVehicle == 'CAR';
   bool get _requiresDrivingLicense => !_isBicycle;
   bool get _requiresFullVehicleDetails =>
       _selectedVehicle == 'CAR' || _selectedVehicle == 'VAN';
   bool get _shouldShowPlateNumberField =>
       _requiresFullVehicleDetails || _isMotorcycle;
+  int get _maximumVehicleYear => DateTime.now().year + 1;
+  List<int> get _vehicleYears => List<int>.generate(
+    _maximumVehicleYear - 1960 + 1,
+    (index) => _maximumVehicleYear - index,
+  );
 
   List<_RegistrationStep> get _visibleSteps {
-    final steps = <_RegistrationStep>[
+    return <_RegistrationStep>[
       _RegistrationStep.personal,
       _RegistrationStep.vehicle,
+      _RegistrationStep.services,
+      _RegistrationStep.address,
+      _RegistrationStep.documents,
     ];
-
-    if (_requiresFullVehicleDetails || _isMotorcycle) {
-      steps.add(_RegistrationStep.details);
-    }
-
-    steps.addAll([_RegistrationStep.services, _RegistrationStep.documents]);
-
-    return steps;
   }
 
   int get _totalSteps => _visibleSteps.length;
@@ -136,6 +157,14 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    if (_googleMapsApiKey.isNotEmpty) {
+      _placesService = GooglePlacesService(apiKey: _googleMapsApiKey);
+    }
+  }
+
+  @override
   void dispose() {
     _nameController.dispose();
     _birthdateController.dispose();
@@ -143,7 +172,17 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     _vehicleColorController.dispose();
     _vehicleMakeController.dispose();
     _vehicleModelController.dispose();
-    _vehicleYearController.dispose();
+    _addressLabelController.dispose();
+    _addressLatitudeController.dispose();
+    _addressLongitudeController.dispose();
+    _fullAddressController.dispose();
+    _streetNameController.dispose();
+    _houseNumberController.dispose();
+    _cityController.dispose();
+    _postalCodeController.dispose();
+    _countryController.dispose();
+    _placesSearchController.dispose();
+    _placesService?.close();
     _pageController.dispose();
     super.dispose();
   }
@@ -162,8 +201,6 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         }
         return null;
       case _RegistrationStep.vehicle:
-        return null; // Always has a selection
-      case _RegistrationStep.details:
         if (_isBicycle) {
           return null;
         }
@@ -188,19 +225,23 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         if (_vehicleModelController.text.trim().isEmpty) {
           return l10n.pleaseEnterVehicleModel;
         }
-        if (_vehicleYearController.text.trim().isEmpty) {
+        if (_selectedVehicleYear == null) {
           return l10n.pleaseEnterVehicleYear;
         }
-        final year = int.tryParse(_vehicleYearController.text.trim());
-        if (year == null || year < 1990 || year > DateTime.now().year + 1) {
+        if (_selectedVehicleYear! < 1960 ||
+            _selectedVehicleYear! > _maximumVehicleYear) {
           return l10n.invalidVehicleYear;
         }
         return null;
       case _RegistrationStep.services:
-        if (!_acceptsFood && !_acceptsShipping && !_acceptsTaxi) {
+        if (!_acceptsFood &&
+            !_acceptsShipping &&
+            !(_canAcceptTaxi && _acceptsTaxi)) {
           return l10n.pleaseSelectService;
         }
         return null;
+      case _RegistrationStep.address:
+        return _validateAddress(l10n);
       case _RegistrationStep.documents:
         final requiredDocuments = <MapEntry<String, String?>>[
           if (_requiresDrivingLicense)
@@ -220,6 +261,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   }
 
   void _nextStep() {
+    FocusManager.instance.primaryFocus?.unfocus();
     final l10n = AppLocalizations.of(context)!;
     final error = _validateCurrentStep(l10n);
     if (error != null) {
@@ -240,6 +282,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   void _previousStep() {
     if (_currentStep > 0) {
+      FocusManager.instance.primaryFocus?.unfocus();
       setState(() {
         _currentStep--;
         _error = null;
@@ -292,7 +335,136 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     return value.isEmpty ? null : value;
   }
 
+  DriverAddress? _addressFromFields() {
+    final address = DriverAddress(
+      label: _controllerValueOrNull(_addressLabelController),
+      lat: _controllerValueOrNull(_addressLatitudeController),
+      lng: _controllerValueOrNull(_addressLongitudeController),
+      fullAddress: _controllerValueOrNull(_fullAddressController),
+      streetName: _controllerValueOrNull(_streetNameController),
+      houseNumber: _controllerValueOrNull(_houseNumberController),
+      city: _controllerValueOrNull(_cityController),
+      postalCode: _controllerValueOrNull(_postalCodeController),
+      country: _controllerValueOrNull(_countryController),
+    );
+    return address.hasAnyValue ? address : null;
+  }
+
+  String? _validateAddress(AppLocalizations l10n) {
+    final searchText = _placesSearchController.text.trim();
+    if (searchText.isEmpty) {
+      return l10n.addressRequired;
+    }
+    if (_selectedGooglePlaceId == null) {
+      return l10n.selectAddressSuggestion;
+    }
+
+    final address = _addressFromFields();
+    if (address == null) return l10n.addressRequired;
+
+    if (address.label == null ||
+        address.lat == null ||
+        address.lng == null ||
+        address.fullAddress == null) {
+      return l10n.addressCoordinatesMissing;
+    }
+
+    final latitude = double.tryParse(address.lat!);
+    if (latitude == null || latitude < -90 || latitude > 90) {
+      return l10n.invalidLatitude;
+    }
+
+    final longitude = double.tryParse(address.lng!);
+    if (longitude == null || longitude < -180 || longitude > 180) {
+      return l10n.invalidLongitude;
+    }
+
+    return null;
+  }
+
+  void _handleGooglePlaceSelection(GooglePlaceAddressSelection selection) {
+    final l10n = AppLocalizations.of(context)!;
+    final sourceAddress = selection.address;
+    final address = DriverAddress(
+      label: sourceAddress.label ?? l10n.home,
+      lat: sourceAddress.lat,
+      lng: sourceAddress.lng,
+      fullAddress: sourceAddress.fullAddress,
+      streetName: sourceAddress.streetName,
+      houseNumber: sourceAddress.houseNumber,
+      city: sourceAddress.city,
+      postalCode: sourceAddress.postalCode,
+      country: sourceAddress.country,
+    );
+
+    setState(() {
+      _selectedGooglePlaceId = selection.placeId;
+      _selectedGoogleAddress = address;
+      _addressLabelController.text = address.label!;
+      _addressLatitudeController.text = address.lat ?? '';
+      _addressLongitudeController.text = address.lng ?? '';
+      _fullAddressController.text = address.fullAddress ?? '';
+      _streetNameController.text = address.streetName ?? '';
+      _houseNumberController.text = address.houseNumber ?? '';
+      _cityController.text = address.city ?? '';
+      _postalCodeController.text = address.postalCode ?? '';
+      _countryController.text = address.country ?? '';
+      _error = null;
+    });
+  }
+
+  void _clearGoogleAddress() {
+    _placesSearchController.clear();
+    setState(() {
+      _selectedGooglePlaceId = null;
+      _selectedGoogleAddress = null;
+      _addressLabelController.clear();
+      _addressLatitudeController.clear();
+      _addressLongitudeController.clear();
+      _fullAddressController.clear();
+      _streetNameController.clear();
+      _houseNumberController.clear();
+      _cityController.clear();
+      _postalCodeController.clear();
+      _countryController.clear();
+      _error = null;
+    });
+  }
+
+  void _handleAddressQueryChanged(String _) {
+    setState(() {
+      if (_selectedGooglePlaceId != null) {
+        _selectedGooglePlaceId = null;
+        _selectedGoogleAddress = null;
+        _addressLatitudeController.clear();
+        _addressLongitudeController.clear();
+        _fullAddressController.clear();
+        _streetNameController.clear();
+        _houseNumberController.clear();
+        _cityController.clear();
+        _postalCodeController.clear();
+        _countryController.clear();
+      }
+      _error = null;
+    });
+  }
+
+  void _handleAddressDetailsChanged() {
+    final current = _addressFromFields();
+    setState(() {
+      _selectedGoogleAddress = current;
+      _error = null;
+    });
+  }
+
+  void _handlePlacesError(Object error) {
+    debugPrint('[ApplicationScreen] Google Places error: $error');
+    if (!mounted) return;
+    setState(() => _error = AppLocalizations.of(context)!.addressSearchError);
+  }
+
   Future<void> _submit() async {
+    FocusManager.instance.primaryFocus?.unfocus();
     final l10n = AppLocalizations.of(context)!;
     final error = _validateCurrentStep(l10n);
     if (error != null) {
@@ -327,13 +499,29 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         ? _controllerValueOrNull(_vehicleModelController)
         : null;
     final vehicleYear = _requiresFullVehicleDetails
-        ? int.tryParse(_vehicleYearController.text.trim())
+        ? _selectedVehicleYear
         : null;
 
     // Debug: Check if token is available
     final token = await apiClient.tokenStorage.getAccessToken();
     debugPrint('[ApplicationScreen] Token available: ${token != null}');
     debugPrint('[ApplicationScreen] Token length: ${token?.length ?? 0}');
+
+    if (token == null || token.isEmpty) {
+      if (!mounted) return;
+      setState(() {
+        _isLoading = false;
+        _error = l10n.sessionExpired;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.sessionExpired),
+          backgroundColor: AppColors.error,
+        ),
+      );
+      context.go(RouteConstants.phone);
+      return;
+    }
 
     final registrationService = DriverRegistrationService(apiClient: apiClient);
 
@@ -351,13 +539,14 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         vehicleYear: vehicleYear,
         acceptsFood: _acceptsFood,
         acceptsShipping: _acceptsShipping,
-        acceptsTaxi: _acceptsTaxi,
+        acceptsTaxi: _canAcceptTaxi && _acceptsTaxi,
         drivingLicense: _requiresDrivingLicense ? _drivingLicenseUrl : null,
         idDocument: _idDocumentUrl,
         healthInsuranceDocument: _healthInsuranceDocumentUrl,
         addressDocument: _addressDocumentUrl,
         bankDocument: _bankDocumentUrl,
         otherDocuments: _otherDocumentsUrl,
+        address: _addressFromFields(),
       );
 
       if (!mounted) return;
@@ -422,142 +611,181 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         centerTitle: true,
       ),
       body: SafeArea(
-        child: Column(
-          children: [
-            // Step Indicator
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              child: _buildStepIndicator(textColor, secondaryColor),
-            ),
-
-            // Page Content
-            Expanded(
-              child: Form(
-                key: _formKey,
-                child: PageView(
-                  controller: _pageController,
-                  physics: const NeverScrollableScrollPhysics(),
-                  children: _buildStepPages(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 720),
+            child: Column(
+              children: [
+                // Step Indicator
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  child: _buildStepIndicator(
                     textColor,
                     secondaryColor,
                     surfaceColor,
-                    l10n,
                   ),
                 ),
-              ),
-            ),
 
-            // Error message
-            if (_error != null)
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 24),
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: AppColors.error.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(
-                        Icons.error_outline,
-                        color: AppColors.error,
-                        size: 20,
+                // Page Content
+                Expanded(
+                  child: Form(
+                    key: _formKey,
+                    child: PageView(
+                      controller: _pageController,
+                      physics: const NeverScrollableScrollPhysics(),
+                      children: _buildStepPages(
+                        textColor,
+                        secondaryColor,
+                        surfaceColor,
+                        l10n,
                       ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          _error!,
-                          style: const TextStyle(
+                    ),
+                  ),
+                ),
+
+                // Error message
+                if (_error != null)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 24),
+                    child: Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: AppColors.error.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
                             color: AppColors.error,
-                            fontSize: 14,
+                            size: 20,
                           ),
-                        ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              _error!,
+                              style: const TextStyle(
+                                color: AppColors.error,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
 
-            // Bottom Navigation
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: _buildBottomButtons(textColor, secondaryColor),
+                // Bottom Navigation
+                Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: _buildBottomButtons(textColor, secondaryColor),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildStepIndicator(Color textColor, Color secondaryColor) {
+  Widget _buildStepIndicator(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+  ) {
     final l10n = AppLocalizations.of(context)!;
     final steps = _visibleSteps;
+    final currentStep = steps[_currentStep];
+    final nextStep = _currentStep < steps.length - 1
+        ? steps[_currentStep + 1]
+        : null;
+    final progress = (_currentStep + 1) / steps.length;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
 
-    return Row(
-      children: List.generate(steps.length, (index) {
-        final step = steps[index];
-        final isActive = index == _currentStep;
-        final isCompleted = index < _currentStep;
-        final label = _stepLabel(step, l10n);
-
-        return Expanded(
-          child: Row(
+    return Container(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        children: [
+          Row(
             children: [
-              // Step circle
               Container(
-                width: 28,
-                height: 28,
-                decoration: BoxDecoration(
-                  color: isActive || isCompleted
-                      ? AppColors.primary
-                      : AppColors.primary.withValues(alpha: 0.1),
+                width: 44,
+                height: 44,
+                decoration: const BoxDecoration(
+                  color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),
-                child: Center(
-                  child: isCompleted
-                      ? const Icon(Icons.check, color: Colors.white, size: 16)
-                      : Text(
-                          '${index + 1}',
-                          style: TextStyle(
-                            color: isActive ? Colors.white : AppColors.primary,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                          ),
-                        ),
-                ),
-              ),
-              const SizedBox(width: 4),
-              // Step label
-              Flexible(
+                alignment: Alignment.center,
                 child: Text(
-                  label,
-                  style: TextStyle(
-                    color: isActive ? textColor : secondaryColor,
-                    fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
-                    fontSize: 11,
+                  '${_currentStep + 1}',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
                   ),
-                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              // Connector line
-              if (index < steps.length - 1)
-                Expanded(
-                  child: Container(
-                    height: 2,
-                    margin: const EdgeInsets.symmetric(horizontal: 4),
-                    decoration: BoxDecoration(
-                      color: isCompleted
-                          ? AppColors.primary
-                          : AppColors.primary.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(1),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.applicationStepProgress(
+                        _currentStep + 1,
+                        steps.length,
+                      ),
+                      style: TextStyle(
+                        color: secondaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
+                    const SizedBox(height: 2),
+                    Text(
+                      _stepLabel(currentStep, l10n),
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (nextStep != null)
+                Flexible(
+                  child: Text(
+                    l10n.applicationNextStep(_stepLabel(nextStep, l10n)),
+                    textAlign: TextAlign.end,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(color: secondaryColor, fontSize: 12),
                   ),
                 ),
             ],
           ),
-        );
-      }),
+          const SizedBox(height: 12),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8),
+            child: LinearProgressIndicator(
+              value: progress,
+              minHeight: 7,
+              backgroundColor: AppColors.primary.withValues(alpha: 0.12),
+              valueColor: const AlwaysStoppedAnimation(AppColors.primary),
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -567,10 +795,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         return l10n.stepPersonal;
       case _RegistrationStep.vehicle:
         return l10n.stepVehicle;
-      case _RegistrationStep.details:
-        return l10n.stepDetails;
       case _RegistrationStep.services:
         return l10n.stepServices;
+      case _RegistrationStep.address:
+        return l10n.address;
       case _RegistrationStep.documents:
         return l10n.stepDocuments;
     }
@@ -596,19 +824,14 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             _buildVehicleStep(textColor, secondaryColor, surfaceColor, l10n),
           );
           break;
-        case _RegistrationStep.details:
-          pages.add(
-            _buildVehicleDetailsStep(
-              textColor,
-              secondaryColor,
-              surfaceColor,
-              l10n,
-            ),
-          );
-          break;
         case _RegistrationStep.services:
           pages.add(
             _buildServicesStep(textColor, secondaryColor, surfaceColor, l10n),
+          );
+          break;
+        case _RegistrationStep.address:
+          pages.add(
+            _buildAddressStep(textColor, secondaryColor, surfaceColor, l10n),
           );
           break;
         case _RegistrationStep.documents:
@@ -663,6 +886,11 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             textColor: textColor,
             secondaryColor: secondaryColor,
             isRequired: true,
+            textCapitalization: TextCapitalization.words,
+            textInputAction: TextInputAction.next,
+            autofillHints: const [AutofillHints.name],
+            maxLength: 80,
+            errorText: _error == l10n.pleaseEnterYourName ? _error : null,
           ),
           const SizedBox(height: 20),
 
@@ -678,6 +906,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             isRequired: true,
             readOnly: true,
             onTap: _selectBirthdate,
+            errorText:
+                _error == l10n.pleaseEnterAge || _error == l10n.invalidAge
+                ? _error
+                : null,
             suffixIcon: const Icon(
               Icons.calendar_month_outlined,
               color: AppColors.primary,
@@ -790,19 +1022,22 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                 onTap: () => setState(() {
                   _selectedVehicle = vehicle['value'];
                   _error = null;
+                  if (!_canAcceptTaxi) {
+                    _acceptsTaxi = false;
+                  }
                   if (_isBicycle) {
                     _selectedCarSize = null;
                     _plateNumberController.clear();
                     _vehicleColorController.clear();
                     _vehicleMakeController.clear();
                     _vehicleModelController.clear();
-                    _vehicleYearController.clear();
+                    _selectedVehicleYear = null;
                   } else if (_isMotorcycle) {
                     _selectedCarSize = null;
                     _vehicleColorController.clear();
                     _vehicleMakeController.clear();
                     _vehicleModelController.clear();
-                    _vehicleYearController.clear();
+                    _selectedVehicleYear = null;
                   }
                 }),
                 textColor: textColor,
@@ -811,12 +1046,24 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
               ),
             );
           }),
+          if (!_isBicycle) ...[
+            const SizedBox(height: 8),
+            Divider(color: secondaryColor.withValues(alpha: 0.18)),
+            const SizedBox(height: 20),
+            _buildVehicleDetailsFields(
+              textColor,
+              secondaryColor,
+              surfaceColor,
+              l10n,
+            ),
+          ],
+          const SizedBox(height: 24),
         ],
       ),
     );
   }
 
-  Widget _buildVehicleDetailsStep(
+  Widget _buildVehicleDetailsFields(
     Color textColor,
     Color secondaryColor,
     Color surfaceColor,
@@ -826,186 +1073,277 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     final showFullVehicleDetails = _requiresFullVehicleDetails;
     final showPlateNumberField = _shouldShowPlateNumberField;
 
-    return SingleChildScrollView(
-      padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 8),
-          Text(
-            l10n.vehicleDetailsTitle,
-            style: TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: textColor,
-            ),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          l10n.vehicleDetailsTitle,
+          style: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+            color: textColor,
           ),
-          const SizedBox(height: 8),
-          Text(
-            l10n.vehicleDetailsSubtitle,
-            style: TextStyle(fontSize: 15, color: secondaryColor),
-          ),
-          const SizedBox(height: 24),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          l10n.vehicleDetailsSubtitle,
+          style: TextStyle(fontSize: 15, color: secondaryColor),
+        ),
+        const SizedBox(height: 24),
 
-          if (showFullVehicleDetails) ...[
-            // Car size dropdown
-            Row(
-              children: [
-                Text(
-                  l10n.carSize,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: secondaryColor,
-                  ),
+        if (showFullVehicleDetails) ...[
+          // Car size dropdown
+          Row(
+            children: [
+              Text(
+                l10n.carSize,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: secondaryColor,
                 ),
-                const Text(
-                  ' *',
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: AppColors.error,
-                  ),
+              ),
+              const Text(
+                ' *',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.error,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: surfaceColor,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.03),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
-            const SizedBox(height: 8),
-            Container(
-              decoration: BoxDecoration(
-                color: surfaceColor,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.03),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
+            child: DropdownButtonFormField<String>(
+              initialValue: _selectedCarSize,
+              decoration: InputDecoration(
+                hintText: l10n.selectCarSize,
+                hintStyle: TextStyle(
+                  color: secondaryColor.withValues(alpha: 0.6),
+                ),
+                prefixIcon: Container(
+                  margin: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                ],
-              ),
-              child: DropdownButtonFormField<String>(
-                initialValue: _selectedCarSize,
-                decoration: InputDecoration(
-                  hintText: l10n.selectCarSize,
-                  hintStyle: TextStyle(
-                    color: secondaryColor.withValues(alpha: 0.6),
-                  ),
-                  prefixIcon: Container(
-                    margin: const EdgeInsets.all(12),
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Icon(
-                      Icons.straighten,
-                      color: AppColors.primary,
-                      size: 20,
-                    ),
-                  ),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: BorderSide.none,
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(16),
-                    borderSide: const BorderSide(
-                      color: AppColors.primary,
-                      width: 2,
-                    ),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 16,
+                  child: const Icon(
+                    Icons.straighten,
+                    color: AppColors.primary,
+                    size: 20,
                   ),
                 ),
-                dropdownColor: surfaceColor,
-                style: TextStyle(color: textColor, fontSize: 16),
-                items: carSizes.map((size) {
-                  return DropdownMenuItem<String>(
-                    value: size['value'],
-                    child: Text(size['label']!),
-                  );
-                }).toList(),
-                onChanged: (value) => setState(() => _selectedCarSize = value),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: BorderSide.none,
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(
+                    color: AppColors.primary,
+                    width: 2,
+                  ),
+                ),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
+              ),
+              dropdownColor: surfaceColor,
+              style: TextStyle(color: textColor, fontSize: 16),
+              items: carSizes.map((size) {
+                return DropdownMenuItem<String>(
+                  value: size['value'],
+                  child: Text(size['label']!),
+                );
+              }).toList(),
+              onChanged: (value) => setState(() => _selectedCarSize = value),
+            ),
+          ),
+          const SizedBox(height: 16),
+
+          // Vehicle make
+          _buildTextField(
+            controller: _vehicleMakeController,
+            label: l10n.vehicleMake,
+            hint: l10n.enterVehicleMake,
+            icon: Icons.factory_outlined,
+            surfaceColor: surfaceColor,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            isRequired: true,
+            textCapitalization: TextCapitalization.words,
+            textInputAction: TextInputAction.next,
+            maxLength: 40,
+            errorText: _error == l10n.pleaseEnterVehicleMake ? _error : null,
+          ),
+          const SizedBox(height: 16),
+
+          // Vehicle model
+          _buildTextField(
+            controller: _vehicleModelController,
+            label: l10n.vehicleModel,
+            hint: l10n.enterVehicleModel,
+            icon: Icons.directions_car_outlined,
+            surfaceColor: surfaceColor,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            isRequired: true,
+            textCapitalization: TextCapitalization.words,
+            textInputAction: TextInputAction.next,
+            maxLength: 40,
+            errorText: _error == l10n.pleaseEnterVehicleModel ? _error : null,
+          ),
+          const SizedBox(height: 16),
+
+          // Vehicle year
+          Row(
+            children: [
+              Text(
+                l10n.vehicleYear,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: secondaryColor,
+                ),
+              ),
+              const Text(
+                ' *',
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: AppColors.error,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          DropdownButtonFormField<int>(
+            initialValue: _selectedVehicleYear,
+            menuMaxHeight: 320,
+            decoration: InputDecoration(
+              hintText: l10n.selectVehicleYear,
+              hintStyle: TextStyle(
+                color: secondaryColor.withValues(alpha: 0.6),
+              ),
+              prefixIcon: Container(
+                margin: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Icon(
+                  Icons.calendar_today_outlined,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+              errorText:
+                  _error == l10n.pleaseEnterVehicleYear ||
+                      _error == l10n.invalidVehicleYear
+                  ? _error
+                  : null,
+              filled: true,
+              fillColor: surfaceColor,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide.none,
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(
+                  color: AppColors.primary,
+                  width: 2,
+                ),
+              ),
+              errorBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: const BorderSide(color: AppColors.error),
+              ),
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 16,
+                vertical: 16,
               ),
             ),
-            const SizedBox(height: 16),
+            dropdownColor: surfaceColor,
+            style: TextStyle(color: textColor, fontSize: 16),
+            items: _vehicleYears
+                .map(
+                  (year) =>
+                      DropdownMenuItem<int>(value: year, child: Text('$year')),
+                )
+                .toList(),
+            onChanged: (value) => setState(() {
+              _selectedVehicleYear = value;
+              _error = null;
+            }),
+          ),
+          const SizedBox(height: 16),
 
-            // Vehicle make
-            _buildTextField(
-              controller: _vehicleMakeController,
-              label: l10n.vehicleMake,
-              hint: l10n.enterVehicleMake,
-              icon: Icons.factory_outlined,
-              surfaceColor: surfaceColor,
-              textColor: textColor,
-              secondaryColor: secondaryColor,
-              isRequired: true,
-            ),
-            const SizedBox(height: 16),
-
-            // Vehicle model
-            _buildTextField(
-              controller: _vehicleModelController,
-              label: l10n.vehicleModel,
-              hint: l10n.enterVehicleModel,
-              icon: Icons.directions_car_outlined,
-              surfaceColor: surfaceColor,
-              textColor: textColor,
-              secondaryColor: secondaryColor,
-              isRequired: true,
-            ),
-            const SizedBox(height: 16),
-
-            // Vehicle year
-            _buildTextField(
-              controller: _vehicleYearController,
-              label: l10n.vehicleYear,
-              hint: l10n.enterVehicleYear,
-              icon: Icons.calendar_today_outlined,
-              surfaceColor: surfaceColor,
-              textColor: textColor,
-              secondaryColor: secondaryColor,
-              keyboardType: TextInputType.number,
-              isRequired: true,
-            ),
-            const SizedBox(height: 16),
-
-            // Vehicle color
-            _buildTextField(
-              controller: _vehicleColorController,
-              label: l10n.vehicleColor,
-              hint: l10n.enterVehicleColor,
-              icon: Icons.palette_outlined,
-              surfaceColor: surfaceColor,
-              textColor: textColor,
-              secondaryColor: secondaryColor,
-              isRequired: true,
-            ),
-            const SizedBox(height: 16),
-          ],
-
-          if (showPlateNumberField) ...[
-            // Plate number
-            _buildTextField(
-              controller: _plateNumberController,
-              label: l10n.licensePlate,
-              hint: l10n.enterVehiclePlateNumber,
-              icon: Icons.pin_outlined,
-              surfaceColor: surfaceColor,
-              textColor: textColor,
-              secondaryColor: secondaryColor,
-              isRequired: true,
-            ),
-            const SizedBox(height: 24),
-          ] else
-            const SizedBox(height: 8),
+          // Vehicle color
+          _buildTextField(
+            controller: _vehicleColorController,
+            label: l10n.vehicleColor,
+            hint: l10n.enterVehicleColor,
+            icon: Icons.palette_outlined,
+            surfaceColor: surfaceColor,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            isRequired: true,
+            textCapitalization: TextCapitalization.words,
+            textInputAction: TextInputAction.next,
+            maxLength: 30,
+            errorText: _error == l10n.pleaseEnterVehicleColor ? _error : null,
+          ),
+          const SizedBox(height: 16),
         ],
-      ),
+
+        if (showPlateNumberField) ...[
+          // Plate number
+          _buildTextField(
+            controller: _plateNumberController,
+            label: l10n.licensePlate,
+            hint: l10n.enterVehiclePlateNumber,
+            icon: Icons.pin_outlined,
+            surfaceColor: surfaceColor,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            isRequired: true,
+            textCapitalization: TextCapitalization.characters,
+            textInputAction: TextInputAction.done,
+            maxLength: 20,
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[A-Za-z0-9 -]')),
+              const _UpperCaseTextFormatter(),
+            ],
+            errorText: _error == l10n.pleaseEnterPlateNumber ? _error : null,
+          ),
+          const SizedBox(height: 24),
+        ] else
+          const SizedBox(height: 8),
+      ],
     );
   }
 
@@ -1057,17 +1395,19 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             secondaryColor: secondaryColor,
             surfaceColor: surfaceColor,
           ),
-          const SizedBox(height: 12),
-          _buildServiceCard(
-            title: l10n.taxi,
-            description: l10n.transportPassengersDesc,
-            icon: Icons.local_taxi_outlined,
-            isSelected: _acceptsTaxi,
-            onTap: () => setState(() => _acceptsTaxi = !_acceptsTaxi),
-            textColor: textColor,
-            secondaryColor: secondaryColor,
-            surfaceColor: surfaceColor,
-          ),
+          if (_canAcceptTaxi) ...[
+            const SizedBox(height: 12),
+            _buildServiceCard(
+              title: l10n.taxi,
+              description: l10n.transportPassengersDesc,
+              icon: Icons.local_taxi_outlined,
+              isSelected: _acceptsTaxi,
+              onTap: () => setState(() => _acceptsTaxi = !_acceptsTaxi),
+              textColor: textColor,
+              secondaryColor: secondaryColor,
+              surfaceColor: surfaceColor,
+            ),
+          ],
 
           const SizedBox(height: 24),
 
@@ -1253,6 +1593,60 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         _error = l10n.uploadFailed;
       }
     });
+  }
+
+  Widget _buildAddressStep(
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    AppLocalizations l10n,
+  ) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final borderColor = isDark ? AppColors.darkBorder : AppColors.lightBorder;
+    final hintColor = isDark ? AppColors.darkTextHint : AppColors.lightTextHint;
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          Text(
+            l10n.addressStepTitle,
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: textColor,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.addressStepSubtitle,
+            style: TextStyle(fontSize: 15, color: secondaryColor),
+          ),
+          const SizedBox(height: 24),
+          GooglePlacesAddressPicker(
+            service: _placesService,
+            searchController: _placesSearchController,
+            selectedAddress: _selectedGoogleAddress,
+            labelController: _addressLabelController,
+            houseNumberController: _houseNumberController,
+            postalCodeController: _postalCodeController,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            surfaceColor: surfaceColor,
+            borderColor: borderColor,
+            hintColor: hintColor,
+            onSelection: _handleGooglePlaceSelection,
+            onClear: _clearGoogleAddress,
+            onError: _handlePlacesError,
+            onQueryChanged: _handleAddressQueryChanged,
+            onDetailsChanged: _handleAddressDetailsChanged,
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
   }
 
   Widget _buildDocumentsStep(
@@ -1618,6 +2012,12 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     bool readOnly = false,
     VoidCallback? onTap,
     Widget? suffixIcon,
+    TextCapitalization textCapitalization = TextCapitalization.none,
+    TextInputAction? textInputAction,
+    Iterable<String>? autofillHints,
+    int? maxLength,
+    List<TextInputFormatter>? inputFormatters,
+    String? errorText,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1661,6 +2061,16 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             keyboardType: keyboardType,
             readOnly: readOnly,
             onTap: onTap,
+            onChanged: (_) {
+              if (_error != null) setState(() => _error = null);
+            },
+            textCapitalization: textCapitalization,
+            textInputAction: textInputAction,
+            autofillHints: autofillHints,
+            maxLength: maxLength,
+            inputFormatters: inputFormatters,
+            autocorrect: !readOnly,
+            enableSuggestions: !readOnly,
             style: TextStyle(color: textColor, fontSize: 16),
             decoration: InputDecoration(
               hintText: hint,
@@ -1677,6 +2087,8 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
                 child: Icon(icon, color: AppColors.primary, size: 20),
               ),
               suffixIcon: suffixIcon,
+              errorText: errorText,
+              counterText: '',
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide.none,
@@ -2007,5 +2419,17 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
         dialogNavigator!.pop();
       }
     }
+  }
+}
+
+class _UpperCaseTextFormatter extends TextInputFormatter {
+  const _UpperCaseTextFormatter();
+
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    return newValue.copyWith(text: newValue.text.toUpperCase());
   }
 }

@@ -6,8 +6,12 @@ class ApiConstants {
   // Auth endpoints
   static const String otpRequest = '/auth/otp/request/';
   static const String otpVerify = '/auth/otp/verify/';
+  static const String passwordLogin = '/auth/token/';
   static const String tokenRefresh = '/auth/token/refresh/';
   static const String logout = '/auth/logout/';
+
+  // Anonymous runtime configuration
+  static const String publicConfig = '/config/public';
 
   // Driver endpoints
   static const String driverProfile = '/driver/profile/';

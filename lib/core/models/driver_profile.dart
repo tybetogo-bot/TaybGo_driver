@@ -1,4 +1,5 @@
 import '../utils/birthdate_utils.dart';
+import 'driver_address.dart';
 
 class DriverProfile {
   final int id;
@@ -31,6 +32,7 @@ class DriverProfile {
   final String? otherDocuments;
   final String? healthInsuranceDocument;
   final String? addressDocument;
+  final DriverAddress? address;
   final String? bankDocument;
   final DateTime? createdAt;
 
@@ -65,6 +67,7 @@ class DriverProfile {
     this.otherDocuments,
     this.healthInsuranceDocument,
     this.addressDocument,
+    this.address,
     this.bankDocument,
     this.createdAt,
   });
@@ -170,13 +173,14 @@ class DriverProfile {
         json['health_insurance_document'],
       ),
       addressDocument: _parseNullableUrl(json['address_document']),
+      address: _parseAddress(json['address']),
       bankDocument: _parseNullableUrl(json['bank_document']),
       createdAt: _parseDateTime(json['created_at'] ?? user['date_joined']),
     );
   }
 
   Map<String, dynamic> toJson() {
-    return {
+    final data = <String, dynamic>{
       'first_name': firstName,
       'last_name': lastName,
       'email': email,
@@ -186,6 +190,10 @@ class DriverProfile {
       'vehicle_type': vehicleType,
       'vehicle_plate': vehiclePlate,
     };
+    if (address != null && address!.hasAnyValue) {
+      data['address'] = address!.toPatchJson();
+    }
+    return data;
   }
 
   DriverProfile copyWith({
@@ -219,6 +227,7 @@ class DriverProfile {
     String? otherDocuments,
     String? healthInsuranceDocument,
     String? addressDocument,
+    DriverAddress? address,
     String? bankDocument,
     DateTime? createdAt,
   }) {
@@ -254,6 +263,7 @@ class DriverProfile {
       healthInsuranceDocument:
           healthInsuranceDocument ?? this.healthInsuranceDocument,
       addressDocument: addressDocument ?? this.addressDocument,
+      address: address ?? this.address,
       bankDocument: bankDocument ?? this.bankDocument,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -288,5 +298,10 @@ class DriverProfile {
     final str = value.toString().trim();
     if (str.isEmpty) return null;
     return str;
+  }
+
+  static DriverAddress? _parseAddress(dynamic value) {
+    if (value is! Map) return null;
+    return DriverAddress.fromJson(Map<String, dynamic>.from(value));
   }
 }

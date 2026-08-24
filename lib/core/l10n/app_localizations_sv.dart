@@ -132,6 +132,51 @@ class AppLocalizationsSv extends AppLocalizations {
   String get forgotPassword => 'Glömt lösenord';
 
   @override
+  String get password => 'Password';
+
+  @override
+  String get enterPassword => 'Enter your password';
+
+  @override
+  String get signIn => 'Sign in';
+
+  @override
+  String get passwordRequiredForDriver =>
+      'Password sign-in is required for driver accounts.';
+
+  @override
+  String get checkingSignInMethod => 'Checking sign-in method…';
+
+  @override
+  String get configFallback =>
+      'Could not refresh sign-in settings. Using password sign-in.';
+
+  @override
+  String get updateRequiredTitle => 'Update required';
+
+  @override
+  String get updateRequiredMessage =>
+      'Install the latest TaybGo Driver version to continue.';
+
+  @override
+  String latestVersionLabel(String version) {
+    return 'Latest version: $version';
+  }
+
+  @override
+  String get updateNow => 'Update now';
+
+  @override
+  String get checkAgain => 'Check again';
+
+  @override
+  String get invalidUpdateUrl =>
+      'The update link is unavailable. Please try again.';
+
+  @override
+  String get couldNotOpenLink => 'Could not open this link.';
+
+  @override
   String get driverApplication => 'Föraransökan';
 
   @override
@@ -162,7 +207,126 @@ class AppLocalizationsSv extends AppLocalizations {
   String get address => 'Adress';
 
   @override
+  String get addressStepTitle => 'Saved Address';
+
+  @override
+  String get addressStepSubtitle =>
+      'Search for your home address and select the correct result from Google.';
+
+  @override
+  String get addressOptionalSubtitle =>
+      'Required — select an address from Google so we can verify your service area.';
+
+  @override
+  String get addressRequired => 'Please search for and select your address.';
+
+  @override
+  String get searchForAddress => 'Search for your address';
+
+  @override
+  String get searchAddressHint =>
+      'Start typing a street, building, or place name';
+
+  @override
+  String get addressSelected => 'Address selected';
+
+  @override
+  String get addressDetails => 'Address details';
+
+  @override
+  String get addressSearchUnavailable =>
+      'Address search is not configured for this build.';
+
+  @override
+  String get addressSearchError =>
+      'We couldn\'t load address results. Check your connection and try again.';
+
+  @override
+  String get noAddressResults =>
+      'No matching addresses found. Try adding a city or postal code.';
+
+  @override
+  String get selectAddressSuggestion =>
+      'Please select an address from the Google suggestions.';
+
+  @override
+  String get addressCoordinatesMissing =>
+      'This result is missing location details. Please choose another address.';
+
+  @override
+  String get clearAddress => 'Clear address';
+
+  @override
+  String get addressLabel => 'Address label';
+
+  @override
+  String get addressLabelHint => 'e.g. Home';
+
+  @override
+  String get fullAddress => 'Full address';
+
+  @override
+  String get fullAddressHint => 'e.g. 12 King Street, Riyadh';
+
+  @override
+  String get latitude => 'Latitude';
+
+  @override
+  String get latitudeHint => 'e.g. 24.713600';
+
+  @override
+  String get longitude => 'Longitude';
+
+  @override
+  String get longitudeHint => 'e.g. 46.675300';
+
+  @override
+  String get useCurrentLocation => 'Use current location';
+
+  @override
+  String get streetName => 'Street name';
+
+  @override
+  String get streetNameHint => 'e.g. King Street';
+
+  @override
+  String get houseNumber => 'House number';
+
+  @override
+  String get houseNumberHint => 'e.g. 12';
+
+  @override
   String get city => 'Stad';
+
+  @override
+  String get cityHint => 'e.g. Riyadh';
+
+  @override
+  String get postalCode => 'Postal code';
+
+  @override
+  String get postalCodeHint => 'e.g. 12345';
+
+  @override
+  String get country => 'Country';
+
+  @override
+  String get countryHint => 'e.g. SA';
+
+  @override
+  String get addressRequiredFields =>
+      'Label, latitude, longitude, and full address are required together.';
+
+  @override
+  String get invalidLatitude => 'Enter a valid latitude between -90 and 90.';
+
+  @override
+  String get invalidLongitude =>
+      'Enter a valid longitude between -180 and 180.';
+
+  @override
+  String get locationFetchFailed =>
+      'Unable to determine your current location.';
 
   @override
   String get vehicleType => 'Fordonstyp';
@@ -172,6 +336,9 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get car => 'Bil';
+
+  @override
+  String get van => 'Skåpbil';
 
   @override
   String get motorcycle => 'Motorcykel';
@@ -208,6 +375,18 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get taxi => 'Taxi';
+
+  @override
+  String get foodOrder => 'Food order';
+
+  @override
+  String get shippingOrder => 'Shipping order';
+
+  @override
+  String get taxiRide => 'Taxi ride';
+
+  @override
+  String get allOrders => 'All';
 
   @override
   String get uploadDocuments => 'Ladda upp dokument';
@@ -393,6 +572,12 @@ class AppLocalizationsSv extends AppLocalizations {
   String get delivered => 'Levererad';
 
   @override
+  String get expired => 'Expired';
+
+  @override
+  String get restaurantDelivered => 'Restaurant delivered';
+
+  @override
   String get pickup => 'Upphämtning';
 
   @override
@@ -498,6 +683,49 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get deliveryFee => 'Leveransavgift';
+
+  @override
+  String get driverDeliveryFee => 'Driver delivery fee';
+
+  @override
+  String get requiredVehicle => 'Required vehicle';
+
+  @override
+  String get packageDetails => 'Package details';
+
+  @override
+  String get packageSize => 'Size';
+
+  @override
+  String get packageWeight => 'Weight';
+
+  @override
+  String get packageContents => 'Contents';
+
+  @override
+  String get rideDetails => 'Ride details';
+
+  @override
+  String get deliveryInstructions => 'Instructions';
+
+  @override
+  String get typeDetailsUnavailable =>
+      'Additional details will appear when provided by dispatch.';
+
+  @override
+  String get headToPassenger => 'Head to passenger';
+
+  @override
+  String get passengerDroppedOff => 'Passenger dropped off';
+
+  @override
+  String get completeRide => 'Complete ride';
+
+  @override
+  String get acceptRide => 'Accept ride';
+
+  @override
+  String get acceptShippingOrder => 'Accept shipment';
 
   @override
   String get total => 'Totalt';
@@ -684,6 +912,24 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get editProfile => 'Redigera profil';
+
+  @override
+  String get currentAddress => 'Current address';
+
+  @override
+  String get editAddress => 'Edit Address';
+
+  @override
+  String get saveAddress => 'Save Address';
+
+  @override
+  String get noAddressAdded => 'No address added yet';
+
+  @override
+  String get addressUpdatedSuccessfully => 'Address updated successfully';
+
+  @override
+  String get failedToUpdateAddress => 'Failed to update address';
 
   @override
   String get changePassword => 'Ändra lösenord';
@@ -1151,6 +1397,16 @@ class AppLocalizationsSv extends AppLocalizations {
   String get stepServices => 'Tjänster';
 
   @override
+  String applicationStepProgress(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String applicationNextStep(String step) {
+    return 'Next: $step';
+  }
+
+  @override
   String get ecoFriendlyOption => 'Miljövänligt alternativ';
 
   @override
@@ -1161,9 +1417,6 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get largeDeliveries => 'Stora leveranser';
-
-  @override
-  String get van => 'Skåpbil';
 
   @override
   String get deleteDataWarning =>
@@ -1266,6 +1519,11 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get collectCashReminder =>
       'Kom ihåg att samla in betalningen från kunden';
+
+  @override
+  String collectCashAmountReminder(String amount) {
+    return 'Collect $amount from the customer before completing.';
+  }
 
   @override
   String get locationPermissionLostWhileOnline =>
@@ -1415,6 +1673,9 @@ class AppLocalizationsSv extends AppLocalizations {
   String get enterVehicleYear => 'e.g. 2020';
 
   @override
+  String get selectVehicleYear => 'Select vehicle year';
+
+  @override
   String get vehicleDetailsTitle => 'Vehicle Details';
 
   @override
@@ -1424,7 +1685,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get stepDetails => 'Details';
 
   @override
-  String get stepDocuments => 'Docs';
+  String get stepDocuments => 'Documents';
 
   @override
   String get documentsTitle => 'Upload Documents';
@@ -1482,7 +1743,7 @@ class AppLocalizationsSv extends AppLocalizations {
   String get pleaseEnterVehicleYear => 'Please enter your vehicle year';
 
   @override
-  String get invalidVehicleYear => 'Please enter a valid year';
+  String get invalidVehicleYear => 'Please select a valid vehicle year';
 
   @override
   String get dropOrder => 'Drop Order';
@@ -1519,4 +1780,208 @@ class AppLocalizationsSv extends AppLocalizations {
 
   @override
   String get failedToRejectOrder => 'Failed to reject order';
+
+  @override
+  String get changelog => 'Ändringslogg';
+
+  @override
+  String get changelogTitle => 'Vad är nytt?';
+
+  @override
+  String get changelogSubtitle =>
+      'Se de senaste förbättringarna i TaybGo Driver.';
+
+  @override
+  String get changelogCurrent => 'Aktuell';
+
+  @override
+  String get changelogBuild => 'Build';
+
+  @override
+  String get changelogReleased => 'Släppt';
+
+  @override
+  String get changelogReleaseNotes => 'Versionsanteckningar';
+
+  @override
+  String get changelogHighlights => 'Höjdpunkter';
+
+  @override
+  String get changelogFixes => 'Rättningar';
+
+  @override
+  String get changelogImprovements => 'Förbättringar';
+
+  @override
+  String get changelogStability => 'Stabilitet';
+
+  @override
+  String get changelogPlatform => 'Plattform';
+
+  @override
+  String get changelogRelease => 'Release';
+
+  @override
+  String get changelogDateAug24 => '24 August 2026';
+
+  @override
+  String get changelogVersion101517Authentication =>
+      'Driver sign-in now follows the live backend policy and automatically uses password or OTP authentication when enabled for the driver role.';
+
+  @override
+  String get changelogVersion101517Password =>
+      'Added secure password sign-in for driver accounts while keeping role-aware OTP support available for configured deployments.';
+
+  @override
+  String get changelogVersion101517Updates =>
+      'Added a required-update screen so unsupported app versions can be directed to the correct update without entering the app.';
+
+  @override
+  String get changelogVersion101517Legal =>
+      'Terms of Service and Privacy Policy links now come from the public application configuration and can be updated without a new app release.';
+
+  @override
+  String get changelogVersion101517Reliability =>
+      'Improved anonymous authentication error handling, configuration fallback behavior, startup timeouts, validation feedback, and small-screen login layout.';
+
+  @override
+  String get changelogVersion101517Release =>
+      'Released TaybGo Driver version 1.0.15+17.';
+
+  @override
+  String get changelogDateAug20 => '20 August 2026';
+
+  @override
+  String get changelogVersion101416ApplicationFlow =>
+      'Redesigned the driver application into five focused steps with clearer progress, organized sections, better field guidance, and inline validation.';
+
+  @override
+  String get changelogVersion101416Address =>
+      'Refactored registration address entry around required Google Places search, a clear selected-address summary, complete structured address data, coordinates, and stronger validation.';
+
+  @override
+  String get changelogVersion101416ProfileAddress =>
+      'Edit Profile now shows the saved address in a compact card with an Edit Address action that opens a dedicated Google Places editor.';
+
+  @override
+  String get changelogVersion101416Vehicle =>
+      'Restored complete vehicle details and added the same vehicle-year selector to registration and Edit Profile, covering 1960 through next year.';
+
+  @override
+  String get changelogVersion101416Documents =>
+      'Improved required-document presentation, upload states, and registration error feedback.';
+
+  @override
+  String get changelogVersion101416DriverFee =>
+      'Incoming orders now show the driver\'s delivery fee instead of the customer total; paid order details show only that fee, while unpaid orders also show the amount to collect.';
+
+  @override
+  String get changelogVersion101416OrderTypes =>
+      'Added type-aware Food, Shipping, and Taxi experiences with package, vehicle, car-class, instruction, status, and action details where provided by the API.';
+
+  @override
+  String get changelogVersion101416History =>
+      'Added Food, Shipping, and Taxi filters to order history with clearer type badges and references.';
+
+  @override
+  String get changelogVersion101416Earnings =>
+      'Connected home and earnings summaries to driver earnings data, kept All Time as the default, and added date and order-type filters.';
+
+  @override
+  String get changelogVersion101416Reliability =>
+      'Improved accepted-order refresh, active-order detail loading, API status handling, and fallback behavior when optional type-specific data is unavailable.';
+
+  @override
+  String get changelogVersion101416Release =>
+      'Released driver app version 1.0.14+16.';
+
+  @override
+  String get changelogDateAug9 => '9 augusti 2026';
+
+  @override
+  String get changelogDateAug11 => '11 augusti 2026';
+
+  @override
+  String get changelogVersion1013Address =>
+      'Valfria, strukturerade föraradresser med koordinater och fullständiga adressuppgifter har lagts till vid registrering och profilredigering.';
+
+  @override
+  String get changelogVersion1013Status =>
+      'Uppdateringar som bara gäller adressen använder nu partiella PATCH-begäranden och behåller en godkänd förares status.';
+
+  @override
+  String get changelogVersion1013Release =>
+      'Förarappen version 1.0.13+15 har släppts.';
+
+  @override
+  String get changelogDateMay31 => '31 maj 2026';
+
+  @override
+  String get changelogDateMay24 => '24 maj 2026';
+
+  @override
+  String get changelogDateMay13 => '13 maj 2026';
+
+  @override
+  String get changelogDateMay11 => '11 maj 2026';
+
+  @override
+  String get changelogCurrentTaxi =>
+      'Val av taxitjänsten begränsades till bilförare, och cykelförare kan inte längre aktivera den vid registrering eller profilredigering.';
+
+  @override
+  String get changelogVersion1113Upload =>
+      'Minskade minnesanvändningen vid web uppladdningar så att dokumentuppladdningar blir mer tillförlitliga på mindre kraftfulla enheter.';
+
+  @override
+  String get changelogCurrentChangelog =>
+      'En lokaliserad, utfällbar ändringslogg lades till i Profil med versionshistorik, buildnummer, datum och versionsanteckningar.';
+
+  @override
+  String get changelogVersion1113Version =>
+      'Appens version och lanseringsdatum visas nu på inloggningsskärmen och webbens startskärm.';
+
+  @override
+  String get changelogCurrentRelease =>
+      'Appen uppdaterades till version 1.0.12+14 med de senaste förbättringarna i förarappen.';
+
+  @override
+  String get changelogVersion1113Release =>
+      'Play Store-versionen uppdaterades till 1.0.11+13 (versionskod 13).';
+
+  @override
+  String get changelogVersion1112Release =>
+      'Förarappen släpptes i version 1.0.11+12 och dess versionsmetadata registrerades.';
+
+  @override
+  String get changelogVersion1011Documents =>
+      'Validering av obligatoriska dokument för bilförare lades till.';
+
+  @override
+  String get changelogVersion1011Uploads =>
+      'Obligatoriska dokument markeras tydligare och hanteringen av uppladdningsstatus förbättrades.';
+
+  @override
+  String get changelogVersion1011Feedback =>
+      'Validering och felmeddelanden vid sparande av profiländringar förbättrades.';
+
+  @override
+  String get changelogVersion1011Release =>
+      'Förarappen släpptes i version 1.0.10+11.';
+
+  @override
+  String get changelogVersion0910Crashlytics =>
+      'Crashlytics-rapportering för allvarliga fel i releaseversioner lades till.';
+
+  @override
+  String get changelogVersion0910Notifications =>
+      'Notifieringarnas livscykel, dubbletthantering och hanteringen av ordernotiser förbättrades.';
+
+  @override
+  String get changelogVersion0910Platform =>
+      'Releasekonfigurationen för Android, iOS, macOS och webben uppdaterades med utvecklings- och produktionsflavors.';
+
+  @override
+  String get changelogVersion0910Release =>
+      'Förarappen släpptes i version 1.0.9+10.';
 }

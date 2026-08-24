@@ -320,6 +320,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       _buildMenuItem(
+                        Icons.auto_awesome_outlined,
+                        l10n.changelog,
+                        null,
+                        AppColors.primary,
+                        textColor,
+                        secondaryColor,
+                        borderColor,
+                        false,
+                        () => context.push(RouteConstants.changelog),
+                      ),
+                      _buildMenuItem(
                         Icons.contrast,
                         l10n.theme,
                         themeProvider.themeModeName,

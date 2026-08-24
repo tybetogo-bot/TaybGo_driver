@@ -11,6 +11,32 @@ void main() {
   });
 
   group('AuthService OTP payloads', () {
+    test('password login posts phone and password and saves tokens', () async {
+      final tokenStorage = _InMemoryTokenStorage();
+      final apiClient = _RecordingApiClient(
+        tokenStorage: tokenStorage,
+        nextResponse: (path, data) => Response<dynamic>(
+          requestOptions: RequestOptions(path: path),
+          statusCode: 200,
+          data: {'access': 'access-token', 'refresh': 'refresh-token'},
+        ),
+      );
+      final service = AuthService(apiClient: apiClient);
+
+      await service.loginWithPassword(
+        phoneNumber: '+49123456789',
+        password: 'secret-password',
+      );
+
+      expect(apiClient.posts.single.path, '/auth/token/');
+      expect(apiClient.posts.single.data, {
+        'phone': '+49123456789',
+        'password': 'secret-password',
+      });
+      expect(tokenStorage.savedAccessToken, 'access-token');
+      expect(tokenStorage.savedRefreshToken, 'refresh-token');
+    });
+
     test('requestOtp includes target_role', () async {
       final apiClient = _RecordingApiClient(
         tokenStorage: _InMemoryTokenStorage(),

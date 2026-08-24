@@ -9,7 +9,7 @@ const _onboardingCompleteKey = 'onboarding_complete';
 
 enum AuthStatus { initial, authenticated, unauthenticated }
 
-enum AuthErrorCode { phoneAlreadyRegistered }
+enum AuthErrorCode { phoneAlreadyRegistered, otpDisabledForRole }
 
 class AuthProvider extends ChangeNotifier {
   static const String driverTargetRole = 'driver';
@@ -69,6 +69,7 @@ class AuthProvider extends ChangeNotifier {
     return switch (_errorCode) {
       AuthErrorCode.phoneAlreadyRegistered =>
         l10n.errorsAuthPhoneAlreadyRegistered,
+      AuthErrorCode.otpDisabledForRole => l10n.passwordRequiredForDriver,
       null => _error,
     };
   }
@@ -133,6 +134,36 @@ class AuthProvider extends ChangeNotifier {
       debugPrint('[AuthProvider] Unknown error: $e');
       _error = 'Failed to send OTP. Please try again.';
       _errorCode = null;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> loginWithPassword(String phoneNumber, String password) async {
+    _isLoading = true;
+    _error = null;
+    _errorCode = null;
+    _phoneNumber = phoneNumber;
+    notifyListeners();
+
+    try {
+      final response = await _authService.loginWithPassword(
+        phoneNumber: phoneNumber,
+        password: password,
+      );
+      _isNewUser = response.isNewUser;
+      _status = AuthStatus.authenticated;
+      _isLoading = false;
+      notifyListeners();
+      return true;
+    } on ApiException catch (e) {
+      _error = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
+    } catch (e) {
+      _error = 'Failed to sign in. Please try again.';
       _isLoading = false;
       notifyListeners();
       return false;
@@ -272,6 +303,12 @@ class AuthProvider extends ChangeNotifier {
   }
 
   void _setOtpError(ApiException exception) {
+    if (_errorResponseCode(exception) == 'otp_disabled_for_role') {
+      _error = null;
+      _errorCode = AuthErrorCode.otpDisabledForRole;
+      return;
+    }
+
     if (_isPhoneAlreadyRegisteredConflict(exception)) {
       _error = null;
       _errorCode = AuthErrorCode.phoneAlreadyRegistered;
@@ -280,6 +317,12 @@ class AuthProvider extends ChangeNotifier {
 
     _error = exception.message;
     _errorCode = null;
+  }
+
+  String? _errorResponseCode(ApiException exception) {
+    final data = exception.data;
+    if (data is Map) return data['code']?.toString();
+    return null;
   }
 
   bool _isPhoneAlreadyRegisteredConflict(ApiException exception) {

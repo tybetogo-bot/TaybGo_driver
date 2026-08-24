@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,6 +7,8 @@ import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:provider/provider.dart';
+import '../../../core/constants/route_constants.dart';
+import '../../../core/models/driver_address.dart';
 import '../../../core/models/driver_profile.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/l10n/framework_locale_support.dart';
@@ -52,7 +56,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   late TextEditingController _vehicleColorController;
   late TextEditingController _vehicleMakeController;
   late TextEditingController _vehicleModelController;
-  late TextEditingController _vehicleYearController;
 
   // Document status
   Uint8List? _drivingLicenseBytes;
@@ -82,6 +85,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   // Vehicle type & car size
   String? _selectedVehicleType;
   String? _selectedCarSize;
+  int? _selectedVehicleYear;
+
+  int get _maximumVehicleYear => DateTime.now().year + 1;
+  List<int> get _vehicleYears => List<int>.generate(
+    _maximumVehicleYear - 1960 + 1,
+    (index) => _maximumVehicleYear - index,
+  );
 
   late final DriverProvider _driverProvider;
   final CloudinaryService _cloudinaryService = CloudinaryService();
@@ -97,6 +107,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _driverProvider = context.read<DriverProvider>();
     _driverProvider.addListener(_handleDriverProfileChanged);
     final profile = _driverProvider.profile;
+    if (profile == null) {
+      unawaited(_driverProvider.fetchProfile());
+    }
 
     // Initialize personal info
     _nameController = TextEditingController(text: profile?.fullName ?? '');
@@ -105,7 +118,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
     _selectedBirthdate = profile?.birthdate;
     _birthdateController = TextEditingController();
-    _syncBirthdateController();
 
     // Initialize vehicle info
     _selectedVehicleType = profile?.vehicleType;
@@ -122,11 +134,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _vehicleModelController = TextEditingController(
       text: profile?.vehicleModel ?? '',
     );
-    _vehicleYearController = TextEditingController(
-      text: profile?.vehicleYear != null && profile!.vehicleYear! > 0
-          ? profile.vehicleYear.toString()
-          : '',
-    );
+    _selectedVehicleYear = _validVehicleYear(profile?.vehicleYear);
 
     // Initialize document URLs from existing profile
     _drivingLicenseUrl = profile?.drivingLicense;
@@ -148,11 +156,21 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     // Initialize service toggles
     _acceptsFood = profile?.acceptsFood ?? false;
     _acceptsShipping = profile?.acceptsShipping ?? false;
-    _acceptsTaxi = profile?.acceptsTaxi ?? false;
+    _acceptsTaxi =
+        _isCarVehicleType(profile?.vehicleType) &&
+        (profile?.acceptsTaxi ?? false);
 
     if (profile != null) {
       _profileInitialized = true;
     }
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Birthdate formatting depends on the inherited app locale, which is not
+    // safe to read until after initState has completed.
+    _syncBirthdateController();
   }
 
   @override
@@ -165,7 +183,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _vehicleColorController.dispose();
     _vehicleMakeController.dispose();
     _vehicleModelController.dispose();
-    _vehicleYearController.dispose();
     super.dispose();
   }
 
@@ -208,10 +225,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     _vehicleColorController.text = profile.vehicleColor ?? '';
     _vehicleMakeController.text = profile.vehicleMake ?? '';
     _vehicleModelController.text = profile.vehicleModel ?? '';
-    _vehicleYearController.text =
-        profile.vehicleYear != null && profile.vehicleYear! > 0
-        ? profile.vehicleYear.toString()
-        : '';
+    _selectedVehicleYear = _validVehicleYear(profile.vehicleYear);
 
     _drivingLicenseUrl = profile.drivingLicense;
     _idDocumentUrl = profile.idDocument;
@@ -222,7 +236,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     _acceptsFood = profile.acceptsFood;
     _acceptsShipping = profile.acceptsShipping;
-    _acceptsTaxi = profile.acceptsTaxi;
+    _acceptsTaxi =
+        _isCarVehicleType(profile.vehicleType) && profile.acceptsTaxi;
 
     _profileInitialized = true;
 
@@ -317,17 +332,64 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     });
   }
 
+  bool _sameDate(DateTime? first, DateTime? second) {
+    if (first == null || second == null) return first == second;
+    return first.year == second.year &&
+        first.month == second.month &&
+        first.day == second.day;
+  }
+
+  String? _nameUpdate() {
+    final profile = _driverProvider.profile;
+    final value = _nameController.text.trim();
+    if (profile == null || value == profile.fullName.trim()) return null;
+    return value.isEmpty ? null : value;
+  }
+
+  String? _phoneUpdate() {
+    final profile = _driverProvider.profile;
+    final value = _digitsOnly(_phoneController.text);
+    if (profile == null || value == _digitsOnly(profile.phone)) return null;
+    return value.isEmpty ? null : value;
+  }
+
+  DateTime? _birthdateUpdate() {
+    final profile = _driverProvider.profile;
+    if (profile == null || _sameDate(_selectedBirthdate, profile.birthdate)) {
+      return null;
+    }
+    return _selectedBirthdate;
+  }
+
+  bool _hasServiceChanges() {
+    final profile = _driverProvider.profile;
+    if (profile == null) return false;
+    return _acceptsFood != profile.acceptsFood ||
+        _acceptsShipping != profile.acceptsShipping ||
+        _acceptsTaxi != profile.acceptsTaxi;
+  }
+
+  String? _changedDocumentValue(String? value, String? original) {
+    if (_normalizeDocumentUrl(value) == _normalizeDocumentUrl(original)) {
+      return null;
+    }
+    return _normalizeDocumentUrl(value);
+  }
+
   Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
 
     final l10n = AppLocalizations.of(context)!;
+    final hasVehicleChanges = _hasVehicleDataChanges();
+    final hasDocumentChanges = _hasDocumentChanges();
+    final hasServiceChanges = _hasServiceChanges();
     final requiredDocumentsError = _validateCarRequiredDocuments(l10n);
     if (requiredDocumentsError != null) {
       _showErrorSnackBar(requiredDocumentsError);
       return;
     }
 
-    final requiresApproval = _hasVehicleDataChanges() || _hasDocumentChanges();
+    final requiresApproval = hasVehicleChanges || hasDocumentChanges;
     if (requiresApproval) {
       final confirmed = await _showProfileApprovalWarningDialog();
       if (!confirmed || !mounted) return;
@@ -339,41 +401,66 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     final isCarType = _isCarVehicleType(_selectedVehicleType);
 
     final success = await driverProvider.updateUserProfile(
-      name: _nameController.text.trim().isNotEmpty
-          ? _nameController.text.trim()
-          : null,
-      phone: _phoneController.text.trim().isNotEmpty
-          ? _phoneController.text.trim()
-          : null,
-      birthdate: _selectedBirthdate,
-      vehicleType: _selectedVehicleType,
-      clearCarDetails: !isCarType,
-      carSize: isCarType ? _selectedCarSize : null,
+      name: _nameUpdate(),
+      phone: _phoneUpdate(),
+      birthdate: _birthdateUpdate(),
+      vehicleType: hasVehicleChanges ? _selectedVehicleType : null,
+      clearCarDetails: hasVehicleChanges && !isCarType,
+      carSize: hasVehicleChanges && isCarType ? _selectedCarSize : null,
       vehiclePlateNumber:
-          isCarType && _vehiclePlateNumberController.text.trim().isNotEmpty
+          hasVehicleChanges &&
+              isCarType &&
+              _vehiclePlateNumberController.text.trim().isNotEmpty
           ? _vehiclePlateNumberController.text.trim()
           : null,
-      vehicleColor: isCarType && _vehicleColorController.text.trim().isNotEmpty
+      vehicleColor:
+          hasVehicleChanges &&
+              isCarType &&
+              _vehicleColorController.text.trim().isNotEmpty
           ? _vehicleColorController.text.trim()
           : null,
-      vehicleMake: isCarType && _vehicleMakeController.text.trim().isNotEmpty
+      vehicleMake:
+          hasVehicleChanges &&
+              isCarType &&
+              _vehicleMakeController.text.trim().isNotEmpty
           ? _vehicleMakeController.text.trim()
           : null,
-      vehicleModel: isCarType && _vehicleModelController.text.trim().isNotEmpty
+      vehicleModel:
+          hasVehicleChanges &&
+              isCarType &&
+              _vehicleModelController.text.trim().isNotEmpty
           ? _vehicleModelController.text.trim()
           : null,
-      vehicleYear: isCarType && _vehicleYearController.text.trim().isNotEmpty
-          ? int.tryParse(_vehicleYearController.text.trim())
+      vehicleYear: hasVehicleChanges && isCarType ? _selectedVehicleYear : null,
+      acceptsFood: hasServiceChanges ? _acceptsFood : null,
+      acceptsShipping: hasServiceChanges ? _acceptsShipping : null,
+      acceptsTaxi: hasServiceChanges
+          ? (isCarType ? _acceptsTaxi : false)
           : null,
-      acceptsFood: _acceptsFood,
-      acceptsShipping: _acceptsShipping,
-      acceptsTaxi: _acceptsTaxi,
-      drivingLicense: _drivingLicenseUrl,
-      idDocument: _idDocumentUrl,
-      otherDocuments: _otherDocumentsUrl,
-      healthInsuranceDocument: _healthInsuranceDocumentUrl,
-      addressDocument: _addressDocumentUrl,
-      bankDocument: _bankDocumentUrl,
+      drivingLicense: _changedDocumentValue(
+        _drivingLicenseUrl,
+        _driverProvider.profile?.drivingLicense,
+      ),
+      idDocument: _changedDocumentValue(
+        _idDocumentUrl,
+        _driverProvider.profile?.idDocument,
+      ),
+      otherDocuments: _changedDocumentValue(
+        _otherDocumentsUrl,
+        _driverProvider.profile?.otherDocuments,
+      ),
+      healthInsuranceDocument: _changedDocumentValue(
+        _healthInsuranceDocumentUrl,
+        _driverProvider.profile?.healthInsuranceDocument,
+      ),
+      addressDocument: _changedDocumentValue(
+        _addressDocumentUrl,
+        _driverProvider.profile?.addressDocument,
+      ),
+      bankDocument: _changedDocumentValue(
+        _bankDocumentUrl,
+        _driverProvider.profile?.bankDocument,
+      ),
     );
 
     if (!mounted) return;
@@ -571,6 +658,25 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
               const SizedBox(height: 28),
 
+              _buildSectionHeader(
+                l10n.currentAddress,
+                Icons.home_outlined,
+                textColor,
+              ),
+              const SizedBox(height: 16),
+              Consumer<DriverProvider>(
+                builder: (context, provider, _) => _buildCurrentAddressCard(
+                  provider.profile?.address,
+                  textColor,
+                  secondaryColor,
+                  surfaceColor,
+                  borderColor,
+                  l10n,
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
               // Vehicle Information Section
               _buildSectionHeader(
                 l10n.vehicleInfo,
@@ -591,7 +697,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 items: vehicleTypeItems,
                 hint: l10n.selectVehicleType,
                 onChanged: (value) {
-                  setState(() => _selectedVehicleType = value);
+                  setState(() {
+                    _selectedVehicleType = value;
+                    if (!_isCarVehicleType(value)) {
+                      _acceptsTaxi = false;
+                    }
+                  });
                 },
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
@@ -739,28 +850,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   secondaryColor,
                 ),
                 const SizedBox(height: 8),
-                _buildTextField(
-                  controller: _vehicleYearController,
-                  hint: l10n.enterVehicleYear,
-                  keyboardType: TextInputType.number,
-                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                _buildVehicleYearDropdown(
                   surfaceColor: surfaceColor,
                   borderColor: borderColor,
                   textColor: textColor,
                   hintColor: hintColor,
-                  validator: (value) {
-                    final trimmed = value?.trim() ?? '';
-                    if (trimmed.isEmpty) {
-                      return l10n.pleaseEnterVehicleYear;
-                    }
-                    final year = int.tryParse(trimmed);
-                    if (year == null ||
-                        year < 1990 ||
-                        year > DateTime.now().year + 1) {
-                      return l10n.invalidVehicleYear;
-                    }
-                    return null;
-                  },
+                  l10n: l10n,
                 ),
               ],
 
@@ -793,16 +888,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 surfaceColor,
                 textColor,
               ),
-              const SizedBox(height: 12),
-
-              _buildServiceToggle(
-                l10n.taxi,
-                Icons.local_taxi_outlined,
-                _acceptsTaxi,
-                (value) => setState(() => _acceptsTaxi = value),
-                surfaceColor,
-                textColor,
-              ),
+              if (_isCarVehicleType(_selectedVehicleType)) ...[
+                const SizedBox(height: 12),
+                _buildServiceToggle(
+                  l10n.taxi,
+                  Icons.local_taxi_outlined,
+                  _acceptsTaxi,
+                  (value) => setState(() => _acceptsTaxi = value),
+                  surfaceColor,
+                  textColor,
+                ),
+              ],
 
               const SizedBox(height: 28),
 
@@ -1007,6 +1103,96 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  Widget _buildCurrentAddressCard(
+    DriverAddress? address,
+    Color textColor,
+    Color secondaryColor,
+    Color surfaceColor,
+    Color borderColor,
+    AppLocalizations l10n,
+  ) {
+    final fullAddress = address?.fullAddress?.toString().trim();
+    final area = [
+      address?.postalCode,
+      address?.city,
+      address?.country,
+    ].whereType<String>().where((value) => value.trim().isNotEmpty).join(' · ');
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: surfaceColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: borderColor),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(
+                  Icons.location_on_rounded,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      fullAddress == null || fullAddress.isEmpty
+                          ? l10n.noAddressAdded
+                          : fullAddress,
+                      style: TextStyle(
+                        color: textColor,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        height: 1.35,
+                      ),
+                    ),
+                    if (area.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        area,
+                        style: TextStyle(color: secondaryColor, fontSize: 12),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          OutlinedButton.icon(
+            onPressed: () => context.push(RouteConstants.editAddress),
+            icon: const Icon(Icons.edit_outlined, size: 17),
+            label: Text(l10n.editAddress),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.primary,
+              side: BorderSide(
+                color: AppColors.primary.withValues(alpha: 0.45),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFieldLabel(IconData icon, String label, Color color) {
     return Row(
       children: [
@@ -1133,6 +1319,68 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     );
   }
 
+  Widget _buildVehicleYearDropdown({
+    required Color surfaceColor,
+    required Color borderColor,
+    required Color textColor,
+    required Color hintColor,
+    required AppLocalizations l10n,
+  }) {
+    return DropdownButtonFormField<int>(
+      key: ValueKey(_selectedVehicleYear),
+      initialValue: _selectedVehicleYear,
+      menuMaxHeight: 320,
+      decoration: InputDecoration(
+        hintText: l10n.selectVehicleYear,
+        hintStyle: TextStyle(fontSize: 14, color: hintColor),
+        filled: true,
+        fillColor: surfaceColor,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 14,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: borderColor),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: borderColor),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.error),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+        ),
+      ),
+      dropdownColor: surfaceColor,
+      style: TextStyle(fontSize: 15, color: textColor),
+      items: _vehicleYears
+          .map(
+            (year) => DropdownMenuItem<int>(
+              value: year,
+              child: Text(year.toString()),
+            ),
+          )
+          .toList(),
+      onChanged: (value) => setState(() => _selectedVehicleYear = value),
+      validator: (value) {
+        if (value == null) return l10n.pleaseEnterVehicleYear;
+        if (value < 1960 || value > _maximumVehicleYear) {
+          return l10n.invalidVehicleYear;
+        }
+        return null;
+      },
+    );
+  }
+
   bool get _isAnyDocumentUploading =>
       _drivingLicenseUploading ||
       _idDocumentUploading ||
@@ -1193,9 +1441,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             _normalizeVehicleText(profile.vehicleMake) ||
         _normalizeVehicleText(_vehicleModelController.text) !=
             _normalizeVehicleText(profile.vehicleModel) ||
-        _normalizeVehicleYear(
-              int.tryParse(_vehicleYearController.text.trim()),
-            ) !=
+        _normalizeVehicleYear(_selectedVehicleYear) !=
             _normalizeVehicleYear(profile.vehicleYear);
   }
 
@@ -1234,6 +1480,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   int? _normalizeVehicleYear(int? value) {
     if (value == null || value <= 0) return null;
+    return value;
+  }
+
+  int? _validVehicleYear(int? value) {
+    if (value == null || value < 1960 || value > _maximumVehicleYear) {
+      return null;
+    }
     return value;
   }
 

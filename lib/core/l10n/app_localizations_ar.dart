@@ -131,6 +131,51 @@ class AppLocalizationsAr extends AppLocalizations {
   String get forgotPassword => 'نسيت كلمة المرور';
 
   @override
+  String get password => 'Password';
+
+  @override
+  String get enterPassword => 'Enter your password';
+
+  @override
+  String get signIn => 'Sign in';
+
+  @override
+  String get passwordRequiredForDriver =>
+      'Password sign-in is required for driver accounts.';
+
+  @override
+  String get checkingSignInMethod => 'Checking sign-in method…';
+
+  @override
+  String get configFallback =>
+      'Could not refresh sign-in settings. Using password sign-in.';
+
+  @override
+  String get updateRequiredTitle => 'Update required';
+
+  @override
+  String get updateRequiredMessage =>
+      'Install the latest TaybGo Driver version to continue.';
+
+  @override
+  String latestVersionLabel(String version) {
+    return 'Latest version: $version';
+  }
+
+  @override
+  String get updateNow => 'Update now';
+
+  @override
+  String get checkAgain => 'Check again';
+
+  @override
+  String get invalidUpdateUrl =>
+      'The update link is unavailable. Please try again.';
+
+  @override
+  String get couldNotOpenLink => 'Could not open this link.';
+
+  @override
   String get driverApplication => 'طلب السائق';
 
   @override
@@ -161,7 +206,123 @@ class AppLocalizationsAr extends AppLocalizations {
   String get address => 'العنوان';
 
   @override
+  String get addressStepTitle => 'العنوان المحفوظ';
+
+  @override
+  String get addressStepSubtitle => 'أضف عنواناً اختيارياً إلى ملف السائق.';
+
+  @override
+  String get addressOptionalSubtitle =>
+      'اختياري. إذا أضفت عنواناً، أكمل الحقول المطلوبة.';
+
+  @override
+  String get addressRequired => 'Please search for and select your address.';
+
+  @override
+  String get searchForAddress => 'Search for your address';
+
+  @override
+  String get searchAddressHint =>
+      'Start typing a street, building, or place name';
+
+  @override
+  String get addressSelected => 'Address selected';
+
+  @override
+  String get addressDetails => 'Address details';
+
+  @override
+  String get addressSearchUnavailable =>
+      'Address search is not configured for this build.';
+
+  @override
+  String get addressSearchError =>
+      'We couldn\'t load address results. Check your connection and try again.';
+
+  @override
+  String get noAddressResults =>
+      'No matching addresses found. Try adding a city or postal code.';
+
+  @override
+  String get selectAddressSuggestion =>
+      'Please select an address from the Google suggestions.';
+
+  @override
+  String get addressCoordinatesMissing =>
+      'This result is missing location details. Please choose another address.';
+
+  @override
+  String get clearAddress => 'Clear address';
+
+  @override
+  String get addressLabel => 'اسم العنوان';
+
+  @override
+  String get addressLabelHint => 'مثال: المنزل';
+
+  @override
+  String get fullAddress => 'العنوان الكامل';
+
+  @override
+  String get fullAddressHint => 'مثال: شارع الملك 12، الرياض';
+
+  @override
+  String get latitude => 'خط العرض';
+
+  @override
+  String get latitudeHint => 'مثال: 24.713600';
+
+  @override
+  String get longitude => 'خط الطول';
+
+  @override
+  String get longitudeHint => 'مثال: 46.675300';
+
+  @override
+  String get useCurrentLocation => 'استخدام الموقع الحالي';
+
+  @override
+  String get streetName => 'اسم الشارع';
+
+  @override
+  String get streetNameHint => 'مثال: شارع الملك';
+
+  @override
+  String get houseNumber => 'رقم المنزل';
+
+  @override
+  String get houseNumberHint => 'مثال: 12';
+
+  @override
   String get city => 'المدينة';
+
+  @override
+  String get cityHint => 'مثال: الرياض';
+
+  @override
+  String get postalCode => 'الرمز البريدي';
+
+  @override
+  String get postalCodeHint => 'مثال: 12345';
+
+  @override
+  String get country => 'الدولة';
+
+  @override
+  String get countryHint => 'مثال: SA';
+
+  @override
+  String get addressRequiredFields =>
+      'اسم العنوان وخط العرض وخط الطول والعنوان الكامل مطلوبة معاً.';
+
+  @override
+  String get invalidLatitude => 'أدخل خط عرض صحيحاً بين -90 و90.';
+
+  @override
+  String get invalidLongitude => 'أدخل خط طول صحيحاً بين -180 و180.';
+
+  @override
+  String get locationFetchFailed => 'تعذر تحديد موقعك الحالي.';
 
   @override
   String get vehicleType => 'نوع المركبة';
@@ -171,6 +332,9 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get car => 'سيارة';
+
+  @override
+  String get van => 'شاحنة صغيرة';
 
   @override
   String get motorcycle => 'دراجة نارية';
@@ -207,6 +371,18 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get taxi => 'تاكسي';
+
+  @override
+  String get foodOrder => 'Food order';
+
+  @override
+  String get shippingOrder => 'Shipping order';
+
+  @override
+  String get taxiRide => 'Taxi ride';
+
+  @override
+  String get allOrders => 'All';
 
   @override
   String get uploadDocuments => 'رفع الوثائق';
@@ -392,6 +568,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get delivered => 'تم التسليم';
 
   @override
+  String get expired => 'Expired';
+
+  @override
+  String get restaurantDelivered => 'Restaurant delivered';
+
+  @override
   String get pickup => 'الاستلام';
 
   @override
@@ -493,6 +675,49 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deliveryFee => 'رسوم التوصيل';
+
+  @override
+  String get driverDeliveryFee => 'Driver delivery fee';
+
+  @override
+  String get requiredVehicle => 'Required vehicle';
+
+  @override
+  String get packageDetails => 'Package details';
+
+  @override
+  String get packageSize => 'Size';
+
+  @override
+  String get packageWeight => 'Weight';
+
+  @override
+  String get packageContents => 'Contents';
+
+  @override
+  String get rideDetails => 'Ride details';
+
+  @override
+  String get deliveryInstructions => 'Instructions';
+
+  @override
+  String get typeDetailsUnavailable =>
+      'Additional details will appear when provided by dispatch.';
+
+  @override
+  String get headToPassenger => 'Head to passenger';
+
+  @override
+  String get passengerDroppedOff => 'Passenger dropped off';
+
+  @override
+  String get completeRide => 'Complete ride';
+
+  @override
+  String get acceptRide => 'Accept ride';
+
+  @override
+  String get acceptShippingOrder => 'Accept shipment';
 
   @override
   String get total => 'المجموع';
@@ -680,6 +905,24 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get editProfile => 'تعديل الملف الشخصي';
+
+  @override
+  String get currentAddress => 'Current address';
+
+  @override
+  String get editAddress => 'Edit Address';
+
+  @override
+  String get saveAddress => 'Save Address';
+
+  @override
+  String get noAddressAdded => 'No address added yet';
+
+  @override
+  String get addressUpdatedSuccessfully => 'Address updated successfully';
+
+  @override
+  String get failedToUpdateAddress => 'Failed to update address';
 
   @override
   String get changePassword => 'تغيير كلمة المرور';
@@ -1142,6 +1385,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get stepServices => 'الخدمات';
 
   @override
+  String applicationStepProgress(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String applicationNextStep(String step) {
+    return 'Next: $step';
+  }
+
+  @override
   String get ecoFriendlyOption => 'خيار صديق للبيئة';
 
   @override
@@ -1152,9 +1405,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get largeDeliveries => 'توصيلات كبيرة';
-
-  @override
-  String get van => 'شاحنة صغيرة';
 
   @override
   String get deleteDataWarning =>
@@ -1255,6 +1505,11 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get collectCashReminder => 'تذكّر تحصيل المبلغ من العميل';
+
+  @override
+  String collectCashAmountReminder(String amount) {
+    return 'Collect $amount from the customer before completing.';
+  }
 
   @override
   String get locationPermissionLostWhileOnline =>
@@ -1404,6 +1659,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enterVehicleYear => 'مثال: 2020';
 
   @override
+  String get selectVehicleYear => 'Select vehicle year';
+
+  @override
   String get vehicleDetailsTitle => 'تفاصيل المركبة';
 
   @override
@@ -1507,4 +1765,208 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get failedToRejectOrder => 'Failed to reject order';
+
+  @override
+  String get changelog => 'سجل التغييرات';
+
+  @override
+  String get changelogTitle => 'ما الجديد؟';
+
+  @override
+  String get changelogSubtitle =>
+      'اطّلع سريعًا على أحدث التحسينات في تطبيق TaybGo Driver.';
+
+  @override
+  String get changelogCurrent => 'الحالي';
+
+  @override
+  String get changelogBuild => 'البنية';
+
+  @override
+  String get changelogReleased => 'صدر في';
+
+  @override
+  String get changelogReleaseNotes => 'ملاحظات الإصدار';
+
+  @override
+  String get changelogHighlights => 'أبرز التغييرات';
+
+  @override
+  String get changelogFixes => 'الإصلاحات';
+
+  @override
+  String get changelogImprovements => 'التحسينات';
+
+  @override
+  String get changelogStability => 'الاستقرار';
+
+  @override
+  String get changelogPlatform => 'المنصة';
+
+  @override
+  String get changelogRelease => 'الإصدار';
+
+  @override
+  String get changelogDateAug24 => '24 August 2026';
+
+  @override
+  String get changelogVersion101517Authentication =>
+      'Driver sign-in now follows the live backend policy and automatically uses password or OTP authentication when enabled for the driver role.';
+
+  @override
+  String get changelogVersion101517Password =>
+      'Added secure password sign-in for driver accounts while keeping role-aware OTP support available for configured deployments.';
+
+  @override
+  String get changelogVersion101517Updates =>
+      'Added a required-update screen so unsupported app versions can be directed to the correct update without entering the app.';
+
+  @override
+  String get changelogVersion101517Legal =>
+      'Terms of Service and Privacy Policy links now come from the public application configuration and can be updated without a new app release.';
+
+  @override
+  String get changelogVersion101517Reliability =>
+      'Improved anonymous authentication error handling, configuration fallback behavior, startup timeouts, validation feedback, and small-screen login layout.';
+
+  @override
+  String get changelogVersion101517Release =>
+      'Released TaybGo Driver version 1.0.15+17.';
+
+  @override
+  String get changelogDateAug20 => '20 August 2026';
+
+  @override
+  String get changelogVersion101416ApplicationFlow =>
+      'Redesigned the driver application into five focused steps with clearer progress, organized sections, better field guidance, and inline validation.';
+
+  @override
+  String get changelogVersion101416Address =>
+      'Refactored registration address entry around required Google Places search, a clear selected-address summary, complete structured address data, coordinates, and stronger validation.';
+
+  @override
+  String get changelogVersion101416ProfileAddress =>
+      'Edit Profile now shows the saved address in a compact card with an Edit Address action that opens a dedicated Google Places editor.';
+
+  @override
+  String get changelogVersion101416Vehicle =>
+      'Restored complete vehicle details and added the same vehicle-year selector to registration and Edit Profile, covering 1960 through next year.';
+
+  @override
+  String get changelogVersion101416Documents =>
+      'Improved required-document presentation, upload states, and registration error feedback.';
+
+  @override
+  String get changelogVersion101416DriverFee =>
+      'Incoming orders now show the driver\'s delivery fee instead of the customer total; paid order details show only that fee, while unpaid orders also show the amount to collect.';
+
+  @override
+  String get changelogVersion101416OrderTypes =>
+      'Added type-aware Food, Shipping, and Taxi experiences with package, vehicle, car-class, instruction, status, and action details where provided by the API.';
+
+  @override
+  String get changelogVersion101416History =>
+      'Added Food, Shipping, and Taxi filters to order history with clearer type badges and references.';
+
+  @override
+  String get changelogVersion101416Earnings =>
+      'Connected home and earnings summaries to driver earnings data, kept All Time as the default, and added date and order-type filters.';
+
+  @override
+  String get changelogVersion101416Reliability =>
+      'Improved accepted-order refresh, active-order detail loading, API status handling, and fallback behavior when optional type-specific data is unavailable.';
+
+  @override
+  String get changelogVersion101416Release =>
+      'Released driver app version 1.0.14+16.';
+
+  @override
+  String get changelogDateAug9 => '9 أغسطس 2026';
+
+  @override
+  String get changelogDateAug11 => '11 أغسطس 2026';
+
+  @override
+  String get changelogVersion1013Address =>
+      'تمت إضافة عناوين منظمة اختيارية للسائقين مع الإحداثيات وتفاصيل العنوان الكامل أثناء التسجيل وتعديل الملف الشخصي.';
+
+  @override
+  String get changelogVersion1013Status =>
+      'تستخدم تحديثات العنوان فقط طلبات PATCH جزئية وتحافظ على حالة السائق المعتمد.';
+
+  @override
+  String get changelogVersion1013Release =>
+      'تم إصدار تطبيق السائق بالإصدار 1.0.13+15.';
+
+  @override
+  String get changelogDateMay31 => '31 مايو 2026';
+
+  @override
+  String get changelogDateMay24 => '24 مايو 2026';
+
+  @override
+  String get changelogDateMay13 => '13 مايو 2026';
+
+  @override
+  String get changelogDateMay11 => '11 مايو 2026';
+
+  @override
+  String get changelogCurrentTaxi =>
+      'تم تقييد اختيار خدمة التاكسي على سائقي السيارات ومنع سائقي الدراجات الهوائية من تفعيلها أثناء التسجيل وتعديل الملف الشخصي.';
+
+  @override
+  String get changelogVersion1113Upload =>
+      'تم تقليل استهلاك الذاكرة أثناء رفع الملفات على الويب لجعل رفع المستندات أكثر موثوقية على الأجهزة منخفضة الإمكانات.';
+
+  @override
+  String get changelogCurrentChangelog =>
+      'تمت إضافة سجل تغييرات مترجم وقابل للتوسيع إلى الملف الشخصي، مع سجل الإصدارات وأرقام البنية والتواريخ وملاحظات الإصدار.';
+
+  @override
+  String get changelogVersion1113Version =>
+      'تمت إضافة إصدار التطبيق وتاريخ الإصدار إلى شاشة تسجيل الدخول وشاشة بدء تشغيل الويب.';
+
+  @override
+  String get changelogCurrentRelease =>
+      'تم تحديث التطبيق إلى الإصدار 1.0.12+14 مع أحدث تحسينات تطبيق السائق.';
+
+  @override
+  String get changelogVersion1113Release =>
+      'تم تحديث نسخة متجر Play إلى الإصدار 1.0.11+13 (رمز الإصدار 13).';
+
+  @override
+  String get changelogVersion1112Release =>
+      'تم إصدار تطبيق السائق بالإصدار 1.0.11+12 وتسجيل بيانات الإصدار الخاصة به.';
+
+  @override
+  String get changelogVersion1011Documents =>
+      'تمت إضافة التحقق من المستندات المطلوبة لسائقي السيارات.';
+
+  @override
+  String get changelogVersion1011Uploads =>
+      'تم توضيح المستندات المطلوبة وتحسين عرض حالة الرفع.';
+
+  @override
+  String get changelogVersion1011Feedback =>
+      'تم تحسين التحقق ورسائل الخطأ عند حفظ تغييرات الملف الشخصي.';
+
+  @override
+  String get changelogVersion1011Release =>
+      'تم إصدار تطبيق السائق بالإصدار 1.0.10+11.';
+
+  @override
+  String get changelogVersion0910Crashlytics =>
+      'تمت إضافة تقارير Crashlytics للأخطاء الفادحة في إصدارات الإنتاج.';
+
+  @override
+  String get changelogVersion0910Notifications =>
+      'تم تحسين دورة حياة الإشعارات ومنع التكرار ومعالجة إشعارات الطلبات.';
+
+  @override
+  String get changelogVersion0910Platform =>
+      'تم تحديث إعدادات إصدارات Android وiOS وmacOS والويب مع بيئتي التطوير والإنتاج.';
+
+  @override
+  String get changelogVersion0910Release =>
+      'تم إصدار تطبيق السائق بالإصدار 1.0.9+10.';
 }
