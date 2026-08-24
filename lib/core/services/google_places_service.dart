@@ -1,8 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:http/http.dart' as http;
 
 import '../models/driver_address.dart';
+import 'web_places_bridge.dart';
 
 class GooglePlaceSuggestion {
   const GooglePlaceSuggestion({
@@ -65,6 +67,18 @@ class GooglePlacesService {
     final normalizedInput = input.trim();
     if (normalizedInput.length < 3) return const [];
 
+    if (kIsWeb) {
+      final suggestions = await webPlacesAutocomplete(
+        apiKey,
+        normalizedInput,
+        countryCode: regionCode,
+      );
+      return suggestions
+          .map(_suggestionFromWebJson)
+          .whereType<GooglePlaceSuggestion>()
+          .toList(growable: false);
+    }
+
     final response = await _client.post(
       Uri.parse('$_baseUrl/places:autocomplete'),
       headers: _headers(_autocompleteFieldMask),
@@ -97,6 +111,20 @@ class GooglePlacesService {
     String? languageCode,
     String? regionCode,
   }) async {
+    if (kIsWeb) {
+      final data = await webPlaceDetails(apiKey, suggestion.placeId);
+      if (data == null) {
+        throw const GooglePlacesException(
+          'Google Places did not return address details.',
+        );
+      }
+      return _selectionFromWebJson(
+        data: data,
+        suggestion: suggestion,
+        label: label,
+      );
+    }
+
     final uri =
         Uri.parse(
           '$_baseUrl/places/${Uri.encodeComponent(suggestion.placeId)}',
@@ -229,6 +257,50 @@ class GooglePlacesService {
       fullText: fullText,
       primaryText: primary ?? fullText,
       secondaryText: secondary,
+    );
+  }
+
+  GooglePlaceSuggestion? _suggestionFromWebJson(Map<String, dynamic> json) {
+    final placeId = _normalize(json['placeId']?.toString());
+    final fullText = _normalize(json['fullText']?.toString());
+    if (placeId == null || fullText == null) return null;
+    return GooglePlaceSuggestion(
+      placeId: placeId,
+      fullText: fullText,
+      primaryText: _normalize(json['primaryText']?.toString()) ?? fullText,
+      secondaryText: _normalize(json['secondaryText']?.toString()),
+    );
+  }
+
+  GooglePlaceAddressSelection _selectionFromWebJson({
+    required Map<String, dynamic> data,
+    required GooglePlaceSuggestion suggestion,
+    required String label,
+  }) {
+    final latitude = (data['latitude'] as num?)?.toDouble();
+    final longitude = (data['longitude'] as num?)?.toDouble();
+    if (latitude == null || longitude == null) {
+      throw const GooglePlacesException(
+        'The selected place did not include valid coordinates.',
+      );
+    }
+
+    return GooglePlaceAddressSelection(
+      placeId: suggestion.placeId,
+      address: DriverAddress(
+        label: _normalize(label),
+        lat: latitude.toStringAsFixed(6),
+        lng: longitude.toStringAsFixed(6),
+        fullAddress: _firstNonEmpty([
+          data['formattedAddress']?.toString(),
+          suggestion.fullText,
+        ]),
+        streetName: _normalize(data['streetName']?.toString()),
+        houseNumber: _normalize(data['houseNumber']?.toString()),
+        city: _normalize(data['city']?.toString()),
+        postalCode: _normalize(data['postalCode']?.toString()),
+        country: _normalize(data['country']?.toString()),
+      ),
     );
   }
 

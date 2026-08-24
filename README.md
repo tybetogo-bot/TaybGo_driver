@@ -8,11 +8,16 @@ A multi-service driver partner application for the TaybGo platform. Drivers acce
 # Install dependencies
 flutter pub get
 
+# Supply a restricted Google Maps/Places key through your environment.
+export GOOGLE_MAPS_API_KEY='<your-key>'
+
 # Run dev flavor
-flutter run --flavor dev --target lib/main_dev.dart
+flutter run --flavor dev --target lib/main_dev.dart \
+  --dart-define=GOOGLE_MAPS_API_KEY="$GOOGLE_MAPS_API_KEY"
 
 # Run prod flavor
-flutter run --flavor prod --target lib/main_prod.dart
+flutter run --flavor prod --target lib/main_prod.dart \
+  --dart-define=GOOGLE_MAPS_API_KEY="$GOOGLE_MAPS_API_KEY"
 ```
 
 Or use the VSCode launch configurations: **Dev (Debug)** / **Prod (Debug)** from the Run and Debug panel.
@@ -34,18 +39,27 @@ The flavor system works across all platforms:
 
 ```bash
 # Debug
-flutter run --flavor dev --target lib/main_dev.dart
-flutter run --flavor prod --target lib/main_prod.dart
+flutter run --flavor dev --target lib/main_dev.dart \
+  --dart-define=GOOGLE_MAPS_API_KEY="$GOOGLE_MAPS_API_KEY"
+flutter run --flavor prod --target lib/main_prod.dart \
+  --dart-define=GOOGLE_MAPS_API_KEY="$GOOGLE_MAPS_API_KEY"
 
 # Release APK
-flutter build apk --flavor prod --target lib/main_prod.dart --release
+flutter build apk --flavor prod --target lib/main_prod.dart --release \
+  --dart-define=GOOGLE_MAPS_API_KEY="$GOOGLE_MAPS_API_KEY"
 
 # Release App Bundle (Play Store)
-flutter build appbundle --flavor prod --target lib/main_prod.dart --release
+flutter build appbundle --flavor prod --target lib/main_prod.dart --release \
+  --dart-define=GOOGLE_MAPS_API_KEY="$GOOGLE_MAPS_API_KEY"
 
 # iOS (requires macOS)
-flutter build ios --flavor prod --target lib/main_prod.dart --release
+flutter build ios --flavor prod --target lib/main_prod.dart --release \
+  --dart-define=GOOGLE_MAPS_API_KEY="$GOOGLE_MAPS_API_KEY"
 ```
+
+Android release builds validate this value before compilation. A missing or
+malformed key stops the build with a clear message instead of shipping an APK
+whose required address step cannot be completed.
 
 ## Features
 
