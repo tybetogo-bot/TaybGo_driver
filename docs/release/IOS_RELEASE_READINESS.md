@@ -1,3 +1,5 @@
+Latest build: **1.0.16+19**. See [UIScene, push and Places audit](IOS_SCENE_PUSH_AUDIT.md) for the follow-up fixes, final artifact verification and remaining real-device checks. The build 18 evidence below is historical.
+
 # TaybGo Driver iOS release readiness
 
 Prepared October 11, 2026. Xcode automatic provisioning and App Store IPA export succeeded. Final archive/package evidence is recorded below; physical-device and TestFlight readiness remain unverified.

@@ -1,7 +1,7 @@
 import Flutter
 import UIKit
 import FirebaseCore
-import FirebaseMessaging
+import firebase_messaging
 import CoreLocation
 import flutter_local_notifications
 
@@ -17,14 +17,13 @@ import flutter_local_notifications
       GeneratedPluginRegistrant.register(with: registry)
     }
 
-    FirebaseApp.configure()
-
-    // Set up push notifications
-    if #available(iOS 10.0, *) {
-      UNUserNotificationCenter.current().delegate = self
+    if FirebaseApp.app() == nil {
+      FirebaseApp.configure()
     }
 
-    application.registerForRemoteNotifications()
+    // UIScene registers plugins after launch. Set the Messaging delegate before
+    // launch returns, as required by FlutterFire's UIScene integration.
+    FLTFirebaseMessagingPlugin.configureNotificationCenterDelegate()
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
@@ -36,12 +35,6 @@ import flutter_local_notifications
       binaryMessenger: engineBridge.applicationRegistrar.messenger()
     )
     locationPermissionBridge = LocationPermissionBridge(channel: channel)
-  }
-
-  override func application(_ application: UIApplication,
-                            didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-    Messaging.messaging().apnsToken = deviceToken
-    super.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
   }
 }
 
