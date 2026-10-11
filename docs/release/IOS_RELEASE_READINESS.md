@@ -1,6 +1,6 @@
 # TaybGo Driver iOS release readiness
 
-Prepared October 11, 2026. This is a pre-Apple handoff, not a signed IPA or a claim of TestFlight readiness.
+Prepared October 11, 2026. Xcode automatic provisioning and App Store IPA export succeeded. Final archive/package evidence is recorded below; physical-device and TestFlight readiness remain unverified.
 
 ## App and source
 
@@ -12,7 +12,7 @@ Prepared October 11, 2026. This is a pre-Apple handoff, not a signed IPA or a cl
 - Current version/build: `1.0.16 (18)`. App Store Connect build history has not been checked; do not assume build 18 is unused.
 - Production: `com.taybgo.driver`, display name `TaybGo Driver`, `lib/main_prod.dart`, `https://taybgo.com/api`.
 - Development: `com.taybgo.driver.dev`, display name `TaybGo Driver Dev`, `lib/main_dev.dart`, `https://dev.taybgo.com/api`.
-- Apple team in source: `Z8ZLXJ9696`, supplied by the owner on October 11; signing identity/provisioning awaits Apple verification.
+- Apple team in source: `Z8ZLXJ9696`, supplied by the owner on October 11; automatic provisioning and distribution export have now succeeded.
 - Toolchain used: Flutter 3.47.2 / Dart 3.13.2; Xcode 27.0 (27A266a).
 - Minimum iOS: 15.0. The installed Flutter engine's generated podspec requires 15.0; the previous 13.0 target failed dependency resolution.
 
@@ -74,19 +74,19 @@ flutter build ios --release --no-codesign --no-pub \
 - The 1024px App Store icon has no alpha channel.
 - A signed Release build without the required Places define is rejected by `scripts/check_ios_release_config.sh`.
 
-The initial unsigned build omitted the Places key. After the owner supplied it, a second production build succeeded using `--dart-define-from-file=releases/config/ios-prod.json`. The local file is ignored by Git and mode 0600; the build script uses it by default. Google Places API (New) autocomplete returned five suggestions, and details returned an address and coordinates. The exact key was verified present in the compiled App framework without logging it. Evidence: `places-api-validation.json` and `unsigned-with-places-validation.json` in `build/ios/release-readiness/`. This verifies API access and compilation, not physical-device signup or a distributable release. No signing, provisioning profile, production APNs entitlement, physical-device launch or TestFlight evidence was verified.
+The initial unsigned build omitted the Places key. After the owner supplied it, a second production build succeeded using `--dart-define-from-file=releases/config/ios-prod.json`. The local file is ignored by Git and mode 0600; the build script uses it by default. Google Places API (New) autocomplete returned five suggestions, and details returned an address and coordinates. The exact key was verified present in the compiled App framework without logging it. Evidence: `places-api-validation.json` and `unsigned-with-places-validation.json` in `build/ios/release-readiness/`. This verifies API access and compilation, not physical-device signup or a distributable release. The signed export checks are recorded below. Physical-device launch and TestFlight evidence remain unverified.
 
-The local keychain has a valid Apple Development identity for team `Z8ZLXJ9696` (certificate expires October 10, 2027), but its only Apple Distribution identity belongs to another team (`9JVDMU4TKQ`). Distribution signing for the requested team remains to be configured through Apple.
+Initially, the keychain had a valid Apple Development identity for team `Z8ZLXJ9696` but no matching distribution identity. Xcode automatic provisioning subsequently obtained the required distribution signing assets and exported a correctly signed App Store IPA. No unrelated certificate was revoked.
 
 Existing Flutter localization gaps remain: Arabic has 81 untranslated messages; nine other non-English locales have 156 each and use the template fallback. Native permission strings were added separately; the full app is not claimed to be fully translated.
 
-## Remaining before the final IPA
+## Release and device follow-up
 
 1. Verify native signup/address selection on a physical iPhone using the supplied Places configuration. Direct autocomplete/details verification succeeded; actual app/device behavior remains unverified.
-2. Verify Apple team, App Store record, bundle ID, Push App ID capability, signing identity/private key, provisioning and next unused build number. Align `pubspec.yaml` and `ReleaseInfo` when choosing the final version/build.
+2. Verify App Store record and that build 18 is unused before upload. Bundle ID, team, push capability and distribution signing/provisioning passed exported-package validation. Align `pubspec.yaml` and `ReleaseInfo` if Apple build history requires a new version/build.
 3. Production APNs credentials are saved and verified for the production registration. Configure the still-empty sandbox slot and development registration when development push testing is required, confirming scope/topic compatibility. Production device delivery remains unverified.
-4. Build/export an App Store IPA with explicit production flavor/target, the Places define and verified export options. Choose `manageAppVersionAndBuildNumber` explicitly; record the command and source commit.
-5. Inspect final distribution signatures/profile/expiry, production push entitlement, disabled debugging, full package resources/manifests, architectures and final dSYM UUIDs. Compute IPA/symbol checksums and source/config manifest.
+4. App Store IPA archive/export completed using production flavor/target and local Places defines. Export method is `app-store-connect`, destination `export`, automatic signing, team `Z8ZLXJ9696`, and `manageAppVersionAndBuildNumber=false`. No upload was requested.
+5. Preserve the exported IPA, matching archive/dSYMs and validation report/checksums together. Revalidate any subsequent rebuild/export.
 6. Test driver password login/signup, session restore, dispatch acceptance/rejection, pickup/drop-off/navigation, background location, earnings, document uploads, deletion and denied permissions on a physical iPhone.
 7. Test Firebase and real backend notifications in foreground/background/cold start, permission denied, token refresh/reinstall and logout/account switching; confirm the opened destination and locale/sound/badges.
 8. Verify deployed Firebase sender project/credentials and token ownership/cleanup behavior. Device token registration or a successful send response alone is not delivery evidence.
@@ -99,4 +99,17 @@ For the final signed build, with verified Apple export options and the ignored l
 sh scripts/build_ios_store.sh VERSION UNUSED_BUILD PATH_TO_EXPORT_OPTIONS_PLIST
 ```
 
-No Apple upload, App Review submission, publication, backend deployment or outbound messages occurred during this preparation.
+Apple automatic provisioning, archive and App Store IPA export were performed. No Apple upload, App Review submission, publication, backend deployment or outbound messages occurred.
+
+## Final signed App Store artifact
+
+- IPA: `releases/2026-10-11/TaybGo-Driver-1.0.16+18-AppStore.ipa` (27,174,269 bytes).
+- Build source commit: `b9d6b5f`; production version/build `1.0.16+18`.
+- Automatic Xcode provisioning created `iOS Team Store Provisioning Profile: com.taybgo.driver`, UUID `042f50dc-807e-4db4-9bdc-28dc6493fb92`, team `Z8ZLXJ9696`, expiry October 10, 2027 at 19:52:17 UTC.
+- `signed-ipa-validation.json`: all checks passed, including Apple Distribution certificate, strict signature, exact team/application identity, App Store profile, unexpired profile, production push entitlement, disabled debugging, resources and privacy plist syntax.
+- All five embedded frameworks are arm64. Archive dSYMs match all six executable images (Runner and five frameworks); two objective_c symbol bundles have the same verified UUID.
+- Runner UUID: `71F0A1D3-4DA4-3F99-A197-7B6D73BE5F66`; App UUID: `85AA7E27-0A13-2B93-DB3E-F2C22BA20B1E`.
+- Places key inclusion was verified in the final App framework without exposing the value in reports.
+- Replaced Flutter's template launch image with the existing TaybGo artwork; final archive has no template icon/launch-image validation warning.
+- Preserved Xcode archive ZIP, dSYMs ZIP, export options, build log, source/config manifest and SHA-256 checksums alongside the IPA. Credentials are excluded from reports/source control.
+- This is an exported App Store distribution IPA. It has not been uploaded or accepted by Apple, and does not establish physical-device/TestFlight QA or that build 18 is unused.

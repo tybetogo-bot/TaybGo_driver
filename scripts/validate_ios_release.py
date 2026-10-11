@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Inspect a Driver app bundle; signed exports require production entitlements."""
 import argparse
+from datetime import datetime, timezone
 import hashlib
 import json
 import plistlib
@@ -39,6 +40,7 @@ for path in manifests:
         privacy.append({'path': str(path.relative_to(app)), 'valid_plist': False, 'error': str(error)})
 checks['privacy_plist_syntax'] = bool(privacy) and all(p['valid_plist'] for p in privacy)
 entitlements = None
+profile_summary = None
 if not args.unsigned:
     result = subprocess.run(['codesign', '--verify', '--deep', '--strict', str(app)], capture_output=True, text=True)
     checks['strict_signature'] = result.returncode == 0
@@ -49,7 +51,19 @@ if not args.unsigned:
     result = subprocess.run(['security', 'cms', '-D', '-i', str(app / 'embedded.mobileprovision')], capture_output=True)
     profile = plistlib.loads(result.stdout)
     checks['app_store_profile'] = not profile.get('ProvisionedDevices') and not profile.get('ProvisionsAllDevices', False)
-    checks['profile_identity'] = profile.get('Entitlements', {}).get('application-identifier', '').endswith('.com.taybgo.driver')
+    expected_app = 'Z8ZLXJ9696.com.taybgo.driver'
+    checks['profile_identity'] = profile.get('Entitlements', {}).get('application-identifier') == expected_app
+    checks['signing_team'] = (profile.get('TeamIdentifier') == ['Z8ZLXJ9696']
+                              and entitlements.get('com.apple.developer.team-identifier') == 'Z8ZLXJ9696'
+                              and entitlements.get('application-identifier') == expected_app)
+    expiry = profile.get('ExpirationDate')
+    checks['profile_not_expired'] = isinstance(expiry, datetime) and expiry.replace(tzinfo=timezone.utc) > datetime.now(timezone.utc)
+    checks['profile_production_push'] = profile.get('Entitlements', {}).get('aps-environment') == 'production'
+    result = subprocess.run(['codesign', '-dvv', str(app)], capture_output=True, text=True)
+    checks['distribution_certificate'] = result.returncode == 0 and 'Authority=Apple Distribution:' in result.stderr
+    profile_summary = {'name': profile.get('Name'), 'uuid': profile.get('UUID'),
+                       'team': profile.get('TeamIdentifier'), 'expires': expiry.isoformat() if isinstance(expiry, datetime) else None}
+
 binary = app / info['CFBundleExecutable']
 arch = subprocess.run(['lipo', '-archs', str(binary)], capture_output=True, text=True)
 checks['arm64'] = arch.returncode == 0 and 'arm64' in arch.stdout.split()
@@ -57,7 +71,7 @@ report = {
     'app': str(app), 'signed_export_inspected': not args.unsigned,
     'version': info.get('CFBundleShortVersionString'), 'build': info.get('CFBundleVersion'),
     'minimum_os': info.get('MinimumOSVersion'), 'architectures': arch.stdout.strip(),
-    'checks': checks, 'privacy_manifests': privacy, 'entitlements': entitlements,
+    'checks': checks, 'privacy_manifests': privacy, 'entitlements': entitlements, 'profile': profile_summary,
     'binary_sha256': hashlib.sha256(binary.read_bytes()).hexdigest(),
     'limits': ['No physical-device, TestFlight, backend or store-console verification.',
                'Privacy plist syntax does not validate disclosure accuracy.',
