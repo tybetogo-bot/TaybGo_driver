@@ -12,7 +12,7 @@ Prepared October 11, 2026. This is a pre-Apple handoff, not a signed IPA or a cl
 - Current version/build: `1.0.16 (18)`. App Store Connect build history has not been checked; do not assume build 18 is unused.
 - Production: `com.taybgo.driver`, display name `TaybGo Driver`, `lib/main_prod.dart`, `https://taybgo.com/api`.
 - Development: `com.taybgo.driver.dev`, display name `TaybGo Driver Dev`, `lib/main_dev.dart`, `https://dev.taybgo.com/api`.
-- Apple team currently in source: `LJQDSCZM7A`; ownership/provisioning awaits Apple verification.
+- Apple team in source: `Z8ZLXJ9696`, supplied by the owner on October 11; signing identity/provisioning awaits Apple verification.
 - Toolchain used: Flutter 3.47.2 / Dart 3.13.2; Xcode 27.0 (27A266a).
 - Minimum iOS: 15.0. The installed Flutter engine's generated podspec requires 15.0; the previous 13.0 target failed dependency resolution.
 
@@ -41,7 +41,7 @@ Project: `drivertaybgo`, sender/project number `527527512549`.
 
 Both registrations were created and verified in the signed-in Firebase console. Previous `com.tybetogo.*` registrations were retained. The production plist was downloaded from Firebase; the development plist uses the downloaded project's configuration and the new development bundle/app IDs verified in the console because its download did not complete. Dart/native values agree.
 
-Firebase Cloud Messaging API v1 is enabled. Both new iOS registrations show **no development or production APNs key/certificate**. Actual delivery is not ready until suitable Apple APNs credentials are configured.
+Firebase Cloud Messaging API v1 is enabled. The owner supplied APNs key ID `5TTLPZXPX6` for team `Z8ZLXJ9696`, supporting sandbox and production. Credential upload and saved Firebase configuration are pending verification. The private `.p8` key remains outside the repository. Actual delivery still requires physical-device verification.
 
 Read-only inspection of local backend commit `4af71211b227e547626b91b9620625f96749e14b` found:
 
