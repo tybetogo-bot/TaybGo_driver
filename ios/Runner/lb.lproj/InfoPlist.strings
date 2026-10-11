@@ -1,0 +1,5 @@
+"NSLocationWhenInUseUsageDescription" = "TaybGo Driver benotzt däi Standuert fir Bestellungen an der Géigend ze weisen a Clienten d’Liwwerunge verfollegen ze loossen.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "TaybGo Driver benotzt däi Standuert wärend Liwwerungen, och wann d’App am Hannergrond leeft.";
+"NSCameraUsageDescription" = "TaybGo Driver benotzt d’Kamera fir Fotoe vu Fuererdokumenter a Liwwerungen ze maachen.";
+"NSPhotoLibraryUsageDescription" = "TaybGo Driver benotzt deng ausgewielte Fotoe fir Fuererdokumenter a Liwwerungsfotoen eropzelueden.";
+"NSLocationAlwaysUsageDescription" = "TaybGo Driver benotzt däi Standuert wärend Liwwerungen, och wann d’App am Hannergrond leeft.";

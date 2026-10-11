@@ -1,0 +1,5 @@
+"NSLocationWhenInUseUsageDescription" = "يستخدم TaybGo Driver موقعك لعرض الطلبات القريبة ومساعدة العملاء على تتبع التوصيل.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "يستخدم TaybGo Driver موقعك أثناء التوصيل، بما في ذلك عندما يعمل التطبيق في الخلفية.";
+"NSCameraUsageDescription" = "يستخدم TaybGo Driver الكاميرا لتصوير مستندات السائق وصور التوصيل.";
+"NSPhotoLibraryUsageDescription" = "يستخدم TaybGo Driver الصور التي تختارها لرفع مستندات السائق وصور التوصيل.";
+"NSLocationAlwaysUsageDescription" = "يستخدم TaybGo Driver موقعك أثناء التوصيل، بما في ذلك عندما يعمل التطبيق في الخلفية.";

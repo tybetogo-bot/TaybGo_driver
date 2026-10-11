@@ -45,19 +45,42 @@
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-	<!-- Background modes for location tracking and push notifications -->
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>location</string>
 		<string>remote-notification</string>
 		<string>fetch</string>
 	</array>
-	<!-- Location permissions for geolocator -->
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>TaybGo Driver needs your location to show you nearby orders and help customers track deliveries.</string>
 	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
 	<string>TaybGo Driver needs your location to show you nearby orders and help customers track deliveries, even when the app is in the background.</string>
 	<key>NSLocationAlwaysUsageDescription</key>
 	<string>TaybGo Driver needs your location to show you nearby orders and help customers track deliveries, even when the app is in the background.</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>UIWindowScene</string>
+					<key>UISceneDelegateClassName</key>
+					<string>$(PRODUCT_MODULE_NAME).SceneDelegate</string>
+					<key>UISceneConfigurationName</key>
+					<string>flutter</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>TaybGo Driver uses the camera to capture driver documents and delivery photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>TaybGo Driver uses your selected photos to upload driver documents and delivery photos.</string>
 </dict>
 </plist>

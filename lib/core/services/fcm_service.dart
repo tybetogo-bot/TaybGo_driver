@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:ui';
 
@@ -689,6 +690,20 @@ class FcmService {
         debugPrint('[FCM] Auto-init enabled for token retrieval');
       }
 
+      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+        String? apnsToken;
+        for (var attempt = 0; attempt < 10; attempt++) {
+          apnsToken = await _messagingInstance.getAPNSToken();
+          if (apnsToken != null) break;
+          await Future<void>.delayed(const Duration(milliseconds: 500));
+        }
+        if (apnsToken == null) {
+          debugPrint(
+            '[FCM] APNs token is not ready; registration will retry later',
+          );
+          return null;
+        }
+      }
       final token = await _messagingInstance.getToken();
       debugPrint('[FCM] Token: ${token?.substring(0, 20)}...');
       return token;
@@ -698,11 +713,24 @@ class FcmService {
     }
   }
 
-  void onTokenRefresh(void Function(String token) callback) {
-    _messagingInstance.onTokenRefresh.listen((token) {
+  StreamSubscription<String> onTokenRefresh(
+    void Function(String token) callback,
+  ) {
+    return _messagingInstance.onTokenRefresh.listen((token) {
       debugPrint('[FCM] Token refreshed: ${token.substring(0, 20)}...');
       callback(token);
     });
+  }
+
+  Future<void> stopPushForSignedOutUser() async {
+    _pendingNotificationTapData = null;
+    try {
+      await _messagingInstance.setAutoInitEnabled(false);
+      await _messagingInstance.deleteToken();
+    } catch (e) {
+      debugPrint('[FCM] Could not invalidate signed-out device token: $e');
+    }
+    await clearDeliveredNotifications();
   }
 
   Future<void> _handleForegroundMessage(RemoteMessage message) async {

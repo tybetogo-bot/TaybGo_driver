@@ -1,0 +1,5 @@
+"NSLocationWhenInUseUsageDescription" = "TaybGo Driver käyttää sijaintiasi lähellä olevien tilausten näyttämiseen ja toimitusten seurantaan.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "TaybGo Driver käyttää sijaintiasi toimitusten aikana myös sovelluksen ollessa taustalla.";
+"NSCameraUsageDescription" = "TaybGo Driver käyttää kameraa kuljettajan asiakirjojen ja toimitusten kuvaamiseen.";
+"NSPhotoLibraryUsageDescription" = "TaybGo Driver käyttää valitsemiasi kuvia kuljettajan asiakirjojen ja toimituskuvien lataamiseen.";
+"NSLocationAlwaysUsageDescription" = "TaybGo Driver käyttää sijaintiasi toimitusten aikana myös sovelluksen ollessa taustalla.";

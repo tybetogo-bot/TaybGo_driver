@@ -26,8 +26,8 @@ Or use the VSCode launch configurations: **Dev (Debug)** / **Prod (Debug)** from
 
 | Flavor | App Name   | Base URL                  | Bundle ID                    |
 |--------|------------|---------------------------|------------------------------|
-| `dev`  | TaybGo Driver Dev | `https://dev.taybgo.com/api` | `com.tybetogo.driver.dev`  |
-| `prod` | TaybGo Driver     | `https://taybgo.com/api`     | `com.tybetogo.driver`      |
+| `dev`  | TaybGo Driver Dev | `https://dev.taybgo.com/api` | `com.taybgo.driver.dev`  |
+| `prod` | TaybGo Driver     | `https://taybgo.com/api`     | `com.taybgo.driver`      |
 
 The flavor system works across all platforms:
 
@@ -59,7 +59,9 @@ flutter build ios --flavor prod --target lib/main_prod.dart --release \
 
 Android release builds validate this value before compilation. A missing or
 malformed key stops the build with a clear message instead of shipping an APK
-whose required address step cannot be completed.
+whose required address step cannot be completed. Use `scripts/build_ios_store.sh`
+for the signed iOS export; it enforces the same key requirement and the production
+flavor/target. See `docs/release/IOS_RELEASE_READINESS.md` for Apple and device checks.
 
 ## Features
 
