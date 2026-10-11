@@ -41,7 +41,7 @@ Project: `drivertaybgo`, sender/project number `527527512549`.
 
 Both registrations were created and verified in the signed-in Firebase console. Previous `com.tybetogo.*` registrations were retained. The production plist was downloaded from Firebase; the development plist uses the downloaded project's configuration and the new development bundle/app IDs verified in the console because its download did not complete. Dart/native values agree.
 
-Firebase Cloud Messaging API v1 is enabled. The owner supplied APNs key ID `5TTLPZXPX6` for team `Z8ZLXJ9696`, supporting sandbox and production. Credential upload and saved Firebase configuration are pending verification. The private `.p8` key remains outside the repository. Actual delivery still requires physical-device verification.
+Firebase Cloud Messaging API v1 is enabled. The owner supplied APNs key ID `5TTLPZXPX6` for team `Z8ZLXJ9696`, supporting sandbox and production. The production APNs slot for `com.taybgo.driver` was verified saved in Firebase with these IDs after the owner uploaded it. Its development/sandbox slot is empty; both slots for `com.taybgo.driver.dev` are also empty. The private `.p8` key remains outside the repository. Actual delivery still requires physical-device verification.
 
 Read-only inspection of local backend commit `4af71211b227e547626b91b9620625f96749e14b` found:
 
@@ -74,15 +74,17 @@ flutter build ios --release --no-codesign --no-pub \
 - The 1024px App Store icon has no alpha channel.
 - A signed Release build without the required Places define is rejected by `scripts/check_ios_release_config.sh`.
 
-The unsigned build intentionally omitted the unavailable Places key. It verifies compilation/resources, not a usable signup or distributable release. No signing, provisioning profile, production APNs entitlement, physical-device launch or TestFlight evidence was verified.
+The initial unsigned build omitted the Places key. After the owner supplied it, a second production build succeeded using `--dart-define-from-file=releases/config/ios-prod.json`. The local file is ignored by Git and mode 0600; the build script uses it by default. Google Places API (New) autocomplete returned five suggestions, and details returned an address and coordinates. The exact key was verified present in the compiled App framework without logging it. Evidence: `places-api-validation.json` and `unsigned-with-places-validation.json` in `build/ios/release-readiness/`. This verifies API access and compilation, not physical-device signup or a distributable release. No signing, provisioning profile, production APNs entitlement, physical-device launch or TestFlight evidence was verified.
+
+The local keychain has a valid Apple Development identity for team `Z8ZLXJ9696` (certificate expires October 10, 2027), but its only Apple Distribution identity belongs to another team (`9JVDMU4TKQ`). Distribution signing for the requested team remains to be configured through Apple.
 
 Existing Flutter localization gaps remain: Arabic has 81 untranslated messages; nine other non-English locales have 156 each and use the template fallback. Native permission strings were added separately; the full app is not claimed to be fully translated.
 
 ## Remaining before the final IPA
 
-1. Supply the approved production `GOOGLE_MAPS_API_KEY`. Driver signup requires selecting a Places suggestion with coordinates; without the key, that required step cannot be completed. Verify the actual Places APIs/restrictions with native signup/address QA. Do not substitute a Firebase API key merely because both are Google keys.
+1. Verify native signup/address selection on a physical iPhone using the supplied Places configuration. Direct autocomplete/details verification succeeded; actual app/device behavior remains unverified.
 2. Verify Apple team, App Store record, bundle ID, Push App ID capability, signing identity/private key, provisioning and next unused build number. Align `pubspec.yaml` and `ReleaseInfo` when choosing the final version/build.
-3. Configure APNs credentials for the new registrations, confirming team, key ID, scope/topic and production environment.
+3. Production APNs credentials are saved and verified for the production registration. Configure the still-empty sandbox slot and development registration when development push testing is required, confirming scope/topic compatibility. Production device delivery remains unverified.
 4. Build/export an App Store IPA with explicit production flavor/target, the Places define and verified export options. Choose `manageAppVersionAndBuildNumber` explicitly; record the command and source commit.
 5. Inspect final distribution signatures/profile/expiry, production push entitlement, disabled debugging, full package resources/manifests, architectures and final dSYM UUIDs. Compute IPA/symbol checksums and source/config manifest.
 6. Test driver password login/signup, session restore, dispatch acceptance/rejection, pickup/drop-off/navigation, background location, earnings, document uploads, deletion and denied permissions on a physical iPhone.
@@ -91,7 +93,7 @@ Existing Flutter localization gaps remain: Arabic has 81 untranslated messages; 
 9. Check truthful privacy disclosures/reasons, policy/support pages, reviewer access, export compliance, screenshots and other store metadata. Privacy plist syntax alone is insufficient.
 10. Upload only when authorized; confirm Apple processing, then perform TestFlight QA. Submission/publication are separate actions.
 
-For the final signed build, with verified Apple export options and key supplied through the environment:
+For the final signed build, with verified Apple export options and the ignored local production defines file (or an environment key override):
 
 ```sh
 sh scripts/build_ios_store.sh VERSION UNUSED_BUILD PATH_TO_EXPORT_OPTIONS_PLIST
