@@ -1840,6 +1840,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get changelogDateAug24 => '24 August 2026';
 
   @override
+  String get changelogVersion101618WebPlaces =>
+      'Address autocomplete on web now uses the supported Google Maps JavaScript API with compatibility fallback for existing Google Places projects.';
+
+  @override
+  String get changelogVersion101618AddressConfig =>
+      'Google Places configuration is centralized and supplied through the build environment without duplicating the key in Driver source files.';
+
+  @override
+  String get changelogVersion101618ReleaseGuard =>
+      'Android release builds now block missing or malformed Places configuration before an unusable APK or App Bundle can be produced.';
+
+  @override
+  String get changelogVersion101618Release =>
+      'Released TaybGo Driver version 1.0.16+18.';
+
+  @override
   String get changelogVersion101517Authentication =>
       'Driver sign-in now follows the live backend policy and automatically uses password or OTP authentication when enabled for the driver role.';
 

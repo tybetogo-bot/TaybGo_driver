@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/foundation.dart';
 import '../api/api_client.dart';
@@ -13,14 +14,21 @@ class NotificationProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   bool _isTokenRegistered = false;
+  StreamSubscription<String>? _tokenRefreshSubscription;
+  Timer? _registrationRetry;
+  int _pushSession = 0;
+  bool _pushActive = false;
+  Future<void>? _pushCleanup;
+  String? _registeredToken;
 
   NotificationProvider({
     NotificationService? notificationService,
     ApiClient? apiClient,
     FcmService? fcmService,
-  })  : _notificationService = notificationService ??
-            NotificationService(apiClient: apiClient ?? ApiClient()),
-        _fcmService = fcmService ?? FcmService();
+  }) : _notificationService =
+           notificationService ??
+           NotificationService(apiClient: apiClient ?? ApiClient()),
+       _fcmService = fcmService ?? FcmService();
 
   List<NotificationModel> get notifications => _notifications;
   bool get isLoading => _isLoading;
@@ -32,7 +40,9 @@ class NotificationProvider extends ChangeNotifier {
   List<NotificationModel> get todayNotifications {
     final now = DateTime.now();
     final todayStart = DateTime(now.year, now.month, now.day);
-    return _notifications.where((n) => n.createdAt.isAfter(todayStart)).toList();
+    return _notifications
+        .where((n) => n.createdAt.isAfter(todayStart))
+        .toList();
   }
 
   List<NotificationModel> get yesterdayNotifications {
@@ -40,50 +50,98 @@ class NotificationProvider extends ChangeNotifier {
     final todayStart = DateTime(now.year, now.month, now.day);
     final yesterdayStart = todayStart.subtract(const Duration(days: 1));
     return _notifications
-        .where((n) => n.createdAt.isAfter(yesterdayStart) && n.createdAt.isBefore(todayStart))
+        .where(
+          (n) =>
+              n.createdAt.isAfter(yesterdayStart) &&
+              n.createdAt.isBefore(todayStart),
+        )
         .toList();
   }
 
   List<NotificationModel> get earlierNotifications {
     final now = DateTime.now();
-    final yesterdayStart = DateTime(now.year, now.month, now.day).subtract(const Duration(days: 1));
-    return _notifications.where((n) => n.createdAt.isBefore(yesterdayStart)).toList();
+    final yesterdayStart = DateTime(
+      now.year,
+      now.month,
+      now.day,
+    ).subtract(const Duration(days: 1));
+    return _notifications
+        .where((n) => n.createdAt.isBefore(yesterdayStart))
+        .toList();
   }
 
   /// Retrieve the FCM token, register it with the backend, and listen for refreshes.
   /// Call this after the user is authenticated.
   Future<void> initializePushNotifications() async {
-    // Get current token and register
-    final token = await _fcmService.getToken();
-    debugPrint('[NotificationProvider] FCM token retrieved: ${token != null ? '${token.substring(0, 20)}...' : 'NULL'}');
-
-    if (token != null) {
-      final success = await registerDeviceToken(token);
-      debugPrint('[NotificationProvider] Token registration ${success ? 'SUCCEEDED' : 'FAILED'}');
-    } else {
-      debugPrint('[NotificationProvider] WARNING: No FCM token available — push notifications will not work');
-    }
-
-    // Re-register whenever the token rotates
-    _fcmService.onTokenRefresh((newToken) {
-      debugPrint('[NotificationProvider] Token rotated, re-registering...');
-      registerDeviceToken(newToken);
+    if (_pushActive) return;
+    _pushActive = true;
+    final session = ++_pushSession;
+    await _pushCleanup;
+    if (!_pushActive || session != _pushSession) return;
+    _tokenRefreshSubscription = _fcmService.onTokenRefresh((token) {
+      if (_pushActive && session == _pushSession) {
+        unawaited(registerDeviceToken(token));
+      }
     });
+    await _tryRegisterToken(session);
+  }
+
+  Future<void> _tryRegisterToken(int session) async {
+    final token = await _fcmService.getToken();
+    if (!_pushActive || session != _pushSession) return;
+    final registered = token != null && await registerDeviceToken(token);
+    if (!registered && _pushActive && session == _pushSession) {
+      _registrationRetry?.cancel();
+      _registrationRetry = Timer(const Duration(seconds: 30), () {
+        unawaited(_tryRegisterToken(session));
+      });
+    }
+  }
+
+  Future<void> stopPushNotifications() {
+    _pushActive = false;
+    ++_pushSession;
+    _registrationRetry?.cancel();
+    _registrationRetry = null;
+    unawaited(_tokenRefreshSubscription?.cancel());
+    _tokenRefreshSubscription = null;
+    final token = _registeredToken;
+    _registeredToken = null;
+    return _pushCleanup ??= _unregisterAndStop(token).whenComplete(() {
+      _pushCleanup = null;
+    });
+  }
+
+  Future<void> _unregisterAndStop(String? token) async {
+    if (token != null) {
+      try {
+        await _notificationService
+            .unregisterDeviceToken(token)
+            .timeout(const Duration(seconds: 5));
+      } catch (error) {
+        debugPrint('[NotificationProvider] Device unregister failed: $error');
+      }
+    }
+    // Invalidation also protects a shared device when the backend is offline.
+    await _fcmService.stopPushForSignedOutUser();
   }
 
   /// Register FCM device token with the server
   Future<bool> registerDeviceToken(String token) async {
+    final session = _pushSession;
     try {
       final deviceType = _getDeviceType();
 
       debugPrint('[NotificationProvider] Registering device token...');
       debugPrint('[NotificationProvider] Device type: $deviceType');
 
+      _registeredToken = token;
       await _notificationService.registerDeviceToken(
         token: token,
         deviceType: deviceType,
       );
 
+      if (session != _pushSession) return false;
       _isTokenRegistered = true;
       notifyListeners();
 
@@ -91,6 +149,7 @@ class NotificationProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       debugPrint('[NotificationProvider] Failed to register device token: $e');
+      if (session != _pushSession) return false;
       _error = e.toString();
       notifyListeners();
       return false;
@@ -108,7 +167,9 @@ class NotificationProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
 
-      debugPrint('[NotificationProvider] Fetched ${_notifications.length} notifications');
+      debugPrint(
+        '[NotificationProvider] Fetched ${_notifications.length} notifications',
+      );
     } catch (e) {
       _error = e.toString();
       _isLoading = false;
@@ -146,6 +207,7 @@ class NotificationProvider extends ChangeNotifier {
 
   /// Clear all notifications locally
   void clearAll() {
+    unawaited(stopPushNotifications());
     _notifications = [];
     _isTokenRegistered = false;
     _isLoading = false;
@@ -157,6 +219,15 @@ class NotificationProvider extends ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _pushActive = false;
+    ++_pushSession;
+    _registrationRetry?.cancel();
+    unawaited(_tokenRefreshSubscription?.cancel());
+    super.dispose();
   }
 
   String _getDeviceType() {

@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/route_constants.dart';
+import '../../../core/config/google_places_config.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/l10n/framework_locale_support.dart';
 import '../../../core/models/driver_address.dart';
@@ -31,10 +32,6 @@ class ApplicationScreen extends StatefulWidget {
 }
 
 class _ApplicationScreenState extends State<ApplicationScreen> {
-  static const _googleMapsApiKey = String.fromEnvironment(
-    'GOOGLE_MAPS_API_KEY',
-  );
-
   final _formKey = GlobalKey<FormState>();
   final _pageController = PageController();
   final _placesSearchController = TextEditingController();
@@ -159,8 +156,10 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   @override
   void initState() {
     super.initState();
-    if (_googleMapsApiKey.isNotEmpty) {
-      _placesService = GooglePlacesService(apiKey: _googleMapsApiKey);
+    if (GooglePlacesConfig.isConfigured) {
+      _placesService = GooglePlacesService(
+        apiKey: GooglePlacesConfig.apiKey.trim(),
+      );
     }
   }
 

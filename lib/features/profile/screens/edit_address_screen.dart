@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/config/google_places_config.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/models/driver_address.dart';
 import '../../../core/providers/driver_provider.dart';
@@ -19,9 +20,6 @@ class EditAddressScreen extends StatefulWidget {
 }
 
 class _EditAddressScreenState extends State<EditAddressScreen> {
-  static const _googleMapsApiKey = String.fromEnvironment(
-    'GOOGLE_MAPS_API_KEY',
-  );
   static const _existingAddressSelectionId = 'existing-profile-address';
 
   final _placesSearchController = TextEditingController();
@@ -45,8 +43,10 @@ class _EditAddressScreenState extends State<EditAddressScreen> {
   @override
   void initState() {
     super.initState();
-    if (_googleMapsApiKey.isNotEmpty) {
-      _placesService = GooglePlacesService(apiKey: _googleMapsApiKey);
+    if (GooglePlacesConfig.isConfigured) {
+      _placesService = GooglePlacesService(
+        apiKey: GooglePlacesConfig.apiKey.trim(),
+      );
     }
     _driverProvider = context.read<DriverProvider>();
     _driverProvider.addListener(_handleProfileChanged);

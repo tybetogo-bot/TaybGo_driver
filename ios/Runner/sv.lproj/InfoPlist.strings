@@ -1,0 +1,5 @@
+"NSLocationWhenInUseUsageDescription" = "TaybGo Driver använder din plats för att visa beställningar i närheten och låta kunder följa leveranser.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "TaybGo Driver använder din plats under leveranser, även när appen körs i bakgrunden.";
+"NSCameraUsageDescription" = "TaybGo Driver använder kameran för att fotografera förardokument och leveranser.";
+"NSPhotoLibraryUsageDescription" = "TaybGo Driver använder dina valda foton för att ladda upp förardokument och leveransfoton.";
+"NSLocationAlwaysUsageDescription" = "TaybGo Driver använder din plats under leveranser, även när appen körs i bakgrunden.";

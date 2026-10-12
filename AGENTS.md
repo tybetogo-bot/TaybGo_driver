@@ -58,7 +58,7 @@ Always specify both `--flavor` and `--target` together. The flavor controls nati
 
 ## Things to Watch Out For
 
-- `google-services.json` must contain clients for both `com.tybetogo.driver` and `com.tybetogo.driver.dev`
+- `google-services.json` must contain clients for both `com.taybgo.driver` and `com.taybgo.driver.dev`
 - iOS `Info.plist` uses `$(APP_DISPLAY_NAME)` build variable — set per Xcode build configuration
 - `flutter run` without `--flavor` will fail on Android since product flavors are defined
-- Running `main.dart` directly defaults to the dev environment
+- Running `main.dart` directly defaults to the prod environment

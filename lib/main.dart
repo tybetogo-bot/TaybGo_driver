@@ -3,7 +3,7 @@ import 'dart:ui';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
-import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb, kReleaseMode;
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
@@ -11,6 +11,7 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'firebase_options.dart';
 import 'core/config/app_config.dart';
+import 'core/services/notification_destination.dart';
 import 'core/l10n/app_localizations.dart';
 import 'core/l10n/framework_locale_support.dart';
 import 'core/theme/app_theme.dart';
@@ -26,16 +27,23 @@ import 'core/providers/public_config_provider.dart';
 import 'core/providers/earnings_provider.dart';
 import 'core/router/app_router.dart';
 import 'core/services/fcm_service.dart';
-import 'core/constants/route_constants.dart';
 import 'features/support/application/support_provider.dart';
 import 'shared/widgets/required_update_gate.dart';
 
 GoRouter? _router;
+AuthProvider? _notificationAuthProvider;
+String? _pendingNotificationDestination;
+bool _notificationNavigationScheduled = false;
 _NotificationCleanupObserver? _notificationCleanupObserver;
 bool _crashlyticsReady = false;
 
 Future<void> main() async {
   await runZonedGuarded(() async {
+    // Service diagnostics contain request bodies and account data. Keep them
+    // out of distributed builds; production failures are sent to Crashlytics.
+    if (kReleaseMode) {
+      debugPrint = (String? message, {int? wrapWidth}) {};
+    }
     WidgetsFlutterBinding.ensureInitialized();
 
     // Default to prod if main.dart is launched directly (no flavor entry-point)
@@ -62,7 +70,14 @@ Future<void> main() async {
         debugPrint('[Main] FCM web init failed: $e');
       });
     } else {
-      await fcmService.initialize();
+      try {
+        await fcmService.initialize();
+      } catch (error, stack) {
+        debugPrint('[Main] Notification initialization failed: $error');
+        if (_crashlyticsReady) {
+          unawaited(FirebaseCrashlytics.instance.recordError(error, stack));
+        }
+      }
     }
     _notificationCleanupObserver = _NotificationCleanupObserver(fcmService);
     WidgetsBinding.instance.addObserver(_notificationCleanupObserver!);
@@ -70,6 +85,8 @@ Future<void> main() async {
     // Initialize auth provider before running app
     final authProvider = AuthProvider();
     await authProvider.initialize();
+    _notificationAuthProvider = authProvider;
+    authProvider.addListener(_scheduleNotificationNavigation);
 
     final publicConfigProvider = PublicConfigProvider();
     await publicConfigProvider.initialize();
@@ -129,12 +146,30 @@ void _recordFatalError(Object error, StackTrace stack) {
   );
 }
 
-void _handleNotificationTap(Map<String, dynamic> _) {
-  final router = _router;
-  if (router == null) return;
+void _handleNotificationTap(Map<String, dynamic> data) {
+  _pendingNotificationDestination = notificationDestination(data);
+  _scheduleNotificationNavigation();
+}
 
-  unawaited(FcmService().clearDeliveredNotifications());
-  router.go(RouteConstants.home);
+void _scheduleNotificationNavigation() {
+  if (_pendingNotificationDestination == null ||
+      _notificationAuthProvider?.isAuthenticated != true ||
+      _notificationNavigationScheduled) {
+    return;
+  }
+  _notificationNavigationScheduled = true;
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _notificationNavigationScheduled = false;
+    final destination = _pendingNotificationDestination;
+    if (destination == null ||
+        _notificationAuthProvider?.isAuthenticated != true ||
+        _router == null) {
+      return;
+    }
+    _pendingNotificationDestination = null;
+    unawaited(FcmService().clearDeliveredNotifications());
+    _router!.go(destination);
+  });
 }
 
 class _NotificationCleanupObserver extends WidgetsBindingObserver {
@@ -177,9 +212,11 @@ class TaybGoDriverApp extends StatelessWidget {
     // Wire up logout callback so all providers clear on any logout
     // (including forced logout from expired tokens)
     authProvider.onBeforeLogoutCallback = () async {
+      await notificationProvider.stopPushNotifications();
       await driverProvider.markOfflineBeforeLogout();
     };
     authProvider.onLogoutCallback = () {
+      _pendingNotificationDestination = null;
       driverProvider.clearProfile();
       orderProvider.clearAll();
       earningsProvider.clearAll();

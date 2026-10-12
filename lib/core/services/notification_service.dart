@@ -17,23 +17,35 @@ class NotificationService {
     try {
       debugPrint('[NotificationService] === REGISTER DEVICE TOKEN REQUEST ===');
       debugPrint('[NotificationService] Endpoint: ${ApiConstants.deviceToken}');
-      debugPrint('[NotificationService] Data: {token: ${token.substring(0, 20)}..., device_type: $deviceType}');
+      debugPrint(
+        '[NotificationService] Data: {token: ${token.substring(0, 20)}..., device_type: $deviceType}',
+      );
 
       final response = await _apiClient.post(
         ApiConstants.deviceToken,
-        data: {
-          'token': token,
-          'device_type': deviceType,
-        },
+        data: {'token': token, 'device_type': deviceType},
       );
 
-      debugPrint('[NotificationService] === REGISTER DEVICE TOKEN RESPONSE ===');
+      debugPrint(
+        '[NotificationService] === REGISTER DEVICE TOKEN RESPONSE ===',
+      );
       debugPrint('[NotificationService] Status: ${response.statusCode}');
       debugPrint('[NotificationService] Data: ${response.data}');
     } on DioException catch (e) {
-      debugPrint('[NotificationService] Register Device Token Error: ${e.message}');
+      debugPrint(
+        '[NotificationService] Register Device Token Error: ${e.message}',
+      );
       debugPrint('[NotificationService] Error Response: ${e.response?.data}');
       throw ApiException.fromDioException(e);
+    }
+  }
+
+  /// Deactivate only this device token while the current user's session exists.
+  Future<void> unregisterDeviceToken(String token) async {
+    try {
+      await _apiClient.delete(ApiConstants.deviceToken, data: {'token': token});
+    } on DioException catch (error) {
+      throw ApiException.fromDioException(error);
     }
   }
 
@@ -41,7 +53,9 @@ class NotificationService {
   Future<List<NotificationModel>> getNotifications() async {
     try {
       debugPrint('[NotificationService] === GET NOTIFICATIONS REQUEST ===');
-      debugPrint('[NotificationService] Endpoint: ${ApiConstants.notifications}');
+      debugPrint(
+        '[NotificationService] Endpoint: ${ApiConstants.notifications}',
+      );
 
       final response = await _apiClient.get(ApiConstants.notifications);
 
@@ -51,7 +65,9 @@ class NotificationService {
 
       final List<dynamic> data = response.data as List<dynamic>;
       return data
-          .map((json) => NotificationModel.fromJson(json as Map<String, dynamic>))
+          .map(
+            (json) => NotificationModel.fromJson(json as Map<String, dynamic>),
+          )
           .toList();
     } on DioException catch (e) {
       debugPrint('[NotificationService] Get Notifications Error: ${e.message}');

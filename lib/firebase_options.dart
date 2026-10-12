@@ -50,19 +50,19 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions iosDev = FirebaseOptions(
     apiKey: 'AIzaSyCzOao6qpoVhY3mx27AyTroCm0P1qHK9xk',
-    appId: '1:527527512549:ios:ca0656279d66d881d1c70c',
+    appId: '1:527527512549:ios:11c5c441b1fb2de0d1c70c',
     messagingSenderId: '527527512549',
     projectId: 'drivertaybgo',
     storageBucket: 'drivertaybgo.firebasestorage.app',
-    iosBundleId: 'com.tybetogo.driver.dev',
+    iosBundleId: 'com.taybgo.driver.dev',
   );
 
   static const FirebaseOptions iosProd = FirebaseOptions(
     apiKey: 'AIzaSyCzOao6qpoVhY3mx27AyTroCm0P1qHK9xk',
-    appId: '1:527527512549:ios:00b7019ba2761a44d1c70c',
+    appId: '1:527527512549:ios:e08595c6813c6ac8d1c70c',
     messagingSenderId: '527527512549',
     projectId: 'drivertaybgo',
     storageBucket: 'drivertaybgo.firebasestorage.app',
-    iosBundleId: 'com.tybetogo.driver',
+    iosBundleId: 'com.taybgo.driver',
   );
 }

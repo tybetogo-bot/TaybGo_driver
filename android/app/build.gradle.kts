@@ -9,6 +9,7 @@ plugins {
 
 import java.util.Properties
 import java.io.FileInputStream
+import java.util.Base64
 
 val keystoreProperties = Properties()
 val keystorePropertiesFile = rootProject.file("key.properties")
@@ -86,4 +87,40 @@ dependencies {
 
 flutter {
     source = "../.."
+}
+
+fun decodedDartDefines(rawDefines: String?): Map<String, String> =
+    rawDefines
+        .orEmpty()
+        .split(',')
+        .mapNotNull { encoded ->
+            runCatching {
+                String(Base64.getDecoder().decode(encoded))
+            }.getOrNull()
+        }
+        .mapNotNull { define ->
+            val separator = define.indexOf('=')
+            if (separator <= 0) null
+            else define.substring(0, separator) to define.substring(separator + 1)
+        }
+        .toMap()
+
+// Never produce a release APK/App Bundle with a disabled address step.
+tasks.configureEach {
+    if (name.startsWith("compileFlutterBuild") && name.endsWith("Release")) {
+        doFirst {
+            val googlePlacesApiKey = decodedDartDefines(
+                project.findProperty("dart-defines")?.toString(),
+            )["GOOGLE_MAPS_API_KEY"]?.trim()
+            if (
+                googlePlacesApiKey == null ||
+                !Regex("^AIza[0-9A-Za-z_-]{20,}$").matches(googlePlacesApiKey)
+            ) {
+                throw GradleException(
+                    "Release build blocked: GOOGLE_MAPS_API_KEY is missing or invalid. " +
+                        "Use --dart-define=GOOGLE_MAPS_API_KEY=YOUR_KEY.",
+                )
+            }
+        }
+    }
 }

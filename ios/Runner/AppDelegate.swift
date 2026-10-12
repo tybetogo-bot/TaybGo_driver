@@ -1,12 +1,12 @@
 import Flutter
 import UIKit
 import FirebaseCore
-import FirebaseMessaging
+import firebase_messaging
 import CoreLocation
 import flutter_local_notifications
 
 @main
-@objc class AppDelegate: FlutterAppDelegate {
+@objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
   private var locationPermissionBridge: LocationPermissionBridge?
 
   override func application(
@@ -17,32 +17,24 @@ import flutter_local_notifications
       GeneratedPluginRegistrant.register(with: registry)
     }
 
-    FirebaseApp.configure()
-
-    // Set up push notifications
-    if #available(iOS 10.0, *) {
-      UNUserNotificationCenter.current().delegate = self
+    if FirebaseApp.app() == nil {
+      FirebaseApp.configure()
     }
 
-    application.registerForRemoteNotifications()
-
-    GeneratedPluginRegistrant.register(with: self)
-
-    if let controller = window?.rootViewController as? FlutterViewController {
-      let channel = FlutterMethodChannel(
-        name: "com.taybgo.driver/location_permissions",
-        binaryMessenger: controller.binaryMessenger
-      )
-      locationPermissionBridge = LocationPermissionBridge(channel: channel)
-    }
+    // UIScene registers plugins after launch. Set the Messaging delegate before
+    // launch returns, as required by FlutterFire's UIScene integration.
+    FLTFirebaseMessagingPlugin.configureNotificationCenterDelegate()
 
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 
-  override func application(_ application: UIApplication,
-                            didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-    Messaging.messaging().apnsToken = deviceToken
-    super.application(application, didRegisterForRemoteNotificationsWithDeviceToken: deviceToken)
+  func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
+    GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    let channel = FlutterMethodChannel(
+      name: "com.taybgo.driver/location_permissions",
+      binaryMessenger: engineBridge.applicationRegistrar.messenger()
+    )
+    locationPermissionBridge = LocationPermissionBridge(channel: channel)
   }
 }
 

@@ -32,9 +32,11 @@ class ApiClient {
 
     _authInterceptor = _AuthInterceptor(_dio, _tokenStorage, this);
     _dio.interceptors.add(_authInterceptor);
-    _dio.interceptors.add(
-      LogInterceptor(requestBody: true, responseBody: true, error: true),
-    );
+    if (kDebugMode) {
+      _dio.interceptors.add(
+        LogInterceptor(requestBody: true, responseBody: true, error: true),
+      );
+    }
   }
 
   Dio get dio => _dio;
@@ -74,8 +76,8 @@ class ApiClient {
     return _dio.patch<T>(path, data: data, options: options);
   }
 
-  Future<Response<T>> delete<T>(String path, {Options? options}) {
-    return _dio.delete<T>(path, options: options);
+  Future<Response<T>> delete<T>(String path, {dynamic data, Options? options}) {
+    return _dio.delete<T>(path, data: data, options: options);
   }
 }
 
