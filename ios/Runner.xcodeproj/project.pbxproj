@@ -22,6 +22,8 @@
 		C447F2313FDC382B00C60E5D /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 59A51E26818A5BC1C205102F /* InfoPlist.strings */; };
 		CD79846F6A794627286E4129 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E3565CB701829FC654BF04CF /* Pods_RunnerTests.framework */; };
 		F40D17D9858E3FE49D1BA72F /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 6955C537C32E2E5B39D40EAF /* Pods_Runner.framework */; };
+		48A175F52D99411185FDC79F /* signal_4.wav in Resources */ = {isa = PBXBuildFile; fileRef = CC37E2A82C604E98866CB94A /* signal_4.wav */; };
+		688031C1A8424155AA5F9551 /* signal_5.wav in Resources */ = {isa = PBXBuildFile; fileRef = FFBB213A2D2E45B19E933823 /* signal_5.wav */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -105,6 +107,8 @@
 		E53B5F9E3CDBA6883C18FD74 /* Pods-Runner.profile-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile-dev.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile-dev.xcconfig"; sourceTree = "<group>"; };
 		E60481075FA4D2D0C427A7D5 /* fr */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.strings; name = fr; path = fr.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		FBBCA248CFF90E5E3974686A /* Pods-RunnerTests.release-dev.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RunnerTests.release-dev.xcconfig"; path = "Target Support Files/Pods-RunnerTests/Pods-RunnerTests.release-dev.xcconfig"; sourceTree = "<group>"; };
+		CC37E2A82C604E98866CB94A /* signal_4.wav */ = {isa = PBXFileReference; includeInIndex = 1; path = signal_4.wav; sourceTree = "<group>"; };
+		FFBB213A2D2E45B19E933823 /* signal_5.wav */ = {isa = PBXFileReference; includeInIndex = 1; path = signal_5.wav; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -216,6 +220,8 @@
 				489143EF9CE3C956C44F5CFF /* signal_1.wav */,
 				A200DA587C70745141AE55EA /* signal_2.wav */,
 				437EAAD8C86496F7E929241C /* signal_3.wav */,
+				FFBB213A2D2E45B19E933823 /* signal_5.wav */,
+				CC37E2A82C604E98866CB94A /* signal_4.wav */,
 				59A51E26818A5BC1C205102F /* InfoPlist.strings */,
 			);
 			path = Runner;
@@ -358,6 +364,8 @@
 				2FFC55B46D0A01672602BE8D /* signal_1.wav in Resources */,
 				1E2F242860F0C9C76CB957E7 /* signal_2.wav in Resources */,
 				B7C82C7EEE987EE6A1BC809F /* signal_3.wav in Resources */,
+				688031C1A8424155AA5F9551 /* signal_5.wav in Resources */,
+				48A175F52D99411185FDC79F /* signal_4.wav in Resources */,
 				C447F2313FDC382B00C60E5D /* InfoPlist.strings in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

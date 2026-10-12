@@ -1,3 +1,5 @@
+Latest build: **1.0.16+20**. See [signal 5 release](IOS_SIGNAL5_RELEASE.md) and [backend PR #87](https://github.com/tybetogo-bot/backend/pull/87). Build 20 adds missing sound resources; the older build evidence below is historical.
+
 Latest build: **1.0.16+19**. See [UIScene, push and Places audit](IOS_SCENE_PUSH_AUDIT.md) for the follow-up fixes, final artifact verification and remaining real-device checks. The build 18 evidence below is historical.
 
 # TaybGo Driver iOS release readiness

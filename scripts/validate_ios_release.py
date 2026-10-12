@@ -26,7 +26,7 @@ checks['firebase_identity'] = (
 )
 scene = info.get('UIApplicationSceneManifest', {}).get('UISceneConfigurations', {}).get('UIWindowSceneSessionRoleApplication', [])
 checks['scene'] = any(s.get('UISceneDelegateClassName', '').endswith('.SceneDelegate') for s in scene)
-checks['sounds'] = all((app / f'signal_{n}.wav').is_file() for n in range(1, 4))
+checks['sounds'] = all((app / f'signal_{n}.wav').is_file() for n in range(1, 6))
 checks['flutter_assets'] = (app / 'Frameworks/App.framework/flutter_assets').is_dir()
 checks['location_permissions'] = all(info.get(k) for k in ['NSLocationWhenInUseUsageDescription', 'NSLocationAlwaysAndWhenInUseUsageDescription'])
 checks['camera_photo_permissions'] = all(info.get(k) for k in ['NSCameraUsageDescription', 'NSPhotoLibraryUsageDescription'])

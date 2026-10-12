@@ -1,6 +1,6 @@
 class ReleaseInfo {
   ReleaseInfo._();
 
-  static const String version = '1.0.16+19';
-  static const String releaseDate = '11 October 2026';
+  static const String version = '1.0.16+20';
+  static const String releaseDate = '12 October 2026';
 }
