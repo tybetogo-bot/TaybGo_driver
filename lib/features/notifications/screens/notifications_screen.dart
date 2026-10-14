@@ -518,7 +518,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
           TextButton(
             onPressed: () {
               Navigator.pop(context);
-              provider.clearAll();
+              provider.clearInbox();
             },
             child: Text(l10n.confirm, style: const TextStyle(color: Colors.red)),
           ),

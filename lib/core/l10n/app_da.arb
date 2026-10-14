@@ -560,5 +560,8 @@
   "changelogVersion0910Crashlytics": "Tilføjede Crashlytics-rapportering af alvorlige fejl i release-builds.",
   "changelogVersion0910Notifications": "Forbedrede notifikationernes livscyklus, deduplikering og håndtering af ordre-notifikationer.",
   "changelogVersion0910Platform": "Opdaterede releasekonfigurationen for Android, iOS, macOS og web med udviklings- og produktionsflavors.",
-  "changelogVersion0910Release": "Udgav driverappen i version 1.0.9+10."
+  "changelogVersion0910Release": "Udgav driverappen i version 1.0.9+10.",
+  "notificationsAllRead": "Alt læst",
+  "notificationsNewCount": "{count} nye",
+  "notificationsUnreadCount": "{count} ulæste notifikationer"
 }

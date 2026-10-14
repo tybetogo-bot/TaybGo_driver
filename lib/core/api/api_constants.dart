@@ -39,5 +39,6 @@ class ApiConstants {
 
   // Notifications
   static const String notifications = '/notifications';
+  static String notificationDetail(int id) => '$notifications/$id';
   static const String deviceToken = '/notifications/device';
 }

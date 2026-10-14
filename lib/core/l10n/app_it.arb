@@ -560,5 +560,8 @@
   "changelogVersion0910Crashlytics": "Aggiunta la segnalazione Crashlytics degli errori irreversibili nelle build di rilascio.",
   "changelogVersion0910Notifications": "Migliorati il ciclo di vita delle notifiche, la deduplicazione e la gestione delle notifiche degli ordini.",
   "changelogVersion0910Platform": "Aggiornata la configurazione di rilascio per Android, iOS, macOS e web con flavor di sviluppo e produzione.",
-  "changelogVersion0910Release": "L'app per autisti è stata rilasciata nella versione 1.0.9+10."
+  "changelogVersion0910Release": "L'app per autisti è stata rilasciata nella versione 1.0.9+10.",
+  "notificationsAllRead": "Tutte lette",
+  "notificationsNewCount": "{count} nuove",
+  "notificationsUnreadCount": "{count} notifiche non lette"
 }

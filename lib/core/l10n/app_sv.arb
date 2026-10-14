@@ -560,5 +560,8 @@
   "changelogVersion0910Crashlytics": "Crashlytics-rapportering för allvarliga fel i releaseversioner lades till.",
   "changelogVersion0910Notifications": "Notifieringarnas livscykel, dubbletthantering och hanteringen av ordernotiser förbättrades.",
   "changelogVersion0910Platform": "Releasekonfigurationen för Android, iOS, macOS och webben uppdaterades med utvecklings- och produktionsflavors.",
-  "changelogVersion0910Release": "Förarappen släpptes i version 1.0.9+10."
+  "changelogVersion0910Release": "Förarappen släpptes i version 1.0.9+10.",
+  "notificationsAllRead": "Allt läst",
+  "notificationsNewCount": "{count} nya",
+  "notificationsUnreadCount": "{count} olästa aviseringar"
 }

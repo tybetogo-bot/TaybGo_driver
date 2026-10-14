@@ -22,6 +22,8 @@ import '../../orders/utils/order_presentation.dart';
 import '../../tour/widgets/tour_welcome_card.dart';
 import '../../tour/tour_keys.dart';
 import '../utils/home_earnings_date_filter.dart';
+import '../widgets/notification_unread_pill.dart';
+import '../../../core/services/fcm_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -52,6 +54,8 @@ class _HomeScreenState extends State<HomeScreen>
   static bool get _batteryOptimizationWarningEnabled => false;
   OrderProvider? _orderProvider;
   Timer? _refreshTimer;
+  Timer? _notificationRefreshTimer;
+  StreamSubscription<void>? _notificationMessages;
   final BatteryOptimizationService _batteryOptimizationService =
       BatteryOptimizationService();
   late final EarningsService _homeEarningsService = EarningsService(
@@ -92,6 +96,17 @@ class _HomeScreenState extends State<HomeScreen>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final notifications = context.read<NotificationProvider>();
+      unawaited(notifications.fetchNotifications(silent: true));
+      _notificationRefreshTimer = Timer.periodic(const Duration(seconds: 30), (
+        _,
+      ) {
+        unawaited(notifications.fetchNotifications(silent: true));
+      });
+      _notificationMessages = FcmService().foregroundMessages.listen((_) {
+        if (mounted) unawaited(notifications.fetchNotifications(silent: true));
+      });
       _orderProvider = context.read<OrderProvider>();
       final driverProvider = context.read<DriverProvider>();
       final tourProvider = context.read<TourProvider>();
@@ -170,6 +185,7 @@ class _HomeScreenState extends State<HomeScreen>
       orderProvider.checkActiveOrder(),
       driverProvider.fetchProfile(),
       _fetchHomeEarnings(),
+      context.read<NotificationProvider>().fetchNotifications(silent: true),
     ]);
 
     if (!mounted) return;
@@ -315,6 +331,7 @@ class _HomeScreenState extends State<HomeScreen>
       _orderProvider!.fetchOrderHistory(),
       _orderProvider!.checkActiveOrder(),
       _fetchHomeEarnings(),
+      context.read<NotificationProvider>().fetchNotifications(silent: true),
       driverProvider.fetchProfile().then((_) {
         final profile = driverProvider.profile;
         if (profile != null) {
@@ -729,6 +746,8 @@ class _HomeScreenState extends State<HomeScreen>
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     _refreshTimer?.cancel();
+    _notificationRefreshTimer?.cancel();
+    unawaited(_notificationMessages?.cancel());
     _orderProvider?.onNewOrderReceived = null;
     _slideController.dispose();
     _glowController.dispose();
@@ -832,22 +851,27 @@ class _HomeScreenState extends State<HomeScreen>
                                 ),
                         ),
                         const SizedBox(width: 8),
-                        Container(
-                          width: 40,
-                          height: 40,
-                          decoration: BoxDecoration(
-                            color: surfaceColor,
-                            borderRadius: BorderRadius.circular(10),
+                        Selector<NotificationProvider, (int, bool)>(
+                          selector: (_, provider) => (
+                            provider.unreadCount,
+                            provider.hasLoadedNotifications,
                           ),
-                          child: IconButton(
-                            icon: Icon(
-                              Icons.notifications_none,
-                              color: secondaryColor,
-                              size: 22,
-                            ),
-                            onPressed: () =>
-                                context.push(RouteConstants.notifications),
-                          ),
+                          builder: (context, inbox, _) =>
+                              NotificationUnreadPill(
+                                unreadCount: inbox.$1,
+                                isReady: inbox.$2,
+                                onPressed: () async {
+                                  await context.push(
+                                    RouteConstants.notifications,
+                                  );
+                                  if (!context.mounted) return;
+                                  unawaited(
+                                    context
+                                        .read<NotificationProvider>()
+                                        .fetchNotifications(silent: true),
+                                  );
+                                },
+                              ),
                         ),
                       ],
                     ),

@@ -45,6 +45,7 @@ class LocationService {
 
   StreamSubscription<Position>? _positionStream;
   Position? _lastPosition;
+  int _trackingGeneration = 0;
 
   Position? get lastPosition => _lastPosition;
 
@@ -104,12 +105,18 @@ class LocationService {
 
   /// Get current location (with permission check)
   Future<LocationResult> getCurrentLocation() async {
+    final generation = _trackingGeneration;
+    bool isCurrent() => generation == _trackingGeneration;
+    LocationResult cancelled() =>
+        LocationResult(success: false, message: 'Location lookup cancelled.');
     // Check permission first
     final status = await checkPermission();
+    if (!isCurrent()) return cancelled();
 
     if (!status.hasForegroundAccess) {
       // Try to request permission
       final requestStatus = await requestPermission();
+      if (!isCurrent()) return cancelled();
       if (!requestStatus.hasForegroundAccess) {
         return LocationResult(
           success: false,
@@ -136,25 +143,30 @@ class LocationService {
         timeLimit: timeout,
       );
 
+      final currentStatus = await checkPermission();
+      if (!isCurrent()) return cancelled();
       _lastPosition = position;
       debugPrint('Got location: ${position.latitude}, ${position.longitude}');
 
       return LocationResult(
         success: true,
         position: position,
-        status: await checkPermission(),
+        status: currentStatus,
       );
     } on TimeoutException {
+      if (!isCurrent()) return cancelled();
       debugPrint('Location timeout');
       // getLastKnownPosition doesn't work on web, so only try on mobile
       if (!kIsWeb) {
         final lastKnown = await Geolocator.getLastKnownPosition();
+        final currentStatus = await checkPermission();
+        if (!isCurrent()) return cancelled();
         if (lastKnown != null) {
           _lastPosition = lastKnown;
           return LocationResult(
             success: true,
             position: lastKnown,
-            status: await checkPermission(),
+            status: currentStatus,
           );
         }
       }
@@ -163,6 +175,7 @@ class LocationService {
         message: 'Location timeout. Please enable location in your browser.',
       );
     } catch (e) {
+      if (!isCurrent()) return cancelled();
       debugPrint('Error getting location: $e');
       return LocationResult(
         success: false,
@@ -177,6 +190,7 @@ class LocationService {
     void Function(String error)? onError,
   }) {
     stopLocationUpdates();
+    final generation = _trackingGeneration;
 
     late final LocationSettings locationSettings;
 
@@ -218,6 +232,7 @@ class LocationService {
     _positionStream =
         Geolocator.getPositionStream(locationSettings: locationSettings).listen(
           (Position position) {
+            if (generation != _trackingGeneration) return;
             debugPrint('[LocationService] === POSITION STREAM EVENT ===');
             debugPrint(
               '[LocationService] New position: ${position.latitude}, ${position.longitude}',
@@ -240,6 +255,7 @@ class LocationService {
             onLocationUpdate(position);
           },
           onError: (error) {
+            if (generation != _trackingGeneration) return;
             debugPrint('[LocationService] === LOCATION STREAM ERROR ===');
             debugPrint('[LocationService] Error: $error');
             onError?.call('Location tracking error');
@@ -250,6 +266,8 @@ class LocationService {
 
   /// Stop location updates
   void stopLocationUpdates() {
+    ++_trackingGeneration;
+    _lastPosition = null;
     if (_positionStream != null) {
       debugPrint('[LocationService] === STOPPING LOCATION STREAM ===');
     }

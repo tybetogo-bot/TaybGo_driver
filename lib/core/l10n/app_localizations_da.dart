@@ -2000,4 +2000,17 @@ class AppLocalizationsDa extends AppLocalizations {
   @override
   String get changelogVersion0910Release =>
       'Udgav driverappen i version 1.0.9+10.';
+
+  @override
+  String get notificationsAllRead => 'Alt læst';
+
+  @override
+  String notificationsNewCount(String count) {
+    return '$count nye';
+  }
+
+  @override
+  String notificationsUnreadCount(int count) {
+    return '$count ulæste notifikationer';
+  }
 }

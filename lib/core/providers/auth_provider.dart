@@ -1,8 +1,9 @@
+import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../l10n/app_localizations.dart';
 import '../services/auth_service.dart';
-import '../services/cache_service.dart';
+import '../api/session_lifecycle.dart';
 import '../api/api_client.dart';
 
 const _onboardingCompleteKey = 'onboarding_complete';
@@ -30,7 +31,11 @@ class AuthProvider extends ChangeNotifier {
 
   /// Called when logout happens (including forced logout from token expiry)
   /// so other providers can clear their in-memory data.
-  VoidCallback? onLogoutCallback;
+  Future<void> Function()? onLogoutCallback;
+  VoidCallback? onLogoutStarted;
+  Future<void>? _logoutFuture;
+  int _authOperation = 0;
+  SessionLifecycle get session => _authService.apiClient.session;
   Future<void> Function()? onBeforeLogoutCallback;
 
   AuthProvider({
@@ -38,17 +43,7 @@ class AuthProvider extends ChangeNotifier {
     String appTargetRole = driverTargetRole,
   }) : _authService = authService ?? AuthService(),
        _appTargetRole = appTargetRole {
-    // Set up callback for token refresh failures
-    _authService.setTokenRefreshFailedCallback(() {
-      debugPrint(
-        '[AuthProvider] Token refresh failed callback - forcing logout',
-      );
-      onLogoutCallback?.call();
-      _status = AuthStatus.unauthenticated;
-      _phoneNumber = null;
-      _isNewUser = false;
-      notifyListeners();
-    });
+    _authService.setTokenRefreshFailedCallback(() => logout(forced: true));
   }
 
   AuthStatus get status => _status;
@@ -80,7 +75,18 @@ class AuthProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     _onboardingComplete = prefs.getBool(_onboardingCompleteKey) ?? false;
 
-    final hasTokens = await _authService.isAuthenticated();
+    final operation = _authOperation;
+    bool hasTokens;
+    try {
+      hasTokens = await _authService.isAuthenticated();
+    } catch (_) {
+      hasTokens = await _authService.apiClient.tokenStorage.hasTokens();
+    }
+    if (operation != _authOperation) {
+      _initialized = true;
+      notifyListeners();
+      return;
+    }
     _status = hasTokens ? AuthStatus.authenticated : AuthStatus.unauthenticated;
 
     _initialized = true;
@@ -88,7 +94,14 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> checkAuthStatus() async {
-    final hasTokens = await _authService.isAuthenticated();
+    final operation = _authOperation;
+    bool hasTokens;
+    try {
+      hasTokens = await _authService.isAuthenticated();
+    } catch (_) {
+      hasTokens = await _authService.apiClient.tokenStorage.hasTokens();
+    }
+    if (operation != _authOperation) return;
     _status = hasTokens ? AuthStatus.authenticated : AuthStatus.unauthenticated;
     notifyListeners();
   }
@@ -101,6 +114,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> requestOtp(String phoneNumber) async {
+    final operation = ++_authOperation;
     final targetRole = _otpTargetRole ?? _appTargetRole;
 
     _isLoading = true;
@@ -117,6 +131,7 @@ class AuthProvider extends ChangeNotifier {
         phoneNumber: phoneNumber,
         targetRole: targetRole,
       );
+      if (operation != _authOperation) return false;
       debugPrint(
         '[AuthProvider] OTP response received - debugOtp: ${response.debugOtp}',
       );
@@ -125,12 +140,14 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } on ApiException catch (e) {
+      if (operation != _authOperation) return false;
       debugPrint('[AuthProvider] ApiException: ${e.message}');
       _setOtpError(e);
       _isLoading = false;
       notifyListeners();
       return false;
     } catch (e) {
+      if (operation != _authOperation) return false;
       debugPrint('[AuthProvider] Unknown error: $e');
       _error = 'Failed to send OTP. Please try again.';
       _errorCode = null;
@@ -141,6 +158,8 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<bool> loginWithPassword(String phoneNumber, String password) async {
+    if (_logoutFuture != null) await _logoutFuture;
+    final operation = ++_authOperation;
     _isLoading = true;
     _error = null;
     _errorCode = null;
@@ -152,17 +171,20 @@ class AuthProvider extends ChangeNotifier {
         phoneNumber: phoneNumber,
         password: password,
       );
+      if (operation != _authOperation) return false;
       _isNewUser = response.isNewUser;
       _status = AuthStatus.authenticated;
       _isLoading = false;
       notifyListeners();
       return true;
     } on ApiException catch (e) {
+      if (operation != _authOperation) return false;
       _error = e.message;
       _isLoading = false;
       notifyListeners();
       return false;
     } catch (e) {
+      if (operation != _authOperation) return false;
       _error = 'Failed to sign in. Please try again.';
       _isLoading = false;
       notifyListeners();
@@ -177,6 +199,8 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
 
+    if (_logoutFuture != null) await _logoutFuture;
+    final operation = ++_authOperation;
     _isLoading = true;
     _error = null;
     _errorCode = null;
@@ -190,17 +214,20 @@ class AuthProvider extends ChangeNotifier {
         targetRole: targetRole,
       );
 
+      if (operation != _authOperation) return false;
       _isNewUser = response.isNewUser;
       _status = AuthStatus.authenticated;
       _isLoading = false;
       notifyListeners();
       return true;
     } on ApiException catch (e) {
+      if (operation != _authOperation) return false;
       _setOtpError(e);
       _isLoading = false;
       notifyListeners();
       return false;
     } catch (e) {
+      if (operation != _authOperation) return false;
       _error = 'Failed to verify OTP. Please try again.';
       _errorCode = null;
       _isLoading = false;
@@ -209,41 +236,65 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> logout() async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      await onBeforeLogoutCallback?.call();
-    } catch (e) {
-      debugPrint('[AuthProvider] Error during pre-logout hook: $e');
-    }
-
-    try {
-      await _authService.logout();
-    } catch (e) {
-      debugPrint('[AuthProvider] Error during logout API call: $e');
-    }
-
-    // Clear all cache and saved data
-    try {
-      await CacheService.clearAllCache();
-    } catch (e) {
-      debugPrint('[AuthProvider] Error clearing cache: $e');
-    }
-
-    // Notify other providers to clear their in-memory data
-    onLogoutCallback?.call();
-
+  Future<void> logout({bool forced = false}) {
+    if (_logoutFuture != null) return _logoutFuture!;
+    final completion = Completer<void>();
+    _logoutFuture = completion.future;
+    session.cleanup = completion.future;
+    final generation = session.beginLogout();
+    ++_authOperation;
     _status = AuthStatus.unauthenticated;
+    _isLoading = true;
     _phoneNumber = null;
     _otpTargetRole = null;
     _isNewUser = false;
-    _isLoading = false;
+    _debugOtp = null;
+    try {
+      onLogoutStarted?.call();
+    } catch (e) {
+      debugPrint('[AuthProvider] Immediate logout cleanup failed: $e');
+    }
     notifyListeners();
+    unawaited(() async {
+      try {
+        if (!forced) {
+          try {
+            await onBeforeLogoutCallback?.call();
+          } catch (e) {
+            debugPrint('[AuthProvider] Pre-logout cleanup failed: $e');
+          }
+          await _authService.logout().timeout(const Duration(seconds: 5));
+        }
+      } catch (e) {
+        debugPrint('[AuthProvider] Logout request failed: $e');
+      } finally {
+        try {
+          await session.writeIfCurrent(
+            generation,
+            _authService.apiClient.tokenStorage.clearTokens,
+          );
+        } catch (e) {
+          debugPrint('[AuthProvider] Credential deletion failed: $e');
+        }
+        try {
+          // Both logout paths await local SDK cleanup and account clearing.
+          await onLogoutCallback?.call();
+        } catch (e) {
+          debugPrint('[AuthProvider] Local logout cleanup failed: $e');
+        } finally {
+          _isLoading = false;
+          _logoutFuture = null;
+          session.cleanup = null;
+          notifyListeners();
+          completion.complete();
+        }
+      }
+    }());
+    return completion.future;
   }
 
   Future<void> deleteAccount() async {
+    final operation = ++_authOperation;
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -251,7 +302,9 @@ class AuthProvider extends ChangeNotifier {
     try {
       debugPrint('[AuthProvider] Deleting account');
       await _authService.deleteAccount();
+      if (operation != _authOperation) return;
 
+      await logout(forced: true);
       // Clear all user state
       _status = AuthStatus.unauthenticated;
       _phoneNumber = null;
@@ -267,6 +320,8 @@ class AuthProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     } on ApiException catch (e) {
+      if (operation != _authOperation) return;
+      await logout(forced: true);
       debugPrint('[AuthProvider] Delete account error: ${e.message}');
       _error = e.message;
       _isLoading = false;
@@ -274,6 +329,8 @@ class AuthProvider extends ChangeNotifier {
       notifyListeners();
       rethrow;
     } catch (e) {
+      if (operation != _authOperation) return;
+      await logout(forced: true);
       debugPrint('[AuthProvider] Unknown error during account deletion: $e');
       _error = 'Failed to delete account. Please try again.';
       _isLoading = false;
@@ -299,7 +356,7 @@ class AuthProvider extends ChangeNotifier {
   /// Call this when catching exceptions from API calls
   Future<void> handleAuthenticationError() async {
     debugPrint('[AuthProvider] Handling authentication error - forcing logout');
-    await logout();
+    await logout(forced: true);
   }
 
   void _setOtpError(ApiException exception) {

@@ -518,5 +518,8 @@
   "changelogVersion0910Crashlytics": "Crashlytics-Berichte für schwerwiegende Fehler in Release-Builds wurden hinzugefügt.",
   "changelogVersion0910Notifications": "Benachrichtigungsabläufe, Duplikaterkennung und die Verarbeitung von Bestellbenachrichtigungen wurden verbessert.",
   "changelogVersion0910Platform": "Die Release-Konfiguration für Android, iOS, macOS und Web wurde mit Entwicklungs- und Produktions-Flavors aktualisiert.",
-  "changelogVersion0910Release": "Die Fahrer-App wurde in Version 1.0.9+10 veröffentlicht."
+  "changelogVersion0910Release": "Die Fahrer-App wurde in Version 1.0.9+10 veröffentlicht.",
+  "notificationsAllRead": "Alle gelesen",
+  "notificationsNewCount": "{count} neu",
+  "notificationsUnreadCount": "{count} ungelesene Benachrichtigungen"
 }

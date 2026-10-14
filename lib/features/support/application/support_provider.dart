@@ -4,6 +4,8 @@ import '../data/models/support_ticket_model.dart';
 import '../data/repositories/support_repository.dart';
 
 class SupportProvider extends ChangeNotifier {
+  int _stateGeneration = 0;
+
   final SupportRepository _repository;
 
   SupportProvider({SupportRepository? repository, ApiClient? apiClient})
@@ -79,6 +81,7 @@ class SupportProvider extends ChangeNotifier {
 
   /// Fetch tickets (first page)
   Future<void> fetchTickets() async {
+    final generation = _stateGeneration;
     _isLoading = true;
     _error = null;
     _currentPage = 1;
@@ -89,12 +92,14 @@ class SupportProvider extends ChangeNotifier {
         page: 1,
         status: _statusFilter,
       );
+      if (generation != _stateGeneration) return;
       _tickets = result.tickets;
       _hasMore = result.hasMore;
       _currentPage = 1;
       _isLoading = false;
       notifyListeners();
     } catch (e) {
+      if (generation != _stateGeneration) return;
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
@@ -103,6 +108,7 @@ class SupportProvider extends ChangeNotifier {
 
   /// Load next page of tickets
   Future<void> loadMore() async {
+    final generation = _stateGeneration;
     if (_isLoadingMore || !_hasMore) return;
 
     _isLoadingMore = true;
@@ -114,12 +120,14 @@ class SupportProvider extends ChangeNotifier {
         page: nextPage,
         status: _statusFilter,
       );
+      if (generation != _stateGeneration) return;
       _tickets = [..._tickets, ...result.tickets];
       _hasMore = result.hasMore;
       _currentPage = nextPage;
       _isLoadingMore = false;
       notifyListeners();
     } catch (e) {
+      if (generation != _stateGeneration) return;
       _isLoadingMore = false;
       notifyListeners();
     }
@@ -133,6 +141,7 @@ class SupportProvider extends ChangeNotifier {
     required String message,
     int? orderId,
   }) async {
+    final generation = _stateGeneration;
     _isCreating = true;
     _error = null;
     notifyListeners();
@@ -145,11 +154,13 @@ class SupportProvider extends ChangeNotifier {
         message: message,
         orderId: orderId,
       );
+      if (generation != _stateGeneration) return null;
       _tickets.insert(0, ticket);
       _isCreating = false;
       notifyListeners();
       return ticket;
     } catch (e) {
+      if (generation != _stateGeneration) return null;
       _error = e.toString();
       _isCreating = false;
       notifyListeners();
@@ -159,15 +170,19 @@ class SupportProvider extends ChangeNotifier {
 
   /// Fetch ticket detail with messages
   Future<void> fetchTicketDetail(int ticketId) async {
+    final generation = _stateGeneration;
     _isLoadingDetail = true;
     _error = null;
     notifyListeners();
 
     try {
-      _currentTicket = await _repository.getTicketDetail(ticketId);
+      final loadedTicket = await _repository.getTicketDetail(ticketId);
+      if (generation != _stateGeneration) return;
+      _currentTicket = loadedTicket;
       _isLoadingDetail = false;
       notifyListeners();
     } catch (e) {
+      if (generation != _stateGeneration) return;
       _error = e.toString();
       _isLoadingDetail = false;
       notifyListeners();
@@ -176,6 +191,7 @@ class SupportProvider extends ChangeNotifier {
 
   /// Send a message on the current ticket
   Future<bool> sendMessage(String body) async {
+    final generation = _stateGeneration;
     if (_currentTicket == null) return false;
 
     _isSending = true;
@@ -183,6 +199,7 @@ class SupportProvider extends ChangeNotifier {
 
     try {
       final message = await _repository.sendMessage(_currentTicket!.id, body);
+      if (generation != _stateGeneration) return false;
 
       // Update current ticket with new message
       final updatedMessages = [..._currentTicket!.messages, message];
@@ -203,6 +220,7 @@ class SupportProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
+      if (generation != _stateGeneration) return false;
       _error = e.toString();
       _isSending = false;
       notifyListeners();
@@ -220,6 +238,7 @@ class SupportProvider extends ChangeNotifier {
   }
 
   void clearAll() {
+    ++_stateGeneration;
     _tickets = [];
     _statusFilter = null;
     _currentPage = 1;
@@ -232,5 +251,11 @@ class SupportProvider extends ChangeNotifier {
     _isLoadingDetail = false;
     _error = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    ++_stateGeneration;
+    super.dispose();
   }
 }

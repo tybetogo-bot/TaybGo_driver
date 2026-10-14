@@ -638,5 +638,8 @@
   "changelogVersion0910Crashlytics": "تمت إضافة تقارير Crashlytics للأخطاء الفادحة في إصدارات الإنتاج.",
   "changelogVersion0910Notifications": "تم تحسين دورة حياة الإشعارات ومنع التكرار ومعالجة إشعارات الطلبات.",
   "changelogVersion0910Platform": "تم تحديث إعدادات إصدارات Android وiOS وmacOS والويب مع بيئتي التطوير والإنتاج.",
-  "changelogVersion0910Release": "تم إصدار تطبيق السائق بالإصدار 1.0.9+10."
+  "changelogVersion0910Release": "تم إصدار تطبيق السائق بالإصدار 1.0.9+10.",
+  "notificationsAllRead": "الكل مقروء",
+  "notificationsNewCount": "{count} جديدة",
+  "notificationsUnreadCount": "{count} إشعارات غير مقروءة"
 }

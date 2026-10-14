@@ -2003,4 +2003,17 @@ class AppLocalizationsFi extends AppLocalizations {
   @override
   String get changelogVersion0910Release =>
       'Kuljettajasovellus julkaistiin versiona 1.0.9+10.';
+
+  @override
+  String get notificationsAllRead => 'Kaikki luettu';
+
+  @override
+  String notificationsNewCount(String count) {
+    return '$count uutta';
+  }
+
+  @override
+  String notificationsUnreadCount(int count) {
+    return '$count lukematonta ilmoitusta';
+  }
 }

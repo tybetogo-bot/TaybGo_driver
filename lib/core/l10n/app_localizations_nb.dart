@@ -1999,4 +1999,17 @@ class AppLocalizationsNb extends AppLocalizations {
   @override
   String get changelogVersion0910Release =>
       'Sjåførapplikasjonen ble utgitt i versjon 1.0.9+10.';
+
+  @override
+  String get notificationsAllRead => 'Alt lest';
+
+  @override
+  String notificationsNewCount(String count) {
+    return '$count nye';
+  }
+
+  @override
+  String notificationsUnreadCount(int count) {
+    return '$count uleste varsler';
+  }
 }

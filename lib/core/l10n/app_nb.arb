@@ -560,5 +560,8 @@
   "changelogVersion0910Crashlytics": "La til Crashlytics-rapportering for alvorlige feil i release-bygg.",
   "changelogVersion0910Notifications": "Forbedret varslenes livssyklus, deduplisering og håndtering av ordremeldinger.",
   "changelogVersion0910Platform": "Oppdaterte release-konfigurasjonen for Android, iOS, macOS og web med utviklings- og produksjonsflavors.",
-  "changelogVersion0910Release": "Sjåførapplikasjonen ble utgitt i versjon 1.0.9+10."
+  "changelogVersion0910Release": "Sjåførapplikasjonen ble utgitt i versjon 1.0.9+10.",
+  "notificationsAllRead": "Alt lest",
+  "notificationsNewCount": "{count} nye",
+  "notificationsUnreadCount": "{count} uleste varsler"
 }

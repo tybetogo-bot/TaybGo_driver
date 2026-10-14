@@ -560,5 +560,8 @@
   "changelogVersion0910Crashlytics": "Crashlytics-rapportage voor fatale fouten in release-builds is toegevoegd.",
   "changelogVersion0910Notifications": "De levenscyclus van meldingen, deduplicatie en de verwerking van ordermeldingen zijn verbeterd.",
   "changelogVersion0910Platform": "De releaseconfiguratie voor Android, iOS, macOS en web is vernieuwd met ontwikkel- en productieflavors.",
-  "changelogVersion0910Release": "De chauffeursapp is uitgebracht als versie 1.0.9+10."
+  "changelogVersion0910Release": "De chauffeursapp is uitgebracht als versie 1.0.9+10.",
+  "notificationsAllRead": "Alles gelezen",
+  "notificationsNewCount": "{count} nieuw",
+  "notificationsUnreadCount": "{count} ongelezen meldingen"
 }
