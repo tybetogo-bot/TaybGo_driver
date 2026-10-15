@@ -1985,4 +1985,17 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get changelogVersion0910Release =>
       'تم إصدار تطبيق السائق بالإصدار 1.0.9+10.';
+
+  @override
+  String get notificationsAllRead => 'الكل مقروء';
+
+  @override
+  String notificationsNewCount(String count) {
+    return '$count جديدة';
+  }
+
+  @override
+  String notificationsUnreadCount(int count) {
+    return '$count إشعارات غير مقروءة';
+  }
 }

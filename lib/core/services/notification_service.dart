@@ -43,7 +43,22 @@ class NotificationService {
   /// Deactivate only this device token while the current user's session exists.
   Future<void> unregisterDeviceToken(String token) async {
     try {
-      await _apiClient.delete(ApiConstants.deviceToken, data: {'token': token});
+      await _apiClient.delete(
+        ApiConstants.deviceToken,
+        data: {'token': token},
+        options: Options(extra: {'sessionCleanup': true}),
+      );
+    } on DioException catch (error) {
+      throw ApiException.fromDioException(error);
+    }
+  }
+
+  Future<void> markAsRead(int id) async {
+    try {
+      await _apiClient.patch(
+        ApiConstants.notificationDetail(id),
+        data: {'is_read': true},
+      );
     } on DioException catch (error) {
       throw ApiException.fromDioException(error);
     }

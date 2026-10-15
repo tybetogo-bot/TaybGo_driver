@@ -10,6 +10,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 import '../../firebase_options.dart';
 import '../api/api_client.dart';
+import '../api/token_storage.dart';
 import '../config/app_config.dart';
 import 'notification_preferences_service.dart';
 import 'order_service.dart';
@@ -153,6 +154,7 @@ Future<void> _handleOrderActionFromPayload({
   int? notificationId,
   FlutterLocalNotificationsPlugin? plugin,
 }) async {
+  if (!await TokenStorage().hasTokens()) return;
   final data = _decodeNotificationPayload(payload);
   final orderId = _extractOrderId(data);
   if (orderId == null) {
@@ -395,6 +397,7 @@ Future<void> _showNotification({
   required RemoteMessage message,
   required bool initializePlugin,
   required NotificationPreferences preferences,
+  Future<bool> Function()? canShow,
 }) async {
   final isOrderNotification = _isOrderNotification(message.data);
   final isDispatchOffer = _isDispatchOffer(message.data);
@@ -471,6 +474,7 @@ Future<void> _showNotification({
       ),
   ];
 
+  if (canShow != null && !await canShow()) return;
   await plugin.show(
     notificationId,
     title,
@@ -531,6 +535,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await AppConfig.ensureInitializedFromStorage();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
+  if (!await TokenStorage().hasTokens()) return;
   debugPrint('[FCM] Background message: ${message.messageId}');
   debugPrint('[FCM]   title: ${message.notification?.title}');
   debugPrint('[FCM]   body: ${message.notification?.body}');
@@ -543,6 +548,7 @@ Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
     message: message,
     initializePlugin: true,
     preferences: preferences,
+    canShow: () => TokenStorage().hasTokens(),
   );
 }
 
@@ -552,6 +558,45 @@ class FcmService {
   static final FcmService _instance = FcmService._();
   factory FcmService() => _instance;
   FcmService._();
+  @visibleForTesting
+  FcmService.forTesting({required FirebaseMessaging messaging})
+    : _messaging = messaging;
+
+  final _foregroundMessages = StreamController<void>.broadcast();
+  Stream<void> get foregroundMessages => _foregroundMessages.stream;
+
+  bool _pushActive = false;
+  int _pushGeneration = 0;
+  Future<void> _notificationWork = Future<void>.value();
+  Future<void> _tokenWork = Future<void>.value();
+
+  Future<T> _serializeTokenWork<T>(Future<T> Function() operation) {
+    final result = _tokenWork.then((_) => operation());
+    _tokenWork = result.then<void>(
+      (_) {},
+      onError: (Object _, StackTrace _) {},
+    );
+    return result;
+  }
+
+  void startPushForSignedInUser() {
+    _pushActive = true;
+    ++_pushGeneration;
+    final pending = _pendingNotificationTapData;
+    if (pending != null && _onNotificationTap != null) {
+      _pendingNotificationTapData = null;
+      _onNotificationTap!(pending);
+    }
+  }
+
+  void pausePushForSignedOutUser() {
+    _pushActive = false;
+    ++_pushGeneration;
+    _pendingNotificationTapData = null;
+  }
+
+  bool _isCurrent(int generation) =>
+      _pushActive && generation == _pushGeneration;
 
   final FlutterLocalNotificationsPlugin _localNotifications =
       FlutterLocalNotificationsPlugin();
@@ -573,7 +618,7 @@ class FcmService {
     _onNotificationTap = callback;
 
     final pendingData = _pendingNotificationTapData;
-    if (callback != null && pendingData != null) {
+    if (_pushActive && callback != null && pendingData != null) {
       _pendingNotificationTapData = null;
       callback(pendingData);
     }
@@ -614,7 +659,7 @@ class FcmService {
       final initialMessage = await _messagingInstance.getInitialMessage();
       if (initialMessage != null) {
         debugPrint('[FCM] App opened from terminated via notification');
-        _handleNotificationTap(initialMessage);
+        _pendingNotificationTapData = initialMessage.data;
       }
 
       await _messagingInstance.setForegroundNotificationPresentationOptions(
@@ -642,6 +687,7 @@ class FcmService {
       onDidReceiveNotificationResponse: (response) {
         debugPrint('[FCM] Local notification response: ${response.payload}');
 
+        if (!_pushActive) return;
         if (response.actionId == _acceptOrderActionId ||
             response.actionId == _rejectOrderActionId) {
           _handleOrderActionResponse(response, plugin: _localNotifications);
@@ -662,7 +708,7 @@ class FcmService {
         launchResponse?.actionId == null) {
       final data = _decodeNotificationPayload(launchResponse?.payload);
       if (data.isNotEmpty) {
-        _emitNotificationTap(data);
+        _pendingNotificationTapData = data;
       }
     }
 
@@ -683,34 +729,37 @@ class FcmService {
     }
   }
 
-  Future<String?> getToken() async {
-    try {
-      if (!kIsWeb) {
-        await _messagingInstance.setAutoInitEnabled(true);
-        debugPrint('[FCM] Auto-init enabled for token retrieval');
-      }
-
-      if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
-        String? apnsToken;
-        for (var attempt = 0; attempt < 10; attempt++) {
-          apnsToken = await _messagingInstance.getAPNSToken();
-          if (apnsToken != null) break;
-          await Future<void>.delayed(const Duration(milliseconds: 500));
-        }
-        if (apnsToken == null) {
-          debugPrint(
-            '[FCM] APNs token is not ready; registration will retry later',
-          );
+  Future<String?> getToken() {
+    final generation = _pushGeneration;
+    return _serializeTokenWork(() async {
+      if (!_isCurrent(generation)) return null;
+      try {
+        final settings = await _messagingInstance.getNotificationSettings();
+        if (!_isCurrent(generation) ||
+            (settings.authorizationStatus != AuthorizationStatus.authorized &&
+                settings.authorizationStatus !=
+                    AuthorizationStatus.provisional)) {
           return null;
         }
+        await _messagingInstance.setAutoInitEnabled(true);
+        if (!_isCurrent(generation)) return null;
+        if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+          String? apnsToken;
+          for (var attempt = 0; attempt < 10; attempt++) {
+            apnsToken = await _messagingInstance.getAPNSToken();
+            if (!_isCurrent(generation)) return null;
+            if (apnsToken != null) break;
+            await Future<void>.delayed(const Duration(milliseconds: 500));
+          }
+          if (apnsToken == null) return null;
+        }
+        final token = await _messagingInstance.getToken();
+        return _isCurrent(generation) ? token : null;
+      } catch (e) {
+        debugPrint('[FCM] Error getting token: $e');
+        return null;
       }
-      final token = await _messagingInstance.getToken();
-      debugPrint('[FCM] Token: ${token?.substring(0, 20)}...');
-      return token;
-    } catch (e) {
-      debugPrint('[FCM] Error getting token: $e');
-      return null;
-    }
+    });
   }
 
   StreamSubscription<String> onTokenRefresh(
@@ -722,30 +771,58 @@ class FcmService {
     });
   }
 
-  Future<void> stopPushForSignedOutUser() async {
-    _pendingNotificationTapData = null;
-    try {
-      await _messagingInstance.setAutoInitEnabled(false);
-      await _messagingInstance.deleteToken();
-    } catch (e) {
-      debugPrint('[FCM] Could not invalidate signed-out device token: $e');
-    }
-    await clearDeliveredNotifications();
+  Future<void> stopPushForSignedOutUser() {
+    pausePushForSignedOutUser();
+    // This queue waits for any actual getToken/deleteToken operation. A timeout
+    // at the UI must never let new token generation overtake old SDK deletion.
+    return _serializeTokenWork(() async {
+      try {
+        await _messagingInstance.setAutoInitEnabled(false);
+      } catch (e) {
+        debugPrint('[FCM] Could not disable automatic token generation: $e');
+      }
+      try {
+        await _messagingInstance.deleteToken();
+      } catch (e) {
+        debugPrint('[FCM] Could not delete signed-out device token: $e');
+      }
+      await _notificationWork;
+      await clearDeliveredNotifications();
+    });
   }
 
-  Future<void> _handleForegroundMessage(RemoteMessage message) async {
+  Future<void> _handleForegroundMessage(RemoteMessage message) {
+    if (_pushActive) _foregroundMessages.add(null);
+    final generation = _pushGeneration;
+    final result = _notificationWork.then<void>((_) async {
+      if (!_isCurrent(generation)) return;
+      await _showForegroundMessage(message, generation);
+    });
+    _notificationWork = result.catchError((Object error) {
+      debugPrint('[FCM] Foreground presentation failed: $error');
+    });
+    return _notificationWork;
+  }
+
+  Future<void> _showForegroundMessage(
+    RemoteMessage message,
+    int generation,
+  ) async {
     debugPrint('[FCM] Foreground message: ${message.messageId}');
     debugPrint('[FCM]   title: ${message.notification?.title}');
     debugPrint('[FCM]   body: ${message.notification?.body}');
     debugPrint('[FCM]   data: ${message.data}');
 
+    if (!_isCurrent(generation)) return;
     final preferences = await NotificationPreferencesService()
         .loadPreferences();
+    if (!_isCurrent(generation)) return;
     await _showNotification(
       plugin: _localNotifications,
       message: message,
       initializePlugin: false,
       preferences: preferences,
+      canShow: () async => _isCurrent(generation),
     );
   }
 
@@ -755,6 +832,7 @@ class FcmService {
   }
 
   void _emitNotificationTap(Map<String, dynamic> data) {
+    if (!_pushActive) return;
     final callback = _onNotificationTap;
     if (callback != null) {
       callback(data);

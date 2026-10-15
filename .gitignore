@@ -52,3 +52,6 @@ app.*.map.json
 /release_artifacts/
 /releases/
 nul
+
+# Kotlin incremental compiler cache
+android/.kotlin/

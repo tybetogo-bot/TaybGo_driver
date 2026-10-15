@@ -85,6 +85,7 @@ Future<void> main() async {
     // Initialize auth provider before running app
     final authProvider = AuthProvider();
     await authProvider.initialize();
+    if (!authProvider.isAuthenticated) fcmService.pausePushForSignedOutUser();
     _notificationAuthProvider = authProvider;
     authProvider.addListener(_scheduleNotificationNavigation);
 
@@ -147,6 +148,7 @@ void _recordFatalError(Object error, StackTrace stack) {
 }
 
 void _handleNotificationTap(Map<String, dynamic> data) {
+  if (_notificationAuthProvider?.isAuthenticated != true) return;
   _pendingNotificationDestination = notificationDestination(data);
   _scheduleNotificationNavigation();
 }
@@ -157,11 +159,13 @@ void _scheduleNotificationNavigation() {
       _notificationNavigationScheduled) {
     return;
   }
+  final generation = _notificationAuthProvider!.session.generation;
   _notificationNavigationScheduled = true;
   WidgetsBinding.instance.addPostFrameCallback((_) {
     _notificationNavigationScheduled = false;
     final destination = _pendingNotificationDestination;
     if (destination == null ||
+        !_notificationAuthProvider!.session.isCurrent(generation) ||
         _notificationAuthProvider?.isAuthenticated != true ||
         _router == null) {
       return;
@@ -185,7 +189,7 @@ class _NotificationCleanupObserver extends WidgetsBindingObserver {
   }
 }
 
-class TaybGoDriverApp extends StatelessWidget {
+class TaybGoDriverApp extends StatefulWidget {
   final AuthProvider authProvider;
   final TourProvider tourProvider;
   final PublicConfigProvider publicConfigProvider;
@@ -200,31 +204,88 @@ class TaybGoDriverApp extends StatelessWidget {
        publicConfigProvider = publicConfigProvider ?? PublicConfigProvider();
 
   @override
-  Widget build(BuildContext context) {
-    final orderProvider = OrderProvider();
-    final driverProvider = DriverProvider();
-    final notificationProvider = NotificationProvider();
-    final notificationSettingsProvider = NotificationSettingsProvider();
-    final earningsProvider = EarningsProvider();
-    final supportProvider = SupportProvider();
-    final router = _router ??= AppRouter.createRouter(authProvider);
+  State<TaybGoDriverApp> createState() => _TaybGoDriverAppState();
+}
+
+class _TaybGoDriverAppState extends State<TaybGoDriverApp> {
+  late final AuthProvider authProvider;
+  late final TourProvider tourProvider;
+  late final PublicConfigProvider publicConfigProvider;
+  late final OrderProvider orderProvider;
+  late final DriverProvider driverProvider;
+  late final NotificationProvider notificationProvider;
+  late final NotificationSettingsProvider notificationSettingsProvider;
+  late final EarningsProvider earningsProvider;
+  late final SupportProvider supportProvider;
+  late final GoRouter router;
+
+  @override
+  void initState() {
+    super.initState();
+    authProvider = widget.authProvider;
+    tourProvider = widget.tourProvider;
+    publicConfigProvider = widget.publicConfigProvider;
+    orderProvider = OrderProvider();
+    driverProvider = DriverProvider();
+    notificationProvider = NotificationProvider();
+    notificationSettingsProvider = NotificationSettingsProvider();
+    earningsProvider = EarningsProvider();
+    supportProvider = SupportProvider();
+    router = _router ??= AppRouter.createRouter(authProvider);
 
     // Wire up logout callback so all providers clear on any logout
     // (including forced logout from expired tokens)
+    authProvider.onLogoutStarted = () {
+      _pendingNotificationDestination = null;
+      notificationProvider.pausePushNotifications();
+      driverProvider.pauseForLogout();
+      orderProvider.clearAll();
+      earningsProvider.clearAll();
+      notificationProvider.clearAll();
+      supportProvider.clearAll();
+    };
     authProvider.onBeforeLogoutCallback = () async {
       await notificationProvider.stopPushNotifications();
       await driverProvider.markOfflineBeforeLogout();
     };
-    authProvider.onLogoutCallback = () {
+    authProvider.onLogoutCallback = () async {
+      await notificationProvider.stopPushNotifications(unregister: false);
       _pendingNotificationDestination = null;
       driverProvider.clearProfile();
       orderProvider.clearAll();
       earningsProvider.clearAll();
       notificationProvider.clearAll();
       supportProvider.clearAll();
-      tourProvider.resetTour();
+      await tourProvider.resetTour();
     };
 
+    authProvider.addListener(_syncPushAuthentication);
+    _syncPushAuthentication();
+  }
+
+  void _syncPushAuthentication() {
+    if (authProvider.isAuthenticated) {
+      unawaited(notificationProvider.initializePushNotifications());
+    }
+  }
+
+  @override
+  void dispose() {
+    authProvider.removeListener(_syncPushAuthentication);
+    authProvider.onLogoutStarted = null;
+    authProvider.onBeforeLogoutCallback = null;
+    authProvider.onLogoutCallback = null;
+    orderProvider.dispose();
+    driverProvider.dispose();
+    notificationProvider.dispose();
+    notificationSettingsProvider.dispose();
+    earningsProvider.dispose();
+    supportProvider.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeProvider()),

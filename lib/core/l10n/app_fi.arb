@@ -560,5 +560,8 @@
   "changelogVersion0910Crashlytics": "Julkaisuversioiden vakaville virheille lisättiin Crashlytics-raportointi.",
   "changelogVersion0910Notifications": "Ilmoitusten elinkaarta, duplikaattien estoa ja tilausilmoitusten käsittelyä parannettiin.",
   "changelogVersion0910Platform": "Androidin, iOS:n, macOS:n ja verkon julkaisuasetukset päivitettiin kehitys- ja tuotantoversioille.",
-  "changelogVersion0910Release": "Kuljettajasovellus julkaistiin versiona 1.0.9+10."
+  "changelogVersion0910Release": "Kuljettajasovellus julkaistiin versiona 1.0.9+10.",
+  "notificationsAllRead": "Kaikki luettu",
+  "notificationsNewCount": "{count} uutta",
+  "notificationsUnreadCount": "{count} lukematonta ilmoitusta"
 }

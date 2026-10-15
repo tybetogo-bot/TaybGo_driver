@@ -2014,4 +2014,17 @@ class AppLocalizationsLb extends AppLocalizations {
   @override
   String get changelogVersion0910Release =>
       'D\'Fuerer-App gouf an der Versioun 1.0.9+10 verëffentlecht.';
+
+  @override
+  String get notificationsAllRead => 'Alles gelies';
+
+  @override
+  String notificationsNewCount(String count) {
+    return '$count nei';
+  }
+
+  @override
+  String notificationsUnreadCount(int count) {
+    return '$count ongelies Notifikatiounen';
+  }
 }

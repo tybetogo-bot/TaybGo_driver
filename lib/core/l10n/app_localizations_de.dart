@@ -2015,4 +2015,17 @@ class AppLocalizationsDe extends AppLocalizations {
   @override
   String get changelogVersion0910Release =>
       'Die Fahrer-App wurde in Version 1.0.9+10 veröffentlicht.';
+
+  @override
+  String get notificationsAllRead => 'Alle gelesen';
+
+  @override
+  String notificationsNewCount(String count) {
+    return '$count neu';
+  }
+
+  @override
+  String notificationsUnreadCount(int count) {
+    return '$count ungelesene Benachrichtigungen';
+  }
 }

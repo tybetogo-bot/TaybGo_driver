@@ -52,7 +52,7 @@ class AuthService {
   ApiClient get apiClient => _apiClient;
 
   /// Set callback to handle token refresh failures
-  void setTokenRefreshFailedCallback(void Function() callback) {
+  void setTokenRefreshFailedCallback(Future<void> Function() callback) {
     _apiClient.onTokenRefreshFailed = callback;
   }
 
@@ -60,6 +60,7 @@ class AuthService {
     required String phoneNumber,
     required String password,
   }) async {
+    final generation = await _apiClient.session.beginLogin();
     try {
       final response = await _apiClient.post(
         ApiConstants.passwordLogin,
@@ -70,10 +71,14 @@ class AuthService {
         throw const FormatException('Password login response was empty.');
       }
       final loginResponse = OtpVerifyResponse.fromJson(data);
-      await _apiClient.tokenStorage.saveTokens(
-        accessToken: loginResponse.accessToken,
-        refreshToken: loginResponse.refreshToken,
+      final saved = await _apiClient.session.writeIfCurrent(
+        generation,
+        () => _apiClient.tokenStorage.saveTokens(
+          accessToken: loginResponse.accessToken,
+          refreshToken: loginResponse.refreshToken,
+        ),
       );
+      if (!saved) throw ApiException(message: 'Sign-in was cancelled.');
       return loginResponse;
     } on DioException catch (e) {
       throw ApiException.fromDioException(e);
@@ -128,6 +133,7 @@ class AuthService {
     required String otp,
     required String targetRole,
   }) async {
+    final generation = await _apiClient.session.beginLogin();
     try {
       final data = _buildOtpVerifyData(
         phoneNumber: phoneNumber,
@@ -150,10 +156,14 @@ class AuthService {
       final otpResponse = OtpVerifyResponse.fromJson(response.data);
 
       // Save tokens
-      await _apiClient.tokenStorage.saveTokens(
-        accessToken: otpResponse.accessToken,
-        refreshToken: otpResponse.refreshToken,
+      final saved = await _apiClient.session.writeIfCurrent(
+        generation,
+        () => _apiClient.tokenStorage.saveTokens(
+          accessToken: otpResponse.accessToken,
+          refreshToken: otpResponse.refreshToken,
+        ),
       );
+      if (!saved) throw ApiException(message: 'Sign-in was cancelled.');
 
       debugPrint('[AuthService] Tokens saved successfully');
       debugPrint('[AuthService] isNewUser: ${otpResponse.isNewUser}');
@@ -167,6 +177,7 @@ class AuthService {
   }
 
   Future<void> logout() async {
+    final generation = _apiClient.session.generation;
     try {
       debugPrint('[AuthService] === LOGOUT REQUEST ===');
       final refreshToken = await _apiClient.tokenStorage.getRefreshToken();
@@ -177,6 +188,7 @@ class AuthService {
         final response = await _apiClient.post(
           ApiConstants.logout,
           data: {'refresh': refreshToken},
+          options: Options(extra: {'sessionCleanup': true}),
         );
         debugPrint('[AuthService] === LOGOUT RESPONSE ===');
         debugPrint('[AuthService] Status: ${response.statusCode}');
@@ -186,12 +198,16 @@ class AuthService {
       debugPrint('[AuthService] Logout Error (ignored): $e');
       // Ignore errors during logout API call
     } finally {
-      await _apiClient.tokenStorage.clearTokens();
+      await _apiClient.session.writeIfCurrent(
+        generation,
+        _apiClient.tokenStorage.clearTokens,
+      );
       debugPrint('[AuthService] Tokens cleared');
     }
   }
 
   Future<void> deleteAccount() async {
+    final generation = _apiClient.session.generation;
     try {
       debugPrint('[AuthService] === DELETE ACCOUNT REQUEST ===');
       debugPrint('[AuthService] Endpoint: ${ApiConstants.userMe}');
@@ -207,7 +223,10 @@ class AuthService {
       throw ApiException.fromDioException(e);
     } finally {
       // Always clear tokens after account deletion attempt
-      await _apiClient.tokenStorage.clearTokens();
+      await _apiClient.session.writeIfCurrent(
+        generation,
+        _apiClient.tokenStorage.clearTokens,
+      );
       debugPrint('[AuthService] Tokens cleared after account deletion');
     }
   }

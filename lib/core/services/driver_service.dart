@@ -232,7 +232,10 @@ class DriverService {
     }
   }
 
-  Future<bool> toggleOnlineStatus(bool isOnline) async {
+  Future<bool> toggleOnlineStatus(
+    bool isOnline, {
+    bool sessionCleanup = false,
+  }) async {
     try {
       debugPrint('[DriverService] === TOGGLE ONLINE STATUS REQUEST ===');
       debugPrint(
@@ -243,6 +246,7 @@ class DriverService {
       final response = await _apiClient.post(
         ApiConstants.driverToggleOnline,
         data: {'is_online': isOnline},
+        options: Options(extra: {'sessionCleanup': sessionCleanup}),
       );
 
       debugPrint('[DriverService] === TOGGLE ONLINE STATUS RESPONSE ===');

@@ -2000,4 +2000,17 @@ class AppLocalizationsSv extends AppLocalizations {
   @override
   String get changelogVersion0910Release =>
       'Förarappen släpptes i version 1.0.9+10.';
+
+  @override
+  String get notificationsAllRead => 'Allt läst';
+
+  @override
+  String notificationsNewCount(String count) {
+    return '$count nya';
+  }
+
+  @override
+  String notificationsUnreadCount(int count) {
+    return '$count olästa aviseringar';
+  }
 }

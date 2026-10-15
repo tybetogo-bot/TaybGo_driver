@@ -15,6 +15,8 @@ enum OrderActionError {
 }
 
 class OrderProvider extends ChangeNotifier {
+  int _stateGeneration = 0;
+
   final OrderService _orderService;
 
   // Tour mode reference (will be set after initialization)
@@ -120,6 +122,7 @@ class OrderProvider extends ChangeNotifier {
   /// Fetch suggested orders from API.
   /// Always replaces pending order data with fresh API data.
   Future<void> _fetchSuggestedOrders() async {
+    final generation = _stateGeneration;
     if (_isFetchingSuggested) return;
     _isFetchingSuggested = true;
 
@@ -132,6 +135,7 @@ class OrderProvider extends ChangeNotifier {
         '[OrderProvider] Calling orderService.getSuggestedOrders()...',
       );
       final orders = await _orderService.getSuggestedOrders();
+      if (generation != _stateGeneration) return;
       debugPrint('[OrderProvider] Received ${orders.length} suggested orders');
 
       if (orders.isNotEmpty) {
@@ -166,10 +170,13 @@ class OrderProvider extends ChangeNotifier {
         debugPrint('[OrderProvider] No suggested orders available');
       }
     } catch (e, stackTrace) {
+      if (generation != _stateGeneration) return;
       debugPrint('[OrderProvider] Error fetching suggested orders: $e');
       debugPrint('[OrderProvider] Stack trace: $stackTrace');
     } finally {
-      _isFetchingSuggested = false;
+      if (generation == _stateGeneration) {
+        _isFetchingSuggested = false;
+      }
     }
   }
 
@@ -179,6 +186,7 @@ class OrderProvider extends ChangeNotifier {
     String? orderId,
     OrderModel? orderSnapshot,
   }) async {
+    final generation = _stateGeneration;
     final targetOrderId = orderId ?? _pendingOrder?.id;
     if (targetOrderId == null) return OrderActionError.notFound;
 
@@ -208,11 +216,14 @@ class OrderProvider extends ChangeNotifier {
 
     try {
       await _orderService.acceptOrder(targetOrderId);
+      if (generation != _stateGeneration) return OrderActionError.unknown;
 
       OrderModel? acceptedOrder;
       try {
         acceptedOrder = await _orderService.getOrderDetails(targetOrderId);
+        if (generation != _stateGeneration) return OrderActionError.unknown;
       } catch (error) {
+        if (generation != _stateGeneration) return OrderActionError.unknown;
         debugPrint(
           '[OrderProvider] Accepted order details are not available yet: $error',
         );
@@ -238,6 +249,7 @@ class OrderProvider extends ChangeNotifier {
 
       return null;
     } catch (e) {
+      if (generation != _stateGeneration) return OrderActionError.unknown;
       _isActionLoading = false;
 
       final errorMsg = e.toString().toLowerCase();
@@ -289,6 +301,7 @@ class OrderProvider extends ChangeNotifier {
   /// Reject/skip pending order.
   /// Returns `null` on success, or an [OrderActionError] on failure.
   Future<OrderActionError?> rejectOrder() async {
+    final generation = _stateGeneration;
     if (_pendingOrder == null) return null;
 
     final orderId = _pendingOrder!.id;
@@ -299,9 +312,11 @@ class OrderProvider extends ChangeNotifier {
 
     try {
       await _orderService.rejectOrder(orderId);
+      if (generation != _stateGeneration) return OrderActionError.unknown;
       unawaited(refreshSuggestedOrders());
       return null;
     } catch (e) {
+      if (generation != _stateGeneration) return OrderActionError.unknown;
       debugPrint('[OrderProvider] Error rejecting order: $e');
       // Order is already cleared from UI — just inform the user if it was a real problem
       final errorMsg = e.toString().toLowerCase();
@@ -318,8 +333,10 @@ class OrderProvider extends ChangeNotifier {
 
   /// Reject an order by id so notification actions can reuse the same flow.
   Future<OrderActionError?> rejectOrderById(String orderId) async {
+    final generation = _stateGeneration;
     try {
       await _orderService.rejectOrderById(orderId);
+      if (generation != _stateGeneration) return OrderActionError.unknown;
       if (_pendingOrder?.id == orderId) {
         _pendingOrder = null;
         notifyListeners();
@@ -327,6 +344,7 @@ class OrderProvider extends ChangeNotifier {
       unawaited(refreshSuggestedOrders());
       return null;
     } catch (e) {
+      if (generation != _stateGeneration) return OrderActionError.unknown;
       debugPrint('[OrderProvider] Error rejecting order by id: $e');
       final errorMsg = e.toString().toLowerCase();
       if (errorMsg.contains('connection') ||
@@ -344,6 +362,7 @@ class OrderProvider extends ChangeNotifier {
     String? orderId,
     OrderModel? orderSnapshot,
   }) async {
+    final generation = _stateGeneration;
     final targetOrderId = orderId ?? _activeOrder?.id;
     if (targetOrderId == null) return false;
 
@@ -366,6 +385,7 @@ class OrderProvider extends ChangeNotifier {
 
     try {
       await _orderService.dropOrder(targetOrderId);
+      if (generation != _stateGeneration) return false;
 
       if (_activeOrder?.id == targetOrderId) {
         _activeOrder = null;
@@ -386,6 +406,7 @@ class OrderProvider extends ChangeNotifier {
       unawaited(refreshSuggestedOrders());
       return true;
     } catch (e) {
+      if (generation != _stateGeneration) return false;
       _error = e.toString();
       _isActionLoading = false;
 
@@ -402,6 +423,7 @@ class OrderProvider extends ChangeNotifier {
 
   /// Update order status: ACCEPTED -> ON_THE_WAY
   Future<bool> startDelivery() async {
+    final generation = _stateGeneration;
     if (_activeOrder == null) return false;
     if (_activeOrder!.status == OrderStatus.onTheWay) return true;
 
@@ -421,11 +443,13 @@ class OrderProvider extends ChangeNotifier {
         _activeOrder!.id,
         OrderStatus.onTheWay,
       );
+      if (generation != _stateGeneration) return false;
       _activeOrder = _activeOrder!.copyWith(status: newStatus);
       _isActionLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
+      if (generation != _stateGeneration) return false;
       _error = e.toString();
       _isActionLoading = false;
       notifyListeners();
@@ -435,6 +459,7 @@ class OrderProvider extends ChangeNotifier {
 
   /// Update order status: ON_THE_WAY -> DELIVERED
   Future<bool> markDelivered() async {
+    final generation = _stateGeneration;
     if (_activeOrder == null) return false;
     if (_activeOrder!.status == OrderStatus.delivered) return true;
 
@@ -454,11 +479,13 @@ class OrderProvider extends ChangeNotifier {
         _activeOrder!.id,
         OrderStatus.delivered,
       );
+      if (generation != _stateGeneration) return false;
       _activeOrder = _activeOrder!.copyWith(status: newStatus);
       _isActionLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
+      if (generation != _stateGeneration) return false;
       // If backend says order is already past DELIVERED, sync local state
       final errorMsg = e.toString().toLowerCase();
       if (errorMsg.contains('cannot update status from delivered') ||
@@ -479,6 +506,7 @@ class OrderProvider extends ChangeNotifier {
 
   /// Update order status: DELIVERED -> COMPLETED
   Future<bool> completeOrder() async {
+    final generation = _stateGeneration;
     if (_activeOrder == null) return false;
     if (_activeOrder!.status == OrderStatus.completed) return true;
 
@@ -504,6 +532,7 @@ class OrderProvider extends ChangeNotifier {
         _activeOrder!.id,
         OrderStatus.completed,
       );
+      if (generation != _stateGeneration) return false;
 
       // Update local order with completed status
       final completedOrder = _activeOrder!.copyWith(
@@ -525,6 +554,7 @@ class OrderProvider extends ChangeNotifier {
       notifyListeners();
       return true;
     } catch (e) {
+      if (generation != _stateGeneration) return false;
       // If the backend says the order is already completed, clean up local state
       final errorMsg = e.toString().toLowerCase();
       if (errorMsg.contains('cannot update status from completed') ||
@@ -557,11 +587,13 @@ class OrderProvider extends ChangeNotifier {
   /// Replaces all cached data with fresh API data on every call.
   /// Never touches _isActionLoading so buttons remain interactive.
   Future<void> fetchOrderHistory() async {
+    final generation = _stateGeneration;
     if (_isFetchingHistory) return;
     _isFetchingHistory = true;
 
     try {
       final freshOrders = await _orderService.getOrderHistory();
+      if (generation != _stateGeneration) return;
 
       // Replace entire history with fresh data
       _orderHistory = freshOrders;
@@ -616,16 +648,21 @@ class OrderProvider extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
+      if (generation != _stateGeneration) return;
       debugPrint('[OrderProvider] Error fetching order history: $e');
     } finally {
-      _isFetchingHistory = false;
+      if (generation == _stateGeneration) {
+        _isFetchingHistory = false;
+      }
     }
   }
 
   /// Fetch full order details from /orders/{id}/ endpoint
   Future<OrderModel?> fetchOrderDetails(String orderId) async {
+    final generation = _stateGeneration;
     try {
       final order = await _orderService.getOrderDetails(orderId);
+      if (generation != _stateGeneration) return null;
 
       // Update cached data with the fresh details
       if (_activeOrder?.id == orderId) {
@@ -643,6 +680,7 @@ class OrderProvider extends ChangeNotifier {
       notifyListeners();
       return order;
     } catch (e) {
+      if (generation != _stateGeneration) return null;
       debugPrint('[OrderProvider] Error fetching order details: $e');
       return null;
     }
@@ -650,13 +688,16 @@ class OrderProvider extends ChangeNotifier {
 
   /// Check for active order on app start
   Future<void> checkActiveOrder() async {
+    final generation = _stateGeneration;
     try {
       final active = await _orderService.getActiveOrder();
+      if (generation != _stateGeneration) return;
       if (active != null) {
         _activeOrder = active;
         notifyListeners();
       }
     } catch (e) {
+      if (generation != _stateGeneration) return;
       debugPrint('Error checking active order: $e');
     }
   }
@@ -711,6 +752,7 @@ class OrderProvider extends ChangeNotifier {
 
   /// Clear all order data (called on logout)
   void clearAll() {
+    ++_stateGeneration;
     _stopPolling();
     _pendingOrder = null;
     _activeOrder = null;
@@ -718,6 +760,8 @@ class OrderProvider extends ChangeNotifier {
     _totalOrders = 0;
     _totalEarnings = 0.0;
     _isActionLoading = false;
+    _isFetchingSuggested = false;
+    _isFetchingHistory = false;
     _error = null;
     notifyListeners();
   }
@@ -791,6 +835,7 @@ class OrderProvider extends ChangeNotifier {
 
   @override
   void dispose() {
+    ++_stateGeneration;
     _stopPolling();
     super.dispose();
   }

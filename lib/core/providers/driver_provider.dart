@@ -20,6 +20,9 @@ enum ToggleOnlineResult {
 }
 
 class DriverProvider extends ChangeNotifier {
+  int _stateGeneration = 0;
+  bool _wasOnlineBeforeLogout = false;
+
   final DriverService _driverService;
   final LocationService _locationService;
   final GeocodingService _geocodingService;
@@ -66,16 +69,20 @@ class DriverProvider extends ChangeNotifier {
   bool? get profileExists => _profileExists;
 
   Future<void> fetchProfile() async {
+    final generation = _stateGeneration;
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      _profile = await _driverService.getProfile();
+      final loadedProfile = await _driverService.getProfile();
+      if (generation != _stateGeneration) return;
+      _profile = loadedProfile;
       _profileExists = true;
       _isLoading = false;
       notifyListeners();
     } on ApiException catch (e) {
+      if (generation != _stateGeneration) return;
       // 403 means user doesn't have a driver profile yet
       if (e.statusCode == 403 || e.statusCode == 404) {
         _profileExists = false;
@@ -86,6 +93,7 @@ class DriverProvider extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     } catch (e) {
+      if (generation != _stateGeneration) return;
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
@@ -100,12 +108,13 @@ class DriverProvider extends ChangeNotifier {
     String? vehiclePlate,
     DriverAddress? address,
   }) async {
+    final generation = _stateGeneration;
     _isLoading = true;
     _error = null;
     notifyListeners();
 
     try {
-      _profile = await _driverService.updateProfile(
+      final loadedProfile = await _driverService.updateProfile(
         firstName: firstName,
         lastName: lastName,
         email: email,
@@ -113,10 +122,13 @@ class DriverProvider extends ChangeNotifier {
         vehiclePlate: vehiclePlate,
         address: address,
       );
+      if (generation != _stateGeneration) return false;
+      _profile = loadedProfile;
       _isLoading = false;
       notifyListeners();
       return true;
     } catch (e) {
+      if (generation != _stateGeneration) return false;
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
@@ -147,6 +159,7 @@ class DriverProvider extends ChangeNotifier {
     String? bankDocument,
     DriverAddress? address,
   }) async {
+    final generation = _stateGeneration;
     _isLoading = true;
     _error = null;
     notifyListeners();
@@ -175,12 +188,15 @@ class DriverProvider extends ChangeNotifier {
         bankDocument: bankDocument,
         address: address,
       );
+      if (generation != _stateGeneration) return false;
       _profile = updatedProfile;
       notifyListeners();
       // Refresh driver profile to reflect changes
       await fetchProfile();
+      if (generation != _stateGeneration) return false;
       return true;
     } catch (e) {
+      if (generation != _stateGeneration) return false;
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
@@ -191,6 +207,7 @@ class DriverProvider extends ChangeNotifier {
   /// Toggle online status — independent of location.
   /// Location tracking starts after going online, not before.
   Future<ToggleOnlineResult> toggleOnline() async {
+    final generation = _stateGeneration;
     if (_profile == null) return ToggleOnlineResult.apiError;
     if (_isLoading) return ToggleOnlineResult.apiError;
 
@@ -214,6 +231,7 @@ class DriverProvider extends ChangeNotifier {
 
     if (newStatus) {
       final locationResult = await _ensureLocationReadyForOnline();
+      if (generation != _stateGeneration) return ToggleOnlineResult.apiError;
       if (locationResult != ToggleOnlineResult.success) {
         _isLoading = false;
         notifyListeners();
@@ -226,6 +244,7 @@ class DriverProvider extends ChangeNotifier {
       final confirmedStatus = await _driverService.toggleOnlineStatus(
         newStatus,
       );
+      if (generation != _stateGeneration) return ToggleOnlineResult.apiError;
       _profile = _profile!.copyWith(isOnline: confirmedStatus);
       _isLoading = false;
       notifyListeners();
@@ -240,6 +259,7 @@ class DriverProvider extends ChangeNotifier {
 
       return ToggleOnlineResult.success;
     } catch (e) {
+      if (generation != _stateGeneration) return ToggleOnlineResult.apiError;
       _error = e.toString();
       _isLoading = false;
       notifyListeners();
@@ -248,9 +268,12 @@ class DriverProvider extends ChangeNotifier {
   }
 
   Future<ToggleOnlineResult> _ensureLocationReadyForOnline() async {
+    final generation = _stateGeneration;
     var status = await _locationService.checkPermission();
+    if (generation != _stateGeneration) return ToggleOnlineResult.apiError;
     if (!status.hasForegroundAccess) {
       status = await _locationService.requestPermission();
+      if (generation != _stateGeneration) return ToggleOnlineResult.apiError;
     }
     _locationStatus = status;
 
@@ -263,6 +286,7 @@ class DriverProvider extends ChangeNotifier {
 
     if (!status.hasBackgroundAccess) {
       status = await _locationService.requestBackgroundPermission();
+      if (generation != _stateGeneration) return ToggleOnlineResult.apiError;
       _locationStatus = status;
       if (!status.hasForegroundAccess) {
         final mappedResult = _mapPermissionStatusToToggleResult(status);
@@ -273,6 +297,7 @@ class DriverProvider extends ChangeNotifier {
     }
 
     final locationResult = await _locationService.getCurrentLocation();
+    if (generation != _stateGeneration) return ToggleOnlineResult.apiError;
     if (!locationResult.success || locationResult.position == null) {
       final failureStatus = locationResult.status;
       if (failureStatus != null) {
@@ -300,7 +325,9 @@ class DriverProvider extends ChangeNotifier {
         locationResult.position!.latitude,
         locationResult.position!.longitude,
       );
+      if (generation != _stateGeneration) return ToggleOnlineResult.apiError;
     } catch (e) {
+      if (generation != _stateGeneration) return ToggleOnlineResult.apiError;
       _error = 'Failed to send location. Please try again.';
       notifyListeners();
       return ToggleOnlineResult.locationUnavailable;
@@ -327,10 +354,12 @@ class DriverProvider extends ChangeNotifier {
 
   /// Start location tracking after going online
   void _startLocationTracking() {
+    final generation = _stateGeneration;
     // Start periodic permission monitoring
     _startLocationPermissionMonitoring();
 
     _locationService.checkPermission().then((status) async {
+      if (generation != _stateGeneration || !isOnline) return;
       _locationStatus = status;
       _locationPermissionLost = !status.hasForegroundAccess;
 
@@ -351,6 +380,7 @@ class DriverProvider extends ChangeNotifier {
 
       // Immediate first POST so the server sees us as soon as we go online.
       final result = await _locationService.getCurrentLocation();
+      if (generation != _stateGeneration || !isOnline) return;
       if (result.success && result.position != null) {
         await updateLocation(
           result.position!.latitude,
@@ -358,6 +388,7 @@ class DriverProvider extends ChangeNotifier {
         );
       }
 
+      if (generation != _stateGeneration || !isOnline) return;
       // Fixed 10-second heartbeat — POSTs the latest known position whether
       // or not the driver is moving. Works in foreground and background
       // (background requires "Always" permission + active foreground service).
@@ -388,6 +419,7 @@ class DriverProvider extends ChangeNotifier {
 
   /// Start periodic location permission checks while online
   void _startLocationPermissionMonitoring() {
+    final generation = _stateGeneration;
     _locationPermissionCheckTimer?.cancel();
     _locationPermissionLost = false;
     _locationPermissionCheckTimer = Timer.periodic(const Duration(seconds: 30), (
@@ -395,6 +427,7 @@ class DriverProvider extends ChangeNotifier {
     ) async {
       if (!(_profile?.isOnline ?? false)) return;
       final status = await _locationService.checkPermission();
+      if (generation != _stateGeneration || !isOnline) return;
       _locationStatus = status;
       final wasLost = _locationPermissionLost;
       _locationPermissionLost = !status.hasForegroundAccess;
@@ -426,7 +459,10 @@ class DriverProvider extends ChangeNotifier {
 
   /// Check location permission status without toggling
   Future<LocationPermissionStatus> checkLocationPermission() async {
-    _locationStatus = await _locationService.checkPermission();
+    final generation = _stateGeneration;
+    final loadedStatus = await _locationService.checkPermission();
+    if (generation != _stateGeneration) return LocationPermissionStatus.denied;
+    _locationStatus = loadedStatus;
     return _locationStatus!;
   }
 
@@ -441,6 +477,7 @@ class DriverProvider extends ChangeNotifier {
   }
 
   Future<void> updateLocation(double latitude, double longitude) async {
+    final generation = _stateGeneration;
     debugPrint('[DriverProvider] === SENDING LOCATION TO API ===');
     debugPrint('[DriverProvider] Coordinates: $latitude, $longitude');
     try {
@@ -448,6 +485,7 @@ class DriverProvider extends ChangeNotifier {
         latitude: latitude,
         longitude: longitude,
       );
+      if (generation != _stateGeneration) return;
       _lastLocationUpdate = DateTime.now();
       debugPrint('[DriverProvider] === LOCATION SENT SUCCESSFULLY ===');
 
@@ -456,13 +494,16 @@ class DriverProvider extends ChangeNotifier {
 
       notifyListeners();
     } catch (e) {
+      if (generation != _stateGeneration) return;
       debugPrint('[DriverProvider] === LOCATION UPDATE FAILED ===');
       debugPrint('[DriverProvider] Error: $e');
     }
   }
 
   Future<void> _updatePlaceName(double latitude, double longitude) async {
+    final generation = _stateGeneration;
     final placeName = await _geocodingService.getPlaceName(latitude, longitude);
+    if (generation != _stateGeneration) return;
     if (placeName != null) {
       _currentPlaceName = placeName;
     }
@@ -470,36 +511,54 @@ class DriverProvider extends ChangeNotifier {
 
   /// Best-effort offline sync before logout while auth tokens are still valid.
   Future<void> markOfflineBeforeLogout() async {
-    if (_profile == null) return;
+    final generation = _stateGeneration;
+    if (_profile == null && !_wasOnlineBeforeLogout) return;
 
-    if (!(_profile?.isOnline ?? false)) {
+    if (!(_profile?.isOnline ?? _wasOnlineBeforeLogout)) {
       _stopLocationTracking();
       return;
     }
 
     if (_isTourActive?.call() == true) {
-      _profile = _profile!.copyWith(isOnline: false);
+      _profile = _profile?.copyWith(isOnline: false);
       _stopLocationTracking();
       notifyListeners();
       return;
     }
 
     try {
-      final confirmedStatus = await _driverService.toggleOnlineStatus(false);
-      _profile = _profile!.copyWith(isOnline: confirmedStatus);
+      final confirmedStatus = await _driverService.toggleOnlineStatus(
+        false,
+        sessionCleanup: true,
+      );
+      if (generation != _stateGeneration) return;
+      _profile = _profile?.copyWith(isOnline: confirmedStatus);
       if (!confirmedStatus) {
         _stopLocationTracking();
       }
       notifyListeners();
     } catch (e) {
+      if (generation != _stateGeneration) return;
       debugPrint(
         '[DriverProvider] Failed to mark driver offline before logout: $e',
       );
     }
   }
 
-  void clearProfile() {
+  void pauseForLogout() {
+    _wasOnlineBeforeLogout = _profile?.isOnline ?? false;
+    ++_stateGeneration;
     _stopLocationTracking();
+    _profile = null;
+    _profileExists = null;
+    _isLoading = false;
+    notifyListeners();
+  }
+
+  void clearProfile() {
+    pauseForLogout();
+    _wasOnlineBeforeLogout = false;
+    _isLoading = false;
     _profile = null;
     _profileExists = null;
     _error = null;
@@ -513,5 +572,12 @@ class DriverProvider extends ChangeNotifier {
   void clearError() {
     _error = null;
     notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    ++_stateGeneration;
+    _stopLocationTracking();
+    super.dispose();
   }
 }

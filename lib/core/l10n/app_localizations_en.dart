@@ -1999,4 +1999,17 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get changelogVersion0910Release =>
       'Released driver app version 1.0.9+10.';
+
+  @override
+  String get notificationsAllRead => 'All read';
+
+  @override
+  String notificationsNewCount(String count) {
+    return '$count new';
+  }
+
+  @override
+  String notificationsUnreadCount(int count) {
+    return '$count unread notifications';
+  }
 }

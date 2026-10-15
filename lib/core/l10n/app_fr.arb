@@ -518,5 +518,8 @@
   "changelogVersion0910Crashlytics": "Le signalement Crashlytics des erreurs fatales dans les builds de production a été ajouté.",
   "changelogVersion0910Notifications": "Le cycle de vie des notifications, la déduplication et le traitement des notifications de commandes ont été améliorés.",
   "changelogVersion0910Platform": "La configuration de publication pour Android, iOS, macOS et le web a été actualisée avec les flavors de développement et de production.",
-  "changelogVersion0910Release": "L'application chauffeur est sortie en version 1.0.9+10."
+  "changelogVersion0910Release": "L'application chauffeur est sortie en version 1.0.9+10.",
+  "notificationsAllRead": "Tout lu",
+  "notificationsNewCount": "{count} nouv.",
+  "notificationsUnreadCount": "{count} notifications non lues"
 }

@@ -3799,6 +3799,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Released driver app version 1.0.9+10.'**
   String get changelogVersion0910Release;
+
+  /// No description provided for @notificationsAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'All read'**
+  String get notificationsAllRead;
+
+  /// Compact unread notification count for the home header; count may be 99+.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} new'**
+  String notificationsNewCount(String count);
+
+  /// Accessible unread notification count.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} unread notifications'**
+  String notificationsUnreadCount(int count);
 }
 
 class _AppLocalizationsDelegate

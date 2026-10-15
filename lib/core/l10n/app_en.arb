@@ -757,5 +757,24 @@
   "changelogVersion0910Crashlytics": "Added Crashlytics reporting for fatal errors in release builds.",
   "changelogVersion0910Notifications": "Improved notification lifecycle, deduplication, and order-notification handling.",
   "changelogVersion0910Platform": "Refreshed Android, iOS, macOS, and web release configuration with development and production flavors.",
-  "changelogVersion0910Release": "Released driver app version 1.0.9+10."
+  "changelogVersion0910Release": "Released driver app version 1.0.9+10.",
+  "notificationsAllRead": "All read",
+  "notificationsNewCount": "{count} new",
+  "notificationsUnreadCount": "{count} unread notifications",
+  "@notificationsNewCount": {
+    "description": "Compact unread notification count for the home header; count may be 99+.",
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "@notificationsUnreadCount": {
+    "description": "Accessible unread notification count.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

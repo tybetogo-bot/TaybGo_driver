@@ -2003,4 +2003,17 @@ class AppLocalizationsNl extends AppLocalizations {
   @override
   String get changelogVersion0910Release =>
       'De chauffeursapp is uitgebracht als versie 1.0.9+10.';
+
+  @override
+  String get notificationsAllRead => 'Alles gelezen';
+
+  @override
+  String notificationsNewCount(String count) {
+    return '$count nieuw';
+  }
+
+  @override
+  String notificationsUnreadCount(int count) {
+    return '$count ongelezen meldingen';
+  }
 }

@@ -560,5 +560,8 @@
   "changelogVersion0910Crashlytics": "Crashlytics-Berichter fir schwéier Feeler a Release-Builds goufen derbäigesat.",
   "changelogVersion0910Notifications": "Den Notifikatiouns-Liewenszyklus, d'Deduplikatioun an d'Veraarbechtung vun Bestellungsnotifikatioune goufe verbessert.",
   "changelogVersion0910Platform": "D'Release-Konfiguratioun fir Android, iOS, macOS an de Web gouf mat Entwécklungs- a Produktiouns-Flavors aktualiséiert.",
-  "changelogVersion0910Release": "D'Fuerer-App gouf an der Versioun 1.0.9+10 verëffentlecht."
+  "changelogVersion0910Release": "D'Fuerer-App gouf an der Versioun 1.0.9+10 verëffentlecht.",
+  "notificationsAllRead": "Alles gelies",
+  "notificationsNewCount": "{count} nei",
+  "notificationsUnreadCount": "{count} ongelies Notifikatiounen"
 }

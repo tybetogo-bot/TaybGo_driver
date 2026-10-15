@@ -2015,4 +2015,17 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get changelogVersion0910Release =>
       'L\'application chauffeur est sortie en version 1.0.9+10.';
+
+  @override
+  String get notificationsAllRead => 'Tout lu';
+
+  @override
+  String notificationsNewCount(String count) {
+    return '$count nouv.';
+  }
+
+  @override
+  String notificationsUnreadCount(int count) {
+    return '$count notifications non lues';
+  }
 }

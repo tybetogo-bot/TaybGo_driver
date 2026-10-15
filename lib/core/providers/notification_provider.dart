@@ -20,6 +20,12 @@ class NotificationProvider extends ChangeNotifier {
   bool _pushActive = false;
   Future<void>? _pushCleanup;
   String? _registeredToken;
+  bool _pushStopped = false;
+  bool _hasLoadedNotifications = false;
+  int _inboxRevision = 0;
+  int _inboxRequest = 0;
+  final Set<int> _pendingReads = {};
+  final Set<int> _dismissedIds = {};
 
   NotificationProvider({
     NotificationService? notificationService,
@@ -34,6 +40,7 @@ class NotificationProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get error => _error;
   bool get isTokenRegistered => _isTokenRegistered;
+  bool get hasLoadedNotifications => _hasLoadedNotifications;
 
   int get unreadCount => _notifications.where((n) => !n.isRead).length;
 
@@ -78,6 +85,8 @@ class NotificationProvider extends ChangeNotifier {
     final session = ++_pushSession;
     await _pushCleanup;
     if (!_pushActive || session != _pushSession) return;
+    _pushStopped = false;
+    _fcmService.startPushForSignedInUser();
     _tokenRefreshSubscription = _fcmService.onTokenRefresh((token) {
       if (_pushActive && session == _pushSession) {
         unawaited(registerDeviceToken(token));
@@ -98,18 +107,27 @@ class NotificationProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> stopPushNotifications() {
+  void pausePushNotifications() {
     _pushActive = false;
     ++_pushSession;
     _registrationRetry?.cancel();
     _registrationRetry = null;
     unawaited(_tokenRefreshSubscription?.cancel());
     _tokenRefreshSubscription = null;
+    _fcmService.pausePushForSignedOutUser();
+  }
+
+  Future<void> stopPushNotifications({bool unregister = true}) {
+    if (_pushCleanup != null) return _pushCleanup!;
+    if (_pushStopped) return Future<void>.value();
     final token = _registeredToken;
+    pausePushNotifications();
     _registeredToken = null;
-    return _pushCleanup ??= _unregisterAndStop(token).whenComplete(() {
-      _pushCleanup = null;
-    });
+    return _pushCleanup = _unregisterAndStop(unregister ? token : null)
+        .whenComplete(() {
+          _pushStopped = true;
+          _pushCleanup = null;
+        });
   }
 
   Future<void> _unregisterAndStop(String? token) async {
@@ -129,6 +147,7 @@ class NotificationProvider extends ChangeNotifier {
   /// Register FCM device token with the server
   Future<bool> registerDeviceToken(String token) async {
     final session = _pushSession;
+    if (!_pushActive) return false;
     try {
       final deviceType = _getDeviceType();
 
@@ -156,58 +175,104 @@ class NotificationProvider extends ChangeNotifier {
     }
   }
 
-  /// Fetch notifications from the server
-  Future<void> fetchNotifications() async {
-    _isLoading = true;
-    _error = null;
-    notifyListeners();
-
+  /// Background refreshes keep the last known count and avoid inbox spinners.
+  Future<void> fetchNotifications({bool silent = false}) async {
+    final session = _pushSession;
+    final revision = _inboxRevision;
+    final request = ++_inboxRequest;
+    if (!silent) {
+      _isLoading = true;
+      _error = null;
+      notifyListeners();
+    }
     try {
-      _notifications = await _notificationService.getNotifications();
-      _isLoading = false;
+      final notifications = await _notificationService.getNotifications();
+      if (session != _pushSession ||
+          request != _inboxRequest ||
+          revision != _inboxRevision) {
+        return;
+      }
+      _notifications = notifications
+          .where((n) => !_dismissedIds.contains(n.id))
+          .map(
+            (n) => _pendingReads.contains(n.id) ? n.copyWith(isRead: true) : n,
+          )
+          .toList();
+      _hasLoadedNotifications = true;
+      _error = null;
       notifyListeners();
-
-      debugPrint(
-        '[NotificationProvider] Fetched ${_notifications.length} notifications',
-      );
     } catch (e) {
-      _error = e.toString();
-      _isLoading = false;
-      notifyListeners();
-
+      if (session != _pushSession || request != _inboxRequest) return;
+      if (!silent) _error = e.toString();
       debugPrint('[NotificationProvider] Failed to fetch notifications: $e');
+    } finally {
+      if (session == _pushSession && request == _inboxRequest) {
+        _isLoading = false;
+        notifyListeners();
+      }
     }
   }
 
-  /// Mark a notification as read locally (optimistic update)
-  void markAsRead(int id) {
+  /// Optimistic count changes are persisted, so a refresh cannot resurrect reads.
+  Future<void> markAsRead(int id) async {
     final index = _notifications.indexWhere((n) => n.id == id);
-    if (index != -1) {
-      _notifications[index] = _notifications[index].copyWith(
-        isRead: true,
-        readAt: DateTime.now(),
-      );
-      notifyListeners();
+    if (index == -1 || _notifications[index].isRead) return;
+    final original = _notifications[index];
+    final session = _pushSession;
+    _pendingReads.add(id);
+    ++_inboxRevision;
+    _notifications[index] = original.copyWith(
+      isRead: true,
+      readAt: DateTime.now(),
+    );
+    notifyListeners();
+    try {
+      await _notificationService.markAsRead(id);
+    } catch (error) {
+      if (session != _pushSession) return;
+      final current = _notifications.indexWhere((n) => n.id == id);
+      if (current != -1) _notifications[current] = original;
+      debugPrint('[NotificationProvider] Mark read failed: $error');
+    } finally {
+      if (session == _pushSession) {
+        _pendingReads.remove(id);
+        ++_inboxRevision;
+        notifyListeners();
+      }
     }
   }
 
-  /// Mark all notifications as read locally
-  void markAllAsRead() {
-    _notifications = _notifications
-        .map((n) => n.copyWith(isRead: true, readAt: DateTime.now()))
+  Future<void> markAllAsRead() async {
+    final ids = _notifications
+        .where((n) => !n.isRead)
+        .map((n) => n.id)
         .toList();
+    await Future.wait(ids.map(markAsRead));
+  }
+
+  /// Dismissals retain their existing local-only behavior for this login.
+  void deleteNotification(int id) {
+    _dismissedIds.add(id);
+    ++_inboxRevision;
+    _notifications.removeWhere((n) => n.id == id);
     notifyListeners();
   }
 
-  /// Delete a notification locally
-  void deleteNotification(int id) {
-    _notifications.removeWhere((n) => n.id == id);
+  void clearInbox() {
+    _dismissedIds.addAll(_notifications.map((n) => n.id));
+    ++_inboxRevision;
+    _notifications = [];
     notifyListeners();
   }
 
   /// Clear all notifications locally
   void clearAll() {
-    unawaited(stopPushNotifications());
+    pausePushNotifications();
+    ++_inboxRevision;
+    ++_inboxRequest;
+    _pendingReads.clear();
+    _dismissedIds.clear();
+    _hasLoadedNotifications = false;
     _notifications = [];
     _isTokenRegistered = false;
     _isLoading = false;
