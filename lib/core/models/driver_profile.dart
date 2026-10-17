@@ -83,9 +83,9 @@ class DriverProfile {
 
   String get formattedEarnings {
     if (totalEarnings >= 1000) {
-      return '\$${(totalEarnings / 1000).toStringAsFixed(1)}K';
+      return '€${(totalEarnings / 1000).toStringAsFixed(1)}K';
     }
-    return '\$${totalEarnings.toStringAsFixed(2)}';
+    return '€${totalEarnings.toStringAsFixed(2)}';
   }
 
   String get memberSince {

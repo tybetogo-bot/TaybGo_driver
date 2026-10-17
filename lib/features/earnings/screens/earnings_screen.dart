@@ -246,7 +246,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                             ),
                             const SizedBox(height: 12),
                             Text(
-                              '\$${(summary?.totalEarnings ?? 0).toStringAsFixed(2)}',
+                              '€${(summary?.totalEarnings ?? 0).toStringAsFixed(2)}',
                               style: TextStyle(
                                 fontSize: 44,
                                 fontWeight: FontWeight.w700,
@@ -281,7 +281,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                             Expanded(
                               child: _buildStatCard(
                                 Icons.local_shipping_outlined,
-                                '\$${(summary?.totalDriverDeliveryFees ?? 0).toStringAsFixed(2)}',
+                                '€${(summary?.totalDriverDeliveryFees ?? 0).toStringAsFixed(2)}',
                                 l10n.driverDeliveryFee,
                                 AppColors.info,
                                 surfaceColor,
@@ -297,7 +297,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                             Expanded(
                               child: _buildStatCard(
                                 Icons.volunteer_activism,
-                                '\$${(summary?.totalTips ?? 0).toStringAsFixed(2)}',
+                                '€${(summary?.totalTips ?? 0).toStringAsFixed(2)}',
                                 l10n.tip,
                                 AppColors.warning,
                                 surfaceColor,
@@ -310,7 +310,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                               child: _buildStatCard(
                                 Icons.trending_up,
                                 (summary?.totalOrders ?? 0) > 0
-                                    ? '\$${(summary!.totalEarnings / summary.totalOrders).toStringAsFixed(2)}'
+                                    ? '€${(summary!.totalEarnings / summary.totalOrders).toStringAsFixed(2)}'
                                     : '--',
                                 l10n.avgPerOrder,
                                 AppColors.success,
@@ -664,7 +664,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '${l10n.driverDeliveryFee}: \$${entry.driverDeliveryFee.toStringAsFixed(2)}',
+                  '${l10n.driverDeliveryFee}: €${entry.driverDeliveryFee.toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 11, color: secondaryColor),
                 ),
               ],
@@ -674,7 +674,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '\$${entry.earningAmount.toStringAsFixed(2)}',
+                '€${entry.earningAmount.toStringAsFixed(2)}',
                 style: TextStyle(
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
@@ -683,7 +683,7 @@ class _EarningsScreenState extends State<EarningsScreen> {
               ),
               if (entry.tip > 0)
                 Text(
-                  '${l10n.tip}: \$${entry.tip.toStringAsFixed(2)}',
+                  '${l10n.tip}: €${entry.tip.toStringAsFixed(2)}',
                   style: TextStyle(fontSize: 11, color: AppColors.warning),
                 ),
             ],

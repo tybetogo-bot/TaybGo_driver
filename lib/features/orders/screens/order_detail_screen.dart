@@ -1480,7 +1480,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   ),
                   if (item.price > 0)
                     Text(
-                      '\$${(item.price * item.quantity).toStringAsFixed(2)}',
+                      '€${(item.price * item.quantity).toStringAsFixed(2)}',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

@@ -57,6 +57,6 @@ void main() {
     expect(provider.activeOrder?.status, OrderStatus.onTheWay);
     expect(provider.activeOrder?.driverDeliveryFee, 4132.96);
     expect(provider.activeOrder?.hasDriverDeliveryFee, isTrue);
-    expect(provider.activeOrder?.formattedDriverDeliveryFee, r'$4132.96');
+    expect(provider.activeOrder?.formattedDriverDeliveryFee, '€4132.96');
   });
 }

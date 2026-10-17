@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.18+22 — 17 October 2026
+
+- Display euros throughout home, orders, delivery fees, tips, earnings, and profile totals. Numeric amounts and precision are unchanged.
+- Retain production Places, Firebase, document upload, and notification configuration in store builds.
+
 ## 1.0.17+21 — 14 October 2026
 
 - Added an unread notification pill to the home header with a live count, coral indicator, and brief arrival animation. Supports reduced motion, dark mode, RTL, and all 11 app languages.

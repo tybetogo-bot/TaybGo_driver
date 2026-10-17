@@ -31,7 +31,7 @@ void main() {
     expect(order.hasDriverDeliveryFee, isTrue);
     expect(order.deliveryFee, 8.50);
     expect(order.total, 29.90);
-    expect(order.formattedDriverDeliveryFee, r'$5.75');
+    expect(order.formattedDriverDeliveryFee, '€5.75');
   });
 
   test('keeps explicit paid and unpaid states from order details', () {
@@ -56,7 +56,7 @@ void main() {
     expect(missing.hasDriverDeliveryFee, isFalse);
     expect(missing.formattedDriverDeliveryFee, '—');
     expect(explicitZero.hasDriverDeliveryFee, isTrue);
-    expect(explicitZero.formattedDriverDeliveryFee, r'$0.00');
+    expect(explicitZero.formattedDriverDeliveryFee, '€0.00');
   });
 
   test('maps shipping requirements and package details', () {
