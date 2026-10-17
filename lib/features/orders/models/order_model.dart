@@ -408,14 +408,14 @@ class OrderModel {
   // Computed properties for backward compatibility
   double get price => deliveryFee > 0 ? deliveryFee : total;
 
-  String get formattedPrice => '\$${price.toStringAsFixed(2)}';
-  String get formattedTip => '\$${tip.toStringAsFixed(2)}';
-  String get formattedTotal => '\$${total.toStringAsFixed(2)}';
+  String get formattedPrice => '€${price.toStringAsFixed(2)}';
+  String get formattedTip => '€${tip.toStringAsFixed(2)}';
+  String get formattedTotal => '€${total.toStringAsFixed(2)}';
   String get formattedDistance => '${distance.toStringAsFixed(1)} km';
-  String get formattedSubtotal => '\$${subtotal.toStringAsFixed(2)}';
-  String get formattedDeliveryFee => '\$${deliveryFee.toStringAsFixed(2)}';
+  String get formattedSubtotal => '€${subtotal.toStringAsFixed(2)}';
+  String get formattedDeliveryFee => '€${deliveryFee.toStringAsFixed(2)}';
   String get formattedDriverDeliveryFee =>
-      hasDriverDeliveryFee ? '\$${driverDeliveryFee.toStringAsFixed(2)}' : '—';
+      hasDriverDeliveryFee ? '€${driverDeliveryFee.toStringAsFixed(2)}' : '—';
   bool get shouldShowCustomerTotal => isPaid == false;
   bool get hasDeliveryInstructions =>
       deliveryInstructions != null && deliveryInstructions!.trim().isNotEmpty;

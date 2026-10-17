@@ -1416,7 +1416,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   Expanded(
                                     child: _buildStatItem(
                                       Icons.local_shipping_outlined,
-                                      '\$${totalDeliveryFees.toStringAsFixed(2)}',
+                                      '€${totalDeliveryFees.toStringAsFixed(2)}',
                                       l10n.driverDeliveryFee,
                                       AppColors.info,
                                       textColor,
@@ -1431,7 +1431,7 @@ class _HomeScreenState extends State<HomeScreen>
                                   Expanded(
                                     child: _buildStatItem(
                                       Icons.volunteer_activism,
-                                      '\$${totalTips.toStringAsFixed(2)}',
+                                      '€${totalTips.toStringAsFixed(2)}',
                                       l10n.tip,
                                       AppColors.warning,
                                       textColor,
@@ -1466,7 +1466,7 @@ class _HomeScreenState extends State<HomeScreen>
                                       ),
                                     ),
                                     Text(
-                                      '\$${totalEarnings.toStringAsFixed(2)}',
+                                      '€${totalEarnings.toStringAsFixed(2)}',
                                       style: const TextStyle(
                                         fontSize: 18,
                                         fontWeight: FontWeight.w700,
@@ -1994,7 +1994,7 @@ class _HomeScreenState extends State<HomeScreen>
                             ),
                           ),
                           Text(
-                            '\$${(item.price * item.quantity).toStringAsFixed(2)}',
+                            '€${(item.price * item.quantity).toStringAsFixed(2)}',
                             style: TextStyle(
                               fontSize: 13,
                               color: textColor,
