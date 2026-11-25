@@ -376,7 +376,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     if (order == null) return;
 
     final message = _hasFreshOrderDetails && order.needsCashCollection
-        ? '${l10n.collectCashReminder}\n\n${l10n.completeOrderConfirmation}'
+        ? '${l10n.collectCashAmountReminder(order.formattedCashToCollect)}\n\n${l10n.completeOrderConfirmation}'
         : l10n.completeOrderConfirmation;
 
     final confirmed = await showOrderActionConfirmationSheet(
@@ -901,20 +901,40 @@ class _NavigationScreenState extends State<NavigationScreen> {
         // Status
         _buildStatusChip(order.status, l10n),
         const Spacer(),
-        // Earnings
+        // Earnings / Cash collection
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
           decoration: BoxDecoration(
-            color: AppColors.success.withValues(alpha: 0.1),
+            color: (order.needsCashCollection
+                    ? AppColors.error
+                    : AppColors.success)
+                .withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(6),
           ),
-          child: Text(
-            order.formattedTotal,
-            style: const TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: AppColors.success,
-            ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (order.needsCashCollection) ...[
+                const Icon(
+                  Icons.payments_outlined,
+                  size: 14,
+                  color: AppColors.error,
+                ),
+                const SizedBox(width: 4),
+              ],
+              Text(
+                order.needsCashCollection
+                    ? order.formattedCashToCollect
+                    : order.formattedDriverDeliveryFee,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: order.needsCashCollection
+                      ? AppColors.error
+                      : AppColors.success,
+                ),
+              ),
+            ],
           ),
         ),
       ],
@@ -970,6 +990,13 @@ class _NavigationScreenState extends State<NavigationScreen> {
     }
 
     final color = isPaid ? AppColors.success : AppColors.error;
+    final headline = needsCash
+        ? l10n.cashToCollectAmount(order.formattedCashToCollect)
+        : (order.isPaidViaWalletOnly
+              ? l10n.paidInFullViaWallet
+              : l10n.orderPaid);
+    final showGiftCardLine =
+        order.hasGiftCardApplied && !(isPaid && order.isPaidViaWalletOnly);
 
     return Container(
       width: double.infinity,
@@ -987,12 +1014,30 @@ class _NavigationScreenState extends State<NavigationScreen> {
             color: color,
           ),
           const SizedBox(width: 8),
-          Text(
-            isPaid ? l10n.orderPaid : l10n.collectCash,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: color,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  headline,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
+                if (showGiftCardLine) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    '${l10n.paidViaGiftCard}: -${order.formattedGiftCardApplied}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.success,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],

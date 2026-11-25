@@ -350,6 +350,9 @@ class OrderModel {
   // Payment
   final PaymentType? paymentType;
   final bool? isPaid;
+  final double giftCardAmountApplied;
+  final double cardAmountDue;
+  final double cashAmountDue;
 
   // Timestamps
   final DateTime createdAt;
@@ -391,19 +394,31 @@ class OrderModel {
     required this.estimatedMinutes,
     this.paymentType,
     this.isPaid,
+    this.giftCardAmountApplied = 0,
+    this.cardAmountDue = 0,
+    double? cashAmountDue,
     this.items = const [],
     DateTime? createdAt,
     this.acceptedAt,
     this.completedAt,
   }) : hasDriverDeliveryFee = hasDriverDeliveryFee ?? driverDeliveryFee != 0,
+       cashAmountDue =
+           cashAmountDue ??
+           (paymentType == PaymentType.cash && isPaid != true ? total : 0.0),
        createdAt = createdAt ?? DateTime.now();
 
   /// Whether we have a confirmed paid/unpaid value we can safely show.
-  bool get hasPaymentInfo => isPaid != null;
+  bool get hasPaymentInfo => isPaid != null || hasGiftCardApplied || hasCashToCollect;
 
-  /// Whether the driver needs to collect cash from the customer
-  bool get needsCashCollection =>
-      paymentType == PaymentType.cash && isPaid == false;
+  bool get hasGiftCardApplied => giftCardAmountApplied > 0.009;
+
+  bool get hasCashToCollect => cashAmountDue > 0.009;
+
+  bool get isPaidViaWalletOnly =>
+      hasGiftCardApplied && cashAmountDue <= 0.009 && cardAmountDue <= 0.009;
+
+  /// Whether the driver needs to collect cash from the customer.
+  bool get needsCashCollection => hasCashToCollect && isPaid != true;
 
   // Computed properties for backward compatibility
   double get price => deliveryFee > 0 ? deliveryFee : total;
@@ -411,12 +426,17 @@ class OrderModel {
   String get formattedPrice => '€${price.toStringAsFixed(2)}';
   String get formattedTip => '€${tip.toStringAsFixed(2)}';
   String get formattedTotal => '€${total.toStringAsFixed(2)}';
+  String get formattedGiftCardApplied =>
+      '€${giftCardAmountApplied.toStringAsFixed(2)}';
+  String get formattedCardAmountDue => '€${cardAmountDue.toStringAsFixed(2)}';
+  String get formattedCashToCollect => '€${cashAmountDue.toStringAsFixed(2)}';
   String get formattedDistance => '${distance.toStringAsFixed(1)} km';
   String get formattedSubtotal => '€${subtotal.toStringAsFixed(2)}';
   String get formattedDeliveryFee => '€${deliveryFee.toStringAsFixed(2)}';
   String get formattedDriverDeliveryFee =>
       hasDriverDeliveryFee ? '€${driverDeliveryFee.toStringAsFixed(2)}' : '—';
-  bool get shouldShowCustomerTotal => isPaid == false;
+  bool get shouldShowCustomerTotal =>
+      isPaid == false || hasGiftCardApplied || hasCashToCollect;
   bool get hasDeliveryInstructions =>
       deliveryInstructions != null && deliveryInstructions!.trim().isNotEmpty;
 
@@ -931,6 +951,15 @@ class OrderModel {
               json['is_paid'] == '1' ||
               json['is_paid'] == 'true')
         : null;
+    final giftCardAmountApplied = json['gift_card_amount_applied'] != null
+        ? _parseDouble(json['gift_card_amount_applied'])
+        : null;
+    final cardAmountDue = json['card_amount_due'] != null
+        ? _parseDouble(json['card_amount_due'])
+        : null;
+    final cashAmountDue = json['cash_amount_due'] != null
+        ? _parseDouble(json['cash_amount_due'])
+        : null;
 
     final requestedVehicleType = OrderVehicleType.fromApi(
       json['requested_vehicle_type'],
@@ -994,6 +1023,9 @@ class OrderModel {
       estimatedMinutes: estimatedMinutes,
       paymentType: paymentType,
       isPaid: isPaid,
+      giftCardAmountApplied: giftCardAmountApplied ?? 0.0,
+      cardAmountDue: cardAmountDue ?? 0.0,
+      cashAmountDue: cashAmountDue,
       items: orderItems,
       createdAt: _parseDateTime(json['created_at']) ?? DateTime.now(),
       acceptedAt: _parseDateTime(json['accepted_at']),
@@ -1022,6 +1054,10 @@ class OrderModel {
       if (hasDriverDeliveryFee) 'driver_delivery_fee': driverDeliveryFee,
       'payment_type': paymentType?.apiValue,
       'is_paid': isPaid,
+      if (hasGiftCardApplied)
+        'gift_card_amount_applied': giftCardAmountApplied,
+      if (cardAmountDue > 0) 'card_amount_due': cardAmountDue,
+      if (hasCashToCollect) 'cash_amount_due': cashAmountDue,
       'distance': distance,
       'estimated_minutes': estimatedMinutes,
     };
@@ -1062,6 +1098,9 @@ class OrderModel {
     int? estimatedMinutes,
     PaymentType? paymentType,
     bool? isPaid,
+    double? giftCardAmountApplied,
+    double? cardAmountDue,
+    double? cashAmountDue,
     List<OrderItem>? items,
     DateTime? createdAt,
     DateTime? acceptedAt,
@@ -1105,6 +1144,10 @@ class OrderModel {
       estimatedMinutes: estimatedMinutes ?? this.estimatedMinutes,
       paymentType: paymentType ?? this.paymentType,
       isPaid: isPaid ?? this.isPaid,
+      giftCardAmountApplied:
+          giftCardAmountApplied ?? this.giftCardAmountApplied,
+      cardAmountDue: cardAmountDue ?? this.cardAmountDue,
+      cashAmountDue: cashAmountDue ?? this.cashAmountDue,
       items: items ?? this.items,
       createdAt: createdAt ?? this.createdAt,
       acceptedAt: acceptedAt ?? this.acceptedAt,

@@ -563,5 +563,15 @@
   "changelogVersion0910Release": "L'app per autisti è stata rilasciata nella versione 1.0.9+10.",
   "notificationsAllRead": "Tutte lette",
   "notificationsNewCount": "{count} nuove",
-  "notificationsUnreadCount": "{count} notifiche non lette"
+  "notificationsUnreadCount": "{count} notifiche non lette",
+  "enterYourEmail": "Inserisci il tuo indirizzo e-mail",
+  "pleaseEnterYourEmail": "Inserisci il tuo indirizzo e-mail",
+  "pleaseEnterValidEmail": "Inserisci un indirizzo e-mail valido",
+  "emailRequiredTitle": "Aggiungi il tuo indirizzo e-mail",
+  "emailRequiredMessage": "Un indirizzo e-mail valido è ora obbligatorio per tutti gli autisti TaybGo. Aggiungi la tua e-mail per continuare.",
+  "saveEmail": "Salva e-mail",
+  "cashToCollect": "Contanti da incassare",
+  "cashToCollectAmount": "Contanti da incassare: {amount}",
+  "paidViaGiftCard": "Pagato con carta regalo",
+  "paidInFullViaWallet": "Pagato tramite wallet regalo"
 }

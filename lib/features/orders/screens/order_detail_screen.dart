@@ -768,6 +768,13 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
 
     final color = isPaid ? AppColors.success : AppColors.error;
+    final headline = needsCash
+        ? l10n.cashToCollectAmount(order.formattedCashToCollect)
+        : (order.isPaidViaWalletOnly
+              ? l10n.paidInFullViaWallet
+              : l10n.orderPaid);
+    final showGiftCardLine =
+        order.hasGiftCardApplied && !(isPaid && order.isPaidViaWalletOnly);
 
     return Container(
       width: double.infinity,
@@ -785,12 +792,30 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
             color: color,
           ),
           const SizedBox(width: 8),
-          Text(
-            isPaid ? l10n.orderPaid : l10n.collectCash,
-            style: TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w700,
-              color: color,
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  headline,
+                  style: TextStyle(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: color,
+                  ),
+                ),
+                if (showGiftCardLine) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    '${l10n.paidViaGiftCard}: -${order.formattedGiftCardApplied}',
+                    style: const TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w500,
+                      color: AppColors.success,
+                    ),
+                  ),
+                ],
+              ],
             ),
           ),
         ],
@@ -1598,27 +1623,92 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               padding: EdgeInsets.symmetric(vertical: 10),
               child: Divider(height: 1),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  l10n.total,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: textColor,
-                  ),
-                ),
-                Text(
-                  order.formattedTotal,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w700,
-                    color: AppColors.success,
-                  ),
+            if (order.hasGiftCardApplied || order.hasCashToCollect) ...[
+              _buildEarningRow(
+                l10n.total,
+                order.formattedTotal,
+                secondaryColor,
+                textColor,
+              ),
+              if (order.hasGiftCardApplied) ...[
+                const SizedBox(height: 6),
+                _buildEarningRow(
+                  l10n.paidViaGiftCard,
+                  '-${order.formattedGiftCardApplied}',
+                  secondaryColor,
+                  AppColors.success,
                 ),
               ],
-            ),
+              if (order.hasCashToCollect) ...[
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.cashToCollect,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
+                      ),
+                    ),
+                    Text(
+                      order.formattedCashToCollect,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.error,
+                      ),
+                    ),
+                  ],
+                ),
+              ] else if (order.isPaidViaWalletOnly) ...[
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      l10n.paidInFullViaWallet,
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: textColor,
+                      ),
+                    ),
+                    Text(
+                      order.formattedGiftCardApplied,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.success,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ] else ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    l10n.total,
+                    style: TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
+                  ),
+                  Text(
+                    order.formattedTotal,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.success,
+                    ),
+                  ),
+                ],
+              ),
+            ],
           ],
         ],
       ),
@@ -1844,7 +1934,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
           actionText = l10n.orderCompleted;
           confirmTitle = l10n.completeOrder;
           confirmMessage = _hasFreshOrderDetails && order.needsCashCollection
-              ? '${l10n.collectCashAmountReminder(order.formattedTotal)}\n\n${l10n.completeOrderConfirmation}'
+              ? '${l10n.collectCashAmountReminder(order.formattedCashToCollect)}\n\n${l10n.completeOrderConfirmation}'
               : l10n.completeOrderConfirmation;
           actionIcon = Icons.check_circle;
           nextStatus = OrderStatus.completed;
@@ -1888,7 +1978,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
               : l10n.orderCompleted;
           confirmTitle = actionText;
           confirmMessage = _hasFreshOrderDetails && order.needsCashCollection
-              ? '${l10n.collectCashAmountReminder(order.formattedTotal)}\n\n${l10n.completeOrderConfirmation}'
+              ? '${l10n.collectCashAmountReminder(order.formattedCashToCollect)}\n\n${l10n.completeOrderConfirmation}'
               : l10n.completeOrderConfirmation;
           actionIcon = Icons.check_circle;
           actionColor = AppColors.success;

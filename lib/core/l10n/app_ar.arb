@@ -641,5 +641,15 @@
   "changelogVersion0910Release": "تم إصدار تطبيق السائق بالإصدار 1.0.9+10.",
   "notificationsAllRead": "الكل مقروء",
   "notificationsNewCount": "{count} جديدة",
-  "notificationsUnreadCount": "{count} إشعارات غير مقروءة"
+  "notificationsUnreadCount": "{count} إشعارات غير مقروءة",
+  "enterYourEmail": "أدخل بريدك الإلكتروني",
+  "pleaseEnterYourEmail": "يرجى إدخال بريدك الإلكتروني",
+  "pleaseEnterValidEmail": "يرجى إدخال بريد إلكتروني صالح",
+  "emailRequiredTitle": "أضف بريدك الإلكتروني",
+  "emailRequiredMessage": "أصبح البريد الإلكتروني الصالح مطلوباً الآن لجميع سائقي TaybGo. يرجى إضافة بريدك الإلكتروني للمتابعة.",
+  "saveEmail": "حفظ البريد الإلكتروني",
+  "cashToCollect": "المبلغ النقدي للتحصيل",
+  "cashToCollectAmount": "للتحصيل نقداً: {amount}",
+  "paidViaGiftCard": "مدفوع ببطاقة الهدايا",
+  "paidInFullViaWallet": "مدفوع بالكامل من محفظة الهدايا"
 }

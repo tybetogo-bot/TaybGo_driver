@@ -2016,4 +2016,37 @@ class AppLocalizationsFi extends AppLocalizations {
   String notificationsUnreadCount(int count) {
     return '$count lukematonta ilmoitusta';
   }
+
+  @override
+  String get enterYourEmail => 'Kirjoita sähköpostiosoitteesi';
+
+  @override
+  String get pleaseEnterYourEmail => 'Kirjoita sähköpostiosoitteesi';
+
+  @override
+  String get pleaseEnterValidEmail => 'Kirjoita kelvollinen sähköpostiosoite';
+
+  @override
+  String get emailRequiredTitle => 'Lisää sähköpostiosoitteesi';
+
+  @override
+  String get emailRequiredMessage =>
+      'Kelvollinen sähköpostiosoite vaaditaan nyt kaikilta TaybGo-kuljettajilta. Lisää sähköpostisi jatkaaksesi.';
+
+  @override
+  String get saveEmail => 'Tallenna sähköposti';
+
+  @override
+  String get cashToCollect => 'Käteinen perittäväksi';
+
+  @override
+  String cashToCollectAmount(String amount) {
+    return 'Käteinen perittäväksi: $amount';
+  }
+
+  @override
+  String get paidViaGiftCard => 'Maksettu lahjakortilla';
+
+  @override
+  String get paidInFullViaWallet => 'Maksettu lahjakorttilompakolla';
 }

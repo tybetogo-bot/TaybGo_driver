@@ -17,6 +17,7 @@ import '../../../core/services/driver_registration_service.dart';
 import '../../../core/services/google_places_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/birthdate_utils.dart';
+import '../../../core/utils/email_utils.dart';
 import '../../../shared/widgets/google_places_address_picker.dart';
 import '../utils/document_picker.dart';
 
@@ -42,6 +43,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
 
   // Text controllers
   final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _birthdateController = TextEditingController();
   final _plateNumberController = TextEditingController();
   final _vehicleColorController = TextEditingController();
@@ -166,6 +168,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
   @override
   void dispose() {
     _nameController.dispose();
+    _emailController.dispose();
     _birthdateController.dispose();
     _plateNumberController.dispose();
     _vehicleColorController.dispose();
@@ -191,6 +194,13 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
       case _RegistrationStep.personal:
         if (_nameController.text.trim().isEmpty) {
           return l10n.pleaseEnterYourName;
+        }
+        final normalizedEmail = normalizeEmail(_emailController.text);
+        if (normalizedEmail.isEmpty) {
+          return l10n.pleaseEnterYourEmail;
+        }
+        if (!isValidNormalizedEmail(normalizedEmail)) {
+          return l10n.pleaseEnterValidEmail;
         }
         if (_selectedBirthdate == null) {
           return l10n.pleaseEnterAge;
@@ -527,6 +537,7 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
     try {
       final result = await registrationService.registerDriver(
         name: _nameController.text.trim(),
+        email: normalizeEmail(_emailController.text),
         phone: phone,
         birthdate: _selectedBirthdate!,
         vehicleType: _selectedVehicle,
@@ -890,6 +901,27 @@ class _ApplicationScreenState extends State<ApplicationScreen> {
             autofillHints: const [AutofillHints.name],
             maxLength: 80,
             errorText: _error == l10n.pleaseEnterYourName ? _error : null,
+          ),
+          const SizedBox(height: 20),
+
+          // Email field
+          _buildTextField(
+            controller: _emailController,
+            label: l10n.email,
+            hint: l10n.enterYourEmail,
+            icon: Icons.email_outlined,
+            surfaceColor: surfaceColor,
+            textColor: textColor,
+            secondaryColor: secondaryColor,
+            isRequired: true,
+            keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.next,
+            autofillHints: const [AutofillHints.email],
+            errorText:
+                _error == l10n.pleaseEnterYourEmail ||
+                    _error == l10n.pleaseEnterValidEmail
+                ? _error
+                : null,
           ),
           const SizedBox(height: 20),
 

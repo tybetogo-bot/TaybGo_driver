@@ -563,5 +563,15 @@
   "changelogVersion0910Release": "Förarappen släpptes i version 1.0.9+10.",
   "notificationsAllRead": "Allt läst",
   "notificationsNewCount": "{count} nya",
-  "notificationsUnreadCount": "{count} olästa aviseringar"
+  "notificationsUnreadCount": "{count} olästa aviseringar",
+  "enterYourEmail": "Ange din e-postadress",
+  "pleaseEnterYourEmail": "Vänligen ange din e-postadress",
+  "pleaseEnterValidEmail": "Vänligen ange en giltig e-postadress",
+  "emailRequiredTitle": "Lägg till din e-postadress",
+  "emailRequiredMessage": "En giltig e-postadress krävs nu för alla TaybGo-förare. Lägg till din e-post för att fortsätta.",
+  "saveEmail": "Spara e-post",
+  "cashToCollect": "Kontant att inkassera",
+  "cashToCollectAmount": "Kontant att inkassera: {amount}",
+  "paidViaGiftCard": "Betald med presentkort",
+  "paidInFullViaWallet": "Betald via presentkortsplånbok"
 }

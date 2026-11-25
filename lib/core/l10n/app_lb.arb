@@ -563,5 +563,15 @@
   "changelogVersion0910Release": "D'Fuerer-App gouf an der Versioun 1.0.9+10 verëffentlecht.",
   "notificationsAllRead": "Alles gelies",
   "notificationsNewCount": "{count} nei",
-  "notificationsUnreadCount": "{count} ongelies Notifikatiounen"
+  "notificationsUnreadCount": "{count} ongelies Notifikatiounen",
+  "enterYourEmail": "Gitt Är E-Mail-Adress an",
+  "pleaseEnterYourEmail": "Gitt w.e.g. Är E-Mail-Adress an",
+  "pleaseEnterValidEmail": "Gitt w.e.g. eng gülteg E-Mail-Adress an",
+  "emailRequiredTitle": "E-Mail-Adress derbäisetzen",
+  "emailRequiredMessage": "Eng gülteg E-Mail-Adress ass elo fir all TaybGo-Chauffere verpflichtend. Setzt w.e.g. Är E-Mail derbäi fir weiderzefueren.",
+  "saveEmail": "E-Mail späicheren",
+  "cashToCollect": "Boergeld anzehuelen",
+  "cashToCollectAmount": "Boergeld anzehuelen: {amount}",
+  "paidViaGiftCard": "Mat Kaddoskaart bezuelt",
+  "paidInFullViaWallet": "Mat Kaddoskaarte-Wallet bezuelt"
 }

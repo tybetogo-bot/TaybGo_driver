@@ -2013,4 +2013,38 @@ class AppLocalizationsDa extends AppLocalizations {
   String notificationsUnreadCount(int count) {
     return '$count ulæste notifikationer';
   }
+
+  @override
+  String get enterYourEmail => 'Indtast din e-mailadresse';
+
+  @override
+  String get pleaseEnterYourEmail => 'Indtast venligst din e-mailadresse';
+
+  @override
+  String get pleaseEnterValidEmail =>
+      'Indtast venligst en gyldig e-mailadresse';
+
+  @override
+  String get emailRequiredTitle => 'Tilføj din e-mailadresse';
+
+  @override
+  String get emailRequiredMessage =>
+      'En gyldig e-mailadresse er nu påkrævet for alle TaybGo-chauffører. Tilføj venligst din e-mail for at fortsætte.';
+
+  @override
+  String get saveEmail => 'Gem e-mail';
+
+  @override
+  String get cashToCollect => 'Kontant at opkræve';
+
+  @override
+  String cashToCollectAmount(String amount) {
+    return 'Kontant at opkræve: $amount';
+  }
+
+  @override
+  String get paidViaGiftCard => 'Betalt med gavekort';
+
+  @override
+  String get paidInFullViaWallet => 'Betalt med gavekort-wallet';
 }

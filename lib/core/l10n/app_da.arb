@@ -563,5 +563,15 @@
   "changelogVersion0910Release": "Udgav driverappen i version 1.0.9+10.",
   "notificationsAllRead": "Alt læst",
   "notificationsNewCount": "{count} nye",
-  "notificationsUnreadCount": "{count} ulæste notifikationer"
+  "notificationsUnreadCount": "{count} ulæste notifikationer",
+  "enterYourEmail": "Indtast din e-mailadresse",
+  "pleaseEnterYourEmail": "Indtast venligst din e-mailadresse",
+  "pleaseEnterValidEmail": "Indtast venligst en gyldig e-mailadresse",
+  "emailRequiredTitle": "Tilføj din e-mailadresse",
+  "emailRequiredMessage": "En gyldig e-mailadresse er nu påkrævet for alle TaybGo-chauffører. Tilføj venligst din e-mail for at fortsætte.",
+  "saveEmail": "Gem e-mail",
+  "cashToCollect": "Kontant at opkræve",
+  "cashToCollectAmount": "Kontant at opkræve: {amount}",
+  "paidViaGiftCard": "Betalt med gavekort",
+  "paidInFullViaWallet": "Betalt med gavekort-wallet"
 }

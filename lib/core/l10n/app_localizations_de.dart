@@ -2028,4 +2028,38 @@ class AppLocalizationsDe extends AppLocalizations {
   String notificationsUnreadCount(int count) {
     return '$count ungelesene Benachrichtigungen';
   }
+
+  @override
+  String get enterYourEmail => 'Geben Sie Ihre E-Mail-Adresse ein';
+
+  @override
+  String get pleaseEnterYourEmail => 'Bitte geben Sie Ihre E-Mail-Adresse ein';
+
+  @override
+  String get pleaseEnterValidEmail =>
+      'Bitte geben Sie eine gültige E-Mail-Adresse ein';
+
+  @override
+  String get emailRequiredTitle => 'E-Mail-Adresse hinzufügen';
+
+  @override
+  String get emailRequiredMessage =>
+      'Für alle TaybGo-Fahrer ist jetzt eine gültige E-Mail-Adresse erforderlich. Bitte fügen Sie Ihre E-Mail hinzu, um fortzufahren.';
+
+  @override
+  String get saveEmail => 'E-Mail speichern';
+
+  @override
+  String get cashToCollect => 'Bar zu kassieren';
+
+  @override
+  String cashToCollectAmount(String amount) {
+    return 'Bar zu kassieren: $amount';
+  }
+
+  @override
+  String get paidViaGiftCard => 'Per Geschenkkarte bezahlt';
+
+  @override
+  String get paidInFullViaWallet => 'Über Geschenkkarten-Guthaben bezahlt';
 }

@@ -5,6 +5,7 @@ import '../api/api_constants.dart';
 import '../models/driver_address.dart';
 import '../models/driver_profile.dart';
 import '../utils/birthdate_utils.dart';
+import '../utils/email_utils.dart';
 
 class DriverService {
   final ApiClient _apiClient;
@@ -92,6 +93,7 @@ class DriverService {
   Future<DriverProfile> updateUserProfile({
     String? name,
     String? phone,
+    String? email,
     DateTime? birthdate,
     String? vehicleType,
     bool clearCarDetails = false,
@@ -119,6 +121,9 @@ class DriverService {
       }
       if (phone != null) {
         data['phone'] = phone;
+      }
+      if (email != null) {
+        data['email'] = normalizeEmail(email);
       }
       if (birthdate != null) {
         data['birthdate'] = BirthdateUtils.formatForApi(birthdate);

@@ -6,6 +6,7 @@ import '../l10n/app_localizations.dart';
 import '../providers/tour_provider.dart';
 import '../providers/order_provider.dart';
 import '../../features/tour/tour_coordinator.dart';
+import '../../shared/widgets/mandatory_email_gate.dart';
 
 class ShellScaffold extends StatefulWidget {
   final Widget child;
@@ -124,33 +125,35 @@ class _ShellScaffoldState extends State<ShellScaffold> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      body: widget.child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _getSelectedIndex(context),
-        onTap: (index) => _onItemTapped(context, index),
-        items: [
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.home_outlined),
-            activeIcon: const Icon(Icons.home),
-            label: l10n.home,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.receipt_long_outlined),
-            activeIcon: const Icon(Icons.receipt_long),
-            label: l10n.orders,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.account_balance_wallet_outlined),
-            activeIcon: const Icon(Icons.account_balance_wallet),
-            label: l10n.earnings_label,
-          ),
-          BottomNavigationBarItem(
-            icon: const Icon(Icons.person_outline),
-            activeIcon: const Icon(Icons.person),
-            label: l10n.profile,
-          ),
-        ],
+    return MandatoryEmailGate(
+      child: Scaffold(
+        body: widget.child,
+        bottomNavigationBar: BottomNavigationBar(
+          currentIndex: _getSelectedIndex(context),
+          onTap: (index) => _onItemTapped(context, index),
+          items: [
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.home_outlined),
+              activeIcon: const Icon(Icons.home),
+              label: l10n.home,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.receipt_long_outlined),
+              activeIcon: const Icon(Icons.receipt_long),
+              label: l10n.orders,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.account_balance_wallet_outlined),
+              activeIcon: const Icon(Icons.account_balance_wallet),
+              label: l10n.earnings_label,
+            ),
+            BottomNavigationBarItem(
+              icon: const Icon(Icons.person_outline),
+              activeIcon: const Icon(Icons.person),
+              label: l10n.profile,
+            ),
+          ],
+        ),
       ),
     );
   }
