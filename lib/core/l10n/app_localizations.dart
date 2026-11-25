@@ -3817,6 +3817,66 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count} unread notifications'**
   String notificationsUnreadCount(int count);
+
+  /// No description provided for @enterYourEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your email address'**
+  String get enterYourEmail;
+
+  /// No description provided for @pleaseEnterYourEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter your email address'**
+  String get pleaseEnterYourEmail;
+
+  /// No description provided for @pleaseEnterValidEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Please enter a valid email address'**
+  String get pleaseEnterValidEmail;
+
+  /// No description provided for @emailRequiredTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Your Email Address'**
+  String get emailRequiredTitle;
+
+  /// No description provided for @emailRequiredMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'A valid email address is now required for all TaybGo drivers. Please add your email to continue.'**
+  String get emailRequiredMessage;
+
+  /// No description provided for @saveEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Email'**
+  String get saveEmail;
+
+  /// No description provided for @cashToCollect.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash to Collect'**
+  String get cashToCollect;
+
+  /// No description provided for @cashToCollectAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Cash to collect: {amount}'**
+  String cashToCollectAmount(String amount);
+
+  /// No description provided for @paidViaGiftCard.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid via gift card'**
+  String get paidViaGiftCard;
+
+  /// No description provided for @paidInFullViaWallet.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid via gift card wallet'**
+  String get paidInFullViaWallet;
 }
 
 class _AppLocalizationsDelegate

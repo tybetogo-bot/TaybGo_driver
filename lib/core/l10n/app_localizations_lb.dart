@@ -2027,4 +2027,37 @@ class AppLocalizationsLb extends AppLocalizations {
   String notificationsUnreadCount(int count) {
     return '$count ongelies Notifikatiounen';
   }
+
+  @override
+  String get enterYourEmail => 'Gitt Är E-Mail-Adress an';
+
+  @override
+  String get pleaseEnterYourEmail => 'Gitt w.e.g. Är E-Mail-Adress an';
+
+  @override
+  String get pleaseEnterValidEmail => 'Gitt w.e.g. eng gülteg E-Mail-Adress an';
+
+  @override
+  String get emailRequiredTitle => 'E-Mail-Adress derbäisetzen';
+
+  @override
+  String get emailRequiredMessage =>
+      'Eng gülteg E-Mail-Adress ass elo fir all TaybGo-Chauffere verpflichtend. Setzt w.e.g. Är E-Mail derbäi fir weiderzefueren.';
+
+  @override
+  String get saveEmail => 'E-Mail späicheren';
+
+  @override
+  String get cashToCollect => 'Boergeld anzehuelen';
+
+  @override
+  String cashToCollectAmount(String amount) {
+    return 'Boergeld anzehuelen: $amount';
+  }
+
+  @override
+  String get paidViaGiftCard => 'Mat Kaddoskaart bezuelt';
+
+  @override
+  String get paidInFullViaWallet => 'Mat Kaddoskaarte-Wallet bezuelt';
 }

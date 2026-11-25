@@ -63,7 +63,9 @@
   "latestVersionLabel": "Latest version: {version}",
   "@latestVersionLabel": {
     "placeholders": {
-      "version": {"type": "String"}
+      "version": {
+        "type": "String"
+      }
     }
   },
   "updateNow": "Update now",
@@ -542,7 +544,6 @@
   "fastAndAgile": "Fast and agile",
   "mostVersatile": "Most versatile",
   "largeDeliveries": "Large deliveries",
-  "van": "Van",
   "deleteDataWarning": "This will permanently delete all your data including profile, ratings, and order history.",
   "finalConfirmation": "Final Confirmation",
   "finalDeleteWarning": "Are you absolutely sure? This action is irreversible and you will lose all your data.",
@@ -776,5 +777,22 @@
         "type": "int"
       }
     }
-  }
+  },
+  "enterYourEmail": "Enter your email address",
+  "pleaseEnterYourEmail": "Please enter your email address",
+  "pleaseEnterValidEmail": "Please enter a valid email address",
+  "emailRequiredTitle": "Add Your Email Address",
+  "emailRequiredMessage": "A valid email address is now required for all TaybGo drivers. Please add your email to continue.",
+  "saveEmail": "Save Email",
+  "cashToCollect": "Cash to Collect",
+  "cashToCollectAmount": "Cash to collect: {amount}",
+  "@cashToCollectAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paidViaGiftCard": "Paid via gift card",
+  "paidInFullViaWallet": "Paid via gift card wallet"
 }

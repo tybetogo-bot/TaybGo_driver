@@ -4,6 +4,7 @@ import '../api/api_client.dart';
 import '../api/api_constants.dart';
 import '../models/driver_address.dart';
 import '../utils/birthdate_utils.dart';
+import '../utils/email_utils.dart';
 
 class DriverRegistrationService {
   final ApiClient _apiClient;
@@ -15,6 +16,7 @@ class DriverRegistrationService {
   /// POST /api/driver/profile/
   Future<DriverRegistrationResult> registerDriver({
     required String name,
+    required String email,
     required String phone,
     required DateTime birthdate,
     required String vehicleType,
@@ -38,6 +40,7 @@ class DriverRegistrationService {
     try {
       final data = <String, dynamic>{
         'name': name,
+        'email': normalizeEmail(email),
         'phone': phone,
         'birthdate': BirthdateUtils.formatForApi(birthdate),
         'vehicle_type': vehicleType,

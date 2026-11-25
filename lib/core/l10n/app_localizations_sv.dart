@@ -2013,4 +2013,37 @@ class AppLocalizationsSv extends AppLocalizations {
   String notificationsUnreadCount(int count) {
     return '$count olästa aviseringar';
   }
+
+  @override
+  String get enterYourEmail => 'Ange din e-postadress';
+
+  @override
+  String get pleaseEnterYourEmail => 'Vänligen ange din e-postadress';
+
+  @override
+  String get pleaseEnterValidEmail => 'Vänligen ange en giltig e-postadress';
+
+  @override
+  String get emailRequiredTitle => 'Lägg till din e-postadress';
+
+  @override
+  String get emailRequiredMessage =>
+      'En giltig e-postadress krävs nu för alla TaybGo-förare. Lägg till din e-post för att fortsätta.';
+
+  @override
+  String get saveEmail => 'Spara e-post';
+
+  @override
+  String get cashToCollect => 'Kontant att inkassera';
+
+  @override
+  String cashToCollectAmount(String amount) {
+    return 'Kontant att inkassera: $amount';
+  }
+
+  @override
+  String get paidViaGiftCard => 'Betald med presentkort';
+
+  @override
+  String get paidInFullViaWallet => 'Betald via presentkortsplånbok';
 }

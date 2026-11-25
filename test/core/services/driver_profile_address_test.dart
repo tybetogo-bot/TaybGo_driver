@@ -90,6 +90,7 @@ void main() {
 
       final result = await service.registerDriver(
         name: 'Driver',
+        email: '  Driver@Example.COM  ',
         phone: '+966500000000',
         birthdate: DateTime(1990, 1, 1),
         vehicleType: 'CAR',
@@ -100,6 +101,7 @@ void main() {
       );
 
       final payload = client.postedData as Map<String, dynamic>;
+      expect(payload['email'], 'driver@example.com');
       expect(payload['address'], completeAddress.toCreateJson());
       expect(payload.containsKey('is_default'), isFalse);
       expect(result.address?.fullAddress, '12 King Street, Riyadh');
@@ -113,6 +115,7 @@ void main() {
 
       await service.registerDriver(
         name: 'Driver',
+        email: 'driver2@example.com',
         phone: '+966500000001',
         birthdate: DateTime(1990, 1, 1),
         vehicleType: 'CAR',

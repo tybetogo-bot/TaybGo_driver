@@ -16,6 +16,7 @@ import '../../../core/providers/driver_provider.dart';
 import '../../../core/services/cloudinary_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/birthdate_utils.dart';
+import '../../../core/utils/email_utils.dart';
 import '../../application/utils/document_picker.dart';
 
 enum _DocumentPickAction { camera, gallery, file }
@@ -48,6 +49,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   // Personal info controllers
   late TextEditingController _nameController;
+  late TextEditingController _emailController;
   late TextEditingController _phoneController;
   late TextEditingController _birthdateController;
 
@@ -113,6 +115,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     // Initialize personal info
     _nameController = TextEditingController(text: profile?.fullName ?? '');
+    _emailController = TextEditingController(text: profile?.email ?? '');
     _phoneController = TextEditingController(
       text: _digitsOnly(profile?.phone ?? ''),
     );
@@ -177,6 +180,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void dispose() {
     _driverProvider.removeListener(_handleDriverProfileChanged);
     _nameController.dispose();
+    _emailController.dispose();
     _phoneController.dispose();
     _birthdateController.dispose();
     _vehiclePlateNumberController.dispose();
@@ -215,6 +219,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   void _applyProfile(DriverProfile profile) {
     _nameController.text = profile.fullName;
+    _emailController.text = profile.email ?? '';
     _phoneController.text = _digitsOnly(profile.phone);
     _selectedBirthdate = profile.birthdate;
     _syncBirthdateController();
@@ -346,6 +351,14 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     return value.isEmpty ? null : value;
   }
 
+  String? _emailUpdate() {
+    final profile = _driverProvider.profile;
+    final value = normalizeEmail(_emailController.text);
+    final original = normalizeEmail(profile?.email ?? '');
+    if (profile == null || value == original) return null;
+    return value.isEmpty ? null : value;
+  }
+
   String? _phoneUpdate() {
     final profile = _driverProvider.profile;
     final value = _digitsOnly(_phoneController.text);
@@ -402,6 +415,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
     final success = await driverProvider.updateUserProfile(
       name: _nameUpdate(),
+      email: _emailUpdate(),
       phone: _phoneUpdate(),
       birthdate: _birthdateUpdate(),
       vehicleType: hasVehicleChanges ? _selectedVehicleType : null,
@@ -606,6 +620,36 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return l10n.pleaseEnterYourName;
+                  }
+                  return null;
+                },
+              ),
+
+              const SizedBox(height: 16),
+
+              // Email
+              _buildFieldLabel(
+                Icons.email_outlined,
+                l10n.email,
+                secondaryColor,
+              ),
+              const SizedBox(height: 8),
+              _buildTextField(
+                controller: _emailController,
+                hint: l10n.enterYourEmail,
+                keyboardType: TextInputType.emailAddress,
+                textDirection: TextDirection.ltr,
+                surfaceColor: surfaceColor,
+                borderColor: borderColor,
+                textColor: textColor,
+                hintColor: hintColor,
+                validator: (value) {
+                  final normalized = normalizeEmail(value ?? '');
+                  if (normalized.isEmpty) {
+                    return l10n.pleaseEnterYourEmail;
+                  }
+                  if (!isValidNormalizedEmail(normalized)) {
+                    return l10n.pleaseEnterValidEmail;
                   }
                   return null;
                 },

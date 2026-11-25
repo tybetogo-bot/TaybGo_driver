@@ -2012,4 +2012,38 @@ class AppLocalizationsNb extends AppLocalizations {
   String notificationsUnreadCount(int count) {
     return '$count uleste varsler';
   }
+
+  @override
+  String get enterYourEmail => 'Skriv inn e-postadressen din';
+
+  @override
+  String get pleaseEnterYourEmail => 'Vennligst skriv inn e-postadressen din';
+
+  @override
+  String get pleaseEnterValidEmail =>
+      'Vennligst skriv inn en gyldig e-postadresse';
+
+  @override
+  String get emailRequiredTitle => 'Legg til e-postadressen din';
+
+  @override
+  String get emailRequiredMessage =>
+      'En gyldig e-postadresse er nå påkrevd for alle TaybGo-sjåfører. Legg til e-posten din for å fortsette.';
+
+  @override
+  String get saveEmail => 'Lagre e-post';
+
+  @override
+  String get cashToCollect => 'Kontant å kreve inn';
+
+  @override
+  String cashToCollectAmount(String amount) {
+    return 'Kontant å kreve inn: $amount';
+  }
+
+  @override
+  String get paidViaGiftCard => 'Betalt med gavekort';
+
+  @override
+  String get paidInFullViaWallet => 'Betalt med gavekort-lommebok';
 }

@@ -7,6 +7,7 @@ class DriverProfile {
   final String? lastName;
   final String phone;
   final String? email;
+  final bool needsEmail;
   final String? avatarUrl;
   final double rating;
   final int totalOrders;
@@ -42,6 +43,7 @@ class DriverProfile {
     this.lastName,
     required this.phone,
     this.email,
+    bool? needsEmail,
     this.avatarUrl,
     this.rating = 0.0,
     this.totalOrders = 0,
@@ -70,7 +72,7 @@ class DriverProfile {
     this.address,
     this.bankDocument,
     this.createdAt,
-  });
+  }) : needsEmail = needsEmail ?? (email == null || email.trim().isEmpty);
 
   String get fullName {
     if (firstName == null && lastName == null) return 'Driver';
@@ -142,7 +144,14 @@ class DriverProfile {
       firstName: firstName,
       lastName: lastName,
       phone: user['phone'] ?? json['phone'] ?? '',
-      email: user['email'] ?? json['email'],
+      email: (user['email'] ?? json['email'])?.toString(),
+      needsEmail: json['needs_email'] != null
+          ? (json['needs_email'] == true ||
+              json['needs_email'] == 1 ||
+              json['needs_email'] == '1' ||
+              json['needs_email'] == 'true')
+          : ((user['email'] ?? json['email'])?.toString().trim().isEmpty ??
+              true),
       avatarUrl: json['avatar'] ?? json['avatar_url'] ?? user['avatar'],
       rating: _parseDouble(json['rating'] ?? json['average_rating']),
       totalOrders: _parseInt(json['total_orders'] ?? json['orders_count']),
@@ -202,6 +211,7 @@ class DriverProfile {
     String? lastName,
     String? phone,
     String? email,
+    bool? needsEmail,
     String? avatarUrl,
     double? rating,
     int? totalOrders,
@@ -237,6 +247,8 @@ class DriverProfile {
       lastName: lastName ?? this.lastName,
       phone: phone ?? this.phone,
       email: email ?? this.email,
+      needsEmail: needsEmail ??
+          (email != null ? email.trim().isEmpty : this.needsEmail),
       avatarUrl: avatarUrl ?? this.avatarUrl,
       rating: rating ?? this.rating,
       totalOrders: totalOrders ?? this.totalOrders,

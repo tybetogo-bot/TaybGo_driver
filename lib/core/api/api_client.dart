@@ -587,6 +587,13 @@ class ApiException implements Exception {
         message = responseData['message'].toString();
       } else if (responseData.containsKey('error')) {
         message = responseData['error'].toString();
+      } else if (responseData.isNotEmpty) {
+        final firstValue = responseData.values.first;
+        if (firstValue is List && firstValue.isNotEmpty) {
+          message = firstValue.first.toString();
+        } else if (firstValue != null && firstValue.toString().trim().isNotEmpty) {
+          message = firstValue.toString();
+        }
       }
     } else if (e.type == DioExceptionType.connectionTimeout) {
       message = 'Connection timed out';

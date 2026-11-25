@@ -521,5 +521,15 @@
   "changelogVersion0910Release": "L'application chauffeur est sortie en version 1.0.9+10.",
   "notificationsAllRead": "Tout lu",
   "notificationsNewCount": "{count} nouv.",
-  "notificationsUnreadCount": "{count} notifications non lues"
+  "notificationsUnreadCount": "{count} notifications non lues",
+  "enterYourEmail": "Entrez votre adresse e-mail",
+  "pleaseEnterYourEmail": "Veuillez entrer votre adresse e-mail",
+  "pleaseEnterValidEmail": "Veuillez entrer une adresse e-mail valide",
+  "emailRequiredTitle": "Ajouter votre adresse e-mail",
+  "emailRequiredMessage": "Une adresse e-mail valide est désormais requise pour tous les chauffeurs TaybGo. Veuillez ajouter votre e-mail pour continuer.",
+  "saveEmail": "Enregistrer l’e-mail",
+  "cashToCollect": "Espèces à encaisser",
+  "cashToCollectAmount": "Espèces à encaisser : {amount}",
+  "paidViaGiftCard": "Payé par carte-cadeau",
+  "paidInFullViaWallet": "Payé via le solde carte-cadeau"
 }

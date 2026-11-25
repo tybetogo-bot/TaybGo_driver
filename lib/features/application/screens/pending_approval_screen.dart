@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/constants/route_constants.dart';
 import '../../../core/l10n/app_localizations.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../shared/widgets/mandatory_email_gate.dart';
 
 class PendingApprovalScreen extends StatelessWidget {
   const PendingApprovalScreen({super.key});
@@ -15,8 +16,9 @@ class PendingApprovalScreen extends StatelessWidget {
     final surfaceColor = isDark ? AppColors.darkSurface : AppColors.lightSurface;
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      body: SafeArea(
+    return MandatoryEmailGate(
+      child: Scaffold(
+        body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.all(32),
           child: Column(
@@ -163,6 +165,7 @@ class PendingApprovalScreen extends StatelessWidget {
             ],
           ),
         ),
+      ),
       ),
     );
   }

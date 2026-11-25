@@ -2013,4 +2013,37 @@ class AppLocalizationsIt extends AppLocalizations {
   String notificationsUnreadCount(int count) {
     return '$count notifiche non lette';
   }
+
+  @override
+  String get enterYourEmail => 'Inserisci il tuo indirizzo e-mail';
+
+  @override
+  String get pleaseEnterYourEmail => 'Inserisci il tuo indirizzo e-mail';
+
+  @override
+  String get pleaseEnterValidEmail => 'Inserisci un indirizzo e-mail valido';
+
+  @override
+  String get emailRequiredTitle => 'Aggiungi il tuo indirizzo e-mail';
+
+  @override
+  String get emailRequiredMessage =>
+      'Un indirizzo e-mail valido è ora obbligatorio per tutti gli autisti TaybGo. Aggiungi la tua e-mail per continuare.';
+
+  @override
+  String get saveEmail => 'Salva e-mail';
+
+  @override
+  String get cashToCollect => 'Contanti da incassare';
+
+  @override
+  String cashToCollectAmount(String amount) {
+    return 'Contanti da incassare: $amount';
+  }
+
+  @override
+  String get paidViaGiftCard => 'Pagato con carta regalo';
+
+  @override
+  String get paidInFullViaWallet => 'Pagato tramite wallet regalo';
 }

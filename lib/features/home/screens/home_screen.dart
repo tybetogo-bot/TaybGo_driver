@@ -2026,6 +2026,53 @@ class _HomeScreenState extends State<HomeScreen>
                   order.formattedDriverDeliveryFee,
                   secondaryColor,
                 ),
+                if (order.hasGiftCardApplied) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.paidViaGiftCard,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          color: AppColors.success,
+                        ),
+                      ),
+                      Text(
+                        '-${order.formattedGiftCardApplied}',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.success,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+                if (order.needsCashCollection) ...[
+                  const SizedBox(height: 6),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        l10n.cashToCollect,
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.error,
+                        ),
+                      ),
+                      Text(
+                        order.formattedCashToCollect,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.error,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),
@@ -2409,13 +2456,39 @@ class _HomeScreenState extends State<HomeScreen>
                   ),
                 ],
               ),
-              Text(
-                order.formattedDriverDeliveryFee,
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: textColor,
-                ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(
+                    order.formattedDriverDeliveryFee,
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: textColor,
+                    ),
+                  ),
+                  if (order.needsCashCollection) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.cashToCollectAmount(order.formattedCashToCollect),
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.error,
+                      ),
+                    ),
+                  ] else if (order.isPaidViaWalletOnly) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                      l10n.paidInFullViaWallet,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.success,
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ],
           ),
@@ -2667,6 +2740,17 @@ class _HomeScreenState extends State<HomeScreen>
                     color: AppColors.primary,
                   ),
                 ),
+                if (order.needsCashCollection) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    l10n.cashToCollectAmount(order.formattedCashToCollect),
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.error,
+                    ),
+                  ),
+                ],
                 const SizedBox(height: 4),
                 Icon(Icons.arrow_forward_ios, size: 14, color: secondaryColor),
               ],

@@ -521,5 +521,15 @@
   "changelogVersion0910Release": "Die Fahrer-App wurde in Version 1.0.9+10 veröffentlicht.",
   "notificationsAllRead": "Alle gelesen",
   "notificationsNewCount": "{count} neu",
-  "notificationsUnreadCount": "{count} ungelesene Benachrichtigungen"
+  "notificationsUnreadCount": "{count} ungelesene Benachrichtigungen",
+  "enterYourEmail": "Geben Sie Ihre E-Mail-Adresse ein",
+  "pleaseEnterYourEmail": "Bitte geben Sie Ihre E-Mail-Adresse ein",
+  "pleaseEnterValidEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein",
+  "emailRequiredTitle": "E-Mail-Adresse hinzufügen",
+  "emailRequiredMessage": "Für alle TaybGo-Fahrer ist jetzt eine gültige E-Mail-Adresse erforderlich. Bitte fügen Sie Ihre E-Mail hinzu, um fortzufahren.",
+  "saveEmail": "E-Mail speichern",
+  "cashToCollect": "Bar zu kassieren",
+  "cashToCollectAmount": "Bar zu kassieren: {amount}",
+  "paidViaGiftCard": "Per Geschenkkarte bezahlt",
+  "paidInFullViaWallet": "Über Geschenkkarten-Guthaben bezahlt"
 }

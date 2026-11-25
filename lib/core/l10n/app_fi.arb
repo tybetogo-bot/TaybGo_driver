@@ -563,5 +563,15 @@
   "changelogVersion0910Release": "Kuljettajasovellus julkaistiin versiona 1.0.9+10.",
   "notificationsAllRead": "Kaikki luettu",
   "notificationsNewCount": "{count} uutta",
-  "notificationsUnreadCount": "{count} lukematonta ilmoitusta"
+  "notificationsUnreadCount": "{count} lukematonta ilmoitusta",
+  "enterYourEmail": "Kirjoita sähköpostiosoitteesi",
+  "pleaseEnterYourEmail": "Kirjoita sähköpostiosoitteesi",
+  "pleaseEnterValidEmail": "Kirjoita kelvollinen sähköpostiosoite",
+  "emailRequiredTitle": "Lisää sähköpostiosoitteesi",
+  "emailRequiredMessage": "Kelvollinen sähköpostiosoite vaaditaan nyt kaikilta TaybGo-kuljettajilta. Lisää sähköpostisi jatkaaksesi.",
+  "saveEmail": "Tallenna sähköposti",
+  "cashToCollect": "Käteinen perittäväksi",
+  "cashToCollectAmount": "Käteinen perittäväksi: {amount}",
+  "paidViaGiftCard": "Maksettu lahjakortilla",
+  "paidInFullViaWallet": "Maksettu lahjakorttilompakolla"
 }

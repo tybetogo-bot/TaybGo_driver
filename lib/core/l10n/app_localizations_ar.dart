@@ -1998,4 +1998,37 @@ class AppLocalizationsAr extends AppLocalizations {
   String notificationsUnreadCount(int count) {
     return '$count إشعارات غير مقروءة';
   }
+
+  @override
+  String get enterYourEmail => 'أدخل بريدك الإلكتروني';
+
+  @override
+  String get pleaseEnterYourEmail => 'يرجى إدخال بريدك الإلكتروني';
+
+  @override
+  String get pleaseEnterValidEmail => 'يرجى إدخال بريد إلكتروني صالح';
+
+  @override
+  String get emailRequiredTitle => 'أضف بريدك الإلكتروني';
+
+  @override
+  String get emailRequiredMessage =>
+      'أصبح البريد الإلكتروني الصالح مطلوباً الآن لجميع سائقي TaybGo. يرجى إضافة بريدك الإلكتروني للمتابعة.';
+
+  @override
+  String get saveEmail => 'حفظ البريد الإلكتروني';
+
+  @override
+  String get cashToCollect => 'المبلغ النقدي للتحصيل';
+
+  @override
+  String cashToCollectAmount(String amount) {
+    return 'للتحصيل نقداً: $amount';
+  }
+
+  @override
+  String get paidViaGiftCard => 'مدفوع ببطاقة الهدايا';
+
+  @override
+  String get paidInFullViaWallet => 'مدفوع بالكامل من محفظة الهدايا';
 }

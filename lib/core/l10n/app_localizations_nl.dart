@@ -2016,4 +2016,38 @@ class AppLocalizationsNl extends AppLocalizations {
   String notificationsUnreadCount(int count) {
     return '$count ongelezen meldingen';
   }
+
+  @override
+  String get enterYourEmail => 'Voer uw e-mailadres in';
+
+  @override
+  String get pleaseEnterYourEmail => 'Voer alstublieft uw e-mailadres in';
+
+  @override
+  String get pleaseEnterValidEmail =>
+      'Voer alstublieft een geldig e-mailadres in';
+
+  @override
+  String get emailRequiredTitle => 'Voeg uw e-mailadres toe';
+
+  @override
+  String get emailRequiredMessage =>
+      'Een geldig e-mailadres is nu verplicht voor alle TaybGo-chauffeurs. Voeg uw e-mailadres toe om door te gaan.';
+
+  @override
+  String get saveEmail => 'E-mail opslaan';
+
+  @override
+  String get cashToCollect => 'Contant te ontvangen';
+
+  @override
+  String cashToCollectAmount(String amount) {
+    return 'Contant te ontvangen: $amount';
+  }
+
+  @override
+  String get paidViaGiftCard => 'Betaald met cadeaukaart';
+
+  @override
+  String get paidInFullViaWallet => 'Betaald via cadeaukaart-wallet';
 }

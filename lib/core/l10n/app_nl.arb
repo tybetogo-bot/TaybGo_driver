@@ -563,5 +563,15 @@
   "changelogVersion0910Release": "De chauffeursapp is uitgebracht als versie 1.0.9+10.",
   "notificationsAllRead": "Alles gelezen",
   "notificationsNewCount": "{count} nieuw",
-  "notificationsUnreadCount": "{count} ongelezen meldingen"
+  "notificationsUnreadCount": "{count} ongelezen meldingen",
+  "enterYourEmail": "Voer uw e-mailadres in",
+  "pleaseEnterYourEmail": "Voer alstublieft uw e-mailadres in",
+  "pleaseEnterValidEmail": "Voer alstublieft een geldig e-mailadres in",
+  "emailRequiredTitle": "Voeg uw e-mailadres toe",
+  "emailRequiredMessage": "Een geldig e-mailadres is nu verplicht voor alle TaybGo-chauffeurs. Voeg uw e-mailadres toe om door te gaan.",
+  "saveEmail": "E-mail opslaan",
+  "cashToCollect": "Contant te ontvangen",
+  "cashToCollectAmount": "Contant te ontvangen: {amount}",
+  "paidViaGiftCard": "Betaald met cadeaukaart",
+  "paidInFullViaWallet": "Betaald via cadeaukaart-wallet"
 }

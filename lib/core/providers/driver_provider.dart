@@ -138,6 +138,7 @@ class DriverProvider extends ChangeNotifier {
 
   Future<bool> updateUserProfile({
     String? name,
+    String? email,
     String? phone,
     DateTime? birthdate,
     String? vehicleType,
@@ -167,6 +168,7 @@ class DriverProvider extends ChangeNotifier {
     try {
       final updatedProfile = await _driverService.updateUserProfile(
         name: name,
+        email: email,
         phone: phone,
         birthdate: birthdate,
         vehicleType: vehicleType,
@@ -190,11 +192,18 @@ class DriverProvider extends ChangeNotifier {
       );
       if (generation != _stateGeneration) return false;
       _profile = updatedProfile;
+      _isLoading = false;
       notifyListeners();
       // Refresh driver profile to reflect changes
       await fetchProfile();
       if (generation != _stateGeneration) return false;
       return true;
+    } on ApiException catch (e) {
+      if (generation != _stateGeneration) return false;
+      _error = e.message;
+      _isLoading = false;
+      notifyListeners();
+      return false;
     } catch (e) {
       if (generation != _stateGeneration) return false;
       _error = e.toString();
